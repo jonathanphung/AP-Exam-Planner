@@ -16,6 +16,8 @@ export const meta = {
 //   cards: [{ number, status, title }],     // output of super-board-wave-plan.sh
 //   humanApprovesMerge: boolean (optional, default false),
 //   tier: 'low' | 'medium' | 'high' (optional, default 'medium'),  // run model ladder
+//   repoRoot: '/abs/path/to/repo' (optional),  // anchors lane agents when the
+//                                              // orchestrator session cwd is not the repo
 // }
 // The harness can deliver `args` as a JSON-encoded string (the tool param is
 // untyped) — normalize before validating.
@@ -29,6 +31,11 @@ if (!input || !Array.isArray(input.cards) || !input.configPath || !input.variant
 if (input.tier && !['low', 'medium', 'high'].includes(input.tier)) {
   throw new Error(`super-board-wave: unknown tier "${input.tier}" — use low | medium | high`)
 }
+
+const ROOT = input.repoRoot ? String(input.repoRoot).replace(/\/+$/, '') : null
+const rootPreamble = ROOT
+  ? `Repo root: ${ROOT} — cd there first; every repo-relative path (.claude/..., .worktrees/, docs/...) resolves against it.\n`
+  : ''
 
 const CLASSIFY_SCHEMA = {
   type: 'object',
@@ -69,7 +76,7 @@ const withReviewLock = (fn) => {
   return run
 }
 
-const lanePrompt = (lane, card) => [
+const lanePrompt = (lane, card) => rootPreamble + [
   // "for super-board run" is the literal trigger substring the lane skills
   // match to switch from standalone mode to the issue-scoped super-board
   // lifecycle (same phrase the legacy dispatcher uses) — do not reword it.
@@ -121,6 +128,7 @@ const results = await pipeline(
   async (card) => {
     if (card.status !== 'Ready') return { card, cls: null }
     const cls = await agent(
+      rootPreamble +
       `Read GitHub issue #${card.number} ("${card.title}") — body and all comments — using gh issue view. ` +
       `Classify it: kind (feature|bug|docs|chore) and complexity (low|medium|high) judged by the scope of code change required.`,
       { label: `classify:#${card.number}`, phase: 'Classify', model: classifyModel, schema: CLASSIFY_SCHEMA }
