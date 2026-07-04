@@ -1,0 +1,750 @@
+{
+  "cycle": "May 2026",
+  "lastVerified": "2026-07-04",
+  "sessionStartTimes": {
+    "AM": "8 a.m. local time",
+    "PM": "12 p.m. local time"
+  },
+  "subjects": [
+    {
+      "id": "african-american-studies",
+      "name": "AP African American Studies",
+      "category": "Humanities",
+      "exam": { "date": "2026-05-07", "session": "PM" },
+      "lateTesting": { "date": "2026-05-19", "session": "PM" },
+      "format": {
+        "mcqCount": 60,
+        "frqCount": 5,
+        "frqType": "1 project-validation written response, 3 short-answer questions, 1 document-based question",
+        "totalMinutes": 165,
+        "calculator": false,
+        "delivery": "digital"
+      },
+      "passRate": 77,
+      "portfolio": null
+    },
+    {
+      "id": "art-history",
+      "name": "AP Art History",
+      "category": "Arts",
+      "exam": { "date": "2026-05-14", "session": "AM" },
+      "lateTesting": { "date": "2026-05-21", "session": "PM" },
+      "format": {
+        "mcqCount": 80,
+        "frqCount": 6,
+        "frqType": "6 essay questions (2 long, 4 short)",
+        "totalMinutes": 180,
+        "calculator": false,
+        "delivery": "digital"
+      },
+      "passRate": 67,
+      "portfolio": null
+    },
+    {
+      "id": "biology",
+      "name": "AP Biology",
+      "category": "STEM",
+      "exam": { "date": "2026-05-04", "session": "AM" },
+      "lateTesting": { "date": "2026-05-20", "session": "PM" },
+      "format": {
+        "mcqCount": 60,
+        "frqCount": 6,
+        "frqType": "6 free-response questions (2 long, 4 short)",
+        "totalMinutes": 180,
+        "calculator": true,
+        "delivery": "hybrid"
+      },
+      "passRate": 71,
+      "portfolio": null
+    },
+    {
+      "id": "business-with-personal-finance",
+      "name": "AP Business with Personal Finance",
+      "category": "Career Kickstart",
+      "exam": null,
+      "lateTesting": null,
+      "noExamReason": "First end-of-course exam administration is May 2027; College Board states the 2027 AP Exam dates will be available in summer 2026. No May 2026 exam exists for this course.",
+      "format": {
+        "mcqCount": 60,
+        "frqCount": 4,
+        "frqType": "1 Business Canvas Project validation question + 3 scenario-based free-response questions",
+        "totalMinutes": 160,
+        "calculator": false,
+        "delivery": "digital"
+      },
+      "passRate": "pending",
+      "portfolio": null
+    },
+    {
+      "id": "calculus-ab",
+      "name": "AP Calculus AB",
+      "category": "STEM",
+      "exam": { "date": "2026-05-11", "session": "AM" },
+      "lateTesting": { "date": "2026-05-21", "session": "PM" },
+      "format": {
+        "mcqCount": 45,
+        "frqCount": 6,
+        "frqType": "6 free-response questions (calculator and no-calculator parts)",
+        "totalMinutes": 195,
+        "calculator": true,
+        "delivery": "hybrid"
+      },
+      "passRate": 65,
+      "portfolio": null
+    },
+    {
+      "id": "calculus-bc",
+      "name": "AP Calculus BC",
+      "category": "STEM",
+      "exam": { "date": "2026-05-11", "session": "AM" },
+      "lateTesting": { "date": "2026-05-21", "session": "PM" },
+      "format": {
+        "mcqCount": 45,
+        "frqCount": 6,
+        "frqType": "6 free-response questions (calculator and no-calculator parts)",
+        "totalMinutes": 195,
+        "calculator": true,
+        "delivery": "hybrid"
+      },
+      "passRate": 82,
+      "portfolio": null
+    },
+    {
+      "id": "chemistry",
+      "name": "AP Chemistry",
+      "category": "STEM",
+      "exam": { "date": "2026-05-05", "session": "AM" },
+      "lateTesting": { "date": "2026-05-20", "session": "PM" },
+      "format": {
+        "mcqCount": 60,
+        "frqCount": 7,
+        "frqType": "7 free-response questions (3 long, 4 short)",
+        "totalMinutes": 195,
+        "calculator": true,
+        "delivery": "hybrid"
+      },
+      "passRate": 75,
+      "portfolio": null
+    },
+    {
+      "id": "chinese-language-and-culture",
+      "name": "AP Chinese Language and Culture",
+      "category": "Languages",
+      "exam": { "date": "2026-05-08", "session": "PM" },
+      "lateTesting": { "date": "2026-05-21", "session": "AM" },
+      "format": {
+        "mcqCount": "55–75",
+        "frqCount": 4,
+        "frqType": "2 written tasks + 2 spoken tasks",
+        "totalMinutes": 120,
+        "calculator": false,
+        "delivery": "digital"
+      },
+      "passRate": 85,
+      "portfolio": null
+    },
+    {
+      "id": "comparative-government-and-politics",
+      "name": "AP Comparative Government and Politics",
+      "category": "Humanities",
+      "exam": { "date": "2026-05-06", "session": "PM" },
+      "lateTesting": { "date": "2026-05-18", "session": "AM" },
+      "format": {
+        "mcqCount": 55,
+        "frqCount": 4,
+        "frqType": "4 free-response questions (concept application, quantitative analysis, comparative analysis, argument essay)",
+        "totalMinutes": 150,
+        "calculator": false,
+        "delivery": "digital"
+      },
+      "passRate": 70,
+      "portfolio": null
+    },
+    {
+      "id": "computer-science-a",
+      "name": "AP Computer Science A",
+      "category": "STEM",
+      "exam": { "date": "2026-05-15", "session": "PM" },
+      "lateTesting": { "date": "2026-05-22", "session": "PM" },
+      "format": {
+        "mcqCount": 42,
+        "frqCount": 4,
+        "frqType": "4 code-writing free-response questions",
+        "totalMinutes": 180,
+        "calculator": false,
+        "delivery": "digital"
+      },
+      "passRate": 66,
+      "portfolio": null
+    },
+    {
+      "id": "computer-science-principles",
+      "name": "AP Computer Science Principles",
+      "category": "STEM",
+      "exam": { "date": "2026-05-14", "session": "PM" },
+      "lateTesting": { "date": "2026-05-21", "session": "AM" },
+      "format": {
+        "mcqCount": 70,
+        "frqCount": 2,
+        "frqType": "2 written-response questions about the student's Create performance task",
+        "totalMinutes": 180,
+        "calculator": false,
+        "delivery": "digital"
+      },
+      "passRate": 63,
+      "portfolio": {
+        "deadline": "2026-04-30",
+        "weightPct": 30,
+        "note": "Create performance task submitted as final in the AP Digital Portfolio by 11:59 p.m. ET; together with the exam-day written responses it counts for 30% of the AP score."
+      }
+    },
+    {
+      "id": "cybersecurity",
+      "name": "AP Cybersecurity",
+      "category": "Career Kickstart",
+      "exam": null,
+      "lateTesting": null,
+      "noExamReason": "First end-of-course exam administration is May 2027; College Board states the 2027 AP Exam dates will be available in summer 2026. No May 2026 exam exists for this course.",
+      "format": {
+        "mcqCount": 60,
+        "frqCount": 1,
+        "frqType": "1 multi-source analysis free-response question",
+        "totalMinutes": 130,
+        "calculator": false,
+        "delivery": "digital"
+      },
+      "passRate": "pending",
+      "portfolio": null
+    },
+    {
+      "id": "english-language-and-composition",
+      "name": "AP English Language and Composition",
+      "category": "Humanities",
+      "exam": { "date": "2026-05-13", "session": "AM" },
+      "lateTesting": { "date": "2026-05-21", "session": "AM" },
+      "format": {
+        "mcqCount": 45,
+        "frqCount": 3,
+        "frqType": "3 essays (synthesis, rhetorical analysis, argument)",
+        "totalMinutes": 195,
+        "calculator": false,
+        "delivery": "digital"
+      },
+      "passRate": 73,
+      "portfolio": null
+    },
+    {
+      "id": "english-literature-and-composition",
+      "name": "AP English Literature and Composition",
+      "category": "Humanities",
+      "exam": { "date": "2026-05-06", "session": "AM" },
+      "lateTesting": { "date": "2026-05-18", "session": "PM" },
+      "format": {
+        "mcqCount": 55,
+        "frqCount": 3,
+        "frqType": "3 essays (poetry analysis, prose fiction analysis, thematic analysis)",
+        "totalMinutes": 180,
+        "calculator": false,
+        "delivery": "digital"
+      },
+      "passRate": 75,
+      "portfolio": null
+    },
+    {
+      "id": "environmental-science",
+      "name": "AP Environmental Science",
+      "category": "STEM",
+      "exam": { "date": "2026-05-15", "session": "AM" },
+      "lateTesting": { "date": "2026-05-22", "session": "AM" },
+      "format": {
+        "mcqCount": 80,
+        "frqCount": 3,
+        "frqType": "3 free-response questions",
+        "totalMinutes": 160,
+        "calculator": true,
+        "delivery": "digital"
+      },
+      "passRate": 69,
+      "portfolio": null
+    },
+    {
+      "id": "european-history",
+      "name": "AP European History",
+      "category": "Humanities",
+      "exam": { "date": "2026-05-04", "session": "PM" },
+      "lateTesting": { "date": "2026-05-18", "session": "AM" },
+      "format": {
+        "mcqCount": 55,
+        "frqCount": 5,
+        "frqType": "3 short-answer questions, 1 document-based question, 1 long essay",
+        "totalMinutes": 195,
+        "calculator": false,
+        "delivery": "digital"
+      },
+      "passRate": 74,
+      "portfolio": null
+    },
+    {
+      "id": "french-language-and-culture",
+      "name": "AP French Language and Culture",
+      "category": "Languages",
+      "exam": { "date": "2026-05-12", "session": "AM" },
+      "lateTesting": { "date": "2026-05-20", "session": "PM" },
+      "format": {
+        "mcqCount": 65,
+        "frqCount": 4,
+        "frqType": "2 written tasks + 2 spoken tasks",
+        "totalMinutes": 180,
+        "calculator": false,
+        "delivery": "paper"
+      },
+      "passRate": 71,
+      "portfolio": null
+    },
+    {
+      "id": "german-language-and-culture",
+      "name": "AP German Language and Culture",
+      "category": "Languages",
+      "exam": { "date": "2026-05-13", "session": "AM" },
+      "lateTesting": { "date": "2026-05-22", "session": "PM" },
+      "format": {
+        "mcqCount": 65,
+        "frqCount": 4,
+        "frqType": "2 written tasks + 2 spoken tasks",
+        "totalMinutes": 183,
+        "calculator": false,
+        "delivery": "paper"
+      },
+      "passRate": 68,
+      "portfolio": null
+    },
+    {
+      "id": "human-geography",
+      "name": "AP Human Geography",
+      "category": "Humanities",
+      "exam": { "date": "2026-05-05", "session": "AM" },
+      "lateTesting": { "date": "2026-05-18", "session": "PM" },
+      "format": {
+        "mcqCount": 60,
+        "frqCount": 3,
+        "frqType": "3 free-response questions",
+        "totalMinutes": 135,
+        "calculator": false,
+        "delivery": "digital"
+      },
+      "passRate": 66,
+      "portfolio": null
+    },
+    {
+      "id": "italian-language-and-culture",
+      "name": "AP Italian Language and Culture",
+      "category": "Languages",
+      "exam": { "date": "2026-05-08", "session": "AM" },
+      "lateTesting": { "date": "2026-05-21", "session": "PM" },
+      "format": {
+        "mcqCount": 65,
+        "frqCount": 4,
+        "frqType": "2 written tasks + 2 spoken tasks",
+        "totalMinutes": 180,
+        "calculator": false,
+        "delivery": "paper"
+      },
+      "passRate": 69,
+      "portfolio": null
+    },
+    {
+      "id": "japanese-language-and-culture",
+      "name": "AP Japanese Language and Culture",
+      "category": "Languages",
+      "exam": { "date": "2026-05-12", "session": "PM" },
+      "lateTesting": { "date": "2026-05-19", "session": "AM" },
+      "format": {
+        "mcqCount": "60–75",
+        "frqCount": 4,
+        "frqType": "2 written tasks + 2 spoken tasks",
+        "totalMinutes": 120,
+        "calculator": false,
+        "delivery": "digital"
+      },
+      "passRate": 72,
+      "portfolio": null
+    },
+    {
+      "id": "latin",
+      "name": "AP Latin",
+      "category": "Languages",
+      "exam": { "date": "2026-05-04", "session": "AM" },
+      "lateTesting": { "date": "2026-05-18", "session": "PM" },
+      "format": {
+        "mcqCount": 52,
+        "frqCount": 5,
+        "frqType": "translation, short-answer, and short-essay questions (5 questions)",
+        "totalMinutes": 180,
+        "calculator": false,
+        "delivery": "digital"
+      },
+      "passRate": 73,
+      "portfolio": null
+    },
+    {
+      "id": "macroeconomics",
+      "name": "AP Macroeconomics",
+      "category": "Humanities",
+      "exam": { "date": "2026-05-08", "session": "PM" },
+      "lateTesting": { "date": "2026-05-20", "session": "PM" },
+      "format": {
+        "mcqCount": 60,
+        "frqCount": 3,
+        "frqType": "3 free-response questions (1 long, 2 short)",
+        "totalMinutes": 130,
+        "calculator": true,
+        "delivery": "hybrid"
+      },
+      "passRate": 66,
+      "portfolio": null
+    },
+    {
+      "id": "microeconomics",
+      "name": "AP Microeconomics",
+      "category": "Humanities",
+      "exam": { "date": "2026-05-04", "session": "PM" },
+      "lateTesting": { "date": "2026-05-20", "session": "AM" },
+      "format": {
+        "mcqCount": 60,
+        "frqCount": 3,
+        "frqType": "3 free-response questions (1 long, 2 short)",
+        "totalMinutes": 130,
+        "calculator": true,
+        "delivery": "hybrid"
+      },
+      "passRate": 68,
+      "portfolio": null
+    },
+    {
+      "id": "music-theory",
+      "name": "AP Music Theory",
+      "category": "Arts",
+      "exam": { "date": "2026-05-11", "session": "PM" },
+      "lateTesting": { "date": "2026-05-21", "session": "AM" },
+      "format": {
+        "mcqCount": 75,
+        "frqCount": 9,
+        "frqType": "7 written free-response questions + 2 sight-singing questions",
+        "totalMinutes": 160,
+        "calculator": false,
+        "delivery": "paper"
+      },
+      "passRate": 59,
+      "portfolio": null
+    },
+    {
+      "id": "physics-1",
+      "name": "AP Physics 1: Algebra-Based",
+      "category": "STEM",
+      "exam": { "date": "2026-05-06", "session": "PM" },
+      "lateTesting": { "date": "2026-05-22", "session": "AM" },
+      "format": {
+        "mcqCount": 40,
+        "frqCount": 4,
+        "frqType": "4 free-response questions",
+        "totalMinutes": 180,
+        "calculator": true,
+        "delivery": "hybrid"
+      },
+      "passRate": 68,
+      "portfolio": null
+    },
+    {
+      "id": "physics-2",
+      "name": "AP Physics 2: Algebra-Based",
+      "category": "STEM",
+      "exam": { "date": "2026-05-07", "session": "AM" },
+      "lateTesting": { "date": "2026-05-21", "session": "PM" },
+      "format": {
+        "mcqCount": 40,
+        "frqCount": 4,
+        "frqType": "4 free-response questions",
+        "totalMinutes": 180,
+        "calculator": true,
+        "delivery": "hybrid"
+      },
+      "passRate": 72,
+      "portfolio": null
+    },
+    {
+      "id": "physics-c-electricity-and-magnetism",
+      "name": "AP Physics C: Electricity and Magnetism",
+      "category": "STEM",
+      "exam": { "date": "2026-05-14", "session": "PM" },
+      "lateTesting": { "date": "2026-05-22", "session": "PM" },
+      "format": {
+        "mcqCount": 40,
+        "frqCount": 4,
+        "frqType": "4 free-response questions",
+        "totalMinutes": 180,
+        "calculator": true,
+        "delivery": "hybrid"
+      },
+      "passRate": 75,
+      "portfolio": null
+    },
+    {
+      "id": "physics-c-mechanics",
+      "name": "AP Physics C: Mechanics",
+      "category": "STEM",
+      "exam": { "date": "2026-05-13", "session": "PM" },
+      "lateTesting": { "date": "2026-05-21", "session": "PM" },
+      "format": {
+        "mcqCount": 40,
+        "frqCount": 4,
+        "frqType": "4 free-response questions",
+        "totalMinutes": 180,
+        "calculator": true,
+        "delivery": "hybrid"
+      },
+      "passRate": 72,
+      "portfolio": null
+    },
+    {
+      "id": "precalculus",
+      "name": "AP Precalculus",
+      "category": "STEM",
+      "exam": { "date": "2026-05-12", "session": "AM" },
+      "lateTesting": { "date": "2026-05-21", "session": "AM" },
+      "format": {
+        "mcqCount": 40,
+        "frqCount": 4,
+        "frqType": "4 free-response questions (calculator and no-calculator parts)",
+        "totalMinutes": 180,
+        "calculator": true,
+        "delivery": "hybrid"
+      },
+      "passRate": 82,
+      "portfolio": null
+    },
+    {
+      "id": "psychology",
+      "name": "AP Psychology",
+      "category": "Humanities",
+      "exam": { "date": "2026-05-12", "session": "PM" },
+      "lateTesting": { "date": "2026-05-22", "session": "PM" },
+      "format": {
+        "mcqCount": 75,
+        "frqCount": 2,
+        "frqType": "2 free-response questions (article analysis, evidence-based question)",
+        "totalMinutes": 160,
+        "calculator": false,
+        "delivery": "digital"
+      },
+      "passRate": 74,
+      "portfolio": null
+    },
+    {
+      "id": "research",
+      "name": "AP Research",
+      "category": "Humanities",
+      "exam": null,
+      "lateTesting": null,
+      "format": {
+        "mcqCount": 0,
+        "frqCount": 0,
+        "frqType": "through-course performance task: academic paper, presentation, and oral defense (no timed end-of-course exam)",
+        "totalMinutes": 0,
+        "calculator": false,
+        "delivery": "digital"
+      },
+      "passRate": 90,
+      "portfolio": {
+        "deadline": "2026-04-30",
+        "weightPct": 100,
+        "note": "Academic paper (4,000–5,000 words, 75%) submitted as final in the AP Digital Portfolio by 11:59 p.m. ET; presentation and oral defense (25%) are teacher-scored. There is no end-of-course written exam."
+      }
+    },
+    {
+      "id": "seminar",
+      "name": "AP Seminar",
+      "category": "Humanities",
+      "exam": { "date": "2026-05-11", "session": "PM" },
+      "lateTesting": { "date": "2026-05-20", "session": "AM" },
+      "format": {
+        "mcqCount": 0,
+        "frqCount": 4,
+        "frqType": "end-of-course exam: 3 short-answer questions + 1 evidence-based argument essay",
+        "totalMinutes": 120,
+        "calculator": false,
+        "delivery": "digital"
+      },
+      "passRate": 88,
+      "portfolio": {
+        "deadline": "2026-04-30",
+        "weightPct": 55,
+        "note": "Two performance tasks submitted as final in the AP Digital Portfolio by 11:59 p.m. ET: Team Project and Presentation (20%) and Individual Research-Based Essay and Presentation (35%). The end-of-course exam is the remaining 45%."
+      }
+    },
+    {
+      "id": "spanish-language-and-culture",
+      "name": "AP Spanish Language and Culture",
+      "category": "Languages",
+      "exam": { "date": "2026-05-14", "session": "AM" },
+      "lateTesting": { "date": "2026-05-22", "session": "AM" },
+      "format": {
+        "mcqCount": 65,
+        "frqCount": 4,
+        "frqType": "2 written tasks + 2 spoken tasks",
+        "totalMinutes": 183,
+        "calculator": false,
+        "delivery": "paper"
+      },
+      "passRate": 83,
+      "portfolio": null
+    },
+    {
+      "id": "spanish-literature-and-culture",
+      "name": "AP Spanish Literature and Culture",
+      "category": "Languages",
+      "exam": { "date": "2026-05-13", "session": "PM" },
+      "lateTesting": { "date": "2026-05-22", "session": "AM" },
+      "format": {
+        "mcqCount": 65,
+        "frqCount": 4,
+        "frqType": "2 short-answer questions + 2 essay questions",
+        "totalMinutes": 180,
+        "calculator": false,
+        "delivery": "paper"
+      },
+      "passRate": 71,
+      "portfolio": null
+    },
+    {
+      "id": "statistics",
+      "name": "AP Statistics",
+      "category": "STEM",
+      "exam": { "date": "2026-05-07", "session": "PM" },
+      "lateTesting": { "date": "2026-05-20", "session": "AM" },
+      "format": {
+        "mcqCount": 40,
+        "frqCount": 6,
+        "frqType": "6 free-response questions (5 multipart questions + 1 investigative task)",
+        "totalMinutes": 180,
+        "calculator": true,
+        "delivery": "hybrid"
+      },
+      "passRate": 62,
+      "portfolio": null
+    },
+    {
+      "id": "united-states-government-and-politics",
+      "name": "AP United States Government and Politics",
+      "category": "Humanities",
+      "exam": { "date": "2026-05-05", "session": "PM" },
+      "lateTesting": { "date": "2026-05-19", "session": "AM" },
+      "format": {
+        "mcqCount": 55,
+        "frqCount": 4,
+        "frqType": "4 free-response questions (concept application, quantitative analysis, SCOTUS comparison, argument essay)",
+        "totalMinutes": 180,
+        "calculator": false,
+        "delivery": "digital"
+      },
+      "passRate": 76,
+      "portfolio": null
+    },
+    {
+      "id": "united-states-history",
+      "name": "AP United States History",
+      "category": "Humanities",
+      "exam": { "date": "2026-05-08", "session": "AM" },
+      "lateTesting": { "date": "2026-05-19", "session": "PM" },
+      "format": {
+        "mcqCount": 55,
+        "frqCount": 5,
+        "frqType": "3 short-answer questions, 1 document-based question, 1 long essay",
+        "totalMinutes": 195,
+        "calculator": false,
+        "delivery": "digital"
+      },
+      "passRate": 74,
+      "portfolio": null
+    },
+    {
+      "id": "world-history-modern",
+      "name": "AP World History: Modern",
+      "category": "Humanities",
+      "exam": { "date": "2026-05-07", "session": "AM" },
+      "lateTesting": { "date": "2026-05-18", "session": "AM" },
+      "format": {
+        "mcqCount": 55,
+        "frqCount": 5,
+        "frqType": "3 short-answer questions, 1 document-based question, 1 long essay",
+        "totalMinutes": 195,
+        "calculator": false,
+        "delivery": "digital"
+      },
+      "passRate": 66,
+      "portfolio": null
+    },
+    {
+      "id": "2-d-art-and-design",
+      "name": "AP 2-D Art and Design",
+      "category": "Arts",
+      "exam": null,
+      "lateTesting": null,
+      "format": {
+        "mcqCount": 0,
+        "frqCount": 0,
+        "frqType": "portfolio: sustained investigation (60%) + selected works (40%); no timed exam",
+        "totalMinutes": 0,
+        "calculator": false,
+        "delivery": "digital"
+      },
+      "passRate": 85,
+      "portfolio": {
+        "deadline": "2026-05-08",
+        "weightPct": 100,
+        "note": "Three portfolio components (Sustained Investigation Images, Sustained Investigation Written Evidence, Selected Works) submitted as final in the AP Digital Portfolio by 8 p.m. ET."
+      }
+    },
+    {
+      "id": "3-d-art-and-design",
+      "name": "AP 3-D Art and Design",
+      "category": "Arts",
+      "exam": null,
+      "lateTesting": null,
+      "format": {
+        "mcqCount": 0,
+        "frqCount": 0,
+        "frqType": "portfolio: sustained investigation (60%) + selected works (40%); no timed exam",
+        "totalMinutes": 0,
+        "calculator": false,
+        "delivery": "digital"
+      },
+      "passRate": 75,
+      "portfolio": {
+        "deadline": "2026-05-08",
+        "weightPct": 100,
+        "note": "Three portfolio components (Sustained Investigation Images, Sustained Investigation Written Evidence, Selected Works) submitted as final in the AP Digital Portfolio by 8 p.m. ET."
+      }
+    },
+    {
+      "id": "drawing",
+      "name": "AP Drawing",
+      "category": "Arts",
+      "exam": null,
+      "lateTesting": null,
+      "format": {
+        "mcqCount": 0,
+        "frqCount": 0,
+        "frqType": "portfolio: sustained investigation (60%) + selected works (40%); no timed exam",
+        "totalMinutes": 0,
+        "calculator": false,
+        "delivery": "digital"
+      },
+      "passRate": 83,
+      "portfolio": {
+        "deadline": "2026-05-08",
+        "weightPct": 100,
+        "note": "Three portfolio components (Sustained Investigation Images, Sustained Investigation Written Evidence, Selected Works) submitted as final in the AP Digital Portfolio by 8 p.m. ET."
+      }
+    }
+  ]
+}
