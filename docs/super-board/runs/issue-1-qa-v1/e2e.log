@@ -1,0 +1,13 @@
+
+> ap-exam-planner@0.1.0 test:e2e /Users/jon/repos/AP-Exam-Planner/.worktrees/issue-1-qa
+> playwright test
+
+
+Running 4 tests using 4 workers
+
+  ✓  1 [chromium] › e2e/smoke.spec.ts:3:5 › home page renders the AP Exam Planner header and title (908ms)
+  ✓  4 [chromium] › e2e/qa-evidence.spec.ts:22:7 › AC2 — / renders header + empty main with no console errors (tablet 1024x768) (974ms)
+  ✓  2 [chromium] › e2e/qa-evidence.spec.ts:22:7 › AC2 — / renders header + empty main with no console errors (desktop 1920x1080) (995ms)
+  ✓  3 [chromium] › e2e/qa-evidence.spec.ts:22:7 › AC2 — / renders header + empty main with no console errors (mobile 375x667) (998ms)
+
+  4 passed (5.0s)

@@ -2,7 +2,15 @@
 node_modules/
 .next/
 out/
+build/
 *.tsbuildinfo
+
+# next.js / typescript generated
+next-env.d.ts
+
+# deploy / misc
+.vercel
+*.pem
 
 # test artifacts (QA evidence in docs/super-board/runs/ IS committed)
 test-results/
