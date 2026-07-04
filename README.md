@@ -1,1 +1,1 @@
-# AP-Exam-Scheduler
+# AP Exam Schedule Planner
