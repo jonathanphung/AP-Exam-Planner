@@ -76,7 +76,13 @@ const withReviewLock = (fn) => {
   return run
 }
 
-const lanePrompt = (lane, card) => rootPreamble + [
+// Bounce-loop cap: each card gets at most MAX_PASSES trips through the lane
+// chain per wave. A 'bounced' exit re-enters the chain from the column the
+// card landed in instead of ending the wave; past the cap the chain stops and
+// the card is left where it bounced for the orchestrator/human to triage.
+const MAX_PASSES = 3
+
+const lanePrompt = (lane, card, pass) => rootPreamble + [
   // "for super-board run" is the literal trigger substring the lane skills
   // match to switch from standalone mode to the issue-scoped super-board
   // lifecycle (same phrase the legacy dispatcher uses) — do not reword it.
@@ -84,6 +90,12 @@ const lanePrompt = (lane, card) => rootPreamble + [
   `Read .claude/skills/super-board/references/run.md → "${LANE[lane].section}" lifecycle and follow it EXACTLY:`,
   `create your own worktree under .worktrees/, work on the issue branch, post the required PR/issue comments,`,
   `move the project card yourself, clean up the worktree on exit. Config: ${input.configPath}.`,
+  ``,
+  `Iteration guard: this is pass ${pass} of at most ${MAX_PASSES} this card gets through the lane`,
+  `chain this wave. Do not keep looping on revisions: if a further round of changes would not`,
+  `meaningfully fix a bug or meaningfully improve performance, stop iterating — settle the work`,
+  `as it stands (advance if your lifecycle gates pass, otherwise block with the Block template)`,
+  `rather than producing low-impact churn.`,
   ``,
   `Report your exit via structured output:`,
   `- status=advanced  → card moved forward (Building→QA, QA→Review, Review→Done/merged)`,
@@ -110,9 +122,9 @@ const tierFor = (cls) => (cls ? ladder[cls.complexity] : undefined)
 // The classify router writes no code — haiku is fine except on --high runs.
 const classifyModel = (input.tier || 'medium') === 'high' ? 'sonnet' : 'haiku'
 
-const runLane = async (lane, card, model, history) => {
-  const r = await agent(lanePrompt(lane, card), {
-    label: `${lane}:#${card.number}`,
+const runLane = async (lane, card, model, history, pass) => {
+  const r = await agent(lanePrompt(lane, card, pass), {
+    label: `${lane}:#${card.number}` + (pass > 1 ? `:pass${pass}` : ''),
     phase: LANE[lane].phase,
     schema: STAGE_SCHEMA,
     ...(model ? { model } : {}),
@@ -136,32 +148,43 @@ const results = await pipeline(
     return { card, cls }
   },
   // Stage 2: lane chain — entry point depends on the card's current column.
-  // A non-'advanced' exit ends the chain; the next wave re-selects the card
+  // A 'bounced' exit re-enters the chain from where the card landed (Ready or
+  // QA), capped at MAX_PASSES passes per card per wave. Any other
+  // non-'advanced' exit ends the chain; the next wave re-selects the card
   // from wherever it landed (the board is the loop state, not this script).
   async (prev, card) => {
     const history = []
     const model = tierFor(prev && prev.cls)
     let at = card.status
+    const reentry = (column) => (column === 'QA' ? 'QA' : 'Ready')
 
-    if (at === 'Ready' && input.variant === 'full') {
-      const b = await runLane('build', card, model, history)
-      if (b.status !== 'advanced') return { number: card.number, history }
-      at = 'QA'
+    for (let pass = 1; pass <= MAX_PASSES; pass++) {
+      if (at === 'Ready' && input.variant === 'full') {
+        const b = await runLane('build', card, model, history, pass)
+        if (b.status === 'bounced') { at = reentry(b.column); continue }
+        if (b.status !== 'advanced') return { number: card.number, history }
+        at = 'QA'
+      }
+      // By design: qa-only boards have no Builder lane — Ready cards go
+      // straight to the Tester (run.md "Lane mapping by variant").
+      if (at === 'Ready' && input.variant === 'qa-only') at = 'QA'
+      if (at === 'QA') {
+        const q = await runLane('qa', card, model, history, pass)
+        if (q.status === 'bounced') { at = reentry(q.column); continue }
+        if (q.status !== 'advanced') return { number: card.number, history }
+        at = 'Review'
+      }
+      if (at === 'Review') {
+        // Reviewer always on session model; serialized unless a human merges.
+        const review = () => runLane('review', card, undefined, history, pass)
+        const rv = input.humanApprovesMerge ? await review() : await withReviewLock(review)
+        if (rv.status === 'bounced') { at = reentry(rv.column); continue }
+        return { number: card.number, history }
+      }
+      return { number: card.number, history }
     }
-    // By design: qa-only boards have no Builder lane — Ready cards go
-    // straight to the Tester (run.md "Lane mapping by variant").
-    if (at === 'Ready' && input.variant === 'qa-only') at = 'QA'
-    if (at === 'QA') {
-      const q = await runLane('qa', card, model, history)
-      if (q.status !== 'advanced') return { number: card.number, history }
-      at = 'Review'
-    }
-    if (at === 'Review') {
-      // Reviewer always on session model; serialized unless a human merges.
-      const review = () => runLane('review', card, undefined, history)
-      if (input.humanApprovesMerge) { await review() } else { await withReviewLock(review) }
-    }
-    return { number: card.number, history }
+    log(`#${card.number}: bounce-loop cap hit (${MAX_PASSES} passes) — leaving card for triage, not relaunching`)
+    return { number: card.number, history, loopCapped: true }
   }
 )
 
@@ -175,9 +198,10 @@ const summary = results.filter(Boolean).map((r) => {
     column: last.column,
     detail: last.detail,
     prUrl: last.prUrl || null,
+    loopCapped: r.loopCapped || false,
     lanesRun: r.history.map((h) => `${h.lane}:${h.status}`).join(' → ') || 'none',
   }
 })
 log(`wave complete: ${summary.length} cards — ` +
-    summary.map((s) => `#${s.number}=${s.finalStatus}@${s.column}`).join(', '))
+    summary.map((s) => `#${s.number}=${s.finalStatus}@${s.column}${s.loopCapped ? ' (loop-capped)' : ''}`).join(', '))
 return { cards: summary }
