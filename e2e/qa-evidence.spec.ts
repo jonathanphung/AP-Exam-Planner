@@ -19,7 +19,7 @@ const viewports = [
 ] as const;
 
 for (const vp of viewports) {
-  test(`AC2 — / renders header + empty main with no console errors (${vp.name} ${vp.width}x${vp.height})`, async ({
+  test(`AC2 — / renders header + populated main with no console errors (${vp.name} ${vp.width}x${vp.height})`, async ({
     page,
   }) => {
     const consoleErrors: string[] = [];
@@ -39,10 +39,13 @@ for (const vp of viewports) {
     const h1 = page.getByRole("heading", { level: 1, name: "AP Exam Planner" });
     await expect(h1).toBeVisible();
 
-    // Empty main region (AC2: "an empty main region")
+    // Main region is present. Issue #1's original AC asserted an *empty* main;
+    // issue #3 deliberately mounts the subject catalog into it, so the region
+    // is now populated (the search input is the stable anchor).
     const main = page.getByRole("main");
     await expect(main).toBeAttached();
-    await expect(main).toBeEmpty();
+    await expect(main).not.toBeEmpty();
+    await expect(main.getByLabel("Search subjects")).toBeVisible();
 
     await page.screenshot({
       path: `${EVIDENCE_DIR}/${vp.name}.png`,

@@ -1,3 +1,5 @@
+import { CatalogGrid } from "@/components/CatalogGrid";
+
 export default function Home() {
   return (
     <>
@@ -6,12 +8,14 @@ export default function Home() {
           <h1 className="text-2xl font-semibold tracking-tight">
             AP Exam Planner
           </h1>
+          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+            Find your AP subjects and build your &ldquo;My Exams&rdquo; list.
+          </p>
         </div>
       </header>
-      <main
-        className="mx-auto max-w-5xl px-6 py-10"
-        aria-label="Exam planner"
-      />
+      <main className="mx-auto max-w-5xl px-6 py-10" aria-label="Exam planner">
+        <CatalogGrid />
+      </main>
     </>
   );
 }

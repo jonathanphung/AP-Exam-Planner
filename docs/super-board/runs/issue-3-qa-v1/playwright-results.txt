@@ -1,0 +1,19 @@
+
+Running 14 tests using 4 workers
+
+  ✓   2 [chromium] › e2e/issue-3-catalog-grid.spec.ts:29:7 › issue #3 — subject catalog › AC1 — renders every subject as a card with name, category, and date/deadline meta (2.5s)
+  ✓   3 [chromium] › e2e/issue-3-catalog-grid.spec.ts:51:7 › issue #3 — subject catalog › AC2 — labeled search filters by name, case-insensitively, live as you type (2.6s)
+  ✓   4 [chromium] › e2e/issue-3-catalog-grid.spec.ts:113:7 › issue #3 — subject catalog › AC4 — tapping a card toggles My Exams and updates the running count (2.7s)
+  ✓   1 [chromium] › e2e/issue-3-catalog-grid.spec.ts:72:7 › issue #3 — subject catalog › AC3 — category chips filter, and combine with search (2.9s)
+  ✓   7 [chromium] › e2e/issue-3-catalog-grid.spec.ts:189:7 › issue #3 — subject catalog › AC7 — responsive columns: 1–2 at 375px with no h-scroll, multiple at 1920px (1.1s)
+  ✓   6 [chromium] › e2e/issue-3-catalog-grid.spec.ts:160:7 › issue #3 — subject catalog › AC6 — cards are keyboard focusable in DOM order and toggle on Enter/Space (1.2s)
+  ✓   8 [chromium] › e2e/issue-3-catalog-grid.spec.ts:233:7 › evidence — catalog with a selection (desktop 1920x1080) (1.2s)
+  ✓   5 [chromium] › e2e/issue-3-catalog-grid.spec.ts:131:7 › issue #3 — subject catalog › AC5 — selection persists in localStorage apx.selection.v1 across reload (1.7s)
+  ✓   9 [chromium] › e2e/issue-3-catalog-grid.spec.ts:233:7 › evidence — catalog with a selection (tablet 1024x768) (1.4s)
+  ✓  10 [chromium] › e2e/issue-3-catalog-grid.spec.ts:233:7 › evidence — catalog with a selection (mobile 375x667) (1.3s)
+  ✓  11 [chromium] › e2e/qa-evidence.spec.ts:22:7 › AC2 — / renders header + populated main with no console errors (desktop 1920x1080) (1.2s)
+  ✓  12 [chromium] › e2e/qa-evidence.spec.ts:22:7 › AC2 — / renders header + populated main with no console errors (tablet 1024x768) (1.1s)
+  ✓  14 [chromium] › e2e/smoke.spec.ts:3:5 › home page renders the AP Exam Planner header and title (402ms)
+  ✓  13 [chromium] › e2e/qa-evidence.spec.ts:22:7 › AC2 — / renders header + populated main with no console errors (mobile 375x667) (539ms)
+
+  14 passed (10.5s)
