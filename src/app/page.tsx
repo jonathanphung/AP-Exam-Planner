@@ -1,4 +1,5 @@
 import { CatalogGrid } from "@/components/CatalogGrid";
+import { ScheduleView } from "@/components/ScheduleView";
 
 export default function Home() {
   return (
@@ -13,8 +14,12 @@ export default function Home() {
           </p>
         </div>
       </header>
-      <main className="mx-auto max-w-5xl px-6 py-10" aria-label="Exam planner">
+      <main
+        className="mx-auto flex max-w-5xl flex-col gap-12 px-6 py-10"
+        aria-label="Exam planner"
+      >
         <CatalogGrid />
+        <ScheduleView />
       </main>
     </>
   );
