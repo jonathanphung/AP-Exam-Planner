@@ -1,0 +1,27 @@
+{
+  "empty": {
+    "total": 0,
+    "seriousOrCritical": 0,
+    "ids": []
+  },
+  "with-selections": {
+    "total": 0,
+    "seriousOrCritical": 0,
+    "ids": []
+  },
+  "conflict-dialog-open": {
+    "total": 0,
+    "seriousOrCritical": 0,
+    "ids": []
+  },
+  "info-panel-open": {
+    "total": 0,
+    "seriousOrCritical": 0,
+    "ids": []
+  },
+  "resolved-dark": {
+    "total": 0,
+    "seriousOrCritical": 0,
+    "ids": []
+  }
+}
