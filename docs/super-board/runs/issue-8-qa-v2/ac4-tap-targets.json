@@ -1,0 +1,21 @@
+{
+  "viewport": "375x667",
+  "measured": {
+    "search input": {
+      "width": 327,
+      "height": 44
+    },
+    "category chip 'All'": {
+      "width": 50,
+      "height": 44
+    },
+    "details affordance": {
+      "width": 44,
+      "height": 44
+    },
+    "export button": {
+      "width": 165,
+      "height": 44
+    }
+  }
+}

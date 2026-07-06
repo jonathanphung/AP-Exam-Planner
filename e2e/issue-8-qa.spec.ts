@@ -75,6 +75,28 @@ async function seed(page: Page, ids: string[], resolutions?: unknown[]) {
   );
 }
 
+/**
+ * Settle all in-flight CSS transitions/animations before an axe scan.
+ *
+ * Without this, `AxeBuilder.analyze()` can sample interpolated colors from
+ * the export button's `transition-colors` disabled -> enabled hydration flip
+ * (fires when selections are seeded via localStorage) and report a serious
+ * color-contrast violation against a settled UI that is compliant
+ * (PR #18 review thread, Reviewer rerun failed 3/3 at 73799a3).
+ *
+ * `Animation.finished` rejects on cancel, hence the per-animation catch. The
+ * app has no infinite animations, but the 2s race is a safety valve so a
+ * future one can never hang the scan.
+ */
+async function settleAnimations(page: Page) {
+  await page.evaluate(async () => {
+    const done = Promise.all(
+      document.getAnimations().map((a) => a.finished.catch(() => {})),
+    );
+    await Promise.race([done, new Promise((r) => setTimeout(r, 2000))]);
+  });
+}
+
 function writeEvidence(name: string, content: string) {
   fs.mkdirSync(EVIDENCE_DIR, { recursive: true });
   fs.writeFileSync(path.join(EVIDENCE_DIR, name), content);
@@ -209,6 +231,7 @@ test.describe("issue #8 QA evidence", () => {
     > = {};
 
     const scan = async (p: Page, state: string) => {
+      await settleAnimations(p);
       const results = await new AxeBuilder({ page: p })
         .exclude("nextjs-portal")
         .analyze();

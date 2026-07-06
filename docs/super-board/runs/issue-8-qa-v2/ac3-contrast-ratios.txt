@@ -1,0 +1,16 @@
+AC3 — measured contrast ratios (WCAG relative-luminance, alpha-composited)
+Threshold: >= 4.5:1
+
+[light]
+  conflict prompt body: 9.16:1
+  conflict prompt heading: 9.16:1
+  keep-at-regular-time button: 6.42:1
+  "Moved to late testing" badge: 9.29:1
+  late-collision warning text: 9.16:1
+
+[dark]
+  conflict prompt body: 15.79:1
+  conflict prompt heading: 15.79:1
+  keep-at-regular-time button: 6.42:1
+  "Moved to late testing" badge: 9.06:1
+  late-collision warning text: 15.79:1

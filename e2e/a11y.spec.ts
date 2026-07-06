@@ -106,7 +106,30 @@ const RESOLVED_CHEM_HGEO = {
 // not shipped UI.
 // ---------------------------------------------------------------------------
 
+/**
+ * Settle all in-flight CSS transitions/animations before an axe scan.
+ *
+ * Without this, `AxeBuilder.analyze()` can sample interpolated colors from
+ * `transition-colors` hydration flips (e.g. the export button's disabled ->
+ * enabled transition when selections are seeded via localStorage) and report
+ * a serious color-contrast violation against a settled UI that is compliant
+ * (PR #18 review thread — flake also hit the "info panel open" scan here).
+ *
+ * `Animation.finished` rejects on cancel, hence the per-animation catch. The
+ * app has no infinite animations, but the 2s race is a safety valve so a
+ * future one can never hang the scan.
+ */
+async function settleAnimations(page: Page) {
+  await page.evaluate(async () => {
+    const done = Promise.all(
+      document.getAnimations().map((a) => a.finished.catch(() => {})),
+    );
+    await Promise.race([done, new Promise((r) => setTimeout(r, 2000))]);
+  });
+}
+
 async function expectNoSeriousViolations(page: Page, state: string) {
+  await settleAnimations(page);
   const results = await new AxeBuilder({ page })
     .exclude("nextjs-portal")
     .analyze();
