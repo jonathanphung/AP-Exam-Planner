@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import ICAL from "ical.js";
+import apData from "../data/ap-2026.json";
 import type { ApSubject, ExamSlot, Portfolio } from "../data/schema";
+import { parseApDataset } from "../data/schema";
 import type { SlotResolution } from "./conflicts";
 import {
   buildIcsCalendar,
@@ -9,6 +11,7 @@ import {
   ICS_FILE_NAME,
   type SessionStartTimes,
 } from "./ics";
+import { CATEGORY_EMOJI, SUBJECT_EMOJI } from "./subject-emoji";
 
 /**
  * Unit tests for the ICS generator (issue #7).
@@ -287,6 +290,42 @@ describe("buildIcsCalendar — parses with ical.js (AC5)", () => {
     expect(String(chemEvent?.getFirstPropertyValue("dtstart"))).toContain(
       "2026-05-19",
     );
+  });
+});
+
+describe("buildIcsCalendar — export stays emoji-free (issue #20 AC4)", () => {
+  // Decorative subject emoji (issue #20) live only in the UI render layer, never
+  // in the sourced dataset or the calendar export. This pins the deliberate
+  // choice of emoji-free SUMMARY text for maximum calendar-client
+  // compatibility: even with every real subject selected, no emoji glyph
+  // appears anywhere in the ICS output. If a future change ever routes an emoji
+  // into an event summary, this fails instead of silently shipping.
+  const dataset = parseApDataset(apData);
+  const allIds = dataset.subjects.map((s) => s.id);
+  const ics = buildIcsCalendar(
+    dataset.subjects,
+    allIds,
+    [],
+    dataset.sessionStartTimes,
+    FIXED_NOW,
+  );
+  const emojiGlyphs = [
+    ...Object.values(SUBJECT_EMOJI),
+    ...Object.values(CATEGORY_EMOJI),
+  ];
+
+  it("builds a non-empty calendar with SUMMARY text (sanity check)", () => {
+    expect(ics).toContain("BEGIN:VEVENT");
+    expect(ics).toMatch(/\r\nSUMMARY:/);
+  });
+
+  it("contains none of the decorative subject or category emoji", () => {
+    for (const glyph of emojiGlyphs) {
+      expect(
+        ics.includes(glyph),
+        `emoji "${glyph}" leaked into ICS export`,
+      ).toBe(false);
+    }
   });
 });
 

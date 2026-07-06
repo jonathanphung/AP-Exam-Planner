@@ -28,6 +28,7 @@ import {
   nameList,
 } from "@/components/ConflictDialog";
 import { ExportButton } from "@/components/ExportButton";
+import { SubjectName } from "@/components/SubjectName";
 
 // The dataset ships bundled and is validated by `pnpm test:data`; the JSON
 // module's inferred type is widened, so re-assert the schema's types here.
@@ -42,6 +43,7 @@ const CYCLE = dataset.cycle;
 
 function ScheduleRow({ entry }: { entry: ScheduleEntry }) {
   const isPortfolio = entry.kind === "portfolio";
+  const category = SUBJECTS_BY_ID.get(entry.subjectId)?.category;
 
   return (
     <li
@@ -53,7 +55,13 @@ function ScheduleRow({ entry }: { entry: ScheduleEntry }) {
       ].join(" ")}
     >
       <div className="flex flex-wrap items-center gap-2">
-        <span className="font-medium break-words">{entry.subjectName}</span>
+        <span className="font-medium break-words">
+          <SubjectName
+            id={entry.subjectId}
+            name={entry.subjectName}
+            category={category}
+          />
+        </span>
         {isPortfolio ? (
           <span className="rounded-full bg-amber-200 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-amber-900 dark:bg-amber-500/30 dark:text-amber-200">
             Portfolio due
@@ -230,7 +238,13 @@ export function ScheduleView() {
               </p>
               <ul className="mt-1 list-disc break-words pl-5">
                 {undated.map((subject) => (
-                  <li key={subject.id}>{subject.name}</li>
+                  <li key={subject.id}>
+                    <SubjectName
+                      id={subject.id}
+                      name={subject.name}
+                      category={SUBJECTS_BY_ID.get(subject.id)?.category}
+                    />
+                  </li>
                 ))}
               </ul>
             </div>

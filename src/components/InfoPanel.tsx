@@ -3,6 +3,7 @@
 import { type ReactNode, useId, useRef } from "react";
 import type { ApSubject } from "@/data/schema";
 import { useModalDialog } from "@/lib/modal";
+import { SubjectName } from "@/components/SubjectName";
 
 /**
  * Accessible exam-info modal (issue #6).
@@ -134,7 +135,11 @@ export function InfoPanel({ subject, onClose }: InfoPanelProps) {
               id={titleId}
               className="text-lg font-semibold break-words text-slate-900 dark:text-slate-50"
             >
-              {subject.name}
+              <SubjectName
+                id={subject.id}
+                name={subject.name}
+                category={subject.category}
+              />
             </h2>
             <p
               id={descId}

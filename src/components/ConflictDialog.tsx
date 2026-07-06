@@ -5,6 +5,7 @@ import type { ApSubject } from "@/data/schema";
 import type { ConflictGroup } from "@/lib/conflicts";
 import { formatDateLabel } from "@/lib/schedule";
 import { useModalDialog } from "@/lib/modal";
+import { SubjectName } from "@/components/SubjectName";
 
 /**
  * Conflict prompt (issue #5) with modal-dialog hardening (issue #8): shown for
@@ -99,7 +100,13 @@ function ConflictBody({
           const late = subject?.lateTesting;
           return (
             <li key={id}>
-              <span className="font-medium">{subject?.name ?? id}</span>
+              <span className="font-medium">
+                <SubjectName
+                  id={id}
+                  name={subject?.name ?? id}
+                  category={subject?.category}
+                />
+              </span>
               {late
                 ? ` — late testing ${formatDateLabel(late.date)} (${late.session} session)`
                 : " — no published late-testing slot"}

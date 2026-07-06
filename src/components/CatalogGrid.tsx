@@ -10,6 +10,7 @@ import {
 } from "@/data/schema";
 import { useSelection } from "@/lib/selection";
 import { InfoPanel } from "@/components/InfoPanel";
+import { SubjectName } from "@/components/SubjectName";
 
 // The dataset ships bundled and is validated by `pnpm test:data`; the JSON
 // module's inferred type is widened, so re-assert the schema's types here.
@@ -97,7 +98,11 @@ function SubjectCard({
             ✓
           </span>
           <span className="font-medium leading-snug break-words">
-            {subject.name}
+            <SubjectName
+              id={subject.id}
+              name={subject.name}
+              category={subject.category}
+            />
           </span>
         </span>
         {/* slate-600: slate-500 lands under 4.5:1 on the selected card's blue-50 bg (issue #8 AC3/AC2). */}
