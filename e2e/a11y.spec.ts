@@ -292,7 +292,7 @@ async function expectVisibleFocusIndicator(page: Page, what: string) {
 }
 
 test.describe("AC1 — keyboard operability", () => {
-  test("tab order: search → quick-jump chip → chip toggle → its disclosure → export; visible focus indicators throughout", async ({
+  test("tab order: search → quick-jump chip → chip toggle → its disclosure → view switcher → export; visible focus indicators throughout", async ({
     page,
   }) => {
     // A non-conflicting selection so the export button is enabled (disabled
@@ -344,20 +344,11 @@ test.describe("AC1 — keyboard operability", () => {
     );
     await expectVisibleFocusIndicator(page, "expand affordance");
 
-    // Then the shared "My Schedule" header (issue #19 second bounce): the
-    // Export button sits in the header row ABOVE the view switcher, so it is
-    // the next stop after the catalog.
-    await page.keyboard.press("Tab");
-    d = await focusedDescriptor(page);
-    expect(d, "next stop: the export button").toMatchObject({
-      testid: "export-ics-button",
-      inSchedule: true,
-    });
-    await expectVisibleFocusIndicator(page, "export button");
-
-    // Then the view switcher's two toggle chips — "List" then "Calendar"
-    // (the pressed default view). (`pressed` here means the aria-pressed
-    // attribute exists, not that it is "true".)
+    // Then the shared "My Schedule" toolbar (issue #31 relayout): the
+    // List/Calendar segmented switcher leads the toolbar row and the Export
+    // button sits at its end, so focus order — matching the left-to-right
+    // visual order — is List, Calendar, then Export. (`pressed` here means
+    // the aria-pressed attribute exists, not that it is "true".)
     await page.keyboard.press("Tab");
     d = await focusedDescriptor(page);
     expect(d, "next stop: the List view chip").toMatchObject({
@@ -375,6 +366,14 @@ test.describe("AC1 — keyboard operability", () => {
       inCatalog: false,
     });
     await expectVisibleFocusIndicator(page, "Calendar view chip");
+
+    await page.keyboard.press("Tab");
+    d = await focusedDescriptor(page);
+    expect(d, "next stop: the export button").toMatchObject({
+      testid: "export-ics-button",
+      inSchedule: true,
+    });
+    await expectVisibleFocusIndicator(page, "export button");
   });
 
   test("conflict dialog: modal, focus-trapped, Escape closes (prompt stays available inline)", async ({

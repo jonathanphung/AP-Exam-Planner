@@ -17,6 +17,14 @@ import {
  * Builds the ICS entirely client-side from the shared selection + conflict
  * resolutions and triggers a download via an in-memory Blob — zero network
  * requests. Disabled until at least one subject is selected.
+ *
+ * Sizing (issue #31): the button lives in the My Schedule toolbar row next to
+ * the List/Calendar switcher, so it shares the toolbar control heights —
+ * ≥44px tap target on touch viewports, 36px at sm:+. Below 360px CSS width
+ * the visible label shortens to "Export" (icon retained) so the whole toolbar
+ * still fits on one row at ~320px; the accessible name stays
+ * "Export to Calendar" via aria-label at every width (WCAG 2.5.3 label-in-
+ * name holds for both the full and the shortened visible label).
  */
 
 const dataset = apData as unknown as ApDataset;
@@ -55,11 +63,12 @@ export function ExportButton() {
       onClick={handleExport}
       disabled={disabled}
       data-testid="export-ics-button"
-      aria-label="Export selected exams to a calendar file"
+      aria-label="Export to Calendar"
+      title="Export selected exams to a calendar (.ics) file"
       className={[
-        // ≥44px tall tap target at phone widths (issue #8 AC4); desktop keeps
-        // the original compact pill.
-        "inline-flex min-h-11 w-fit items-center gap-1.5 rounded-full px-4 py-1 text-xs font-semibold transition-colors sm:min-h-0 sm:px-3",
+        // ≥44px tall tap target at phone widths (issue #8 AC4); sm:+ matches
+        // the switcher's 36px control height (issue #31 toolbar coherence).
+        "inline-flex min-h-11 w-fit items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-1 text-xs font-semibold transition-colors sm:min-h-9 sm:px-3",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600",
         disabled
           ? "cursor-not-allowed border border-slate-200 bg-slate-100 text-slate-400 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-600"
@@ -69,7 +78,10 @@ export function ExportButton() {
       ].join(" ")}
     >
       <span aria-hidden="true">📆</span>
-      Export to Calendar
+      <span>
+        Export
+        <span className="hidden min-[360px]:inline">{" to Calendar"}</span>
+      </span>
     </button>
   );
 }
