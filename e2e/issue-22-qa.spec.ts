@@ -92,11 +92,22 @@ test.describe("issue #22 — mobile category-grouped chips + progressive disclos
       await expect(region.locator("button[aria-pressed]")).toHaveCount(count);
     }
 
-    // All 42 subjects present overall; the flat desktop grid is NOT mounted.
+    // All 42 subjects present overall. Since issue #24 the sectioned layout
+    // is one shared grid at every width; on mobile each section's list is a
+    // SINGLE column of full-width cards (not the flat multi-column desktop
+    // grid, and not a width-jumping pill flow — expansion is vertical-only).
     await expect(catalog(page).locator("button[aria-pressed]")).toHaveCount(
       TOTAL_SUBJECTS,
     );
-    await expect(catalog(page).locator("ul.grid")).toHaveCount(0);
+    const mobileCols = await catalog(page)
+      .getByRole("region", { name: /^STEM/ })
+      .locator("ul")
+      .evaluate(
+        (el) =>
+          getComputedStyle(el).gridTemplateColumns.split(" ").filter(Boolean)
+            .length,
+      );
+    expect(mobileCols).toBe(1);
   });
 
   test("AC2 — chip: emoji + name, unmistakable selected state, ≥44px tap targets", async ({
@@ -428,25 +439,32 @@ test.describe("issue #22 — mobile category-grouped chips + progressive disclos
     await expect(sectionHeading(page, "Languages")).toBeInViewport();
   });
 
-  test("AC14 — desktop unregressed; no horizontal scroll at 375/768/1024/1920", async ({
+  // Issue #24 intentionally converged desktop on this ticket's grouped IA:
+  // the flat grid + category filter chips were replaced by the same labeled
+  // sections and quick-jump nav at every width, so "unregressed" now means
+  // the grouped layout holds on desktop with more columns per section.
+  test("AC14 — desktop shares the grouped IA (issue #24); no horizontal scroll at 375/768/1024/1920", async ({
     page,
   }) => {
-    // Desktop keeps the flat multi-column grid + category filter chips, and
-    // does NOT mount the mobile quick-jump nav.
     await page.setViewportSize({ width: 1920, height: 1080 });
     await page.goto("/");
+    // The retired filter group is gone; the quick-jump nav is mounted.
     await expect(
       page.getByRole("group", { name: "Filter by category" }),
-    ).toBeVisible();
-    const grid = catalog(page).locator("ul.grid");
-    await expect(grid).toBeVisible();
-    const cols = await grid.evaluate(
+    ).toHaveCount(0);
+    await expect(quickJump(page)).toBeVisible();
+    // All five labeled sections render, and each section's chip list becomes
+    // a multi-column grid on the wide viewport.
+    await expect(catalog(page).getByRole("region")).toHaveCount(5);
+    const sectionList = catalog(page)
+      .getByRole("region", { name: /^STEM/ })
+      .locator("ul");
+    const cols = await sectionList.evaluate(
       (el) =>
         getComputedStyle(el).gridTemplateColumns.split(" ").filter(Boolean)
           .length,
     );
     expect(cols).toBeGreaterThanOrEqual(2);
-    await expect(quickJump(page)).toHaveCount(0);
 
     // No horizontal page scroll at any of the four checkpoints.
     for (const width of [1920, 1024, 768, 375]) {

@@ -1,0 +1,19 @@
+
+[2mRunning [22m14[2m tests using [22m2[2m workers[22m
+
+  [32m✓[39m  [2m 2 [22m[chromium] › e2e/issue-24-qa.spec.ts:95:7 › issue #24 — desktop catalog grouped by category by default › AC1 — desktop renders labeled category sections by default, not a flat grid[2m (862ms)[22m
+  [32m✓[39m  [2m 1 [22m[chromium] › e2e/issue-24-qa.spec.ts:122:7 › issue #24 — desktop catalog grouped by category by default › AC2 — sections are multi-column on desktop (more columns than mobile), same chip components[2m (866ms)[22m
+  [32m✓[39m  [2m 4 [22m[chromium] › e2e/issue-24-qa.spec.ts:146:7 › issue #24 — desktop catalog grouped by category by default › AC3 — search filters within/across groups; retired filter is now the quick-jump nav[2m (1.1s)[22m
+  [32m✓[39m  [2m 3 [22m[chromium] › e2e/issue-24-qa.spec.ts:189:7 › issue #24 — desktop catalog grouped by category by default › AC4 — chip click toggles the shared useSelection store; grouping changes no semantics[2m (1.1s)[22m
+  [32m✓[39m  [2m 6 [22m[chromium] › e2e/issue-24-qa.spec.ts:254:7 › issue #24 — desktop catalog grouped by category by default › AC6 — category order comes from the CATEGORIES constant, identical on desktop and mobile[2m (630ms)[22m
+  [32m✓[39m  [2m 5 [22m[chromium] › e2e/issue-24-qa.spec.ts:218:7 › issue #24 — desktop catalog grouped by category by default › AC5 — desktop reuses #22's disclosure: Tier-1 timing → Tier-2 InfoPanel → Tier-3 CB link[2m (1.0s)[22m
+  [32m✓[39m  [2m 7 [22m[chromium] › e2e/issue-24-qa.spec.ts:286:7 › issue #24 — desktop catalog grouped by category by default › AC7 — a11y + responsive: real landmarks, buttons with aria-pressed, logical keyboard order, no h-scroll[2m (1.3s)[22m
+  [32m✓[39m  [2m 8 [22m[chromium] › e2e/issue-24-qa.spec.ts:361:7 › AC8 — expansion is vertical-only with a stable arrow at 1920×1080[2m (1.4s)[22m
+  [32m✓[39m  [2m 9 [22m[chromium] › e2e/issue-24-qa.spec.ts:361:7 › AC8 — expansion is vertical-only with a stable arrow at 1024×768[2m (1.2s)[22m
+  [32m✓[39m  [2m10 [22m[chromium] › e2e/issue-24-qa.spec.ts:361:7 › AC8 — expansion is vertical-only with a stable arrow at 768×900[2m (1.1s)[22m
+  [32m✓[39m  [2m11 [22m[chromium] › e2e/issue-24-qa.spec.ts:361:7 › AC8 — expansion is vertical-only with a stable arrow at 375×667[2m (1.0s)[22m
+  [32m✓[39m  [2m12 [22m[chromium] › e2e/issue-24-qa.spec.ts:486:7 › evidence — grouped catalog, one selected + one expanded (desktop 1920x1080)[2m (1.0s)[22m
+  [32m✓[39m  [2m13 [22m[chromium] › e2e/issue-24-qa.spec.ts:486:7 › evidence — grouped catalog, one selected + one expanded (tablet 1024x768)[2m (881ms)[22m
+  [32m✓[39m  [2m14 [22m[chromium] › e2e/issue-24-qa.spec.ts:486:7 › evidence — grouped catalog, one selected + one expanded (mobile 375x667)[2m (745ms)[22m
+
+[32m  14 passed[39m[2m (11.0s)[22m

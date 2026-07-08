@@ -20,10 +20,13 @@ import { SubjectName } from "@/components/SubjectName";
  * uses, which in turn links to the verified official College Board page
  * (Tier 3). Expanding never toggles selection and vice-versa.
  *
- * Collapsed, the chip is an inline pill flowing 1–2 per row (Fiveable-style);
- * expanded, it grows to the full row width so the revealed timing block reads
- * as one card. The expand control's accessible name is stable — state is
- * announced via `aria-expanded`, not a label swap.
+ * Expansion is VERTICAL-ONLY (Jon's bounce on issue #24): the card keeps its
+ * grid-cell width in both states and the revealed timing block flows below
+ * within that same width, growing the card downward — no width jump, no
+ * column-spanning, no horizontal reflow of neighbors. The chevron therefore
+ * stays pinned to the card's top-right edge in both states, so expand and
+ * collapse hit the same target. The expand control's accessible name is
+ * stable — state is announced via `aria-expanded`, not a label swap.
  */
 
 interface SubjectChipProps {
@@ -87,16 +90,15 @@ export function SubjectChip({
 
   // scroll-mt clears the sticky quick-jump bar when the chip is scrolled
   // back into view from below (e.g. keyboard focus or test automation).
+  // The className is deliberately state-independent: expanding must not
+  // change the card's width or grid footprint (vertical-only growth — the
+  // section grid is `items-start`, so the card grows downward in its cell
+  // and only pushes rows below).
   return (
-    <li
-      className={[
-        "min-w-0 max-w-full scroll-mt-20",
-        expanded ? "w-full" : "",
-      ].join(" ")}
-    >
+    <li className="min-w-0 max-w-full scroll-mt-20">
       <div
         className={[
-          "overflow-hidden rounded-xl border transition",
+          "flex flex-col overflow-hidden rounded-xl border transition",
           selected
             ? "border-blue-600 bg-blue-50 dark:border-blue-400 dark:bg-blue-950/40"
             : "border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-900",

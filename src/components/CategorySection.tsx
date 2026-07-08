@@ -9,8 +9,16 @@ import { SubjectChip } from "@/components/SubjectChip";
  * A real `<section>` landmark with a real heading, so assistive tech can
  * navigate by headings/regions, and the sticky quick-jump nav can move focus
  * here (`tabIndex={-1}` on the heading; `scroll-mt` clears the sticky bar).
- * The chips flow 1–2 per row by name length inside a wrapping list, matching
- * the Fiveable reference's grouped-card scannability.
+ *
+ * Issue #24 makes this section the desktop layout too: the chip list is one
+ * responsive CSS grid of uniform-width cards at every width — full-width
+ * cards on mobile, 2 columns at `sm`, 3 at `xl` — so the markup (and
+ * therefore search, selection, and disclosure behavior) is identical across
+ * viewports. Per Jon's bounce on #24, expansion is vertical-only: the grid is
+ * `items-start` so an expanded card grows downward inside its own cell
+ * (pushing rows below) without stretching or reflowing the cards beside it,
+ * and a card's width never changes with disclosure state — which also keeps
+ * each card's expand chevron in the exact same spot in both states.
  */
 
 /** DOM id for a category's section heading (quick-jump scroll/focus target). */
@@ -53,7 +61,7 @@ export function CategorySection({
           {subjects.length} {subjects.length === 1 ? "subject" : "subjects"}
         </span>
       </h2>
-      <ul className="mt-3 flex flex-wrap gap-2">
+      <ul className="mt-3 grid grid-cols-1 items-start gap-2 sm:grid-cols-2 xl:grid-cols-3">
         {subjects.map((subject) => (
           <SubjectChip
             key={subject.id}

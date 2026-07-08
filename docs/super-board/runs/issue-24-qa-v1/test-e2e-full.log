@@ -1,0 +1,13 @@
+=== full suite run 1 (default workers) — 141/145 passed, 4 contention flakes (pass in isolation) ===
+[31m    [chromium] › e2e/issue-8-qa.spec.ts:238:7 › issue #8 QA evidence › AC2 evidence — axe summary across states written to JSON [39m
+[31m    [chromium] › e2e/issue-9-qa.spec.ts:112:7 › AC4 — footer renders with no overflow/overlap/layout-shift (tablet 1024x768) [39m
+[31m    [chromium] › e2e/issue-9-qa.spec.ts:112:7 › AC4 — footer renders with no overflow/overlap/layout-shift (mobile 375x667) [39m
+[31m    [chromium] › e2e/qa-evidence.spec.ts:22:7 › AC2 — / renders header + populated main with no console errors (desktop 1920x1080) [39m
+[32m  141 passed[39m[2m (3.3m)[22m
+[41m[30m ELIFECYCLE [39m[49m [31mCommand failed with exit code 1.[39m
+
+=== full suite run 2 (--workers=4) — 143/145 passed, 2 different contention flakes (pass in isolation) ===
+[31m  2 failed[39m
+[31m    [chromium] › e2e/issue-5-conflict-resolution.spec.ts:548:5 › evidence — resolved state (moved tag) and late-late warning at desktop [39m
+[31m    [chromium] › e2e/issue-8-qa.spec.ts:238:7 › issue #8 QA evidence › AC2 evidence — axe summary across states written to JSON [39m
+[32m  143 passed[39m[2m (3.8m)[22m

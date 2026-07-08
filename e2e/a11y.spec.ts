@@ -1,7 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import apData from "../src/data/ap-2026.json";
-import { CATEGORIES } from "../src/data/schema";
 import { pressViewChip } from "./support/view-chip";
 
 /**
@@ -62,8 +61,8 @@ const dialog = (page: Page) => page.getByRole("dialog");
 const exportButton = (page: Page) => page.getByTestId("export-ics-button");
 const infoButton = (page: Page, name: string) =>
   page.getByRole("button", { name: `View exam details for ${name}` });
-// Issue #22 mobile IA: at <640px the details button lives inside a chip's
-// expanded Tier-1 panel, revealed by this per-subject expand affordance.
+// Issues #22/#24 grouped-chip IA: at every width the details button lives
+// inside a chip's expanded Tier-1 panel, revealed by this expand affordance.
 const expandButton = (page: Page, name: string) =>
   page.getByRole("button", { name: `Show exam dates for ${name}` });
 
@@ -201,6 +200,8 @@ test.describe("AC2 — axe-core scans report zero serious/critical violations", 
 
   test("info panel open", async ({ page }) => {
     await page.goto("/");
+    // Issues #22/#24: reveal the Tier-1 panel to reach the details button.
+    await expandButton(page, "AP Biology").click();
     await infoButton(page, "AP Biology").click();
     await expect(dialog(page)).toBeVisible();
     await expectNoSeriousViolations(page, "info-panel-open");
@@ -257,7 +258,8 @@ async function focusedDescriptor(page: Page) {
       ariaLabel: el.getAttribute("aria-label"),
       testid: el.getAttribute("data-testid"),
       pressed: el.hasAttribute("aria-pressed"),
-      inChipGroup: !!el.closest('[role="group"][aria-label="Filter by category"]'),
+      // Issue #24: the category filter group became the quick-jump nav.
+      inQuickJump: !!el.closest('nav[aria-label="Jump to category"]'),
       inCatalog: !!el.closest('section[aria-label="Subject catalog"]'),
       inSchedule: !!el.closest('section[aria-label="My exams"]'),
       text: (el.textContent ?? "").trim().slice(0, 40),
@@ -290,17 +292,19 @@ async function expectVisibleFocusIndicator(page: Page, what: string) {
 }
 
 test.describe("AC1 — keyboard operability", () => {
-  test("tab order: search → category chips → card → its details → export; visible focus indicators throughout", async ({
+  test("tab order: search → quick-jump chip → chip toggle → its disclosure → export; visible focus indicators throughout", async ({
     page,
   }) => {
     // A non-conflicting selection so the export button is enabled (disabled
     // controls are not tabbable) and the schedule is populated.
     await seedSelection(page, CALM_SELECTION);
     await page.goto("/");
-    // Filter the catalog to one card so the walk is deterministic and short.
+    // Filter the catalog to one chip so the walk is deterministic and short.
     await page.getByLabel("Search subjects").fill("AP Biology");
     await expect(
-      page.locator('section[aria-label="Subject catalog"] ul > li'),
+      page.locator(
+        'section[aria-label="Subject catalog"] ul > li button[aria-pressed]',
+      ),
     ).toHaveCount(1);
 
     // Walk starts from the focused search input (typing focused it).
@@ -310,34 +314,35 @@ test.describe("AC1 — keyboard operability", () => {
     });
     await expectVisibleFocusIndicator(page, "search input");
 
-    // All category chips come next ("All" + each category).
-    for (let i = 0; i < CATEGORIES.length + 1; i++) {
-      await page.keyboard.press("Tab");
-      d = await focusedDescriptor(page);
-      expect(d, `tab stop ${i + 2} must be a category chip`).toMatchObject({
-        inChipGroup: true,
-        pressed: true,
-      });
-    }
-    await expectVisibleFocusIndicator(page, "category chip");
-
-    // The subject card's select toggle...
+    // The quick-jump nav comes next (issue #24: the filter chips' successor).
+    // Only categories with matches render a chip, so the "AP Biology" search
+    // leaves exactly one — STEM.
     await page.keyboard.press("Tab");
     d = await focusedDescriptor(page);
-    expect(d, "next stop: the card select toggle").toMatchObject({
+    expect(d, "tab stop 2 must be the STEM quick-jump chip").toMatchObject({
+      inQuickJump: true,
+      text: "STEM",
+    });
+    await expectVisibleFocusIndicator(page, "quick-jump chip");
+
+    // The subject chip's select toggle (the section heading is tabIndex -1)...
+    await page.keyboard.press("Tab");
+    d = await focusedDescriptor(page);
+    expect(d, "next stop: the chip select toggle").toMatchObject({
       inCatalog: true,
       pressed: true,
-      inChipGroup: false,
+      inQuickJump: false,
     });
-    await expectVisibleFocusIndicator(page, "subject card");
+    await expectVisibleFocusIndicator(page, "subject chip");
 
-    // ...immediately followed by ITS details affordance.
+    // ...immediately followed by ITS disclosure affordance (the Tier-1
+    // expand button; the details button lives inside the revealed panel).
     await page.keyboard.press("Tab");
     d = await focusedDescriptor(page);
-    expect(d.ariaLabel, "next stop: the card's details affordance").toBe(
-      "View exam details for AP Biology",
+    expect(d.ariaLabel, "next stop: the chip's expand affordance").toBe(
+      "Show exam dates for AP Biology",
     );
-    await expectVisibleFocusIndicator(page, "details affordance");
+    await expectVisibleFocusIndicator(page, "expand affordance");
 
     // Then the shared "My Schedule" header (issue #19 second bounce): the
     // Export button sits in the header row ABOVE the view switcher, so it is
@@ -441,6 +446,8 @@ test.describe("AC1 — keyboard operability", () => {
     page,
   }) => {
     await page.goto("/");
+    // Issues #22/#24: reveal the Tier-1 panel to reach the details button.
+    await expandButton(page, "AP Biology").click();
     await infoButton(page, "AP Biology").click();
     const panel = dialog(page);
     await expect(panel).toBeVisible();
@@ -744,11 +751,16 @@ test.describe("AC5 — landmarks and labels", () => {
     await expect(page.locator("h1")).toHaveCount(1);
     await expect(page.getByLabel("Search subjects")).toBeVisible();
 
-    // Icon-only buttons: every details affordance carries a per-subject name.
-    const detailsButtons = page.getByRole("button", {
-      name: /^View exam details for /,
+    // Icon-only buttons: every chip's disclosure affordance carries a
+    // per-subject name (issues #22/#24: the details button lives inside the
+    // expanded Tier-1 panel, so the always-visible icon control is the
+    // expand chevron).
+    const expandButtons = page.getByRole("button", {
+      name: /^Show exam dates for /,
     });
-    expect(await detailsButtons.count()).toBeGreaterThan(0);
+    expect(await expandButtons.count()).toBeGreaterThan(0);
+    await expandButton(page, "AP Biology").click();
+    await expect(infoButton(page, "AP Biology")).toBeVisible();
 
     // Dialog close buttons are named.
     await infoButton(page, "AP Biology").click();
@@ -782,6 +794,8 @@ test.describe("AC5 — landmarks and labels", () => {
     // Moved exam: a text badge, not just a color shift.
     await expect(page.getByText("Moved to late testing")).toBeVisible();
     // Pending data: rendered as the literal text badge (issue #6 contract).
+    // Issues #22/#24: reveal the Tier-1 panel to reach the details button.
+    await expandButton(page, "AP Cybersecurity").click();
     await infoButton(page, "AP Cybersecurity").click();
     await expect(
       dialog(page).getByText("pending", { exact: true }),

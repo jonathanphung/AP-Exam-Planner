@@ -33,10 +33,15 @@ const toggle = (page: Page, name: string) =>
     .locator("button[aria-pressed]");
 const infoButton = (page: Page, name: string) =>
   page.getByRole("button", { name: `View exam details for ${name}` });
-// Issue #22 mobile IA: at <640px the details button lives inside a chip's
-// expanded Tier-1 panel, revealed by this per-subject expand affordance.
+// Issues #22/#24 grouped-chip IA: at every width the details button lives
+// inside a chip's expanded Tier-1 panel, revealed by this expand affordance.
 const expandButton = (page: Page, name: string) =>
   page.getByRole("button", { name: `Show exam dates for ${name}` });
+/** Reveal a subject's Tier-1 panel and open its details dialog (Tier 2). */
+const openInfo = async (page: Page, name: string) => {
+  await expandButton(page, name).click();
+  await infoButton(page, name).click();
+};
 const dialog = (page: Page) => page.getByRole("dialog");
 const selectedCount = (page: Page) => page.getByText(/^\d+ selected$/);
 
@@ -45,24 +50,26 @@ const rowValue = (page: Page, label: string): Locator =>
   dialog(page).locator("dl > div").filter({ hasText: label }).locator("dd");
 
 test.describe("issue #6 — exam info panel", () => {
-  test("AC1 — each card has a details affordance distinct from the select toggle that opens the panel without selecting", async ({
+  test("AC1 — each chip has a details affordance distinct from the select toggle that opens the panel without selecting", async ({
     page,
   }) => {
     await page.goto("/");
 
-    // Both controls exist per card and are distinct elements.
+    // Every rendered chip exposes its own per-subject disclosure affordance
+    // (issues #22/#24: the info button moved into the expanded Tier-1 panel).
+    await expect(
+      page.getByRole("button", { name: /^Show exam dates for / }),
+    ).toHaveCount(42);
+
+    // Both controls exist for a subject and are distinct elements.
     const bioToggle = toggle(page, "AP Biology");
-    const bioInfo = infoButton(page, "AP Biology");
     await expect(bioToggle).toHaveCount(1);
+    await expandButton(page, "AP Biology").click();
+    const bioInfo = infoButton(page, "AP Biology");
     await expect(bioInfo).toHaveCount(1);
     await expect(bioInfo).toBeVisible();
 
-    // Every rendered card exposes its own info affordance.
-    await expect(
-      page.getByRole("button", { name: /^View exam details for / }),
-    ).toHaveCount(42);
-
-    // Baseline: nothing selected.
+    // Baseline: nothing selected (expanding is not selecting).
     await expect(selectedCount(page)).toHaveText("0 selected");
     await expect(bioToggle).toHaveAttribute("aria-pressed", "false");
 
@@ -80,7 +87,7 @@ test.describe("issue #6 — exam info panel", () => {
     page,
   }) => {
     await page.goto("/");
-    await infoButton(page, "AP Biology").click();
+    await openInfo(page, "AP Biology");
     await expect(dialog(page)).toBeVisible();
 
     await expect(rowValue(page, "Multiple choice")).toContainText("60");
@@ -102,7 +109,7 @@ test.describe("issue #6 — exam info panel", () => {
     page,
   }) => {
     await page.goto("/");
-    await infoButton(page, "AP Cybersecurity").click();
+    await openInfo(page, "AP Cybersecurity");
     await expect(dialog(page)).toBeVisible();
 
     const passRate = rowValue(page, "Pass rate");
@@ -123,7 +130,7 @@ test.describe("issue #6 — exam info panel", () => {
     page,
   }) => {
     await page.goto("/");
-    await infoButton(page, "AP Seminar").click();
+    await openInfo(page, "AP Seminar");
     await expect(dialog(page)).toBeVisible();
 
     await expect(
@@ -140,6 +147,9 @@ test.describe("issue #6 — exam info panel", () => {
     page,
   }) => {
     await page.goto("/");
+    // Reveal the Tier-1 panel; the info button stays visible throughout the
+    // open/close cycles below because expanding is independent of the dialog.
+    await expandButton(page, "AP Biology").click();
     const info = infoButton(page, "AP Biology");
 
     // Open → focus moves into the dialog (onto the close button) + scroll lock.
@@ -209,11 +219,9 @@ for (const vp of viewports) {
     await page.setViewportSize({ width: vp.width, height: vp.height });
     await page.goto("/");
 
-    // Issue #22 mobile IA: the details button is inside the chip's expanded
-    // Tier-1 panel at <640px; desktop/tablet keep the per-card affordance.
-    if (vp.width < 640) {
-      await expandButton(page, "AP Biology").click();
-    }
+    // Issues #22/#24: the details button is inside the chip's expanded
+    // Tier-1 panel at every width.
+    await expandButton(page, "AP Biology").click();
     await infoButton(page, "AP Biology").click();
     await expect(dialog(page)).toBeVisible();
     await expect(

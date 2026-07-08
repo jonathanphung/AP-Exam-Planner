@@ -8,6 +8,14 @@ import { test, expect, type Page } from "@playwright/test";
  * 1920x1080, tablet 1024x768, mobile 375x667). Screenshots are written to the
  * run evidence folder and committed to the issue branch so they render inline
  * on the issue / PR.
+ *
+ * Updated for issue #24: the desktop catalog converged on the mobile IA from
+ * issue #22 — category-grouped sections of chips at every width. The category
+ * *filter* chips ("All" + one per category) were retired and repurposed as
+ * the quick-jump nav, a subject's category is now conveyed by its section
+ * (not per-card text), and date/deadline meta lives in the chip's expandable
+ * Tier-1 panel. Assertions below track that intentional behavior change while
+ * preserving each AC's original intent.
  */
 
 const EVIDENCE_DIR = "docs/super-board/runs/issue-3-qa-v1";
@@ -22,33 +30,45 @@ const catalog = (page: Page) =>
 // this scopes the catalog's card helper to the selection toggle specifically.
 const cards = (page: Page) =>
   catalog(page).locator("ul > li button[aria-pressed]");
+// Issue #24: the "Filter by category" chip group became the quick-jump nav.
 const chip = (page: Page, name: string) =>
   catalog(page)
-    .getByRole("group", { name: "Filter by category" })
+    .getByRole("navigation", { name: "Jump to category" })
     .getByRole("button", { name, exact: true });
+// A category's section landmark, named by its heading ("STEM 13 subjects").
+const region = (page: Page, name: string) =>
+  catalog(page).getByRole("region", { name: new RegExp(`^${name}`) });
+const expandButton = (page: Page, name: string) =>
+  page.getByRole("button", { name: `Show exam dates for ${name}` });
 const selectedCount = (page: Page) =>
   page.getByText(/^\d+ selected$/);
 
 test.describe("issue #3 — subject catalog", () => {
-  test("AC1 — renders every subject as a card with name, category, and date/deadline meta", async ({
+  test("AC1 — renders every subject with name, category, and date/deadline meta", async ({
     page,
   }) => {
     await page.goto("/");
 
-    // Every subject in ap-2026.json is rendered as a card.
+    // Every subject in ap-2026.json is rendered as a chip.
     await expect(cards(page)).toHaveCount(TOTAL_SUBJECTS);
 
-    // An exam subject shows name + category + exam date & session.
-    const bio = cards(page).filter({ hasText: "AP Biology" });
-    await expect(bio).toHaveCount(1);
-    await expect(bio).toContainText("STEM");
+    // An exam subject: named chip inside its category's labeled section
+    // (issue #24 — category is conveyed by the section, not per-card text),
+    // with the exam date & session in the expandable Tier-1 panel.
+    const bio = region(page, "STEM")
+      .locator("li")
+      .filter({ has: page.getByRole("button", { name: /AP Biology/ }) });
+    await expect(bio.locator("button[aria-pressed]")).toHaveCount(1);
+    await expandButton(page, "AP Biology").click();
     await expect(bio).toContainText("May"); // exam date, formatted
     await expect(bio).toContainText(/\bAM\b/); // session
 
     // A portfolio-only subject shows its deadline instead of an exam slot.
-    const research = cards(page).filter({ hasText: "AP Research" });
-    await expect(research).toHaveCount(1);
-    await expect(research).toContainText("Humanities");
+    const research = region(page, "Humanities")
+      .locator("li")
+      .filter({ has: page.getByRole("button", { name: /AP Research/ }) });
+    await expect(research.locator("button[aria-pressed]")).toHaveCount(1);
+    await expandButton(page, "AP Research").click();
     await expect(research).toContainText(/Portfolio due/i);
   });
 
@@ -73,14 +93,18 @@ test.describe("issue #3 — subject catalog", () => {
     await expect(cards(page)).toHaveCount(TOTAL_SUBJECTS);
   });
 
-  test("AC3 — category chips filter, and combine with search", async ({
+  // Issue #24 design decision: with every category always visible as a
+  // labeled section, the standalone filter was retired and its chips
+  // repurposed as the quick-jump nav (the same control issue #22 shipped on
+  // mobile) — category access is jump-to-section, search is the one filter.
+  test("AC3 — category chips are a quick-jump to their section, and track search", async ({
     page,
   }) => {
     await page.goto("/");
 
-    // All + the five categories are present as chips.
+    // The five categories are present as quick-jump chips (no "All": nothing
+    // is filtered out anymore). Each category renders as a labeled section.
     for (const name of [
-      "All",
       "STEM",
       "Humanities",
       "Languages",
@@ -88,30 +112,32 @@ test.describe("issue #3 — subject catalog", () => {
       "Career Kickstart",
     ]) {
       await expect(chip(page, name)).toBeVisible();
+      await expect(region(page, name)).toHaveCount(1);
     }
+    await expect(region(page, "STEM").locator("button[aria-pressed]"))
+      .toHaveCount(STEM_COUNT);
 
-    // Tapping STEM shows only STEM subjects.
-    await chip(page, "STEM").click();
-    await expect(cards(page)).toHaveCount(STEM_COUNT);
+    // Tapping a chip scrolls to its section and moves focus to the heading.
+    await chip(page, "Languages").click();
+    const languagesHeading = catalog(page).getByRole("heading", {
+      name: /^Languages/,
+    });
+    await expect(languagesHeading).toBeFocused();
+    await expect(languagesHeading).toBeInViewport();
 
-    // Reset to All.
-    await chip(page, "All").click();
-    await expect(cards(page)).toHaveCount(TOTAL_SUBJECTS);
-
-    // Search + category combine: "history" matches 4 subjects across two
-    // categories (1 Arts — "AP Art History" — and 3 Humanities). Narrowing to
-    // Humanities keeps only the 3 Humanities matches and drops the Arts one,
-    // proving the two filters intersect rather than either winning outright.
+    // Search still filters across/within groups: "history" matches 4
+    // subjects in two categories (1 Arts — "AP Art History" — and 3
+    // Humanities); emptied categories drop their section AND their
+    // quick-jump chip, so the nav never points at a dead target.
     await page.getByLabel("Search subjects").fill("history");
     await expect(cards(page)).toHaveCount(4);
-    await chip(page, "Humanities").click();
-    await expect(cards(page)).toHaveCount(3);
-    await expect(
-      cards(page).filter({ hasText: "AP Art History" }),
-    ).toHaveCount(0);
-    await expect(
-      cards(page).filter({ hasText: "AP European History" }),
-    ).toHaveCount(1);
+    await expect(region(page, "Humanities").locator("button[aria-pressed]"))
+      .toHaveCount(3);
+    await expect(region(page, "Arts").locator("button[aria-pressed]"))
+      .toHaveCount(1);
+    await expect(region(page, "STEM")).toHaveCount(0);
+    await expect(chip(page, "STEM")).toHaveCount(0);
+    await expect(chip(page, "Humanities")).toBeVisible();
   });
 
   test("AC4 — tapping a card toggles My Exams and updates the running count", async ({
@@ -166,7 +192,8 @@ test.describe("issue #3 — subject catalog", () => {
   }) => {
     await page.goto("/");
 
-    // DOM order: tabbing past the last category chip lands on the first card.
+    // DOM order: tabbing past the last quick-jump chip lands on the first
+    // subject chip's select toggle (section headings are tabIndex={-1}).
     await chip(page, "Career Kickstart").focus();
     await page.keyboard.press("Tab");
     const firstCard = cards(page).first();
@@ -192,8 +219,9 @@ test.describe("issue #3 — subject catalog", () => {
 
   // Issue #22 redesigned the mobile IA: at <640px the flat grid is replaced
   // by category-grouped sections (real headings + a sticky quick-jump nav)
-  // with one chip per subject. Desktop keeps the original multi-column grid.
-  test("AC7 — responsive: category-sectioned chips at 375px with no h-scroll, multi-column grid at 1920px", async ({
+  // with one chip per subject. Issue #24 converged desktop on the SAME
+  // grouped IA — the sections' chip lists widen to a multi-column grid.
+  test("AC7 — responsive: category-sectioned chips at 375px with no h-scroll, grouped multi-column sections at 1920px", async ({
     page,
   }) => {
     // Mobile: the sectioned view — quick-jump nav, all five category
@@ -224,17 +252,28 @@ test.describe("issue #3 — subject catalog", () => {
     );
     expect(noHScroll).toBe(true);
 
-    // Desktop: the flat grid with multiple columns (unchanged by issue #22).
+    // Desktop (issue #24): the same grouped sections + quick-jump nav, with
+    // each section's chip list laid out as a multi-column grid.
     await page.setViewportSize({ width: 1920, height: 1080 });
-    const grid = catalog(page).locator("ul.grid");
-    await expect(grid).toBeVisible();
-    const desktopCols = await grid.evaluate(
+    await expect(
+      catalog(page).getByRole("navigation", { name: "Jump to category" }),
+    ).toBeVisible();
+    await expect(cards(page)).toHaveCount(TOTAL_SUBJECTS);
+    const sectionList = region(page, "STEM").locator("ul");
+    const desktopCols = await sectionList.evaluate(
       (el) =>
         getComputedStyle(el)
           .gridTemplateColumns.split(" ")
           .filter(Boolean).length,
     );
     expect(desktopCols).toBeGreaterThanOrEqual(2);
+
+    const noHScrollDesktop = await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth <=
+        document.documentElement.clientWidth + 1,
+    );
+    expect(noHScrollDesktop).toBe(true);
   });
 });
 

@@ -290,6 +290,11 @@ test.describe("issue #8 QA evidence", () => {
     const ctx3 = await browser.newContext();
     const info = await ctx3.newPage();
     await info.goto("/");
+    // Issues #22/#24: the details button lives inside the chip's expanded
+    // Tier-1 panel at every width.
+    await info
+      .getByRole("button", { name: "Show exam dates for AP Biology" })
+      .click();
     await info
       .getByRole("button", { name: "View exam details for AP Biology" })
       .click();
@@ -461,6 +466,10 @@ test.describe("issue #8 QA evidence", () => {
     page,
   }) => {
     await page.goto("/");
+    // Issues #22/#24: reveal the Tier-1 panel to reach the details button.
+    await page
+      .getByRole("button", { name: "Show exam dates for AP Cybersecurity" })
+      .click();
     await page
       .getByRole("button", { name: "View exam details for AP Cybersecurity" })
       .click();

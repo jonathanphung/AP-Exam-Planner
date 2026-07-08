@@ -168,8 +168,12 @@ test.describe("issue #20 — decorative subject emoji everywhere the name shows"
   }) => {
     await page.goto("/");
 
-    // Open the panel via the per-card details button — no conflicting selection
-    // so no modal overlay intercepts the click.
+    // Open the panel via the chip's Tier-1 disclosure (issues #22/#24: the
+    // details button lives inside the expanded panel at every width) — no
+    // conflicting selection so no modal overlay intercepts the click.
+    await page
+      .getByRole("button", { name: "Show exam dates for AP Biology" })
+      .click();
     await page
       .getByRole("button", { name: "View exam details for AP Biology" })
       .click();
@@ -213,6 +217,10 @@ test.describe("issue #20 — decorative subject emoji everywhere the name shows"
   test("evidence — info panel title with emoji (desktop)", async ({ page }) => {
     await page.setViewportSize({ width: 1920, height: 1080 });
     await page.goto("/");
+    // Issues #22/#24: reveal the Tier-1 panel to reach the details button.
+    await page
+      .getByRole("button", { name: "Show exam dates for AP Biology" })
+      .click();
     await page
       .getByRole("button", { name: "View exam details for AP Biology" })
       .click();
