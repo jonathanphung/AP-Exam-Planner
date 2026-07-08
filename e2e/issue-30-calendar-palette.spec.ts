@@ -57,7 +57,7 @@ const LATIN = byId("latin"); // Languages, 05-04 AM (conflicts w/ Biology → or
 // Conflict-free per-category blocks (Career Kickstart has no exam-bearing
 // subject, so it never renders a grid block — it appears only as a legend /
 // off-grid dot, which carries no block text and no AA-for-text obligation).
-const CHEMISTRY = byId("chemistry"); // STEM, 05-05 AM — a clean emerald block
+const CHEMISTRY = byId("chemistry"); // STEM, 05-05 AM — a clean blue block
 const EURO_HISTORY = byId("european-history"); // Humanities, 05-04 PM
 const CHINESE = byId("chinese-language-and-culture"); // Languages, 05-08 PM
 const MUSIC_THEORY = byId("music-theory"); // Arts, 05-11 PM
@@ -281,13 +281,13 @@ test("AC1/AC2 — unresolved conflict paints both blocks orange with a caution m
   await expect(latin).toBeVisible();
 
   // Both wear the shared orange conflict style, NOT their category hues
-  // (STEM emerald / Languages rose) — category is overridden.
+  // (STEM blue #C7CEEA / Languages green #C9E89B) — category is overridden.
   for (const btn of [bio, latin]) {
     const cls = (await btn.getAttribute("class")) ?? "";
-    expect(cls).toContain("bg-orange-200");
-    expect(cls).toContain("border-orange-500");
-    expect(cls).not.toContain("bg-emerald-100");
-    expect(cls).not.toContain("bg-rose-100");
+    expect(cls).toContain("bg-[#FDBA74]");
+    expect(cls).toContain("border-[#EA580C]");
+    expect(cls).not.toContain("bg-[#C7CEEA]");
+    expect(cls).not.toContain("bg-[#C9E89B]");
   }
 
   // ⚠️ marker present on both; it is decorative (aria-hidden), so the conflict
@@ -328,12 +328,12 @@ test("AC3 — resolved conflict drops the orange: keeper returns to its pastel c
   await page.goto("/");
   await openCalendar(page);
 
-  // Regular week: Latin is back to its Languages (rose) pastel — no orange,
-  // no ⚠️, and the accessible name no longer mentions a conflict.
+  // Regular week: Latin is back to its Languages (green #C9E89B) pastel — no
+  // orange, no ⚠️, and the accessible name no longer mentions a conflict.
   await gotoWeek(page, weekNumberOf(LATIN.exam!.date));
   const latinCls = (await blockButton(page, LATIN.id).getAttribute("class")) ?? "";
-  expect(latinCls).toContain("bg-rose-100");
-  expect(latinCls).not.toContain("bg-orange-200");
+  expect(latinCls).toContain("bg-[#C9E89B]");
+  expect(latinCls).not.toContain("bg-[#FDBA74]");
   await expect(blockButton(page, LATIN.id)).toHaveAttribute(
     "aria-label",
     /Languages|Latin/i,
@@ -346,12 +346,12 @@ test("AC3 — resolved conflict drops the orange: keeper returns to its pastel c
     calendarView(page).getByTestId("block-conflict-marker"),
   ).toHaveCount(0);
 
-  // Late-testing week: Biology sits at its late slot in its STEM (emerald)
-  // pastel — moved, but NOT orange (resolved).
+  // Late-testing week: Biology sits at its late slot in its STEM (blue
+  // #C7CEEA) pastel — moved, but NOT orange (resolved).
   await gotoWeek(page, weekNumberOf(BIOLOGY.lateTesting!.date));
   const bioCls = (await blockButton(page, BIOLOGY.id).getAttribute("class")) ?? "";
-  expect(bioCls).toContain("bg-emerald-100");
-  expect(bioCls).not.toContain("bg-orange-200");
+  expect(bioCls).toContain("bg-[#C7CEEA]");
+  expect(bioCls).not.toContain("bg-[#FDBA74]");
   await expect(
     calendarView(page).getByTestId("block-conflict-marker"),
   ).toHaveCount(0);
@@ -365,10 +365,10 @@ test("AC4 — the four block-bearing categories render distinct pastel fills, no
 }) => {
   await page.setViewportSize({ width: 1920, height: 1080 });
   await seedSelection(page, [
-    CHEMISTRY.id, // clean STEM (emerald)
-    EURO_HISTORY.id, // Humanities (indigo)
-    CHINESE.id, // Languages (rose)
-    MUSIC_THEORY.id, // Arts (fuchsia)
+    CHEMISTRY.id, // clean STEM (blue)
+    EURO_HISTORY.id, // Humanities (yellow)
+    CHINESE.id, // Languages (green)
+    MUSIC_THEORY.id, // Arts (pink)
     BIOLOGY.id,
     LATIN.id, // Biology+Latin collide → an orange block exists to compare
   ]);
@@ -407,12 +407,12 @@ async function measureAllContrast(
 ): Promise<Record<string, number>> {
   const out: Record<string, number> = {};
   await gotoWeek(page, weekNumberOf(CHEMISTRY.exam!.date));
-  out["STEM (emerald)"] = await contrastRatio(page, CHEMISTRY.id);
-  out["Humanities (indigo)"] = await contrastRatio(page, EURO_HISTORY.id);
-  out["Languages (rose)"] = await contrastRatio(page, CHINESE.id);
+  out["STEM (blue)"] = await contrastRatio(page, CHEMISTRY.id);
+  out["Humanities (yellow)"] = await contrastRatio(page, EURO_HISTORY.id);
+  out["Languages (green)"] = await contrastRatio(page, CHINESE.id);
   out["Conflict (orange)"] = await contrastRatio(page, LATIN.id);
   await gotoWeek(page, weekNumberOf(MUSIC_THEORY.exam!.date));
-  out["Arts (fuchsia)"] = await contrastRatio(page, MUSIC_THEORY.id);
+  out["Arts (pink)"] = await contrastRatio(page, MUSIC_THEORY.id);
   return out;
 }
 

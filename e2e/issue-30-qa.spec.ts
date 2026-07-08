@@ -212,7 +212,7 @@ for (const vp of viewports) {
     for (const s of [BIOLOGY, LATIN]) {
       const cls = (await blockButton(page, s.id).getAttribute("class")) ?? "";
       expect(cls, `${s.id} must wear the orange conflict style`).toContain(
-        "bg-orange-200",
+        "bg-[#FDBA74]",
       );
     }
     await expect(page.getByTestId("block-conflict-marker")).toHaveCount(2);
@@ -238,11 +238,11 @@ test("AC3 evidence — resolved conflict: keeper pastel, mover keeps the 'Moved 
   await page.goto("/");
   await openCalendar(page);
 
-  // Regular week — Latin (keeper) is rose again, zero markers anywhere.
+  // Regular week — Latin (keeper) is green (#C9E89B) again, zero markers.
   await gotoWeek(page, weekNumberOf(LATIN.exam!.date));
   const latinCls = (await blockButton(page, LATIN.id).getAttribute("class")) ?? "";
-  expect(latinCls).toContain("bg-rose-100");
-  expect(latinCls).not.toContain("bg-orange-200");
+  expect(latinCls).toContain("bg-[#C9E89B]");
+  expect(latinCls).not.toContain("bg-[#FDBA74]");
   await expect(
     calendarView(page).getByTestId("block-conflict-marker"),
   ).toHaveCount(0);
@@ -251,13 +251,13 @@ test("AC3 evidence — resolved conflict: keeper pastel, mover keeps the 'Moved 
     fullPage: true,
   });
 
-  // Late-testing week — Biology moved: emerald pastel, NOT orange, and the
-  // existing moved-to-late affordances (visible caption + accessible-name
+  // Late-testing week — Biology moved: blue (#C7CEEA) pastel, NOT orange, and
+  // the existing moved-to-late affordances (visible caption + accessible-name
   // wording) survive the restyle untouched.
   await gotoWeek(page, weekNumberOf(BIOLOGY.lateTesting!.date));
   const bioCls = (await blockButton(page, BIOLOGY.id).getAttribute("class")) ?? "";
-  expect(bioCls).toContain("bg-emerald-100");
-  expect(bioCls).not.toContain("bg-orange-200");
+  expect(bioCls).toContain("bg-[#C7CEEA]");
+  expect(bioCls).not.toContain("bg-[#FDBA74]");
   await expect(
     page
       .locator(`[data-subject-id="${BIOLOGY.id}"]`)
@@ -369,32 +369,32 @@ test("AC8 — legend and off-grid markers use the pastel accent scheme (incl. Ca
     EURO_HISTORY.id,
     CHINESE.id,
     MUSIC_THEORY.id,
-    DRAWING.id, // Arts portfolio deadline → off-grid row (fuchsia dot)
-    CYBERSECURITY.id, // Career Kickstart, no 2026 exam → off-grid row (cyan dot)
+    DRAWING.id, // Arts portfolio deadline → off-grid row (pink dot)
+    CYBERSECURITY.id, // Career Kickstart, no 2026 exam → off-grid row (lavender dot)
   ]);
   await page.goto("/");
   await openCalendar(page);
 
-  // Legend: one pastel -500 dot per block-bearing category (dark:-400 variant
-  // in the same class string).
+  // Legend: one pastel dot per block-bearing category — the SAME hex accent the
+  // blocks use, with light + dark hex variants in the same class string.
   const legend = page.getByRole("list", { name: "Category color legend" });
   await expect(legend).toBeVisible();
-  const expectedLegend: Array<[string, string]> = [
-    ["STEM", "emerald"],
-    ["Humanities", "indigo"],
-    ["Languages", "rose"],
-    ["Arts", "fuchsia"],
+  const expectedLegend: Array<[string, string, string]> = [
+    ["STEM", "bg-[#5E74C0]", "dark:bg-[#8296DC]"],
+    ["Humanities", "bg-[#CBA53A]", "dark:bg-[#E3C766]"],
+    ["Languages", "bg-[#7EB84A]", "dark:bg-[#A0D172]"],
+    ["Arts", "bg-[#EF5D6A]", "dark:bg-[#F98A93]"],
   ];
-  for (const [label, hue] of expectedLegend) {
+  for (const [label, lightDot, darkDot] of expectedLegend) {
     const dot = legend
       .locator("li", { hasText: label })
       .locator("span[aria-hidden]");
     const cls = (await dot.getAttribute("class")) ?? "";
-    expect(cls, `${label} legend dot uses the pastel ${hue} accent`).toContain(
-      `bg-${hue}-500`,
+    expect(cls, `${label} legend dot uses its pastel light accent`).toContain(
+      lightDot,
     );
     expect(cls, `${label} legend dot has a dark pastel variant`).toContain(
-      `dark:bg-${hue}-400`,
+      darkDot,
     );
   }
 
@@ -402,21 +402,21 @@ test("AC8 — legend and off-grid markers use the pastel accent scheme (incl. Ca
   // markers wear the same pastel accents as the legend/block scheme.
   const offGrid = page.getByTestId("calendar-off-grid");
   await expect(offGrid).toBeVisible();
-  const offGridCases: Array<[string, string]> = [
-    [DRAWING.name, "fuchsia"],
-    [CYBERSECURITY.name, "cyan"],
+  const offGridCases: Array<[string, string, string]> = [
+    [DRAWING.name, "bg-[#EF5D6A]", "dark:bg-[#F98A93]"], // Arts (pink)
+    [CYBERSECURITY.name, "bg-[#9866C0]", "dark:bg-[#B98FD8]"], // Career Kickstart (lavender)
   ];
-  for (const [name, hue] of offGridCases) {
+  for (const [name, lightDot, darkDot] of offGridCases) {
     const dot = offGrid
       .locator("li", { hasText: name })
       .locator("span[aria-hidden]")
       .first();
     const cls = (await dot.getAttribute("class")) ?? "";
-    expect(cls, `${name} off-grid marker uses the pastel ${hue} accent`).toContain(
-      `bg-${hue}-500`,
+    expect(cls, `${name} off-grid marker uses its pastel light accent`).toContain(
+      lightDot,
     );
     expect(cls, `${name} off-grid marker has a dark pastel variant`).toContain(
-      `dark:bg-${hue}-400`,
+      darkDot,
     );
   }
 

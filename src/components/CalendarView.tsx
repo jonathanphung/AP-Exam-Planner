@@ -122,15 +122,24 @@ const BLOCK_GAP_PX = 4;
  * unresolved-conflict style below, so a conflict block can never be confused
  * with a category one.
  *
- * Recipe (identical numeric shades across every hue, for cohesion):
- *   - Light: `bg-{h}-100` fill · `text-{h}-900` text · `border-{h}-400` accent.
- *   - Dark:  `bg-{h}-900` deep desaturated fill · `text-{h}-50` light text ·
- *            `border-{h}-500` accent — a muted dark treatment (NOT the light
- *            pastels inverted), and -900 (not near-black -950) keeps the five
- *            categories distinguishable from one another in dark mode.
+ * Palette mechanism (updated per Jon's post-approval bounce on PR #34): the
+ * four light-mode fills are Jon's EXACT hex codes, expressed as Tailwind v4
+ * arbitrary values (`bg-[#C7CEEA]` …) rather than nearest stock shades. Career
+ * Kickstart — the only category with no exam-bearing subject, so it renders
+ * only as a legend / off-grid dot, never a grid block — takes a harmonizing
+ * fifth pastel (soft lavender `#CDB4DB`) chosen to fill the blue→pink gap and
+ * stay clear of both the pink Arts hue and the reserved orange.
  *
- * Every text/fill pair clears WCAG AA (≥4.5:1) in BOTH themes; the exact
- * measured ratios are asserted live from the rendered colors in
+ *   Light fills — STEM `#C7CEEA` (blue) · Humanities `#F7DC8D` (yellow) ·
+ *                 Languages `#C9E89B` (green) · Arts `#FF9AA2` (pink) ·
+ *                 Career Kickstart `#CDB4DB` (lavender).
+ *
+ * Per-hue companions are derived from each fill: a darker same-hue text, a
+ * mid same-hue left-accent border + legend dot, and a deep desaturated
+ * same-hue DARK fill with a light same-hue text (a muted dark treatment — NOT
+ * the light pastels inverted, and NOT the old emerald/indigo/rose/fuchsia
+ * hues). Every text/fill pair clears WCAG AA (≥4.5:1) in BOTH themes — tightest
+ * is light Arts at 5.09:1 — asserted live from the rendered colours in
  * e2e/issue-30-calendar-palette.spec.ts and captured in the QA evidence.
  */
 const CATEGORY_STYLES: Record<
@@ -139,28 +148,28 @@ const CATEGORY_STYLES: Record<
 > = {
   STEM: {
     block:
-      "border-emerald-400 bg-emerald-100 text-emerald-900 dark:border-emerald-500 dark:bg-emerald-900 dark:text-emerald-50",
-    dot: "bg-emerald-500 dark:bg-emerald-400",
+      "border-[#7C8AC4] bg-[#C7CEEA] text-[#28345E] dark:border-[#5566A0] dark:bg-[#2A3458] dark:text-[#DCE3F7]",
+    dot: "bg-[#5E74C0] dark:bg-[#8296DC]",
   },
   Humanities: {
     block:
-      "border-indigo-400 bg-indigo-100 text-indigo-900 dark:border-indigo-500 dark:bg-indigo-900 dark:text-indigo-50",
-    dot: "bg-indigo-500 dark:bg-indigo-400",
+      "border-[#D6B94A] bg-[#F7DC8D] text-[#5C4708] dark:border-[#8A7526] dark:bg-[#52420F] dark:text-[#F6E6A8]",
+    dot: "bg-[#CBA53A] dark:bg-[#E3C766]",
   },
   Languages: {
     block:
-      "border-rose-400 bg-rose-100 text-rose-900 dark:border-rose-500 dark:bg-rose-900 dark:text-rose-50",
-    dot: "bg-rose-500 dark:bg-rose-400",
+      "border-[#8FBF5A] bg-[#C9E89B] text-[#38541A] dark:border-[#63863C] dark:bg-[#2B4A1C] dark:text-[#DCEFBE]",
+    dot: "bg-[#7EB84A] dark:bg-[#A0D172]",
   },
   Arts: {
     block:
-      "border-fuchsia-400 bg-fuchsia-100 text-fuchsia-900 dark:border-fuchsia-500 dark:bg-fuchsia-900 dark:text-fuchsia-50",
-    dot: "bg-fuchsia-500 dark:bg-fuchsia-400",
+      "border-[#E5666F] bg-[#FF9AA2] text-[#7A1E28] dark:border-[#A24A54] dark:bg-[#52222A] dark:text-[#FBC7CC]",
+    dot: "bg-[#EF5D6A] dark:bg-[#F98A93]",
   },
   "Career Kickstart": {
     block:
-      "border-cyan-400 bg-cyan-100 text-cyan-900 dark:border-cyan-500 dark:bg-cyan-900 dark:text-cyan-50",
-    dot: "bg-cyan-500 dark:bg-cyan-400",
+      "border-[#A47CC0] bg-[#CDB4DB] text-[#4A2C63] dark:border-[#7A5C96] dark:bg-[#402A58] dark:text-[#E4CFF0]",
+    dot: "bg-[#9866C0] dark:bg-[#B98FD8]",
   },
 };
 
@@ -178,12 +187,18 @@ const FALLBACK_BLOCK_STYLE =
  * a "Time conflict" caption on the block, with the conflict also spelled out
  * in the block's accessible name. Text/fill clears AA in both themes.
  *
+ * The light fill is a deeper orange (`#FDBA74`, orange-300 weight) rather than
+ * the earlier pale orange-200: with Jon's yellow Humanities pastel (`#F7DC8D`)
+ * now the conflict's nearest neighbour, the extra depth keeps orange clearly
+ * "warmer/deeper alert" at a glance while text-on-fill still clears AA
+ * (5.56:1 light, 8.27:1 dark).
+ *
  * Orange means ONLY "unresolved conflict": the moment a conflict is resolved
  * (a member moved to late testing) the blocks fall back to their category
  * styling — see `resolveSlots`/`unresolvedConflicts` feeding this component.
  */
 const CONFLICT_BLOCK_STYLE =
-  "border-2 border-orange-500 bg-orange-200 text-orange-900 dark:border-orange-400 dark:bg-orange-900 dark:text-orange-50";
+  "border-2 border-[#EA580C] bg-[#FDBA74] text-[#7C2D12] dark:border-[#FB923C] dark:bg-[#6B2E12] dark:text-[#FFE0C7]";
 
 /** "3 h 15 min" / "2 h" / "45 min" for a whole-minute duration. */
 function minutesLabel(total: number): string {
