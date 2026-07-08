@@ -26,8 +26,10 @@ import { ExportButton } from "@/components/ExportButton";
  * The switcher is a segmented control: native buttons (keyboard-operable via
  * Tab + Enter/Space), `aria-pressed` state, and the same high-contrast active
  * style as the catalog chips (blue-600 on white, ≥4.5:1). All toolbar
- * controls share the same height (44px mobile / 36px at sm:+) so the row
- * reads as one coherent toolbar.
+ * controls share the same slim 32px visible pill height at every width so the
+ * row reads as one coherent toolbar (issue #31 pill-slimming bounce). On touch
+ * viewports a transparent, centered ::before hit-area preserves the ≥44px tap
+ * target behind each slimmer pill.
  */
 
 // The banner reads the cycle from dataset metadata — never hardcoded, so a
@@ -73,9 +75,15 @@ export function ScheduleViews() {
                 onClick={() => setView(mode)}
                 className={[
                   // Segmented control: the two buttons share edges (-ml-px
-                  // collapses the middle border); each keeps a ≥44px tap
-                  // target on touch viewports, 36px at sm:+ like Export.
-                  "relative inline-flex min-h-11 items-center whitespace-nowrap border px-3 py-1 text-sm transition sm:min-h-9",
+                  // collapses the middle border). Slim 32px visible pill
+                  // (issue #31 pill-slimming bounce) at EVERY width, matching
+                  // Export. On touch viewports (< sm) a transparent, centered
+                  // ::before hit-area restores the ≥44px tap target behind the
+                  // slimmer pill; it extends only vertically, so the segmented
+                  // seam and the switcher↔Export gap are untouched. On sm:+
+                  // pointer viewports the slim height alone is the target.
+                  "relative inline-flex h-8 items-center whitespace-nowrap border px-3 text-sm transition",
+                  "max-sm:before:absolute max-sm:before:inset-x-0 max-sm:before:top-1/2 max-sm:before:h-11 max-sm:before:-translate-y-1/2 max-sm:before:content-['']",
                   mode === "list" ? "rounded-l-full" : "-ml-px rounded-r-full",
                   "focus-visible:z-20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-950",
                   active

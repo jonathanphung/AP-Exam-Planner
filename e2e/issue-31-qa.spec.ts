@@ -13,8 +13,12 @@ import { pressViewChip } from "./support/view-chip";
  * Key geometry facts under test (builder's design decisions):
  * - One toolbar row below the header at EVERY width and on BOTH views:
  *   segmented List/Calendar switcher leads, Export trails (justify-between).
- * - Control heights: 44px on touch viewports (min-h-11), 36px at sm:+
- *   (min-h-9) — all three controls identical per width.
+ * - Control heights (issue #31 pill-slimming bounce): a slim 32px VISIBLE
+ *   pill (h-8) on all three controls at EVERY width. On touch viewports
+ *   (< sm) a transparent, centered ::before hit-area extends the EFFECTIVE
+ *   tap target back to ≥44px (issue #8 AC4) behind the slimmer pill; on sm:+
+ *   pointer viewports the 32px height is the target. Tests assert the slim
+ *   visible box (boundingBox) AND, on touch, the ≥44px effective tap height.
  * - The switcher pair intentionally shares an edge (-ml-px segmented
  *   control); the ≥8px anti-mis-tap gap applies between the two DISTINCT
  *   controls (switcher group ↔ Export).
@@ -87,6 +91,25 @@ async function box(locator: ReturnType<typeof exportBtn>): Promise<Box> {
   const b = await locator.boundingBox();
   expect(b, "control must be laid out (non-null boundingBox)").not.toBeNull();
   return b!;
+}
+
+const SLIM_PILL_PX = 32; // h-8 visible pill height (issue #31 slimming bounce)
+const TAP_FLOOR_PX = 44; // issue #8 AC4 effective touch tap-target floor
+
+/**
+ * Effective vertical tap target for a slimmed pill: the taller of the visible
+ * border box and the centered `::before` hit-area pseudo that (on touch
+ * viewports) extends touch reach behind the 32px pill. On sm:+ the pseudo has
+ * no generated content, so this collapses to the visible box height.
+ */
+async function effectiveTapHeight(
+  locator: ReturnType<typeof exportBtn>,
+): Promise<number> {
+  return locator.evaluate((el) => {
+    const own = el.getBoundingClientRect().height;
+    const before = parseFloat(getComputedStyle(el, "::before").height);
+    return Number.isFinite(before) ? Math.max(own, before) : own;
+  });
 }
 
 /** All three toolbar control boxes, left-to-right: List, Calendar, Export. */
@@ -212,7 +235,7 @@ test("AC1 — 375px: Export, List, Calendar sit on ONE row below the My Schedule
   page,
 }) => {
   await gotoAt(page, MOBILE);
-  await expectOneRowToolbar(page, 44, "AC1 mobile");
+  await expectOneRowToolbar(page, SLIM_PILL_PX, "AC1 mobile");
 
   // The banner shares no vertical band with any control (it is not a control).
   const ban = await box(banner(page));
@@ -283,18 +306,36 @@ test("AC2 — 375px: segmented switcher endcaps + filled Export visually distinc
 });
 
 // --------------------------------------------------------------------------
-// AC3 — tap targets ≥44×44px and ≥8px control spacing on touch viewports
+// AC3 — slim 32px visible pills, ≥44px EFFECTIVE tap target (via the centered
+//        ::before hit-area) and ≥8px control spacing on touch viewports
 // --------------------------------------------------------------------------
 
 for (const vp of [MOBILE, NARROW]) {
-  test(`AC3 — ${vp.width}px: all three controls ≥44×44px tap boxes, ≥8px switcher↔Export gap`, async ({
+  test(`AC3 — ${vp.width}px: slim ${SLIM_PILL_PX}px pills with ≥${TAP_FLOOR_PX}px effective tap targets, ≥8px switcher↔Export gap`, async ({
     page,
   }) => {
     await gotoAt(page, vp);
-    const boxes = await expectOneRowToolbar(page, 44, `AC3 @${vp.width}`);
-    for (const [name, b] of Object.entries(boxes)) {
-      expect(b.height, `${name} tap height @${vp.width}px`).toBeGreaterThanOrEqual(43.5);
-      expect(b.width, `${name} tap width @${vp.width}px`).toBeGreaterThanOrEqual(44);
+    // Visible pills are slim (32px, asserted here) — Jon's pill-slimming bounce.
+    await expectOneRowToolbar(page, SLIM_PILL_PX, `AC3 @${vp.width}`);
+
+    // …but the EFFECTIVE touch tap target stays ≥44×44px: width from the
+    // visible box, height from the centered ::before hit-area behind the pill.
+    const controls = [
+      ["list", listChip(page)],
+      ["calendar", calendarChip(page)],
+      ["export", exportBtn(page)],
+    ] as const;
+    for (const [name, locator] of controls) {
+      const b = await box(locator);
+      expect(
+        b.width,
+        `${name} tap width @${vp.width}px`,
+      ).toBeGreaterThanOrEqual(TAP_FLOOR_PX);
+      const tapHeight = await effectiveTapHeight(locator);
+      expect(
+        tapHeight,
+        `${name} effective tap height @${vp.width}px (visible ${b.height}px pill + ::before hit-area) must be ≥${TAP_FLOOR_PX}px`,
+      ).toBeGreaterThanOrEqual(TAP_FLOOR_PX);
     }
   });
 }
@@ -309,13 +350,13 @@ test("AC4 — 375px & 360px: full 'Export to Calendar' label, one row, no page h
   await gotoAt(page, MOBILE);
   await expectNoHorizontalScroll(page, "AC4 @375");
   await expect(exportLabelSuffix(page)).toBeVisible(); // full label
-  await expectOneRowToolbar(page, 44, "AC4 @375");
+  await expectOneRowToolbar(page, SLIM_PILL_PX, "AC4 @375");
 
   // Breakpoint boundary: 360px CSS width still shows the full label.
   await page.setViewportSize({ width: 360, height: 667 });
   await expect(exportLabelSuffix(page)).toBeVisible();
   await expectNoHorizontalScroll(page, "AC4 @360");
-  await expectOneRowToolbar(page, 44, "AC4 @360");
+  await expectOneRowToolbar(page, SLIM_PILL_PX, "AC4 @360");
 });
 
 test("AC4 — 320px: Export label shortens to 'Export' (never stacks), one row, no page h-scroll", async ({
@@ -327,7 +368,7 @@ test("AC4 — 320px: Export label shortens to 'Export' (never stacks), one row, 
   await expect(exportLabelSuffix(page)).toBeHidden();
   await expect(exportBtn(page)).toContainText("Export");
   // …but the toolbar still reads as ONE row (no re-stacking).
-  await expectOneRowToolbar(page, 44, "AC4 @320");
+  await expectOneRowToolbar(page, SLIM_PILL_PX, "AC4 @320");
   // Accessible name survives the shortened visible label (WCAG 2.5.3).
   await expect(exportBtn(page)).toHaveAccessibleName("Export to Calendar");
 
@@ -432,7 +473,9 @@ test("AC5 — keyboard focus reaches List → Calendar → Export in visual orde
 });
 
 // --------------------------------------------------------------------------
-// AC6 — desktop/tablet not regressed: one coherent 36px row, no h-scroll
+// AC6 — desktop/tablet not regressed: one coherent slim 32px row, no h-scroll
+//        (sm:+ pointer viewports: the slim pill height is the target — no
+//        ::before hit-area, matching the design decision)
 // --------------------------------------------------------------------------
 
 const SM_PLUS = [
@@ -442,12 +485,12 @@ const SM_PLUS = [
 ] as const;
 
 for (const vp of SM_PLUS) {
-  test(`AC6 — ${vp.width}px: one-row toolbar at 36px control height, no h-scroll`, async ({
+  test(`AC6 — ${vp.width}px: one-row toolbar at slim ${SLIM_PILL_PX}px control height, no h-scroll`, async ({
     page,
   }) => {
     await gotoAt(page, { width: vp.width, height: vp.height });
     await expectNoHorizontalScroll(page, `AC6 @${vp.width}`);
-    await expectOneRowToolbar(page, 36, `AC6 @${vp.width}`);
+    await expectOneRowToolbar(page, SLIM_PILL_PX, `AC6 @${vp.width}`);
     await expect(exportLabelSuffix(page)).toBeVisible(); // full label at sm:+
     if (vp.shot) {
       await page.screenshot({

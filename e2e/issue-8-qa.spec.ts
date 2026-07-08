@@ -448,12 +448,25 @@ test.describe("issue #8 QA evidence", () => {
     for (const [what, loc] of targets) {
       const box = await loc.boundingBox();
       expect(box, `${what} not visible`).not.toBeNull();
+      // Issue #31 slimmed the My Schedule toolbar pills to a 32px VISIBLE
+      // height; the ≥44px touch tap target is preserved behind the Export
+      // pill by a centered ::before hit-area, so its EFFECTIVE tap height is
+      // the taller of the visible box and that pseudo. Every other control
+      // here still fills a real ≥44px box, so they keep the strict check.
+      const tapHeight =
+        what === "export button"
+          ? await loc.evaluate((el) => {
+              const own = el.getBoundingClientRect().height;
+              const before = parseFloat(getComputedStyle(el, "::before").height);
+              return Number.isFinite(before) ? Math.max(own, before) : own;
+            })
+          : box!.height;
       measured[what] = {
         width: Math.round(box!.width),
-        height: Math.round(box!.height),
+        height: Math.round(tapHeight),
       };
       expect(box!.width, `${what} width`).toBeGreaterThanOrEqual(44);
-      expect(box!.height, `${what} height`).toBeGreaterThanOrEqual(44);
+      expect(tapHeight, `${what} height`).toBeGreaterThanOrEqual(44);
     }
     writeEvidence(
       "ac4-tap-targets.json",

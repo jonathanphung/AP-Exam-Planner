@@ -636,6 +636,32 @@ async function expectTapTarget(
   ).toBeGreaterThanOrEqual(44);
 }
 
+/**
+ * Export button tap target after the issue #31 pill-slimming bounce: the
+ * VISIBLE pill is a slim 32px, so its border box no longer reads ≥44px tall.
+ * The ≥44px touch tap target is preserved behind the slim pill by a centered
+ * `::before` hit-area (extends touch reach vertically). Width comes from the
+ * visible box; effective height is the taller of the box and that pseudo.
+ */
+async function expectExportTapTarget(page: Page) {
+  const btn = exportButton(page);
+  const box = await btn.boundingBox();
+  expect(box, "export button: not visible").not.toBeNull();
+  expect(
+    box!.width,
+    `export button: width ${box!.width}px must be ≥ 44px`,
+  ).toBeGreaterThanOrEqual(44);
+  const tapHeight = await btn.evaluate((el) => {
+    const own = el.getBoundingClientRect().height;
+    const before = parseFloat(getComputedStyle(el, "::before").height);
+    return Number.isFinite(before) ? Math.max(own, before) : own;
+  });
+  expect(
+    tapHeight,
+    `export button: effective tap height ${tapHeight}px (slim ${box!.height}px pill + ::before hit-area, issue #31) must be ≥ 44px`,
+  ).toBeGreaterThanOrEqual(44);
+}
+
 test.describe("AC4 — 375×667 layout", () => {
   test.use({ viewport: { width: 375, height: 667 } });
 
@@ -705,7 +731,7 @@ test.describe("AC4 — 375×667 layout", () => {
         .first(),
       "subject chip toggle",
     );
-    await expectTapTarget(exportButton(page), "export button");
+    await expectExportTapTarget(page);
 
     await infoButton(page, "AP Biology").click();
     await expect(dialog(page)).toBeVisible();
