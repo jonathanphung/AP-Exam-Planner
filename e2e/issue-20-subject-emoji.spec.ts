@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import apData from "../src/data/ap-2026.json";
+import { pressViewChip } from "./support/view-chip";
 
 /**
  * super-board QA (issue #20) — decorative subject emoji next to every name.
@@ -68,12 +69,10 @@ async function select(page: Page, name: string) {
  * The CALENDAR is now the default view (issue #19 bounce item B6); the
  * schedule LIST rows and the auto-raised conflict prompt these tests assert
  * against live in the list view, so switch to it first.
+ * The press is hydration-safe (see e2e/support/view-chip.ts).
  */
 async function openList(page: Page) {
-  await page
-    .getByRole("group", { name: "Schedule view" })
-    .getByRole("button", { name: "List" })
-    .click();
+  await pressViewChip(page, "List");
   await expect(schedule(page)).toBeVisible();
 }
 

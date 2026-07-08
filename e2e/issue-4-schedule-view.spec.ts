@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import apData from "../src/data/ap-2026.json";
+import { pressViewChip } from "./support/view-chip";
 
 /**
  * super-board QA (issue #4) — personal schedule view grouped by date & session
@@ -50,12 +51,10 @@ async function select(page: Page, name: string) {
  * "My Schedule" heading + cycle banner + Export button into a header shared
  * by both views. This suite targets the LIST view, so every test switches to
  * it via the "List" chip first.
+ * The press is hydration-safe (see e2e/support/view-chip.ts).
  */
 async function openList(page: Page) {
-  await page
-    .getByRole("group", { name: "Schedule view" })
-    .getByRole("button", { name: "List" })
-    .click();
+  await pressViewChip(page, "List");
   await expect(schedule(page)).toBeVisible();
 }
 

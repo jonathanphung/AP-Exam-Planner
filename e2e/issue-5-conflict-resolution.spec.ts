@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import apData from "../src/data/ap-2026.json";
+import { pressViewChip } from "./support/view-chip";
 
 /**
  * super-board QA (issue #5) — same-slot conflict detection + resolution to
@@ -129,12 +130,10 @@ async function keep(page: Page, name: string) {
  * Issue #19 (second bounce) made the CALENDAR the default view; this suite
  * exercises the LIST view (where issue #5's modal-on-collision behavior
  * lives), so every test switches to it via the "List" chip after load.
+ * The press is hydration-safe (see e2e/support/view-chip.ts).
  */
 async function openList(page: Page) {
-  await page
-    .getByRole("group", { name: "Schedule view" })
-    .getByRole("button", { name: "List" })
-    .click();
+  await pressViewChip(page, "List");
   await expect(schedule(page)).toBeVisible();
 }
 

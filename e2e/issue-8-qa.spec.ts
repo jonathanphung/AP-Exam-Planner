@@ -3,6 +3,7 @@ import AxeBuilder from "@axe-core/playwright";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import apData from "../src/data/ap-2026.json";
+import { pressViewChip } from "./support/view-chip";
 
 /**
  * super-board QA (issue #8) — Tester evidence spec.
@@ -92,12 +93,10 @@ async function seed(page: Page, ids: string[], resolutions?: unknown[]) {
  * Issue #19 (second bounce) made the CALENDAR the default view; the states
  * this spec captures (conflict modal-on-load, moved badge, late-collision
  * warning) live in the LIST view, so those tests switch to it first.
+ * The press is hydration-safe (see e2e/support/view-chip.ts).
  */
 async function openList(page: Page) {
-  await page
-    .getByRole("group", { name: "Schedule view" })
-    .getByRole("button", { name: "List" })
-    .click();
+  await pressViewChip(page, "List");
   await expect(page.locator('section[aria-label="My schedule"]')).toBeVisible();
 }
 

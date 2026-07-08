@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
+import { pressViewChip } from "./support/view-chip";
 
 /**
  * super-board QA (issue #7) — export selected exams as an ICS calendar file.
@@ -26,12 +27,12 @@ const myExams = (page: Page) =>
   page.locator('section[aria-label="My exams"]');
 const exportButton = (page: Page) => page.getByTestId("export-ics-button");
 
-/** Issue #19 made the calendar the default view; switch to the list. */
+/**
+ * Issue #19 made the calendar the default view; switch to the list.
+ * The press is hydration-safe (see e2e/support/view-chip.ts).
+ */
 async function openList(page: Page) {
-  await page
-    .getByRole("group", { name: "Schedule view" })
-    .getByRole("button", { name: "List" })
-    .click();
+  await pressViewChip(page, "List");
   await expect(schedule(page)).toBeVisible();
 }
 

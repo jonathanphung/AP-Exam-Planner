@@ -4,6 +4,7 @@ import {
   LATE_TESTING_WINDOW,
   REGULAR_WINDOWS,
 } from "../src/data/schema";
+import { pressViewChip } from "./support/view-chip";
 
 /**
  * super-board QA (issue #19) — week-paged calendar grid view for selected
@@ -259,10 +260,13 @@ async function seedResolutions(
   );
 }
 
-/** The calendar is the DEFAULT view (bounce item B6) — click only if needed. */
+/**
+ * The calendar is the DEFAULT view (bounce item B6); the press is a state
+ * no-op when the chip is already active, and hydration-safe otherwise
+ * (see e2e/support/view-chip.ts).
+ */
 async function openCalendar(page: Page) {
-  const chip = calendarChip(page);
-  if ((await chip.getAttribute("aria-pressed")) !== "true") await chip.click();
+  await pressViewChip(page, "Calendar");
   await expect(calendarView(page)).toBeVisible();
   // Navigate to the section the way a user does: since the calendar is now
   // the default (no chip click to auto-scroll) and the #25 resources layout
@@ -271,8 +275,9 @@ async function openCalendar(page: Page) {
   await calendarView(page).scrollIntoViewIfNeeded();
 }
 
+/** Hydration-safe switch to the list view (see e2e/support/view-chip.ts). */
 async function openList(page: Page) {
-  await listChip(page).click();
+  await pressViewChip(page, "List");
   await expect(
     page.locator('section[aria-label="My schedule"]'),
   ).toBeVisible();
@@ -504,7 +509,9 @@ test("AC3 — resolved conflict places the moved exam at its late-testing slot i
   });
 
   // Now resolve: back to the list view, keep Latin at the regular time.
-  await listChip(page).click();
+  // (Hydration-safe press: nothing before this point proves the handlers
+  // are attached — the block reads above are passive.)
+  await pressViewChip(page, "List");
   await expect(prompt.first()).toBeVisible();
   await prompt
     .getByRole("button", { name: `Keep ${LATIN.name} at the regular time` })
