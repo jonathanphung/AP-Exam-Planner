@@ -1,0 +1,174 @@
+
+> ap-exam-planner@0.1.0 test:e2e /Users/jon/repos/AP-Exam-Planner/.worktrees/issue-29-qa
+> playwright test
+
+
+[2mRunning [22m165[2m tests using [22m4[2m workers[22m
+
+  [32m✓[39m  [2m  2 [22m[chromium] › e2e/a11y.spec.ts:168:7 › AC2 — axe-core scans report zero serious/critical violations › empty state (nothing selected)[2m (3.2s)[22m
+  [32m✓[39m  [2m  1 [22m[chromium] › e2e/a11y.spec.ts:201:7 › AC2 — axe-core scans report zero serious/critical violations › info panel open[2m (3.5s)[22m
+  [32m✓[39m  [2m  3 [22m[chromium] › e2e/a11y.spec.ts:192:7 › AC2 — axe-core scans report zero serious/critical violations › conflict dialog open[2m (3.6s)[22m
+  [32m✓[39m  [2m  6 [22m[chromium] › e2e/a11y.spec.ts:295:7 › AC1 — keyboard operability › tab order: search → quick-jump chip → chip toggle → its disclosure → export; visible focus indicators throughout[2m (1.4s)[22m
+  [32m✓[39m  [2m  7 [22m[chromium] › e2e/a11y.spec.ts:380:7 › AC1 — keyboard operability › conflict dialog: modal, focus-trapped, Escape closes (prompt stays available inline)[2m (1.7s)[22m
+  [32m✓[39m  [2m  8 [22m[chromium] › e2e/a11y.spec.ts:426:7 › AC1 — keyboard operability › conflict dialog: choosing a keeper inside the modal resolves and closes it[2m (1.3s)[22m
+  [32m✓[39m  [2m  9 [22m[chromium] › e2e/a11y.spec.ts:445:7 › AC1 — keyboard operability › info panel: focus-trapped and closes on Escape (regression, shared modal helper)[2m (1.3s)[22m
+  [32m✓[39m  [2m  4 [22m[chromium] › e2e/a11y.spec.ts:174:7 › AC2 — axe-core scans report zero serious/critical violations › with selections (schedule populated), light and dark[2m (6.7s)[22m
+  [32m✓[39m  [2m 10 [22m[chromium] › e2e/a11y.spec.ts:533:9 › AC3 — conflict + moved-to-late styles measure ≥ 4.5:1 › measured ratios (light mode)[2m (2.4s)[22m
+  [32m✓[39m  [2m 12 [22m[chromium] › e2e/a11y.spec.ts:643:7 › AC4 — 375×667 layout › no horizontal scroll: populated schedule, conflict dialog, info panel[2m (2.3s)[22m
+  [32m✓[39m  [2m 11 [22m[chromium] › e2e/a11y.spec.ts:533:9 › AC3 — conflict + moved-to-late styles measure ≥ 4.5:1 › measured ratios (dark mode)[2m (2.4s)[22m
+  [32m✓[39m  [2m  5 [22m[chromium] › e2e/a11y.spec.ts:210:7 › AC2 — axe-core scans report zero serious/critical violations › resolved schedule (moved-to-late + late-late warning), light and dark[2m (6.5s)[22m
+  [32m✓[39m  [2m 14 [22m[chromium] › e2e/a11y.spec.ts:746:7 › AC5 — landmarks and labels › exactly one h1; search input is labelled; icon-only buttons have accessible names[2m (923ms)[22m
+  [32m✓[39m  [2m 15 [22m[chromium] › e2e/a11y.spec.ts:772:7 › AC5 — landmarks and labels › selected and moved states are distinguishable by more than color[2m (1.0s)[22m
+  [32m✓[39m  [2m 13 [22m[chromium] › e2e/a11y.spec.ts:679:7 › AC4 — 375×667 layout › primary tap targets are ≥ 44×44 px[2m (2.1s)[22m
+  [32m✓[39m  [2m 16 [22m[chromium] › e2e/issue-19-calendar-view.spec.ts:322:5 › AC1 — calendar is the default; List/Calendar chips toggle by keyboard under a shared header[2m (1.1s)[22m
+  [32m✓[39m  [2m 20 [22m[chromium] › e2e/issue-19-calendar-view.spec.ts:652:5 › AC5 — portfolio deadlines and undated subjects land in the off-grid list, never on the grid[2m (1.1s)[22m
+  [32m✓[39m  [2m 17 [22m[chromium] › e2e/issue-19-calendar-view.spec.ts:393:5 › AC2 — pager walks every published week one grid at a time with dated headers and an hourly axis[2m (2.2s)[22m
+  [32m✓[39m  [2m 19 [22m[chromium] › e2e/issue-19-calendar-view.spec.ts:582:5 › AC4 — blocks are category-colored with a legend, showing subject name and start time[2m (1.4s)[22m
+  [32m✓[39m  [2m 18 [22m[chromium] › e2e/issue-19-calendar-view.spec.ts:476:5 › AC3 — resolved conflict places the moved exam at its late-testing slot in both views[2m (2.2s)[22m
+  [32m✓[39m  [2m 21 [22m[chromium] › e2e/issue-19-calendar-view.spec.ts:709:5 › AC6 — empty selection renders a hint instead of a blank grid[2m (909ms)[22m
+  [32m✓[39m  [2m 22 [22m[chromium] › e2e/issue-19-calendar-view.spec.ts:735:5 › AC7 — banner names the dataset cycle on both views[2m (1.1s)[22m
+  [32m✓[39m  [2m 24 [22m[chromium] › e2e/issue-19-calendar-view.spec.ts:764:7 › AC8 — calendar usable at tablet 1024x768: no body h-scroll, grid scrolls internally, no errors[2m (1.2s)[22m
+  [32m✓[39m  [2m 23 [22m[chromium] › e2e/issue-19-calendar-view.spec.ts:764:7 › AC8 — calendar usable at desktop 1920x1080: no body h-scroll, grid scrolls internally, no errors[2m (1.3s)[22m
+  [32m✓[39m  [2m 25 [22m[chromium] › e2e/issue-19-calendar-view.spec.ts:764:7 › AC8 — calendar usable at mobile 375x667: no body h-scroll, grid scrolls internally, no errors[2m (1.0s)[22m
+  [32m✓[39m  [2m 26 [22m[chromium] › e2e/issue-19-calendar-view.spec.ts:852:5 › AC8 — switcher chips paint a focus-visible ring under keyboard focus[2m (1.1s)[22m
+  [32m✓[39m  [2m 28 [22m[chromium] › e2e/issue-19-calendar-view.spec.ts:935:5 › Pager a11y — keyboard-operable buttons with accessible names and an aria-live week announcement[2m (1.1s)[22m
+  [32m✓[39m  [2m 27 [22m[chromium] › e2e/issue-19-calendar-view.spec.ts:885:5 › Bounce 5 — default page follows the live selection until the student pages manually[2m (1.5s)[22m
+  [32m✓[39m  [2m 29 [22m[chromium] › e2e/issue-19-calendar-view.spec.ts:998:5 › Bounce A — blocks span published exam lengths plus a distinct setup buffer, and the axis fits the longest[2m (1.2s)[22m
+  [32m✓[39m  [2m 30 [22m[chromium] › e2e/issue-19-calendar-view.spec.ts:1070:5 › Bounce C7 — activating a block opens the shared exam-details popup; Escape closes and restores focus[2m (1.2s)[22m
+  [32m✓[39m  [2m 31 [22m[chromium] › e2e/issue-19-calendar-view.spec.ts:1107:5 › Bounce C8 — activating a conflicted block opens the conflict dialog; resolving from the calendar moves the loser[2m (1.5s)[22m
+  [32m✓[39m  [2m 32 [22m[chromium] › e2e/issue-19-calendar-view.spec.ts:1174:5 › Bounce C9 — swap: keep the moved exam at the regular time and move the other exam instead[2m (1.8s)[22m
+  [32m✓[39m  [2m 34 [22m[chromium] › e2e/issue-20-subject-emoji.spec.ts:81:7 › issue #20 — decorative subject emoji everywhere the name shows › AC1 — every catalog card renders a non-blank leading emoji (complete coverage, all 42)[2m (1.2s)[22m
+  [32m✓[39m  [2m 35 [22m[chromium] › e2e/issue-20-subject-emoji.spec.ts:110:7 › issue #20 — decorative subject emoji everywhere the name shows › AC3 — the emoji is aria-hidden: accessible name is the subject name WITHOUT the glyph[2m (622ms)[22m
+  [32m✓[39m  [2m 33 [22m[chromium] › e2e/issue-19-calendar-view.spec.ts:1223:5 › Bounce C9 — switch back re-opens the conflict prompt so the collision is re-resolved[2m (1.9s)[22m
+  [32m✓[39m  [2m 37 [22m[chromium] › e2e/issue-20-subject-emoji.spec.ts:166:7 › issue #20 — decorative subject emoji everywhere the name shows › AC2 — emoji shows in the info-panel title (and stays aria-hidden there)[2m (1.0s)[22m
+  [32m✓[39m  [2m 36 [22m[chromium] › e2e/issue-20-subject-emoji.spec.ts:141:7 › issue #20 — decorative subject emoji everywhere the name shows › AC2 — emoji shows on schedule rows and the conflict prompt's subject list[2m (1.2s)[22m
+  [32m✓[39m  [2m 39 [22m[chromium] › e2e/issue-20-subject-emoji.spec.ts:199:9 › issue #20 — decorative subject emoji everywhere the name shows › evidence — catalog + schedule with emoji at tablet 1024x768[2m (1.3s)[22m
+  [32m✓[39m  [2m 38 [22m[chromium] › e2e/issue-20-subject-emoji.spec.ts:199:9 › issue #20 — decorative subject emoji everywhere the name shows › evidence — catalog + schedule with emoji at desktop 1920x1080[2m (1.7s)[22m
+  [32m✓[39m  [2m 40 [22m[chromium] › e2e/issue-20-subject-emoji.spec.ts:199:9 › issue #20 — decorative subject emoji everywhere the name shows › evidence — catalog + schedule with emoji at mobile 375x667[2m (1.1s)[22m
+  [32m✓[39m  [2m 42 [22m[chromium] › e2e/issue-22-qa.spec.ts:79:7 › issue #22 — mobile category-grouped chips + progressive disclosure › AC1 — mobile catalog is grouped under category headings, not a flat list[2m (776ms)[22m
+  [32m✓[39m  [2m 41 [22m[chromium] › e2e/issue-20-subject-emoji.spec.ts:217:7 › issue #20 — decorative subject emoji everywhere the name shows › evidence — info panel title with emoji (desktop)[2m (1.4s)[22m
+  [32m✓[39m  [2m 43 [22m[chromium] › e2e/issue-22-qa.spec.ts:113:7 › issue #22 — mobile category-grouped chips + progressive disclosure › AC2 — chip: emoji + name, unmistakable selected state, ≥44px tap targets[2m (1.1s)[22m
+  [32m✓[39m  [2m 45 [22m[chromium] › e2e/issue-22-qa.spec.ts:168:7 › issue #22 — mobile category-grouped chips + progressive disclosure › AC4 — search filters the sectioned view; empty categories hide; no-matches state[2m (868ms)[22m
+  [32m✓[39m  [2m 46 [22m[chromium] › e2e/issue-22-qa.spec.ts:204:7 › issue #22 — mobile category-grouped chips + progressive disclosure › AC5 — chip tap toggles the shared selection store; schedule reflects immediately[2m (919ms)[22m
+  [32m✓[39m  [2m 44 [22m[chromium] › e2e/issue-22-qa.spec.ts:147:7 › issue #22 — mobile category-grouped chips + progressive disclosure › AC3 — sticky quick-jump nav reaches a lower category without scrolling the catalog[2m (1.7s)[22m
+  [32m✓[39m  [2m 47 [22m[chromium] › e2e/issue-22-qa.spec.ts:227:7 › issue #22 — mobile category-grouped chips + progressive disclosure › AC6 — expand and select are separate controls; neither triggers the other[2m (972ms)[22m
+  [32m✓[39m  [2m 48 [22m[chromium] › e2e/issue-22-qa.spec.ts:255:7 › issue #22 — mobile category-grouped chips + progressive disclosure › AC7 (Tier 1) — expand reveals exam date, session start time, late testing; portfolio deadline; sourced no-exam reason[2m (919ms)[22m
+  [32m✓[39m  [2m 49 [22m[chromium] › e2e/issue-22-qa.spec.ts:304:7 › issue #22 — mobile category-grouped chips + progressive disclosure › AC8 (Tier 2) — 'Full exam details' opens the shared InfoPanel with the #6 dataset content[2m (709ms)[22m
+  [32m✓[39m  [2m 52 [22m[chromium] › e2e/issue-22-qa.spec.ts:415:7 › issue #22 — mobile category-grouped chips + progressive disclosure › AC13 — real landmarks/headings, chips are buttons with aria-pressed, reduced-motion honored[2m (857ms)[22m
+  [32m✓[39m  [2m 51 [22m[chromium] › e2e/issue-22-qa.spec.ts:374:7 › issue #22 — mobile category-grouped chips + progressive disclosure › AC12 — disclosure is keyboard/SR-accessible: aria-controls wiring, dialog focus trap + restore[2m (977ms)[22m
+  [32m✓[39m  [2m 53 [22m[chromium] › e2e/issue-22-qa.spec.ts:446:7 › issue #22 — mobile category-grouped chips + progressive disclosure › AC14 — desktop shares the grouped IA (issue #24); no horizontal scroll at 375/768/1024/1920[2m (760ms)[22m
+  [32m✓[39m  [2m 50 [22m[chromium] › e2e/issue-22-qa.spec.ts:324:7 › issue #22 — mobile category-grouped chips + progressive disclosure › AC9/AC10 (Tier 3) — verified official College Board link: new tab, noopener noreferrer, ↗, exceptions honored[2m (1.4s)[22m
+  [32m✓[39m  [2m 54 [22m[chromium] › e2e/issue-22-qa.spec.ts:487:7 › evidence — catalog with a selection (desktop 1920x1080)[2m (1.2s)[22m
+  [32m✓[39m  [2m 55 [22m[chromium] › e2e/issue-22-qa.spec.ts:487:7 › evidence — catalog with a selection (tablet 1024x768)[2m (1.1s)[22m
+  [32m✓[39m  [2m 57 [22m[chromium] › e2e/issue-23-resources.spec.ts:55:5 › AC1 — grouped headings with real, descriptively-labeled anchors[2m (718ms)[22m
+  [32m✓[39m  [2m 56 [22m[chromium] › e2e/issue-22-qa.spec.ts:487:7 › evidence — catalog with a selection (mobile 375x667)[2m (1.1s)[22m
+  [32m✓[39m  [2m 60 [22m[chromium] › e2e/issue-23-resources.spec.ts:144:5 › AC4 (desktop) — persistent sidebar renders beside the intact single-page planner[2m (721ms)[22m
+  [32m✓[39m  [2m 58 [22m[chromium] › e2e/issue-23-resources.spec.ts:85:5 › AC2 — every resource link is a real https collegeboard.org URL, no placeholders[2m (759ms)[22m
+  [32m✓[39m  [2m 59 [22m[chromium] › e2e/issue-23-resources.spec.ts:110:5 › AC3 — links open in a new tab with rel=noopener noreferrer and an accessible ↗[2m (932ms)[22m
+  [32m✓[39m  [2m 61 [22m[chromium] › e2e/issue-23-resources.spec.ts:169:5 › AC4 (mobile) — resources collapse into an accessible disclosure near the top[2m (889ms)[22m
+  [32m✓[39m  [2m 62 [22m[chromium] › e2e/issue-23-resources.spec.ts:201:5 › AC5 — the non-affiliation footer notice is present on the home page[2m (889ms)[22m
+  [32m✓[39m  [2m 63 [22m[chromium] › e2e/issue-23-resources.spec.ts:214:5 › AC6 — cycle-labeled links read the cycle from the dataset metadata[2m (889ms)[22m
+  [32m✓[39m  [2m 64 [22m[chromium] › e2e/issue-23-resources.spec.ts:233:7 › AC7 — no horizontal overflow and keyboard-focusable links (desktop 1920x1080)[2m (1.2s)[22m
+  [32m✓[39m  [2m 65 [22m[chromium] › e2e/issue-23-resources.spec.ts:233:7 › AC7 — no horizontal overflow and keyboard-focusable links (tablet 1024x768)[2m (1.2s)[22m
+  [32m✓[39m  [2m 67 [22m[chromium] › e2e/issue-23-resources.spec.ts:272:5 › Home page with the resources sidebar renders without console or page errors[2m (570ms)[22m
+  [32m✓[39m  [2m 66 [22m[chromium] › e2e/issue-23-resources.spec.ts:233:7 › AC7 — no horizontal overflow and keyboard-focusable links (mobile 375x667)[2m (1.4s)[22m
+  [32m✓[39m  [2m 68 [22m[chromium] › e2e/issue-24-qa.spec.ts:95:7 › issue #24 — desktop catalog grouped by category by default › AC1 — desktop renders labeled category sections by default, not a flat grid[2m (1.1s)[22m
+  [32m✓[39m  [2m 69 [22m[chromium] › e2e/issue-24-qa.spec.ts:122:7 › issue #24 — desktop catalog grouped by category by default › AC2 — sections are multi-column on desktop (more columns than mobile), same chip components[2m (1.1s)[22m
+  [32m✓[39m  [2m 70 [22m[chromium] › e2e/issue-24-qa.spec.ts:146:7 › issue #24 — desktop catalog grouped by category by default › AC3 — search filters within/across groups; retired filter is now the quick-jump nav[2m (1.3s)[22m
+  [32m✓[39m  [2m 73 [22m[chromium] › e2e/issue-24-qa.spec.ts:254:7 › issue #24 — desktop catalog grouped by category by default › AC6 — category order comes from the CATEGORIES constant, identical on desktop and mobile[2m (1.0s)[22m
+  [32m✓[39m  [2m 74 [22m[chromium] › e2e/issue-24-qa.spec.ts:286:7 › issue #24 — desktop catalog grouped by category by default › AC7 — a11y + responsive: real landmarks, buttons with aria-pressed, logical keyboard order, no h-scroll[2m (1.0s)[22m
+  [32m✓[39m  [2m 72 [22m[chromium] › e2e/issue-24-qa.spec.ts:218:7 › issue #24 — desktop catalog grouped by category by default › AC5 — desktop reuses #22's disclosure: Tier-1 timing → Tier-2 InfoPanel → Tier-3 CB link[2m (1.4s)[22m
+  [32m✓[39m  [2m 71 [22m[chromium] › e2e/issue-24-qa.spec.ts:189:7 › issue #24 — desktop catalog grouped by category by default › AC4 — chip click toggles the shared useSelection store; grouping changes no semantics[2m (1.7s)[22m
+  [32m✓[39m  [2m 75 [22m[chromium] › e2e/issue-24-qa.spec.ts:361:7 › AC8 — expansion is vertical-only with a stable arrow at 1920×1080[2m (1.4s)[22m
+  [32m✓[39m  [2m 76 [22m[chromium] › e2e/issue-24-qa.spec.ts:361:7 › AC8 — expansion is vertical-only with a stable arrow at 1024×768[2m (1.2s)[22m
+  [32m✓[39m  [2m 78 [22m[chromium] › e2e/issue-24-qa.spec.ts:361:7 › AC8 — expansion is vertical-only with a stable arrow at 375×667[2m (1.1s)[22m
+  [32m✓[39m  [2m 77 [22m[chromium] › e2e/issue-24-qa.spec.ts:361:7 › AC8 — expansion is vertical-only with a stable arrow at 768×900[2m (1.2s)[22m
+  [32m✓[39m  [2m 79 [22m[chromium] › e2e/issue-24-qa.spec.ts:486:7 › evidence — grouped catalog, one selected + one expanded (desktop 1920x1080)[2m (1.5s)[22m
+  [32m✓[39m  [2m 81 [22m[chromium] › e2e/issue-24-qa.spec.ts:486:7 › evidence — grouped catalog, one selected + one expanded (tablet 1024x768)[2m (1.3s)[22m
+  [32m✓[39m  [2m 80 [22m[chromium] › e2e/issue-24-qa.spec.ts:486:7 › evidence — grouped catalog, one selected + one expanded (mobile 375x667)[2m (1.3s)[22m
+  [32m✓[39m  [2m 82 [22m[chromium] › e2e/issue-29-qa.spec.ts:182:5 › AC1 — desktop sidebar: branding → MY SCHEDULES → divider → RESOURCES; collapse toggle widens main, is announced, and is remembered[2m (2.1s)[22m
+  [32m✓[39m  [2m 84 [22m[chromium] › e2e/issue-29-qa.spec.ts:332:7 › AC3 — all 8 resource labels render on one line, untruncated, at 1440px[2m (1.3s)[22m
+  [32m✓[39m  [2m 85 [22m[chromium] › e2e/issue-29-qa.spec.ts:332:7 › AC3 — all 8 resource labels render on one line, untruncated, at 1024px[2m (1.4s)[22m
+  [32m✓[39m  [2m 83 [22m[chromium] › e2e/issue-29-qa.spec.ts:271:5 › AC2 — mobile: no persistent left column; My Schedules and Resources are disclosures and schedule switching works inside them[2m (1.5s)[22m
+  [32m✓[39m  [2m 86 [22m[chromium] › e2e/issue-29-qa.spec.ts:332:7 › AC3 — all 8 resource labels render on one line, untruncated, at 1920px[2m (808ms)[22m
+  [32m✓[39m  [2m 88 [22m[chromium] › e2e/issue-29-qa.spec.ts:385:5 › AC4 — no resource link label contains parentheses[2m (966ms)[22m
+  [32m✓[39m  [2m 87 [22m[chromium] › e2e/issue-29-qa.spec.ts:358:5 › AC3 — resource labels also fit on one line inside the 375px mobile disclosure[2m (1.1s)[22m
+  [32m✓[39m  [2m 89 [22m[chromium] › e2e/issue-29-qa.spec.ts:403:7 › AC5 — hovering a resource link underlines the label but never the ↗ (desktop)[2m (1.5s)[22m
+  [32m✓[39m  [2m 90 [22m[chromium] › e2e/issue-29-qa.spec.ts:403:7 › AC5 — hovering a resource link underlines the label but never the ↗ (mobile disclosure)[2m (1.5s)[22m
+  [32m✓[39m  [2m 91 [22m[chromium] › e2e/issue-29-qa.spec.ts:455:5 › AC6 — switching schedules swaps chips, list, calendar, and ICS export immediately[2m (1.4s)[22m
+  [32m✓[39m  [2m 92 [22m[chromium] › e2e/issue-29-qa.spec.ts:512:5 › AC7 — + creates 'Schedule N'; inline rename; delete needs confirmation; the last schedule cannot be deleted[2m (1.3s)[22m
+  [32m✓[39m  [2m 93 [22m[chromium] › e2e/issue-29-qa.spec.ts:584:5 › AC8 — two schedules hold OPPOSITE resolutions of the same collision without leaking; legacy mirror follows the active schedule[2m (1.2s)[22m
+  [32m✓[39m  [2m 95 [22m[chromium] › e2e/issue-29-qa.spec.ts:714:5 › AC10 — legacy apx.selection.v1 + apx.resolutions.v1 are adopted as 'Schedule 1' with nothing lost[2m (924ms)[22m
+  [32m✓[39m  [2m 94 [22m[chromium] › e2e/issue-29-qa.spec.ts:670:5 › AC9 — schedules persist across reload in versioned localStorage with zero cookies[2m (1.6s)[22m
+  [32m✓[39m  [2m 96 [22m[chromium] › e2e/issue-29-qa.spec.ts:774:5 › AC11 — creating and switching schedules in one tab is reflected in another tab[2m (1.5s)[22m
+  [32m✓[39m  [2m 97 [22m[chromium] › e2e/issue-29-qa.spec.ts:806:5 › AC12 — radiogroup roving tabindex + arrow keys; rename and delete manage focus; collapse toggle is keyboard-operable[2m (1.3s)[22m
+  [32m✓[39m  [2m 98 [22m[chromium] › e2e/issue-29-qa.spec.ts:881:7 › AC13 — no horizontal scroll at 1920px (desktop); evidence screenshot[2m (970ms)[22m
+  [32m✓[39m  [2m 99 [22m[chromium] › e2e/issue-29-qa.spec.ts:881:7 › AC13 — no horizontal scroll at 1024px (tablet); evidence screenshot[2m (962ms)[22m
+  [32m✓[39m  [2m100 [22m[chromium] › e2e/issue-29-qa.spec.ts:881:7 › AC13 — no horizontal scroll at 375px (mobile); evidence screenshot[2m (1.0s)[22m
+  [32m✓[39m  [2m101 [22m[chromium] › e2e/issue-29-qa.spec.ts:881:7 › AC13 — no horizontal scroll at 1440px (laptop); evidence screenshot[2m (860ms)[22m
+  [32m✓[39m  [2m103 [22m[chromium] › e2e/issue-3-catalog-grid.spec.ts:75:7 › issue #3 — subject catalog › AC2 — labeled search filters by name, case-insensitively, live as you type[2m (871ms)[22m
+  [32m✓[39m  [2m102 [22m[chromium] › e2e/issue-3-catalog-grid.spec.ts:47:7 › issue #3 — subject catalog › AC1 — renders every subject with name, category, and date/deadline meta[2m (946ms)[22m
+  [32m✓[39m  [2m105 [22m[chromium] › e2e/issue-3-catalog-grid.spec.ts:143:7 › issue #3 — subject catalog › AC4 — tapping a card toggles My Exams and updates the running count[2m (962ms)[22m
+  [32m✓[39m  [2m104 [22m[chromium] › e2e/issue-3-catalog-grid.spec.ts:100:7 › issue #3 — subject catalog › AC3 — category chips are a quick-jump to their section, and track search[2m (1.1s)[22m
+  [32m✓[39m  [2m107 [22m[chromium] › e2e/issue-3-catalog-grid.spec.ts:190:7 › issue #3 — subject catalog › AC6 — cards are keyboard focusable in DOM order and toggle on Enter/Space[2m (900ms)[22m
+  [32m✓[39m  [2m106 [22m[chromium] › e2e/issue-3-catalog-grid.spec.ts:161:7 › issue #3 — subject catalog › AC5 — selection persists in localStorage apx.selection.v1 across reload[2m (1.4s)[22m
+  [32m✓[39m  [2m108 [22m[chromium] › e2e/issue-3-catalog-grid.spec.ts:224:7 › issue #3 — subject catalog › AC7 — responsive: category-sectioned chips at 375px with no h-scroll, grouped multi-column sections at 1920px[2m (953ms)[22m
+  [32m✓[39m  [2m109 [22m[chromium] › e2e/issue-3-catalog-grid.spec.ts:288:7 › evidence — catalog with a selection (desktop 1920x1080)[2m (1.2s)[22m
+  [32m✓[39m  [2m110 [22m[chromium] › e2e/issue-3-catalog-grid.spec.ts:288:7 › evidence — catalog with a selection (tablet 1024x768)[2m (1.1s)[22m
+  [32m✓[39m  [2m111 [22m[chromium] › e2e/issue-3-catalog-grid.spec.ts:288:7 › evidence — catalog with a selection (mobile 375x667)[2m (1.1s)[22m
+  [32m✓[39m  [2m112 [22m[chromium] › e2e/issue-4-schedule-view.spec.ts:63:7 › issue #4 — my schedule › AC1 — entries render grouped by date ascending, AM before PM, with subject name + session[2m (1.2s)[22m
+  [32m✓[39m  [2m114 [22m[chromium] › e2e/issue-4-schedule-view.spec.ts:143:7 › issue #4 — my schedule › AC3 — a portfolio-only subject appears only as a deadline entry, never as an exam[2m (977ms)[22m
+  [32m✓[39m  [2m113 [22m[chromium] › e2e/issue-4-schedule-view.spec.ts:105:7 › issue #4 — my schedule › AC2 — a subject with a portfolio renders a distinct 'Portfolio due' entry + internal-deadline note[2m (1.1s)[22m
+  [32m✓[39m  [2m115 [22m[chromium] › e2e/issue-4-schedule-view.spec.ts:162:7 › issue #4 — my schedule › AC4 — a banner states the cycle, read from dataset metadata (not hardcoded)[2m (692ms)[22m
+  [32m✓[39m  [2m116 [22m[chromium] › e2e/issue-4-schedule-view.spec.ts:183:7 › issue #4 — my schedule › AC5 — zero selections shows an empty-state hint, not an empty list[2m (978ms)[22m
+  [32m✓[39m  [2m117 [22m[chromium] › e2e/issue-4-schedule-view.spec.ts:198:7 › issue #4 — my schedule › extra — a Career Kickstart subject with no May 2026 exam surfaces under a no-date note, not as an exam[2m (961ms)[22m
+  [32m✓[39m  [2m118 [22m[chromium] › e2e/issue-4-schedule-view.spec.ts:219:9 › issue #4 — my schedule › AC6 — readable at 375px with no horizontal scroll[2m (1.3s)[22m
+  [32m✓[39m  [2m119 [22m[chromium] › e2e/issue-4-schedule-view.spec.ts:219:9 › issue #4 — my schedule › AC6 — readable at 1024px with no horizontal scroll[2m (1.2s)[22m
+  [32m✓[39m  [2m120 [22m[chromium] › e2e/issue-4-schedule-view.spec.ts:219:9 › issue #4 — my schedule › AC6 — readable at 1920px with no horizontal scroll[2m (1.5s)[22m
+  [32m✓[39m  [2m121 [22m[chromium] › e2e/issue-4-schedule-view.spec.ts:253:7 › evidence — populated schedule (desktop 1920x1080)[2m (1.7s)[22m
+  [32m✓[39m  [2m123 [22m[chromium] › e2e/issue-4-schedule-view.spec.ts:253:7 › evidence — populated schedule (mobile 375x667)[2m (1.6s)[22m
+  [32m✓[39m  [2m122 [22m[chromium] › e2e/issue-4-schedule-view.spec.ts:253:7 › evidence — populated schedule (tablet 1024x768)[2m (1.7s)[22m
+  [32m✓[39m  [2m125 [22m[chromium] › e2e/issue-5-conflict-resolution.spec.ts:270:7 › issue #5 — same-slot conflicts resolve to official late-testing slots › AC2 — choosing the keeper moves each non-keeper to ITS OWN late-testing slot, shown under the late date with a 'Moved to late testing' tag[2m (1.0s)[22m
+  [32m✓[39m  [2m127 [22m[chromium] › e2e/issue-5-conflict-resolution.spec.ts:360:7 › issue #5 — same-slot conflicts resolve to official late-testing slots › AC5 — two moved exams landing on the same late slot show a named warning; both entries render; no forced second resolution[2m (1.4s)[22m
+  [32m✓[39m  [2m124 [22m[chromium] › e2e/issue-5-conflict-resolution.spec.ts:223:7 › issue #5 — same-slot conflicts resolve to official late-testing slots › AC1 — conflict prompt appears when the collision comes into existence (second selection AND persisted load), naming both subjects + the shared slot[2m (2.4s)[22m
+  [32m✓[39m  [2m126 [22m[chromium] › e2e/issue-5-conflict-resolution.spec.ts:298:7 › issue #5 — same-slot conflicts resolve to official late-testing slots › AC3 — resolution persists in apx.resolutions.v1 across reload; deselecting an involved subject clears it and restores the regular slot; re-creating the collision re-prompts[2m (1.9s)[22m
+  [32m✓[39m  [2m128 [22m[chromium] › e2e/issue-5-conflict-resolution.spec.ts:404:7 › issue #5 — same-slot conflicts resolve to official late-testing slots › AC6 — both the prompt and the moved-exam tag carry the AP-coordinator planning-choice wording[2m (1.2s)[22m
+  [32m✓[39m  [2m129 [22m[chromium] › e2e/issue-5-conflict-resolution.spec.ts:419:7 › issue #5 — same-slot conflicts resolve to official late-testing slots › AC7 — portfolio deadlines sharing a date never trigger the conflict flow[2m (1.4s)[22m
+  [32m✓[39m  [2m132 [22m[chromium] › e2e/issue-5-conflict-resolution.spec.ts:532:7 › evidence — conflict prompt renders at tablet 1024x768[2m (1.2s)[22m
+  [32m✓[39m  [2m131 [22m[chromium] › e2e/issue-5-conflict-resolution.spec.ts:532:7 › evidence — conflict prompt renders at desktop 1920x1080[2m (1.4s)[22m
+  [32m✓[39m  [2m133 [22m[chromium] › e2e/issue-5-conflict-resolution.spec.ts:532:7 › evidence — conflict prompt renders at mobile 375x667[2m (1.3s)[22m
+  [32m✓[39m  [2m135 [22m[chromium] › e2e/issue-6-exam-info-panel.spec.ts:53:7 › issue #6 — exam info panel › AC1 — each chip has a details affordance distinct from the select toggle that opens the panel without selecting[2m (1.0s)[22m
+  [32m✓[39m  [2m130 [22m[chromium] › e2e/issue-5-conflict-resolution.spec.ts:447:7 › issue #5 — same-slot conflicts resolve to official late-testing slots › AC9 — the schedule renders the RESOLVED slot (never the default) and the conflict styling meets WCAG AA contrast in light and dark[2m (2.7s)[22m
+  [32m✓[39m  [2m137 [22m[chromium] › e2e/issue-6-exam-info-panel.spec.ts:108:7 › issue #6 — exam info panel › AC3 — a 'pending' value renders as a visible muted badge, never blank or fabricated[2m (1.1s)[22m
+  [32m✓[39m  [2m136 [22m[chromium] › e2e/issue-6-exam-info-panel.spec.ts:86:7 › issue #6 — exam info panel › AC2 — panel shows MCQ/FRQ counts + type, length as h/min, calculator, delivery, and the pass rate labeled 'scored 3 or higher'[2m (1.3s)[22m
+  [32m✓[39m  [2m138 [22m[chromium] › e2e/issue-6-exam-info-panel.spec.ts:129:7 › issue #6 — exam info panel › AC4 — portfolio subjects show the portfolio's weight (% of final) and deadline in the panel[2m (1.0s)[22m
+  [32m✓[39m  [2m134 [22m[chromium] › e2e/issue-5-conflict-resolution.spec.ts:548:5 › evidence — resolved state (moved tag) and late-late warning at desktop[2m (3.0s)[22m
+  [32m✓[39m  [2m141 [22m[chromium] › e2e/issue-6-exam-info-panel.spec.ts:180:7 › issue #6 — exam info panel › AC6 — at 375px the panel is a full-width sheet with no horizontal scroll[2m (1.1s)[22m
+  [32m✓[39m  [2m140 [22m[chromium] › e2e/issue-6-exam-info-panel.spec.ts:216:7 › evidence — info panel open (desktop 1920x1080)[2m (1.4s)[22m
+  [32m✓[39m  [2m139 [22m[chromium] › e2e/issue-6-exam-info-panel.spec.ts:146:7 › issue #6 — exam info panel › AC5 — accessible: focus moves in on open, Escape and close button dismiss, focus returns, scroll locked while open[2m (1.4s)[22m
+  [32m✓[39m  [2m142 [22m[chromium] › e2e/issue-6-exam-info-panel.spec.ts:216:7 › evidence — info panel open (tablet 1024x768)[2m (1.1s)[22m
+  [32m✓[39m  [2m143 [22m[chromium] › e2e/issue-6-exam-info-panel.spec.ts:216:7 › evidence — info panel open (mobile 375x667)[2m (867ms)[22m
+  [32m✓[39m  [2m144 [22m[chromium] › e2e/issue-7-export-ics.spec.ts:88:7 › issue #7 — export to calendar › AC1 — clicking downloads ap-exams-2026.ics generated client-side (blob, zero network) with the selected exam + portfolio events[2m (1.1s)[22m
+  [32m✓[39m  [2m145 [22m[chromium] › e2e/issue-7-export-ics.spec.ts:55:7 › issue #7 — export to calendar › AC1 — the Export button lives in the My Schedule header and is disabled until ≥1 subject is selected[2m (1.1s)[22m
+  [32m✓[39m  [2m146 [22m[chromium] › e2e/issue-7-export-ics.spec.ts:158:7 › evidence — enabled Export button over a populated schedule (desktop 1920x1080)[2m (1.3s)[22m
+  [32m✓[39m  [2m147 [22m[chromium] › e2e/issue-7-export-ics.spec.ts:158:7 › evidence — enabled Export button over a populated schedule (tablet 1024x768)[2m (1.2s)[22m
+  [32m✓[39m  [2m148 [22m[chromium] › e2e/issue-7-export-ics.spec.ts:158:7 › evidence — enabled Export button over a populated schedule (mobile 375x667)[2m (1.4s)[22m
+  [32m✓[39m  [2m150 [22m[chromium] › e2e/issue-8-qa.spec.ts:206:7 › issue #8 QA evidence › AC1 evidence — visible focus indicator + focus-trapped conflict modal[2m (858ms)[22m
+  [32m✓[39m  [2m151 [22m[chromium] › e2e/issue-8-qa.spec.ts:221:7 › issue #8 QA evidence › AC1 evidence — conflict modal open with focus inside[2m (939ms)[22m
+  [32m✓[39m  [2m154 [22m[chromium] › e2e/issue-8-qa.spec.ts:391:7 › issue #8 QA evidence › AC4 evidence — mobile conflict dialog + measured tap targets[2m (1.8s)[22m
+  [32m✓[39m  [2m149 [22m[chromium] › e2e/issue-8-qa.spec.ts:178:7 › issue #8 QA evidence › standard viewports — resolved schedule with moved badge + late warning[2m (3.4s)[22m
+  [32m✓[39m  [2m156 [22m[chromium] › e2e/issue-9-qa.spec.ts:30:5 › AC1 — README has what/why, feature list, stack, pnpm quickstart, and the data/swap note[2m (11ms)[22m
+  [32m✓[39m  [2m157 [22m[chromium] › e2e/issue-9-qa.spec.ts:62:5 › AC2 — README embeds committed screenshots under docs/screenshots/ via relative paths[2m (5ms)[22m
+  [32m✓[39m  [2m158 [22m[chromium] › e2e/issue-9-qa.spec.ts:87:5 › AC3 — footer shows both attribution lines and does not duplicate the coordinator note[2m (730ms)[22m
+  [32m✓[39m  [2m155 [22m[chromium] › e2e/issue-8-qa.spec.ts:465:7 › issue #8 QA evidence › AC5 evidence — info panel with textual 'pending' badge[2m (1.1s)[22m
+  [32m✓[39m  [2m153 [22m[chromium] › e2e/issue-8-qa.spec.ts:321:7 › issue #8 QA evidence › AC3 evidence — measured contrast ratios written to contrast-ratios.txt[2m (3.8s)[22m
+  [32m✓[39m  [2m159 [22m[chromium] › e2e/issue-9-qa.spec.ts:112:7 › AC4 — footer renders with no overflow/overlap/layout-shift (desktop 1920x1080)[2m (1.9s)[22m
+  [32m✓[39m  [2m160 [22m[chromium] › e2e/issue-9-qa.spec.ts:112:7 › AC4 — footer renders with no overflow/overlap/layout-shift (tablet 1024x768)[2m (1.7s)[22m
+  [32m✓[39m  [2m161 [22m[chromium] › e2e/issue-9-qa.spec.ts:112:7 › AC4 — footer renders with no overflow/overlap/layout-shift (mobile 375x667)[2m (1.6s)[22m
+  [32m✓[39m  [2m162 [22m[chromium] › e2e/qa-evidence.spec.ts:22:7 › AC2 — / renders header + populated main with no console errors (desktop 1920x1080)[2m (831ms)[22m
+  [32m✓[39m  [2m163 [22m[chromium] › e2e/qa-evidence.spec.ts:22:7 › AC2 — / renders header + populated main with no console errors (tablet 1024x768)[2m (790ms)[22m
+  [32m✓[39m  [2m165 [22m[chromium] › e2e/smoke.spec.ts:3:5 › home page renders the AP Exam Planner header and title[2m (451ms)[22m
+  [32m✓[39m  [2m164 [22m[chromium] › e2e/qa-evidence.spec.ts:22:7 › AC2 — / renders header + populated main with no console errors (mobile 375x667)[2m (783ms)[22m
+  [32m✓[39m  [2m152 [22m[chromium] › e2e/issue-8-qa.spec.ts:238:7 › issue #8 QA evidence › AC2 evidence — axe summary across states written to JSON[2m (9.6s)[22m
+
+[32m  165 passed[39m[2m (1.1m)[22m
