@@ -23,7 +23,7 @@ import { useSyncExternalStore } from "react";
  *   • it ignores OS changes while an explicit `light`/`dark` is chosen;
  *   • cross-tab edits sync via the `storage` event, like `schedules.ts`.
  *
- * The pure core (`parsePreference`, `resolveTheme`, `nextPreference`) is
+ * The pure core (`parsePreference`, `resolveTheme`, `toggledPreference`) is
  * unit-tested in `theme.test.ts`; the DOM/storage shell (pre-paint apply,
  * persistence, live system-change) is exercised by the Playwright suite in a
  * real browser, exactly as `schedules.ts` documents for its shell.
@@ -35,9 +35,6 @@ export type ResolvedTheme = "light" | "dark";
 /** localStorage key — versioned per PROJECT.md ("apx.<name>.vN").
  *  MUST stay in sync with the inline pre-paint script in `layout.tsx`. */
 export const THEME_STORAGE_KEY = "apx.theme.v1";
-
-/** Ordered cycle for the cycling toggle button: light → dark → system → …. */
-const PREFERENCES: readonly ThemePreference[] = ["light", "dark", "system"];
 
 /**
  * Coerce an unknown stored value into a valid preference. Anything that is not
@@ -63,10 +60,17 @@ export function resolveTheme(
   return preference;
 }
 
-/** Next preference in the cycle (wraps): light → dark → system → light. */
-export function nextPreference(preference: ThemePreference): ThemePreference {
-  const index = PREFERENCES.indexOf(preference);
-  return PREFERENCES[(index + 1) % PREFERENCES.length];
+/**
+ * The explicit preference a toggle click writes: always the opposite of the
+ * currently *resolved* theme (issue #41, Jon's 2026-07-09 bounce). This is
+ * what makes the first click out of the `system` default land on the opposite
+ * of whatever the OS was showing, and every click after that flip light ↔
+ * dark. The return type excludes `system` — a click can never land back on it,
+ * so there is no route back to system from the UI (intentional, per the
+ * bounce).
+ */
+export function toggledPreference(resolved: ResolvedTheme): "light" | "dark" {
+  return resolved === "dark" ? "light" : "dark";
 }
 
 export interface ThemeState {
@@ -202,10 +206,15 @@ export function setThemePreference(next: ThemePreference): void {
   recompute();
 }
 
-/** Advance the preference one step in the cycle (light → dark → system → …). */
-export function cycleThemePreference(): ThemePreference {
+/**
+ * Toggle the resolved theme: write the explicit opposite of whatever is
+ * resolved right now. From the `system` default the first call lands on the
+ * opposite of the OS theme and stops following the OS; afterwards it flips
+ * light ↔ dark. Returns the new (always explicit) preference.
+ */
+export function toggleThemePreference(): "light" | "dark" {
   ensureHydrated();
-  const next = nextPreference(preference);
+  const next = toggledPreference(resolved);
   setThemePreference(next);
   return next;
 }
@@ -213,8 +222,9 @@ export function cycleThemePreference(): ThemePreference {
 export interface ThemeApi extends ThemeState {
   /** Set an explicit preference. */
   setPreference: (preference: ThemePreference) => void;
-  /** Advance one step in the light → dark → system cycle; returns the new one. */
-  cycle: () => ThemePreference;
+  /** Flip to the opposite of the resolved theme (writes an explicit
+   *  light/dark preference and stops following the OS); returns the new one. */
+  toggle: () => "light" | "dark";
 }
 
 /**
@@ -232,6 +242,6 @@ export function useTheme(): ThemeApi {
     preference: state.preference,
     resolved: state.resolved,
     setPreference: setThemePreference,
-    cycle: cycleThemePreference,
+    toggle: toggleThemePreference,
   };
 }

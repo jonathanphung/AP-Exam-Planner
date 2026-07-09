@@ -2,47 +2,71 @@ import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
 /**
- * super-board QA (issue #41) — theme toggle (light / dark / system).
+ * super-board QA (issue #41) — theme toggle, REVISED for Jon's 2026-07-09
+ * bounce. The control is now:
+ *   • a two-state light ↔ dark button (no monitor / "system" glyph anywhere);
+ *   • placed in the sidebar BRANDING row, immediately left of the collapse
+ *     control (not in the footer);
+ *   • its glyph a pure function of the *resolved* theme (light → sun,
+ *     dark → moon);
+ *   • `system` survives only as the silent first-visit default: the first
+ *     click writes the explicit opposite of the resolved theme and stops
+ *     following the OS; there is no route back to `system` from the UI.
  *
  * One observable, browser-level test per acceptance-criterion clause that the
  * unit suite (src/lib/theme.test.ts, the pure core) cannot reach: the DOM /
- * storage shell — pre-paint FOUC prevention, persistence across reload, System
- * following an emulated `prefers-color-scheme` change, the class-based dark
- * strategy actually flipping `dark:` utilities, both sidebar presentations +
- * the collapsed rail, and the #8 accessibility bar (button semantics, live
- * announcement, keyboard, 44px target, decorative icon, axe-clean footer).
+ * storage shell — pre-paint FOUC prevention, persistence, System live-follow
+ * before the first click, the class-based dark strategy, both presentations +
+ * the collapsed rail, the absence of the monitor glyph, and the #8 a11y bar.
  *
  * Test hooks (from the Builder's handoff):
- *   data-testid="theme-toggle"        — the cycling button
+ *   data-testid="theme-toggle"        — the toggle button
  *   data-testid="theme-announcement"  — the polite live region
- *   data-testid="sidebar-footer"      — the footer row it lives in
+ *   data-testid="sidebar-branding"    — the branding row it now lives in
+ *   data-testid="sidebar-footer"      — the footer (now Feedback + GitHub only)
  *   apx.theme.v1                      — the localStorage key
  */
 
 const THEME_KEY = "apx.theme.v1";
-const EVIDENCE_DIR = "docs/super-board/runs/issue-41-qa-v1";
+const EVIDENCE_DIR = "docs/super-board/runs/issue-41-qa-v2";
 
-// Exact label strings the component renders (kept in lockstep with
-// ThemeToggle.tsx's LABELS map); the accessible name is
-// `Theme: ${label}. Change theme.` and the announcement is `Theme: ${label}.`.
-const LABEL = {
-  light: "Light",
-  dark: "Dark",
-  system: "System (follows your device)",
-} as const;
+type Resolved = "light" | "dark";
+/** The accessible name the button renders for a given resolved theme:
+ *  `Theme: <state>. Switch to <other> theme.` (state + action). */
+const nameFor = (resolved: Resolved) =>
+  `Theme: ${resolved}. Switch to ${resolved === "dark" ? "light" : "dark"} theme.`;
 
 const toggle = (page: Page) => page.getByTestId("theme-toggle");
 const announcement = (page: Page) => page.getByTestId("theme-announcement");
 const githubLink = (page: Page) =>
   page.getByRole("link", { name: /GitHub repository/ });
+const collapseBtn = (page: Page) =>
+  page.getByRole("button", { name: "Collapse sidebar" });
+const expandBtn = (page: Page) =>
+  page.getByRole("button", { name: "Expand sidebar" });
 
-type HtmlState = { dark: boolean; colorScheme: string; bodyBg: string };
+type HtmlState = { dark: boolean; colorScheme: string };
 const htmlState = (page: Page): Promise<HtmlState> =>
   page.evaluate(() => ({
     dark: document.documentElement.classList.contains("dark"),
     colorScheme: document.documentElement.style.colorScheme,
-    bodyBg: getComputedStyle(document.body).backgroundColor,
   }));
+
+/**
+ * Identify the rendered glyph structurally, without leaning on brittle path
+ * data: the SUN is the only glyph with a <circle>, the MONITOR was the only
+ * glyph with a <rect>, and the MOON has neither. So `{circles:1,rects:0}` ⇒
+ * sun, `{circles:0,rects:0}` ⇒ moon, and any `rects>0` would mean the deleted
+ * monitor glyph resurfaced. Scoped to the toggle's own <svg> (the collapse
+ * control's panel glyph, which does use a <rect>, is a different element).
+ */
+const glyph = (page: Page) =>
+  toggle(page)
+    .locator("svg")
+    .evaluate((svg) => ({
+      circles: svg.querySelectorAll("circle").length,
+      rects: svg.querySelectorAll("rect").length,
+    }));
 
 /** Seed the stored preference before any app script runs (pre-paint path). */
 async function seedTheme(page: Page, value: string) {
@@ -59,7 +83,7 @@ async function seedTheme(page: Page, value: string) {
  * sampling the pixel normalises whatever space the engine chose. `sum` is
  * r+g+b (0–765): near 0 = near-black (dark theme), near 765 = white (light).
  */
-async function bodyBg(page: Page): Promise<{ r: number; g: number; b: number; sum: number }> {
+async function bodyBg(page: Page): Promise<{ sum: number }> {
   return page.evaluate(() => {
     const c = getComputedStyle(document.body).backgroundColor;
     const cv = document.createElement("canvas");
@@ -68,51 +92,133 @@ async function bodyBg(page: Page): Promise<{ r: number; g: number; b: number; su
     ctx.fillStyle = c;
     ctx.fillRect(0, 0, 1, 1);
     const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
-    return { r, g, b, sum: r + g + b };
+    return { sum: r + g + b };
   });
 }
 
-// ── Behavior ───────────────────────────────────────────────────────────────
+// ── Icon semantics: glyph = resolved theme; monitor is gone ──────────────────
 
-test.describe("AC: three-state cycling control (Light / Dark / System)", () => {
-  test("cycles System → Light → Dark → System, flipping the resolved theme", async ({
-    page,
-  }) => {
-    await page.emulateMedia({ colorScheme: "light" }); // deterministic OS = light
-    await page.goto("/");
+test("AC: glyph reflects the resolved theme on first load — light OS → sun", async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: "light" });
+  await page.goto("/"); // default preference = system → resolves light
 
-    const btn = toggle(page);
-    // First-visit default is System (follows the OS, which we pinned to light).
-    await expect(btn).toHaveAttribute(
-      "aria-label",
-      `Theme: ${LABEL.system}. Change theme.`,
-    );
-    expect((await htmlState(page)).dark).toBe(false);
+  await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("light"));
+  expect(await glyph(page)).toEqual({ circles: 1, rects: 0 }); // sun
+  expect((await htmlState(page)).dark).toBe(false);
+});
 
-    // System → Light
-    await btn.click();
-    await expect(btn).toHaveAttribute(
-      "aria-label",
-      `Theme: ${LABEL.light}. Change theme.`,
-    );
-    expect((await htmlState(page)).dark).toBe(false);
+test("AC: glyph reflects the resolved theme on first load — dark OS → moon", async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.goto("/"); // default = system → resolves dark (follows the OS)
 
-    // Light → Dark  (resolved theme flips even though the OS is light)
-    await btn.click();
-    await expect(btn).toHaveAttribute(
-      "aria-label",
-      `Theme: ${LABEL.dark}. Change theme.`,
-    );
-    expect((await htmlState(page)).dark).toBe(true);
+  await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("dark"));
+  expect(await glyph(page)).toEqual({ circles: 0, rects: 0 }); // moon
+  expect((await htmlState(page)).dark).toBe(true);
+});
 
-    // Dark → System  (back to following the light OS)
-    await btn.click();
-    await expect(btn).toHaveAttribute(
-      "aria-label",
-      `Theme: ${LABEL.system}. Change theme.`,
-    );
-    expect((await htmlState(page)).dark).toBe(false);
-  });
+test("AC: the monitor glyph is absent in every state (deleted)", async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.goto("/"); // system (moon)
+  expect((await glyph(page)).rects, "no monitor on the system default").toBe(0);
+
+  await toggle(page).click(); // system(dark) → explicit light (sun)
+  expect((await glyph(page)).rects, "no monitor after first click").toBe(0);
+  await toggle(page).click(); // light → dark (moon)
+  expect((await glyph(page)).rects, "no monitor after a second click").toBe(0);
+  await toggle(page).click(); // dark → light (sun)
+  expect((await glyph(page)).rects, "no monitor ever").toBe(0);
+});
+
+// ── Behavior: first click out of system, then a plain two-state toggle ───────
+
+test("AC: first click out of system picks the opposite of the resolved theme — OS dark", async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.goto("/");
+
+  // First visit: silent system, resolves dark (moon), no stored preference yet.
+  await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("dark"));
+  expect(await page.evaluate((k) => localStorage.getItem(k), THEME_KEY)).toBeNull();
+
+  // First click writes the explicit OPPOSITE of the resolved (dark) theme.
+  await toggle(page).click();
+  await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("light"));
+  expect(await glyph(page)).toEqual({ circles: 1, rects: 0 }); // sun
+  expect((await htmlState(page)).dark).toBe(false);
+  expect(await page.evaluate((k) => localStorage.getItem(k), THEME_KEY)).toBe(
+    "light",
+  );
+});
+
+test("AC: first click out of system picks the opposite of the resolved theme — OS light", async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: "light" });
+  await page.goto("/");
+
+  await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("light"));
+  await toggle(page).click(); // resolves light → explicit dark
+  await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("dark"));
+  expect((await htmlState(page)).dark).toBe(true);
+  expect(await page.evaluate((k) => localStorage.getItem(k), THEME_KEY)).toBe(
+    "dark",
+  );
+});
+
+test("AC: after the first click it is a plain two-state light ↔ dark toggle", async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: "light" });
+  await page.goto("/");
+
+  await toggle(page).click(); // system → dark
+  await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("dark"));
+  await toggle(page).click(); // dark → light
+  await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("light"));
+  await toggle(page).click(); // light → dark  (never lands back on system)
+  await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("dark"));
+});
+
+test("AC: an explicit choice stops following the OS", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.goto("/"); // system, resolves dark
+
+  await toggle(page).click(); // → explicit light
+  await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("light"));
+
+  // OS is (still) dark, and now flips around — the explicit light must win.
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.waitForTimeout(150);
+  expect((await htmlState(page)).dark).toBe(false);
+  await page.emulateMedia({ colorScheme: "light" });
+  await page.waitForTimeout(150);
+  expect((await htmlState(page)).dark).toBe(false);
+});
+
+test("AC: System mode follows a live OS change (before any click)", async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: "light" });
+  await page.goto("/"); // default = system
+
+  await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("light"));
+  expect((await htmlState(page)).dark).toBe(false);
+
+  // OS → dark: system follows it live (no reload, no click) → moon.
+  await page.emulateMedia({ colorScheme: "dark" });
+  await expect.poll(async () => (await htmlState(page)).dark).toBe(true);
+  await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("dark"));
+
+  // OS → light again: follows back.
+  await page.emulateMedia({ colorScheme: "light" });
+  await expect.poll(async () => (await htmlState(page)).dark).toBe(false);
 });
 
 test("AC: choice persists across reload/session under apx.theme.v1", async ({
@@ -121,83 +227,63 @@ test("AC: choice persists across reload/session under apx.theme.v1", async ({
   await page.emulateMedia({ colorScheme: "light" });
   await page.goto("/");
 
-  // System → Light → Dark
-  await toggle(page).click();
-  await toggle(page).click();
-  await expect(toggle(page)).toHaveAttribute(
-    "aria-label",
-    `Theme: ${LABEL.dark}. Change theme.`,
-  );
+  await toggle(page).click(); // system(light) → explicit dark
+  await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("dark"));
   expect(await page.evaluate((k) => localStorage.getItem(k), THEME_KEY)).toBe(
     "dark",
   );
 
   await page.reload();
 
-  // Survives the reload: still Dark, still applied.
-  await expect(toggle(page)).toHaveAttribute(
-    "aria-label",
-    `Theme: ${LABEL.dark}. Change theme.`,
-  );
+  await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("dark"));
   expect((await htmlState(page)).dark).toBe(true);
   expect(await page.evaluate((k) => localStorage.getItem(k), THEME_KEY)).toBe(
     "dark",
   );
 });
 
-test("AC: System mode follows a live OS prefers-color-scheme change", async ({
+test("AC: a stored 'system' still resolves correctly on load", async ({
   page,
 }) => {
-  await page.emulateMedia({ colorScheme: "light" });
-  await page.goto("/"); // default = System
-
-  await expect(toggle(page)).toHaveAttribute(
-    "aria-label",
-    `Theme: ${LABEL.system}. Change theme.`,
-  );
-  expect((await htmlState(page)).dark).toBe(false);
-
-  // OS flips to dark → System follows it live (no reload, no click).
+  // system is never written by the UI anymore, but a value persisted before
+  // this change (or hand-set) must still resolve and live-follow the OS.
+  await seedTheme(page, "system");
   await page.emulateMedia({ colorScheme: "dark" });
-  await expect.poll(async () => (await htmlState(page)).dark).toBe(true);
+  await page.goto("/");
 
-  // OS flips back to light → follows again.
+  await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("dark"));
+  expect((await htmlState(page)).dark).toBe(true);
   await page.emulateMedia({ colorScheme: "light" });
   await expect.poll(async () => (await htmlState(page)).dark).toBe(false);
 });
 
-test("AC: explicit Light/Dark ignore live OS changes", async ({ page }) => {
-  await page.emulateMedia({ colorScheme: "light" });
+test("AC: a malformed stored value degrades to system (no crash)", async ({
+  page,
+}) => {
+  await seedTheme(page, "chartreuse");
+  await page.emulateMedia({ colorScheme: "dark" });
   await page.goto("/");
 
-  await toggle(page).click(); // System → Light
-  await expect(toggle(page)).toHaveAttribute(
-    "aria-label",
-    `Theme: ${LABEL.light}. Change theme.`,
-  );
-
-  // OS goes dark, but the explicit Light choice must win.
-  await page.emulateMedia({ colorScheme: "dark" });
-  // Give the store a beat; it must NOT flip.
-  await page.waitForTimeout(150);
-  expect((await htmlState(page)).dark).toBe(false);
+  // Degrades to system → follows the (dark) OS, and the control still works.
+  await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("dark"));
+  expect((await htmlState(page)).dark).toBe(true);
+  await toggle(page).click();
+  await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("light"));
 });
+
+// ── No FOUC / color-scheme / class strategy / SSR-safety ─────────────────────
 
 test("AC: no flash of the wrong theme (pre-paint apply) — Dark stored on a light OS", async ({
   page,
 }) => {
   await seedTheme(page, "dark");
-  await page.emulateMedia({ colorScheme: "light" }); // light machine
-
-  // domcontentloaded — the inline <script> at the top of <body> runs
-  // synchronously before React, so by this point `.dark` is already on <html>.
+  await page.emulateMedia({ colorScheme: "light" });
   await page.goto("/", { waitUntil: "domcontentloaded" });
 
-  const state = await htmlState(page);
-  expect(state.dark, "pre-paint script must apply .dark before first paint").toBe(
-    true,
-  );
-  // Body is already painted dark (no white flash): near-black background.
+  expect(
+    (await htmlState(page)).dark,
+    "pre-paint script must apply .dark before first paint",
+  ).toBe(true);
   expect((await bodyBg(page)).sum, "body already painted dark (no white flash)")
     .toBeLessThan(120);
 });
@@ -208,14 +294,12 @@ test("AC: color-scheme is set to match the active theme (native UI)", async ({
   await page.emulateMedia({ colorScheme: "light" });
   await page.goto("/");
 
-  await toggle(page).click(); // → Light
-  expect((await htmlState(page)).colorScheme).toBe("light");
-
-  await toggle(page).click(); // → Dark
+  expect((await htmlState(page)).colorScheme).toBe("light"); // system → light
+  await toggle(page).click(); // → dark
   expect((await htmlState(page)).colorScheme).toBe("dark");
+  await toggle(page).click(); // → light
+  expect((await htmlState(page)).colorScheme).toBe("light");
 });
-
-// ── Implementation: class-based dark strategy actually drives `dark:` ─────────
 
 test("AC: class strategy — .dark on <html> flips existing dark: utilities", async ({
   page,
@@ -223,19 +307,14 @@ test("AC: class strategy — .dark on <html> flips existing dark: utilities", as
   await page.emulateMedia({ colorScheme: "light" });
   await page.goto("/");
 
-  // System on a light OS → body uses the light utility (near-white).
   const lightBg = await bodyBg(page);
   expect(lightBg.sum, "light body is near-white").toBeGreaterThan(700);
 
-  // → Light → Dark; body's `dark:bg-slate-950` must now win purely from the
-  // class (the OS is still light), proving the media→class swap works.
-  await toggle(page).click();
-  await toggle(page).click();
-  const dark = await htmlState(page);
-  expect(dark.dark).toBe(true);
+  await toggle(page).click(); // system(light) → explicit dark
+  expect((await htmlState(page)).dark).toBe(true);
   const darkBg = await bodyBg(page);
   expect(darkBg.sum, "dark body is near-black").toBeLessThan(120);
-  expect(darkBg.sum).toBeLessThan(lightBg.sum); // class flip actually changed paint
+  expect(darkBg.sum).toBeLessThan(lightBg.sum);
 });
 
 test("AC: SSR-safe store — no hydration mismatch warning with a stored preference", async ({
@@ -262,26 +341,57 @@ test("AC: SSR-safe store — no hydration mismatch warning with a stored prefere
 
 // ── Placement & presentation ────────────────────────────────────────────────
 
-test("AC: renders beside the GitHub icon at the same size (desktop)", async ({
+test("AC: lives in the branding row, immediately left of the collapse control, same size", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1920, height: 1080 });
   await page.goto("/");
 
   await expect(toggle(page)).toBeVisible();
-  await expect(githubLink(page)).toBeVisible();
+  await expect(collapseBtn(page)).toBeVisible();
+
+  // In the branding row (above the footer), not the footer.
+  const branding = page.getByTestId("sidebar-branding");
+  await expect(branding.getByTestId("theme-toggle")).toBeVisible();
+  await expect(
+    page.getByTestId("sidebar-footer").getByTestId("theme-toggle"),
+  ).toHaveCount(0);
 
   const t = await toggle(page).boundingBox();
-  const g = await githubLink(page).boundingBox();
-  expect(t && g).toBeTruthy();
-  // Same icon size (both h-9 w-9 at lg): within 2px.
-  expect(Math.abs(t!.width - g!.width)).toBeLessThanOrEqual(2);
-  expect(Math.abs(t!.height - g!.height)).toBeLessThanOrEqual(2);
-  // Toggle sits immediately to the LEFT of the GitHub mark (per the issue).
-  expect(t!.x).toBeLessThan(g!.x);
+  const c = await collapseBtn(page).boundingBox();
+  expect(t && c).toBeTruthy();
+  // Same icon-box size as the collapse control (both h-8 w-8 at lg): within 2px.
+  expect(Math.abs(t!.width - c!.width)).toBeLessThanOrEqual(2);
+  expect(Math.abs(t!.height - c!.height)).toBeLessThanOrEqual(2);
+  // Immediately to the LEFT of the collapse control (per Jon's bounce).
+  expect(t!.x).toBeLessThan(c!.x);
 });
 
-test("AC: renders in the mobile presentation too, with a 44px touch target", async ({
+test("AC: h1 stays uncrowded / untruncated after the move (1024 and 1920)", async ({
+  page,
+}) => {
+  for (const width of [1024, 1920]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const h1 = page.getByRole("heading", { level: 1, name: "AP Exam Planner" });
+    await expect(h1).toBeVisible();
+    // The single h1 is not clipped by its `truncate` guard (scrollWidth would
+    // exceed clientWidth if it were), so the title reads in full beside the
+    // two-control cluster.
+    const clipped = await h1.evaluate(
+      (el) => el.scrollWidth > el.clientWidth + 1,
+    );
+    expect(clipped, `h1 truncated at ${width}px`).toBe(false);
+    // Toggle sits between the title and the collapse control.
+    const h1Box = await h1.boundingBox();
+    const tBox = await toggle(page).boundingBox();
+    const cBox = await collapseBtn(page).boundingBox();
+    expect(h1Box!.x + h1Box!.width).toBeLessThanOrEqual(tBox!.x + 1);
+    expect(tBox!.x).toBeLessThan(cBox!.x);
+  }
+});
+
+test("AC: renders in the mobile presentation with a 44px touch target", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 375, height: 667 });
@@ -293,25 +403,25 @@ test("AC: renders in the mobile presentation too, with a 44px touch target", asy
   expect(box!.height).toBeGreaterThanOrEqual(44);
 });
 
-test("AC: reachable when the desktop sidebar is collapsed (icon-only rail)", async ({
+test("AC: reachable & operable when the desktop sidebar is collapsed (rail)", async ({
   page,
 }) => {
+  await page.emulateMedia({ colorScheme: "light" });
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
 
   await expect(toggle(page)).toBeVisible();
-  await page.getByRole("button", { name: "Collapse sidebar" }).click();
+  await collapseBtn(page).click();
+  await expect(expandBtn(page)).toBeVisible();
 
-  // The footer row now stacks the icons in the rail; the toggle stays reachable.
-  await expect(page.getByRole("button", { name: "Expand sidebar" })).toBeVisible();
+  // Theme toggle AND the GitHub mark both stay reachable in the ~40px rail.
   await expect(toggle(page)).toBeVisible();
   await expect(toggle(page)).toBeEnabled();
-  // Still operable from the collapsed rail.
+  await expect(githubLink(page)).toBeVisible();
+
+  // Operable from the rail.
   await toggle(page).click();
-  await expect(toggle(page)).toHaveAttribute(
-    "aria-label",
-    `Theme: ${LABEL.light}. Change theme.`,
-  );
+  await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("dark"));
 });
 
 for (const width of [320, 375, 1024, 1920]) {
@@ -321,7 +431,9 @@ for (const width of [320, 375, 1024, 1920]) {
     await page.setViewportSize({ width, height: 800 });
     await page.goto("/");
     const overflow = await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      () =>
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
     );
     expect(overflow, `horizontal overflow at ${width}px`).toBeLessThanOrEqual(1);
   });
@@ -332,10 +444,12 @@ test("AC: no horizontal scroll with the collapsed rail (desktop)", async ({
 }) => {
   await page.setViewportSize({ width: 1024, height: 800 });
   await page.goto("/");
-  await page.getByRole("button", { name: "Collapse sidebar" }).click();
-  await expect(page.getByRole("button", { name: "Expand sidebar" })).toBeVisible();
+  await collapseBtn(page).click();
+  await expect(expandBtn(page)).toBeVisible();
   const overflow = await page.evaluate(
-    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    () =>
+      document.documentElement.scrollWidth -
+      document.documentElement.clientWidth,
   );
   expect(overflow).toBeLessThanOrEqual(1);
 });
@@ -350,10 +464,9 @@ test("AC: real button semantics; name conveys state + action", async ({
 
   const tag = await toggle(page).evaluate((el) => el.tagName);
   expect(tag).toBe("BUTTON");
-  // Accessible name conveys BOTH the current state and the action.
   await expect(toggle(page)).toHaveAttribute(
     "aria-label",
-    /^Theme: .+\. Change theme\.$/,
+    /^Theme: (light|dark)\. Switch to (light|dark) theme\.$/,
   );
 });
 
@@ -363,38 +476,32 @@ test("AC: new state announced on activation (polite live region)", async ({
   await page.emulateMedia({ colorScheme: "light" });
   await page.goto("/");
 
-  // Nothing read on load.
-  await expect(announcement(page)).toHaveText("");
-  const live = announcement(page);
-  expect(await live.getAttribute("aria-live")).toBe("polite");
+  await expect(announcement(page)).toHaveText(""); // nothing read on load
+  expect(await announcement(page).getAttribute("aria-live")).toBe("polite");
 
-  await toggle(page).click(); // → Light
-  await expect(announcement(page)).toHaveText(`Theme: ${LABEL.light}.`);
-  await toggle(page).click(); // → Dark
-  await expect(announcement(page)).toHaveText(`Theme: ${LABEL.dark}.`);
+  await toggle(page).click(); // → dark
+  await expect(announcement(page)).toHaveText("Theme: dark.");
+  await toggle(page).click(); // → light
+  await expect(announcement(page)).toHaveText("Theme: light.");
 });
 
-test("AC: keyboard operable (Enter activates from focus)", async ({ page }) => {
+test("AC: keyboard operable (Enter / Space activate from focus)", async ({
+  page,
+}) => {
   await page.emulateMedia({ colorScheme: "light" });
   await page.goto("/");
 
   await toggle(page).focus();
   expect(
-    await page.evaluate(
-      () => document.activeElement?.getAttribute("data-testid"),
+    await page.evaluate(() =>
+      document.activeElement?.getAttribute("data-testid"),
     ),
   ).toBe("theme-toggle");
 
-  await page.keyboard.press("Enter"); // System → Light
-  await expect(toggle(page)).toHaveAttribute(
-    "aria-label",
-    `Theme: ${LABEL.light}. Change theme.`,
-  );
-  await page.keyboard.press(" "); // Light → Dark
-  await expect(toggle(page)).toHaveAttribute(
-    "aria-label",
-    `Theme: ${LABEL.dark}. Change theme.`,
-  );
+  await page.keyboard.press("Enter"); // system(light) → dark
+  await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("dark"));
+  await page.keyboard.press(" "); // dark → light
+  await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("light"));
 });
 
 test("AC: icon is decorative (aria-hidden); button carries the name", async ({
@@ -406,7 +513,6 @@ test("AC: icon is decorative (aria-hidden); button carries the name", async ({
     .first()
     .getAttribute("aria-hidden");
   expect(svgHidden).toBe("true");
-  // The button is NOT icon-only-with-no-name.
   const name = await toggle(page).getAttribute("aria-label");
   expect(name && name.length).toBeGreaterThan(0);
 });
@@ -417,8 +523,6 @@ test("AC: respects prefers-reduced-motion (no theme-transition animation)", asyn
   await page.emulateMedia({ reducedMotion: "reduce", colorScheme: "light" });
   await page.goto("/");
 
-  // No transition is declared on the theme-bearing elements, so the flip is
-  // instant for reduced-motion users (honored by construction).
   const htmlDur = await page.evaluate(
     () => getComputedStyle(document.documentElement).transitionDuration,
   );
@@ -428,120 +532,93 @@ test("AC: respects prefers-reduced-motion (no theme-transition animation)", asyn
   expect(parseFloat(htmlDur)).toBe(0);
   expect(parseFloat(bodyDur)).toBe(0);
 
-  // And it still functions under reduced motion.
-  await toggle(page).click();
-  await toggle(page).click();
+  await toggle(page).click(); // still functions under reduced motion
   expect((await htmlState(page)).dark).toBe(true);
 });
 
-test("AC: footer control is axe-clean in both themes (AA contrast)", async ({
+test("AC: branding control cluster is axe-clean in both themes (AA contrast)", async ({
   page,
 }) => {
   await page.emulateMedia({ colorScheme: "light" });
   await page.goto("/");
 
-  const scanFooter = async () =>
+  const scanBranding = async () =>
     new AxeBuilder({ page })
-      .include('[data-testid="sidebar-footer"]')
+      .include('[data-testid="sidebar-branding"]')
       .withTags(["wcag2a", "wcag2aa"])
       .analyze();
 
-  // Light
-  await toggle(page).click(); // → Light (explicit)
-  const light = await scanFooter();
+  // Light (explicit)
+  await toggle(page).click(); // system(light) → dark
+  await toggle(page).click(); // dark → light
+  const light = await scanBranding();
   const lightSerious = light.violations.filter((v) =>
     ["serious", "critical"].includes(v.impact ?? ""),
   );
   expect(
     lightSerious,
-    `light footer violations: ${lightSerious.map((v) => v.id).join(", ")}`,
+    `light branding violations: ${lightSerious.map((v) => v.id).join(", ")}`,
   ).toEqual([]);
 
-  // Dark
-  await toggle(page).click(); // → Dark (explicit)
+  // Dark (explicit)
+  await toggle(page).click(); // light → dark
   expect((await htmlState(page)).dark).toBe(true);
-  const dark = await scanFooter();
+  const dark = await scanBranding();
   const darkSerious = dark.violations.filter((v) =>
     ["serious", "critical"].includes(v.impact ?? ""),
   );
   expect(
     darkSerious,
-    `dark footer violations: ${darkSerious.map((v) => v.id).join(", ")}`,
+    `dark branding violations: ${darkSerious.map((v) => v.id).join(", ")}`,
   ).toEqual([]);
 });
 
-// ── Evidence capture ─────────────────────────────────────────────────────────
+// ── Evidence capture (light/dark, expanded/collapsed, desktop/mobile) ────────
 
-test("evidence — light/dark/system at desktop/tablet/mobile, expanded + collapsed", async ({
+test("evidence — branding-row toggle: light & dark, expanded & collapsed, desktop & mobile", async ({
   page,
 }) => {
-  // Standard super-board viewports (mandatory desktop/tablet/mobile), plus the
-  // per-state shots the issue's Verification AC asks for.
-  const setPref = async (clicks: number) => {
-    for (let i = 0; i < clicks; i += 1) await toggle(page).click();
-  };
-
-  // Desktop 1920 — System (default), light OS
+  // Desktop 1920 — system default on a light OS (sun, light theme). This shot
+  // also documents the h1 still reading as centered/balanced after the move.
   await page.emulateMedia({ colorScheme: "light" });
   await page.setViewportSize({ width: 1920, height: 1080 });
   await page.goto("/");
   await expect(toggle(page)).toBeVisible();
   await page.screenshot({ path: `${EVIDENCE_DIR}/desktop.png`, fullPage: true });
-
-  // Desktop light (explicit)
-  await setPref(1); // System → Light
   await page.screenshot({ path: `${EVIDENCE_DIR}/light-desktop.png`, fullPage: true });
 
   // Desktop dark (explicit)
-  await setPref(1); // Light → Dark
-  await expect(toggle(page)).toHaveAttribute(
-    "aria-label",
-    `Theme: ${LABEL.dark}. Change theme.`,
-  );
+  await toggle(page).click(); // → dark
+  await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("dark"));
   await page.screenshot({ path: `${EVIDENCE_DIR}/dark-desktop.png`, fullPage: true });
 
-  // Desktop system-following-dark: back to System, OS dark
-  await setPref(1); // Dark → System
-  await page.emulateMedia({ colorScheme: "dark" });
-  await expect.poll(async () => (await htmlState(page)).dark).toBe(true);
-  await page.screenshot({
-    path: `${EVIDENCE_DIR}/system-following-dark-desktop.png`,
-    fullPage: true,
-  });
-
-  // Collapsed rail — dark, then light
-  await page.getByRole("button", { name: "Collapse sidebar" }).click();
-  await expect(page.getByRole("button", { name: "Expand sidebar" })).toBeVisible();
+  // Collapsed rail — dark, then light (both controls + GitHub reachable)
+  await collapseBtn(page).click();
+  await expect(expandBtn(page)).toBeVisible();
   await page.screenshot({
     path: `${EVIDENCE_DIR}/collapsed-dark-desktop.png`,
     fullPage: true,
   });
-  await page.emulateMedia({ colorScheme: "light" });
-  // System now resolves to light; capture the collapsed light rail.
-  await expect.poll(async () => (await htmlState(page)).dark).toBe(false);
+  await toggle(page).click(); // dark → light in the rail
+  await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("light"));
   await page.screenshot({
     path: `${EVIDENCE_DIR}/collapsed-light-desktop.png`,
     fullPage: true,
   });
 
-  // Tablet 1024×768 — System/light
+  // Tablet 1024×768 — system/light
   await page.emulateMedia({ colorScheme: "light" });
   await page.setViewportSize({ width: 1024, height: 768 });
   await page.goto("/");
   await expect(toggle(page)).toBeVisible();
   await page.screenshot({ path: `${EVIDENCE_DIR}/tablet.png`, fullPage: true });
 
-  // Mobile 375×667 — System/light (default)
+  // Mobile 375×667 — system/light (default), then explicit dark
   await page.setViewportSize({ width: 375, height: 667 });
   await page.goto("/");
   await expect(toggle(page)).toBeVisible();
   await page.screenshot({ path: `${EVIDENCE_DIR}/mobile.png`, fullPage: true });
-
-  // Mobile dark (explicit) — System → Light → Dark
-  await setPref(2);
-  await expect(toggle(page)).toHaveAttribute(
-    "aria-label",
-    `Theme: ${LABEL.dark}. Change theme.`,
-  );
+  await toggle(page).click(); // → dark
+  await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("dark"));
   await page.screenshot({ path: `${EVIDENCE_DIR}/mobile-dark.png`, fullPage: true });
 });

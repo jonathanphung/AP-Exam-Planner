@@ -16,7 +16,8 @@ import { toggleSidebarCollapsed, useSidebarCollapsed } from "@/lib/sidebar";
  * branded app panel modeled on the UT Registration Plus reference:
  *
  *   1. Branding row — the app mark + "AP Exam Planner" (the page's single h1)
- *      with a collapse/expand toggle on the right (desktop only).
+ *      with a right control cluster: the theme toggle (issue #41; every
+ *      presentation) and, on desktop, the collapse/expand toggle.
  *   2. MY SCHEDULES — the multi-schedule switcher (see MySchedules.tsx).
  *   3. Divider.
  *   4. RESOURCES — the #23/#25 curated official links, content unchanged
@@ -165,19 +166,22 @@ function GitHubIcon() {
 }
 
 /**
- * Footer row: "Send us Feedback" left, an icon cluster right — the theme
- * toggle (issue #41) immediately beside the GitHub icon, at the same icon
- * size. One row, pinned below the content in both presentations. House link
- * rules: the text underlines on hover, the trailing ↗ / the icons never do;
- * ≥44px touch targets on mobile (h-11, relaxed at `lg` like the other sidebar
- * controls).
+ * Footer row: "Send us Feedback" (left) and the GitHub mark (right). One row,
+ * pinned below the content in both presentations. House link rules: the text
+ * underlines on hover, the trailing ↗ / the icon never do; ≥44px touch targets
+ * on mobile (h-11, relaxed at `lg` like the other sidebar controls).
  *
- * Collapsed desktop rail (issue #41): the row previously vanished entirely
- * (`lg:hidden`), which would strand a collapsed-sidebar user with no theme
- * control. Instead, in the ~40px rail we drop the feedback text (no room for
- * a label) and stack the icon controls vertically and centered, so the theme
- * toggle — and the GitHub mark — stay reachable icon-only. Mobile ignores
- * these `lg:` overrides and keeps the full row.
+ * The theme toggle used to live here beside the GitHub mark; the #41 bounce
+ * (Jon, 2026-07-09) moved it up into the branding row, so the footer is once
+ * again just Feedback + GitHub.
+ *
+ * Collapsed desktop rail: no room for the feedback label, so it hides and the
+ * lone GitHub mark centers — it stays reachable in the rail (Jon's explicit
+ * bounce requirement). NB: before #41 the whole footer was `lg:hidden` when
+ * collapsed, so the GitHub mark was NOT reachable in the rail pre-#41 (verified
+ * against e40450e); the bounce's parenthetical "it was, before #41" is
+ * inaccurate, but its instruction — keep GitHub reachable — is what this
+ * implements. Mobile ignores these `lg:` overrides and keeps the full row.
  */
 function SidebarFooter({ collapsed }: { collapsed: boolean }) {
   return (
@@ -185,9 +189,9 @@ function SidebarFooter({ collapsed }: { collapsed: boolean }) {
       data-testid="sidebar-footer"
       className={[
         "mt-5 flex items-center justify-between gap-2 border-t border-slate-200 pt-3 lg:mt-4 lg:shrink-0 dark:border-slate-800",
-        collapsed
-          ? "lg:flex-col lg:items-center lg:justify-center lg:gap-1"
-          : "",
+        // Collapsed rail: the feedback label hides (below); center the lone
+        // GitHub mark so it stays reachable icon-only.
+        collapsed ? "lg:justify-center" : "",
       ].join(" ")}
     >
       <a
@@ -196,8 +200,8 @@ function SidebarFooter({ collapsed }: { collapsed: boolean }) {
         rel="noopener noreferrer"
         className={[
           "group inline-flex min-h-11 items-center gap-1 rounded-sm text-sm font-medium text-slate-700 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 lg:min-h-9 dark:text-slate-300 dark:hover:text-slate-100 dark:focus-visible:outline-blue-400",
-          // No room for the text label in the collapsed rail; the icon
-          // controls below stay reachable.
+          // No room for the text label in the collapsed rail; the GitHub mark
+          // stays reachable.
           collapsed ? "lg:hidden" : "",
         ].join(" ")}
       >
@@ -207,24 +211,16 @@ function SidebarFooter({ collapsed }: { collapsed: boolean }) {
         <span aria-hidden="true">↗</span>
         <span className="sr-only"> (opens in a new tab)</span>
       </a>
-      <div
-        className={[
-          "flex items-center gap-1",
-          collapsed ? "lg:flex-col" : "",
-        ].join(" ")}
+      <a
+        href="https://github.com/jonathanphung/AP-Exam-Planner"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="GitHub repository (opens in a new tab)"
+        title="GitHub repository"
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 lg:h-9 lg:w-9 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 dark:focus-visible:outline-blue-400"
       >
-        <ThemeToggle />
-        <a
-          href="https://github.com/jonathanphung/AP-Exam-Planner"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="GitHub repository (opens in a new tab)"
-          title="GitHub repository"
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 lg:h-9 lg:w-9 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 dark:focus-visible:outline-blue-400"
-        >
-          <GitHubIcon />
-        </a>
-      </div>
+        <GitHubIcon />
+      </a>
     </div>
   );
 }
@@ -264,10 +260,20 @@ export function Sidebar() {
         collapsed ? "lg:w-10" : "lg:w-80",
       ].join(" ")}
     >
-      {/* 1 — Branding row: app mark + name (the page's single h1) + collapse
-          toggle. When collapsed on desktop the text is sr-only, so the
-          document keeps its h1 and the rail shows just the toggle. */}
-      <div className="flex items-center justify-between gap-2">
+      {/* 1 — Branding row: app mark + name (the page's single h1) + a right
+          control cluster [theme toggle][collapse toggle] (issue #41 bounce:
+          the theme toggle moved out of the footer to sit immediately left of
+          the collapse control). When collapsed on desktop the mark+name are
+          sr-only, so the document keeps its h1 and the rail shows only the
+          control cluster — centered and stacked vertically, because the two
+          h-8 controls cannot sit side-by-side in the ~40px (w-10) rail. */}
+      <div
+        data-testid="sidebar-branding"
+        className={[
+          "flex items-center justify-between gap-2",
+          collapsed ? "lg:justify-center" : "",
+        ].join(" ")}
+      >
         <div
           className={`flex min-w-0 items-center gap-2.5 ${collapsed ? "lg:sr-only" : ""}`}
         >
@@ -281,17 +287,29 @@ export function Sidebar() {
             AP Exam Planner
           </h1>
         </div>
-        <button
-          type="button"
-          onClick={toggleSidebarCollapsed}
-          aria-expanded={!collapsed}
-          aria-controls="sidebar-sections"
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          className="hidden h-8 w-8 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 lg:flex dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 dark:focus-visible:outline-blue-400"
+        <div
+          className={[
+            "flex shrink-0 items-center gap-1.5",
+            // Collapsed rail: stack the two icon controls vertically and
+            // centered (they don't fit side-by-side at ~40px).
+            collapsed ? "lg:flex-col" : "",
+          ].join(" ")}
         >
-          <PanelToggleIcon collapsed={collapsed} />
-        </button>
+          {/* Theme toggle (present in every presentation; 44px on mobile,
+              matches the collapse control's h-8 w-8 box at lg). */}
+          <ThemeToggle />
+          <button
+            type="button"
+            onClick={toggleSidebarCollapsed}
+            aria-expanded={!collapsed}
+            aria-controls="sidebar-sections"
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className="hidden h-8 w-8 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 lg:flex dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 dark:focus-visible:outline-blue-400"
+          >
+            <PanelToggleIcon collapsed={collapsed} />
+          </button>
+        </div>
       </div>
 
       <div
