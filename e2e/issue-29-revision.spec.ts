@@ -190,3 +190,71 @@ test("mobile footer row: present in the disclosure card with ≥44px touch targe
   }));
   expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 1);
 });
+
+// ── 4. R6: delete-dialog backdrop dims the catalog filter bar ────────────────
+
+/** Hydration-safe "New schedule" press (revision-spec local copy). */
+async function createSchedule(page: Page) {
+  const radios = page
+    .getByRole("radiogroup", { name: "My schedules" })
+    .getByRole("radio");
+  const before = await radios.count();
+  const button = page.getByRole("button", { name: "New schedule" });
+  await expect(async () => {
+    await button.click();
+    await expect(radios).toHaveCount(before + 1, { timeout: 1000 });
+  }).toPass();
+}
+
+test("R6: the delete-schedule dialog is portaled to <body> and its backdrop dims the sticky catalog filter bar", async ({
+  page,
+}) => {
+  await page.setViewportSize(DESKTOP);
+  await page.goto("/");
+
+  // Need a second schedule so the delete button is enabled.
+  await createSchedule(page);
+
+  // Open the delete confirm dialog for "Schedule 2".
+  await page.getByRole("button", { name: "Delete Schedule 2" }).click();
+  const dialog = page.getByRole("dialog", { name: /Delete .Schedule 2./ });
+  await expect(dialog).toBeVisible();
+
+  // (a) The dialog must live outside the sticky sidebar's stacking context —
+  //     i.e. portaled to <body>, with no <aside> ancestor. Inline in the
+  //     sidebar it would inherit the aside's stacking context (QA v3 R6).
+  const hasAsideAncestor = await dialog.evaluate(
+    (node) => node.closest("aside") !== null,
+  );
+  expect(hasAsideAncestor, "delete dialog must be portaled out of <aside>").toBe(
+    false,
+  );
+
+  // (b) The backdrop must paint over the sticky `z-30` filter bar: the topmost
+  //     element at a filter chip's center is the overlay, not the chip. With
+  //     the bug, the chip stayed hittable ("lit up") above the dim.
+  const chip = page
+    .locator("nav[aria-label='Jump to category']")
+    .getByRole("button", { name: "STEM" });
+  await expect(chip).toBeVisible();
+  const box = (await chip.boundingBox())!;
+  const cx = box.x + box.width / 2;
+  const cy = box.y + box.height / 2;
+
+  const topmostIsChip = await page.evaluate(
+    ({ x, y }) => {
+      const top = document.elementFromPoint(x, y);
+      const chipButton = document
+        .querySelector("nav[aria-label='Jump to category']")
+        ?.querySelector("button");
+      // `contains` also catches the case where the point lands on the chip's
+      // inner text node/span.
+      return top !== null && chipButton !== null && chipButton!.contains(top);
+    },
+    { x: cx, y: cy },
+  );
+  expect(
+    topmostIsChip,
+    "filter chip must be covered by the dialog backdrop, not on top of it",
+  ).toBe(false);
+});

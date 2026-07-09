@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useSchedules, type Schedule } from "@/lib/schedules";
 import { useModalDialog } from "@/lib/modal";
 
@@ -46,7 +47,7 @@ function DeleteScheduleDialog({
   const cancelRef = useRef<HTMLButtonElement>(null);
   useModalDialog(panelRef, onCancel, cancelRef);
 
-  return (
+  const overlay = (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-slate-950/50"
@@ -94,6 +95,19 @@ function DeleteScheduleDialog({
       </div>
     </div>
   );
+
+  // Render through a portal on <body> rather than inline. The desktop sidebar
+  // is now `position: sticky` (post-approval bounce), which makes it a
+  // stacking context that paints *below* <main>. An inline `fixed inset-0
+  // z-50` overlay is trapped inside that context, so its backdrop cannot dim
+  // the catalog filter bar (`sticky top-0 z-30` in <main>) — the bar stayed
+  // "lit up" over the dim (QA v3 R6). Portaling to <body> lifts the overlay to
+  // the root stacking context so it covers the entire app, filter bar
+  // included. `document` is always present here: this component only mounts
+  // after a client-side click, never during SSR/hydration.
+  return typeof document === "undefined"
+    ? overlay
+    : createPortal(overlay, document.body);
 }
 
 export function MySchedules() {
