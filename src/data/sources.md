@@ -53,9 +53,11 @@ labels verbatim.
     `ap-business-personal-finance`)
   - `totalMinutes` is the published "Exam Duration" from the AP Students
     assessment page (e.g. Biology "3hrs" → 180; Cybersecurity "2hrs 10mins"
-    → 130). Where the page publishes a range for question counts (AP Chinese
-    "25–35" + "30–40" listening/reading MCQs), the dataset stores the
-    published range as a string (e.g. `"55–75"`).
+    → 130). The `questionCount` type also accepts a published range string
+    (`"55–75"`) for cycles where College Board prints an adaptive range, though
+    **no subject currently uses one** after the 2026-07-09 re-source — see
+    "2026 digital-redesign question-count corrections" below, which moved AP
+    Chinese and AP Japanese to fixed counts.
 - Portfolio component weights (`weightPct`):
   - AP Seminar 20% + 35% = 55% through-course performance tasks:
     <https://apcentral.collegeboard.org/courses/ap-seminar/exam>
@@ -65,6 +67,120 @@ labels verbatim.
     <https://apcentral.collegeboard.org/courses/ap-computer-science-principles/exam>
   - AP Art and Design sustained investigation 60% + selected works 40%:
     <https://apstudents.collegeboard.org/courses/ap-drawing/assessment>
+
+## 2026 digital-redesign question-count corrections (issue #45, re-sourced 2026-07-09)
+
+The initial 2026-07-04 fill carried **pre-redesign** question counts for seven
+subjects. They were re-sourced on **2026-07-09** from each course's AP Central
+exam page (`https://apcentral.collegeboard.org/courses/ap-<slug>/exam`),
+adversarially verified (one fetch agent + one independent refute-skeptic per
+subject), and re-checked by hand. Verbatim page text for all 42 subjects is
+committed under `docs/super-board/research/collegeboard-2026/` (see that
+folder's `README.md`); each subject below cites its file.
+
+| subject | field | was | now | verbatim source quote |
+|---|---|---|---|---|
+| `statistics` | `mcqCount` | 40 | **42** | "Section I: Multiple Choice — 42 Questions \| 1 Hour 30 Minutes \| 50% of Exam Score" |
+| `statistics` | `frqCount` | 6 | **4** | "Section II: Free Response — 4 Questions \| 1 Hour 30 Minutes \| 50% of Exam Score" |
+| `french-language-and-culture` | `mcqCount` | 65 | **55** | "Section II: Multiple-Choice — 55 Questions \| 80 Minutes \| 50% of Score" |
+| `french-language-and-culture` | `frqCount` | 4 | **3** | "Section I: Free-Response — 3 Questions \| 65–70 Minutes \| 50% of Score" |
+| `german-language-and-culture` | `mcqCount` | 65 | **55** | "Section II: Multiple-Choice — 55 Questions \| 80 Minutes \| 50% of Score" |
+| `german-language-and-culture` | `frqCount` | 4 | **3** | "Section I: Free-Response — 3 Questions \| 65–70 Minutes \| 50% of Score" |
+| `italian-language-and-culture` | `mcqCount` | 65 | **55** | "55 Questions \| 80 Minutes \| 50% of Score" |
+| `italian-language-and-culture` | `frqCount` | 4 | **3** | "3 Questions \| 65–70 Minutes \| 50% of Score" |
+| `spanish-language-and-culture` | `mcqCount` | 65 | **55** | "Section II: Multiple-Choice — 55 Questions \| 80 Minutes \| 50% of Score" |
+| `spanish-language-and-culture` | `frqCount` | 4 | **3** | "Section I: Free-Response — 3 Questions \| 65–70 Minutes \| 50% of Score" |
+| `chinese-language-and-culture` | `mcqCount` | `"55–75"` | **55** | "Section II: Multiple-Choice — 55 Questions \| 65 Minutes \| 50% of Score" |
+| `japanese-language-and-culture` | `mcqCount` | `"60–75"` | **55** | "Section II: Multiple Choice — 55 questions — 50% of Score (Part A: Listening 25 + Part B: Reading 30)" |
+
+The `"55–75"` / `"60–75"` ranges for Chinese and Japanese described the older
+adaptive-listening format; the current pages print a fixed **55** (25 listening
++ 30 reading). AP Statistics moved to 42 MCQ / 4 FRQ and AP French/German/
+Italian/Spanish now open with a spoken project presentation, dropping Section I
+to 3 free-response questions.
+
+### `frqType` re-descriptions (kept consistent with the corrected `frqCount`)
+
+`frqType` renders directly beneath `frqCount` in `InfoPanel`, so a corrected
+count with a stale description would render a self-contradiction. Where the
+count changed, `frqType` was re-sourced from the same page:
+
+- `french/german/italian/spanish-language-and-culture`: `"2 written tasks + 2
+  spoken tasks"` → **`"1 written task + 2 spoken tasks"`** — the three published
+  free-response questions are Project Presentation (spoken), Project Q&A
+  (spoken), and Argumentative Essay (written).
+- `statistics`: `"6 free-response questions (5 multipart questions + 1
+  investigative task)"` → **`"pending"`** — the page prints only "Section II:
+  Free Response — 4 Questions" with no published breakdown of the four, so no
+  composition can be asserted under the hard data rule.
+- `chinese/japanese-language-and-culture`: unchanged — `frqCount` stays 4 and
+  the four questions remain 2 spoken (Presentation, Q&A) + 2 written (Story
+  Narration, Email Response), so `"2 written tasks + 2 spoken tasks"` is correct.
+
+### `french-language-and-culture.totalMinutes` → `"pending"`, and its siblings
+
+The dataset shipped `totalMinutes: 180` for French, **a figure the exam page
+does not print anywhere** ("The page does not print an overall total exam
+duration" — `french-language-and-culture.json`). Its published sections sum to
+~145–150 minutes, and summing published sub-values into an unprinted parent is
+the same forbidden class as back-computing (PRD §7.5/§8/§11). It is now the
+literal `"pending"`. A `"pending"` total already renders as the "Pending" badge
+(`InfoPanel`), falls back to a default calendar block (`calendar.ts`), and emits
+no `DTEND` (`ics.ts`) — so the correction only stops asserting an unsourced
+duration.
+
+The same unprinted-total defect exists for the five sibling language exams this
+card already touches; the provenance's `datasetDiscrepancies` flags each, and
+they are corrected to `"pending"` here for internal consistency (French cannot
+read "Pending" while a structurally identical sibling reads a fabricated
+duration):
+
+- `german-language-and-culture`: was 183 — "The page prints no combined total
+  exam time; Section II = 80 Minutes, Section I = 65–70 Minutes."
+- `italian-language-and-culture`: was 180 — "does not print an overall exam
+  total."
+- `spanish-language-and-culture`: was 183 — "The page prints no single total
+  exam time."
+- `chinese-language-and-culture`: was 120 — "The page does not print a total
+  exam time; only per-section times are stated."
+- `japanese-language-and-culture`: was 120 — the Exam Components block prints no
+  total; the only published figure is the Exam Overview PDF's *approximate*
+  "two hours and 15 minutes ... includ[ing] a 10-minute break," which the hard
+  data rule bars from being asserted as an exact `totalMinutes`.
+
+`statistics.totalMinutes` was **left at 180**: its `datasetDiscrepancies` does
+not flag it, and both 90-minute sections are individually published.
+
+### Scope deliberately held to these seven subjects
+
+Two categories were **intentionally not touched** here:
+
+1. **The seven 3+-section subjects** — `african-american-studies`,
+   `european-history`, `united-states-history`, `world-history-modern`,
+   `music-theory`, `spanish-literature-and-culture`,
+   `business-with-personal-finance`. Their provenance shows separately-timed
+   Part A/B or third sections (e.g. Music Theory free response "7 + 2", US
+   History free response "2"), which the flat `mcqCount`/`frqCount` model
+   cannot express. That is issue #44's `sections[]` work, not a count fix —
+   forcing a flat number here would fabricate an aggregate the page never
+   prints. Left unchanged.
+2. **Other subjects' unsourced durations** — the provenance also flags
+   `microeconomics.totalMinutes` (130, "not printed") and
+   `psychology.totalMinutes` (160, "pending"), plus many per-section
+   `mcqMinutes`/`frqMinutes` values absent from the flat schema. These are
+   outside this card's seven-subject remit and belong to #44's duration model.
+   Recorded here so they are not lost.
+
+### Design decision — keep the range type in `questionCount`
+
+After these corrections **no subject uses a range** for `mcqCount`/`frqCount`
+(Chinese and Japanese moved to the fixed 55). The `questionCount` union in
+`schema.ts` still accepts a published range string (`/^\d+–\d+$/`). It is
+**kept**, not removed: (a) the issue constrains this card to "no schema change";
+(b) College Board has printed adaptive ranges before and may again in a future
+cycle, so retaining the type keeps the model able to represent a published range
+without a schema migration. The data test below pins the seven counts as exact
+integers so a future re-source cannot silently regress them back to a range.
 
 ## Course list (42 subjects, including Career Kickstart)
 

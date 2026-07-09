@@ -108,6 +108,60 @@ describe("ap-2026.json dataset", () => {
   });
 });
 
+describe("ap-2026.json — 2026 digital-redesign question-count corrections (issue #45)", () => {
+  const dataset = parseApDataset(raw);
+  const byId = new Map(dataset.subjects.map((s) => [s.id, s]));
+
+  // Pins the seven re-sourced counts (docs/super-board/research/collegeboard-2026/)
+  // so a future re-source cannot silently regress them to the pre-redesign values.
+  const CORRECTED: Record<string, { mcqCount: number; frqCount: number }> = {
+    statistics: { mcqCount: 42, frqCount: 4 },
+    "french-language-and-culture": { mcqCount: 55, frqCount: 3 },
+    "german-language-and-culture": { mcqCount: 55, frqCount: 3 },
+    "italian-language-and-culture": { mcqCount: 55, frqCount: 3 },
+    "spanish-language-and-culture": { mcqCount: 55, frqCount: 3 },
+    "chinese-language-and-culture": { mcqCount: 55, frqCount: 4 },
+    "japanese-language-and-culture": { mcqCount: 55, frqCount: 4 },
+  };
+
+  it("pins the seven corrected mcq/frq counts as exact published integers", () => {
+    for (const [id, counts] of Object.entries(CORRECTED)) {
+      const format = byId.get(id)?.format;
+      expect(format?.mcqCount, `${id} mcqCount`).toBe(counts.mcqCount);
+      expect(format?.frqCount, `${id} frqCount`).toBe(counts.frqCount);
+    }
+  });
+
+  it("no subject stores mcq/frq as a range string (all cycles now publish fixed counts)", () => {
+    for (const subject of dataset.subjects) {
+      for (const [field, value] of [
+        ["mcqCount", subject.format.mcqCount],
+        ["frqCount", subject.format.frqCount],
+      ] as const) {
+        const isRange = typeof value === "string" && /–/.test(value);
+        expect(isRange, `${subject.id}.${field} = ${String(value)}`).toBe(false);
+      }
+    }
+  });
+
+  it("keeps unsourced language-exam durations as pending, never a fabricated total", () => {
+    // College Board prints no combined total for these six; asserting one would
+    // sum sub-parts into an unprinted parent (forbidden, PRD §7.5/§8/§11).
+    for (const id of [
+      "french-language-and-culture",
+      "german-language-and-culture",
+      "italian-language-and-culture",
+      "spanish-language-and-culture",
+      "chinese-language-and-culture",
+      "japanese-language-and-culture",
+    ]) {
+      expect(byId.get(id)?.format.totalMinutes, `${id} totalMinutes`).toBe(
+        "pending",
+      );
+    }
+  });
+});
+
 describe("ap-2026.json negative cases (validation must fail on broken data)", () => {
   it("rejects a duplicate subject id", () => {
     const broken = clone();

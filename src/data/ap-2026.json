@@ -133,10 +133,10 @@
       "exam": { "date": "2026-05-08", "session": "PM" },
       "lateTesting": { "date": "2026-05-21", "session": "AM" },
       "format": {
-        "mcqCount": "55–75",
+        "mcqCount": 55,
         "frqCount": 4,
         "frqType": "2 written tasks + 2 spoken tasks",
-        "totalMinutes": 120,
+        "totalMinutes": "pending",
         "calculator": false,
         "delivery": "digital"
       },
@@ -291,10 +291,10 @@
       "exam": { "date": "2026-05-12", "session": "AM" },
       "lateTesting": { "date": "2026-05-20", "session": "PM" },
       "format": {
-        "mcqCount": 65,
-        "frqCount": 4,
-        "frqType": "2 written tasks + 2 spoken tasks",
-        "totalMinutes": 180,
+        "mcqCount": 55,
+        "frqCount": 3,
+        "frqType": "1 written task + 2 spoken tasks",
+        "totalMinutes": "pending",
         "calculator": false,
         "delivery": "paper"
       },
@@ -308,10 +308,10 @@
       "exam": { "date": "2026-05-13", "session": "AM" },
       "lateTesting": { "date": "2026-05-22", "session": "PM" },
       "format": {
-        "mcqCount": 65,
-        "frqCount": 4,
-        "frqType": "2 written tasks + 2 spoken tasks",
-        "totalMinutes": 183,
+        "mcqCount": 55,
+        "frqCount": 3,
+        "frqType": "1 written task + 2 spoken tasks",
+        "totalMinutes": "pending",
         "calculator": false,
         "delivery": "paper"
       },
@@ -342,10 +342,10 @@
       "exam": { "date": "2026-05-08", "session": "AM" },
       "lateTesting": { "date": "2026-05-21", "session": "PM" },
       "format": {
-        "mcqCount": 65,
-        "frqCount": 4,
-        "frqType": "2 written tasks + 2 spoken tasks",
-        "totalMinutes": 180,
+        "mcqCount": 55,
+        "frqCount": 3,
+        "frqType": "1 written task + 2 spoken tasks",
+        "totalMinutes": "pending",
         "calculator": false,
         "delivery": "paper"
       },
@@ -359,10 +359,10 @@
       "exam": { "date": "2026-05-12", "session": "PM" },
       "lateTesting": { "date": "2026-05-19", "session": "AM" },
       "format": {
-        "mcqCount": "60–75",
+        "mcqCount": 55,
         "frqCount": 4,
         "frqType": "2 written tasks + 2 spoken tasks",
-        "totalMinutes": 120,
+        "totalMinutes": "pending",
         "calculator": false,
         "delivery": "digital"
       },
@@ -588,10 +588,10 @@
       "exam": { "date": "2026-05-14", "session": "AM" },
       "lateTesting": { "date": "2026-05-22", "session": "AM" },
       "format": {
-        "mcqCount": 65,
-        "frqCount": 4,
-        "frqType": "2 written tasks + 2 spoken tasks",
-        "totalMinutes": 183,
+        "mcqCount": 55,
+        "frqCount": 3,
+        "frqType": "1 written task + 2 spoken tasks",
+        "totalMinutes": "pending",
         "calculator": false,
         "delivery": "paper"
       },
@@ -622,9 +622,9 @@
       "exam": { "date": "2026-05-07", "session": "PM" },
       "lateTesting": { "date": "2026-05-20", "session": "AM" },
       "format": {
-        "mcqCount": 40,
-        "frqCount": 6,
-        "frqType": "6 free-response questions (5 multipart questions + 1 investigative task)",
+        "mcqCount": 42,
+        "frqCount": 4,
+        "frqType": "pending",
         "totalMinutes": 180,
         "calculator": true,
         "delivery": "hybrid"
