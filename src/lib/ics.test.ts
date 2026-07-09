@@ -35,7 +35,9 @@ const EXPECTED_DTSTAMP = "20260705T133000Z";
 
 const FORMAT = {
   mcqCount: 1,
+  mcqMinutes: 25,
   frqCount: 1,
+  frqMinutes: 35,
   frqType: "fixture",
   totalMinutes: 60,
   calculator: false,
@@ -231,9 +233,83 @@ describe("buildIcsCalendar — exam VEVENTs (AC2)", () => {
     expect(unfolded).not.toMatch(/DTSTART:\d{8}T\d{6}Z/); // no UTC-marked starts
   });
 
-  it('formats SUMMARY as "AP <Subject> exam (<AM|PM> session)"', () => {
-    expect(unfolded).toContain("SUMMARY:AP Biology exam (AM session)");
-    expect(unfolded).toContain("SUMMARY:AP Calculus BC exam (PM session)");
+  it('formats SUMMARY as "AP <Subject> exam" with no session suffix (issue #38)', () => {
+    expect(unfolded).toContain("SUMMARY:AP Biology exam");
+    expect(unfolded).toContain("SUMMARY:AP Calculus BC exam");
+    // The AM/PM session is implicit in DTSTART, so the suffix is dropped.
+    expect(unfolded).not.toContain("(AM session)");
+    expect(unfolded).not.toContain("(PM session)");
+  });
+
+  it("gives each exam a DTEND = start + totalMinutes + 30-min setup buffer (issue #38)", () => {
+    // bio kept at 2026-05-11 AM (08:00): 08:00 + 60 + 30 = 09:30, floating.
+    expect(unfolded).toContain("DTSTART:20260511T080000");
+    expect(unfolded).toContain("DTEND:20260511T093000");
+    // calc PM (12:00): 12:00 + 60 + 30 = 13:30.
+    expect(unfolded).toContain("DTSTART:20260512T120000");
+    expect(unfolded).toContain("DTEND:20260512T133000");
+    // chem moved to its late slot 2026-05-19 AM: 08:00 + 60 + 30 = 09:30.
+    expect(unfolded).toContain("DTEND:20260519T093000");
+    // DTEND stays floating — never UTC-marked.
+    expect(unfolded).not.toMatch(/DTEND:\d{8}T\d{6}Z/);
+  });
+
+  it("emits a section-by-section DESCRIPTION with published total + setup line (issue #38)", () => {
+    expect(unfolded).toContain("MCQ: 1 Questions | 25 Minutes");
+    expect(unfolded).toContain("FRQ: 1 Questions | 35 Minutes");
+    // Total Length is the published totalMinutes (60), not the section sum (60).
+    expect(unfolded).toContain("Total Length: 60 Minutes");
+    // The +30 setup allowance is its own line, clearly separate from the total.
+    expect(unfolded).toContain("+ 30 minutes for exam setup time");
+    // Rows are joined by an RFC-5545 literal "\n" escape, never a raw newline
+    // (the global "no bare LF" check in AC4 guards the whole document).
+    expect(unfolded).toContain("25 Minutes\\nFRQ: 1 Questions | 35 Minutes");
+  });
+});
+
+describe("buildIcsCalendar — issue #38 pending / zero-section handling", () => {
+  // 40 MCQ but the MCQ duration, FRQ section, and total are all unpublished.
+  const pendingExam = {
+    ...subject(
+      "pend",
+      "AP Pending",
+      { date: "2026-05-13", session: "AM" },
+      { date: "2026-05-20", session: "AM" },
+    ),
+    format: {
+      mcqCount: 40,
+      mcqMinutes: "pending",
+      frqCount: 0,
+      frqMinutes: "pending",
+      frqType: "pending",
+      totalMinutes: "pending",
+      calculator: "pending",
+      delivery: "digital",
+    },
+  } as ApSubject;
+
+  const ics = buildIcsCalendar(
+    [pendingExam],
+    ["pend"],
+    [],
+    SESSION_START,
+    FIXED_NOW,
+  );
+  const unfolded = ics.replace(/\r\n /g, "");
+
+  it("emits NO DTEND when totalMinutes is pending (never invents a duration)", () => {
+    expect(unfolded).toContain("DTSTART:20260513T080000");
+    expect(unfolded).not.toContain("DTEND:");
+  });
+
+  it('renders a pending section duration as "Duration pending", not a number', () => {
+    expect(unfolded).toContain("MCQ: 40 Questions | Duration pending");
+    expect(unfolded).toContain("Total Length: Duration pending");
+  });
+
+  it("omits a zero-count section entirely rather than printing a 0 row", () => {
+    expect(unfolded).not.toContain("FRQ:");
+    expect(unfolded).not.toContain("| 0 Minutes");
   });
 });
 

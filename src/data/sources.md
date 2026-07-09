@@ -1,9 +1,11 @@
 # Data sources for `ap-2026.json`
 
 Every value in `ap-2026.json` was taken from a College Board page fetched on
-**2026-07-04** (the file's `lastVerified` date). Nothing is estimated; any
-value College Board has not published is the literal string `"pending"`
-(PRD §7.5/§8/§11).
+**2026-07-04** (the file's `lastVerified` date), except the per-section
+durations (`mcqMinutes` / `frqMinutes`, added for issue #38) which were fetched
+on **2026-07-08** — see "Per-section timing (`mcqMinutes` / `frqMinutes`)"
+below. Nothing is estimated; any value College Board has not published is the
+literal string `"pending"` (PRD §7.5/§8/§11).
 
 ## The four data classes (issue #2 AC)
 
@@ -56,6 +58,88 @@ labels verbatim.
     → 130). Where the page publishes a range for question counts (AP Chinese
     "25–35" + "30–40" listening/reading MCQs), the dataset stores the
     published range as a string (e.g. `"55–75"`).
+### Per-section timing (`mcqMinutes` / `frqMinutes`)
+
+Added for issue #38 (ICS export timing breakdown). Each value is the published
+duration of that exam section, fetched **2026-07-08** from the AP Students
+assessment page for the course
+(`https://apstudents.collegeboard.org/courses/ap-<slug>/assessment`, the same
+pages already cited above for `totalMinutes`). **No section duration is
+estimated**, and none is back-computed by subtracting one section from the
+published total — an unpublished section duration is the literal `"pending"`
+(PRD §7.5/§8/§11).
+
+Each populated value was cross-checked against the section's already-verified
+question count and against the published `totalMinutes`; a value was only
+recorded when the fetched page unambiguously stated a single time for exactly
+that section AND its question count matched the dataset. Where a page did not
+survive that check the field is `"pending"` rather than a guess.
+
+Fully populated (both sections stated and cross-checked; `mcqMinutes` +
+`frqMinutes` = published `totalMinutes`):
+
+| Subject | MCQ | FRQ | Total | Assessment page section text (verbatim) |
+|---|---|---|---|---|
+| biology | 90 | 90 | 180 | MC "60 questions 1hr 30mins"; FR "6 questions 1hr 30mins" |
+| calculus-bc | 105 | 90 | 195 | MC "45 questions 1hr 45mins"; FR "6 questions 1hr 30mins" |
+| chemistry | 90 | 105 | 195 | MC "60 questions 1hr 30mins"; FR "7 questions 1hr 45mins" |
+| physics-1 | 80 | 100 | 180 | MC "40 Questions 1hr 20mins"; FR "4 Questions 1hr 40mins" |
+| physics-2 | 80 | 100 | 180 | MC "40 Questions 1hr 20mins"; FR "4 Questions 1hr 40mins" |
+| physics-c-mechanics | 80 | 100 | 180 | MC "40 Questions 1hr 20mins"; FR "4 Questions 1hr 40mins" |
+| physics-c-electricity-and-magnetism | 80 | 100 | 180 | MC "40 Questions 1hr 20mins"; FR "4 Questions 1hr 40mins" |
+| precalculus | 120 | 60 | 180 | MC "40 Questions 2hrs"; FR "4 Questions 1hr" |
+| environmental-science | 90 | 70 | 160 | MC "80 questions 1hr 30mins"; FR "3 questions 1hr 10mins" |
+| psychology | 90 | 70 | 160 | MC "75 questions 1hr 30mins"; FR "2 questions 1hr 10mins" |
+| human-geography | 60 | 75 | 135 | MC "60 questions 1hr"; FR "3 questions 1hr 15mins" |
+| macroeconomics | 70 | 60 | 130 | MC "60 Questions 1hr 10mins"; FR "3 Questions 1hr" |
+| microeconomics | 70 | 60 | 130 | MC "60 questions 1hr 10mins"; FR "3 questions 1hr" |
+| comparative-government-and-politics | 60 | 90 | 150 | MC "55 questions 1hr"; FR "4 questions 1hr 30mins" |
+| united-states-government-and-politics | 80 | 100 | 180 | MC "55 questions 1hr 20mins"; FR "4 questions 1hr 40mins" |
+| computer-science-principles | 120 | 60 | 180 | MC "70 questions 120 minutes"; exam-day written response "2 questions 60 minutes" |
+| latin | 65 | 115 | 180 | MC "52 questions 1hr 05mins"; FR "5 questions 1hr 55mins" |
+
+Partially populated — one section is directly published, the other is
+`"pending"` because the exam's Part A / Part B structure spreads it across
+sections and College Board publishes only per-part times (never summed here):
+
+- `united-states-history`, `world-history-modern`: `mcqMinutes: 55` (Section I
+  Part A: "55 questions 55mins"); `frqMinutes: "pending"` (short-answer +
+  document-based + long essay are timed as separate parts across Sections I–II).
+- `african-american-studies`: `mcqMinutes: 70` (Section I: "60 Questions
+  1hr 10mins"); `frqMinutes: "pending"` (project-validation, short-answer, and
+  document-based questions are timed as separate parts).
+- `english-language-and-composition`: `frqMinutes: 135` (Section II free
+  response: "2 hour and 15 minute time limit ... includes a 15-minute reading
+  period"); `mcqMinutes: "pending"` (the MC section time is not stated on the
+  page).
+- `seminar`: `frqMinutes: 120` (end-of-course written exam, "2hrs", four
+  free-response questions); `mcqMinutes: "pending"` (no MC section — `mcqCount`
+  is 0, so the ICS breakdown omits the MCQ row entirely).
+
+`"pending"` for both sections, with the reason:
+
+- Page states `totalMinutes` but not the per-section split (as fetched):
+  `calculus-ab`, `computer-science-a`, `art-history`, `european-history`,
+  `english-literature-and-composition`, `music-theory`.
+- Fetched section text disagreed with the dataset's verified question counts,
+  so it was not trusted (cross-check failed): `statistics`,
+  `spanish-language-and-culture`, `french-language-and-culture`.
+- World-language / range-count exams whose listening + reading + speaking +
+  writing structure does not map to a single MCQ time + single FRQ time:
+  `german-language-and-culture`, `italian-language-and-culture`,
+  `spanish-literature-and-culture`, `chinese-language-and-culture`,
+  `japanese-language-and-culture`.
+- No May 2026 exam, so section durations never render in the export: the two
+  Career Kickstart courses (`business-with-personal-finance`, `cybersecurity`)
+  and the portfolio-only courses (`research`, `2-d-art-and-design`,
+  `3-d-art-and-design`, `drawing`).
+
+Note on `Total Length` vs the section sum: the ICS breakdown prints the
+published `totalMinutes`, not the sum of `mcqMinutes` + `frqMinutes`. For the
+fully-populated subjects above the two happen to agree, but the total is
+authoritative — some exams' published total excludes breaks/instructions, and
+those are not reconciled by editing section values.
+
 - Portfolio component weights (`weightPct`):
   - AP Seminar 20% + 35% = 55% through-course performance tasks:
     <https://apcentral.collegeboard.org/courses/ap-seminar/exam>

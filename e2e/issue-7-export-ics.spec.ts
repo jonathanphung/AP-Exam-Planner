@@ -137,11 +137,27 @@ test.describe("issue #7 — export to calendar", () => {
     expect(ics.endsWith("\r\n")).toBe(true); // CRLF-terminated (RFC 5545 §3.1)
 
     const unfolded = ics.replace(/\r\n /g, "");
-    expect(unfolded).toContain("SUMMARY:AP Biology exam (AM session)");
-    expect(unfolded).toContain("SUMMARY:AP Seminar exam (PM session)");
+    // issue #38 — SUMMARY drops the "(AM/PM session)" suffix (it is implicit in
+    // the event's DTSTART); portfolio summaries are unchanged.
+    expect(unfolded).toContain("SUMMARY:AP Biology exam");
+    expect(unfolded).toContain("SUMMARY:AP Seminar exam");
     expect(unfolded).toContain("SUMMARY:AP Seminar portfolio due");
+    expect(unfolded).not.toContain("(AM session)");
+    expect(unfolded).not.toContain("(PM session)");
     // Exam start times are floating local (no trailing Z).
     expect(unfolded).not.toMatch(/DTSTART:\d{8}T\d{6}Z/);
+    // issue #38 — each exam carries a floating DTEND = start + published length
+    // + a 30-min setup buffer. Biology (AM 08:00, 180 min) → 11:30; Seminar
+    // (PM 12:00, 120 min) → 14:30.
+    expect(unfolded).toMatch(/DTEND:\d{8}T113000/);
+    expect(unfolded).toMatch(/DTEND:\d{8}T143000/);
+    expect(unfolded).not.toMatch(/DTEND:\d{8}T\d{6}Z/);
+    // issue #38 — the DESCRIPTION carries the published section-by-section
+    // timing breakdown plus the clearly-separate setup allowance line.
+    expect(unfolded).toContain("MCQ: 60 Questions | 90 Minutes");
+    expect(unfolded).toContain("FRQ: 6 Questions | 90 Minutes");
+    expect(unfolded).toContain("Total Length: 180 Minutes");
+    expect(unfolded).toContain("+ 30 minutes for exam setup time");
     // Three events for this selection: 2 exams + 1 portfolio.
     expect((ics.match(/BEGIN:VEVENT/g) ?? []).length).toBe(3);
   });

@@ -1,4 +1,5 @@
-import type { ApSubject, Session } from "../data/schema";
+import type { ApSubject, ExamFormat, Session } from "../data/schema";
+import { SETUP_BUFFER_MINUTES } from "./calendar";
 import type { SlotResolution } from "./conflicts";
 import { resolveSlots } from "./conflicts";
 import { buildSchedule, type ScheduleEntry } from "./schedule";
@@ -77,6 +78,30 @@ function toFloatingDateTime(isoDate: string, hour: number, minute: number): stri
   return `${year}${month}${day}T${pad2(hour)}${pad2(minute)}00`;
 }
 
+/**
+ * Floating local date-time for (start time + `addMinutes`), as
+ * `YYYYMMDDTHHMMSS`. The arithmetic borrows `Date`'s calendar/rollover handling
+ * by working in UTC, then formats the UTC fields verbatim — no timezone shift is
+ * ever applied, so the result stays floating like {@link toFloatingDateTime}.
+ * Used to derive an exam's DTEND from its published length plus the setup buffer.
+ */
+function toFloatingDateTimePlus(
+  isoDate: string,
+  hour: number,
+  minute: number,
+  addMinutes: number,
+): string {
+  const [year, month, day] = isoDate.split("-").map(Number);
+  const end = new Date(
+    Date.UTC(year, month - 1, day, hour, minute + addMinutes, 0),
+  );
+  return (
+    `${end.getUTCFullYear()}${pad2(end.getUTCMonth() + 1)}${pad2(
+      end.getUTCDate(),
+    )}` + `T${pad2(end.getUTCHours())}${pad2(end.getUTCMinutes())}00`
+  );
+}
+
 /** All-day DATE value: `YYYYMMDD`. */
 function toDateValue(isoDate: string): string {
   return isoDate.replace(/-/g, "");
@@ -142,21 +167,88 @@ export function foldContentLine(line: string): string {
     .join("\r\n");
 }
 
+/**
+ * Human-readable timing breakdown for an exam event's DESCRIPTION, e.g.
+ *
+ *   MCQ: 60 Questions | 90 Minutes
+ *   FRQ: 6 Questions | 90 Minutes
+ *   Total Length: 180 Minutes
+ *   + 30 minutes for exam setup time
+ *
+ * Rules (issue #38):
+ *  - One row per section that HAS questions; a section with a count of 0 (a
+ *    subject with no MCQ or no FRQ) is omitted entirely, never printed as "0".
+ *  - A section whose published minutes are "pending" prints "Duration pending"
+ *    rather than an invented number — section durations are never estimated.
+ *  - "Total Length" is the subject's PUBLISHED `totalMinutes`, not a recomputed
+ *    sum of the section minutes (sections may exclude breaks/instructions).
+ *  - The setup line is always its own row, clearly separated so a reader can see
+ *    the +30 is our product allowance, NOT College Board's stated duration.
+ *
+ * Returns the raw (unescaped, `\n`-joined) description text; the caller escapes
+ * it through {@link escapeText}, which turns the newlines into literal `\n`.
+ */
+function buildExamDescription(format: ExamFormat): string {
+  const rows: string[] = [];
+
+  const sectionRow = (
+    label: string,
+    count: ExamFormat["mcqCount"],
+    minutes: ExamFormat["mcqMinutes"],
+  ): void => {
+    // A section that does not exist (a literal 0 count) is omitted, never "0".
+    if (count === 0) return;
+    const duration =
+      minutes === "pending" ? "Duration pending" : `${minutes} Minutes`;
+    rows.push(`${label}: ${count} Questions | ${duration}`);
+  };
+
+  sectionRow("MCQ", format.mcqCount, format.mcqMinutes);
+  sectionRow("FRQ", format.frqCount, format.frqMinutes);
+
+  rows.push(
+    typeof format.totalMinutes === "number"
+      ? `Total Length: ${format.totalMinutes} Minutes`
+      : "Total Length: Duration pending",
+  );
+  rows.push(`+ ${SETUP_BUFFER_MINUTES} minutes for exam setup time`);
+
+  return rows.join("\n");
+}
+
 function examEventLines(
   entry: ScheduleEntry,
   session: Session,
   sessionStartTimes: SessionStartTimes,
+  format: ExamFormat,
   dtstamp: string,
 ): string[] {
   const { hour, minute } = parseSessionStartTime(sessionStartTimes[session]);
-  return [
+  const lines = [
     "BEGIN:VEVENT",
     `UID:${entry.subjectId}-exam@ap-exam-planner`,
     `DTSTAMP:${dtstamp}`,
     `DTSTART:${toFloatingDateTime(entry.date, hour, minute)}`,
-    `SUMMARY:${escapeText(`${entry.subjectName} exam (${session} session)`)}`,
-    "END:VEVENT",
   ];
+  // DTEND = start + published length + the setup buffer. A subject whose
+  // totalMinutes is "pending" gets NO DTEND — never invent a duration from an
+  // estimate (issue #38); the client renders it as a point/default instead.
+  if (typeof format.totalMinutes === "number") {
+    lines.push(
+      `DTEND:${toFloatingDateTimePlus(
+        entry.date,
+        hour,
+        minute,
+        format.totalMinutes + SETUP_BUFFER_MINUTES,
+      )}`,
+    );
+  }
+  // The AM/PM session is already implicit in DTSTART, so the summary no longer
+  // carries the "(AM session)" / "(PM session)" suffix (issue #38).
+  lines.push(`SUMMARY:${escapeText(`${entry.subjectName} exam`)}`);
+  lines.push(`DESCRIPTION:${escapeText(buildExamDescription(format))}`);
+  lines.push("END:VEVENT");
+  return lines;
 }
 
 function portfolioEventLines(entry: ScheduleEntry, dtstamp: string): string[] {
@@ -194,6 +286,7 @@ export function buildIcsCalendar(
   const resolved = resolveSlots(subjects, selectedIds, resolutions);
   const { groups } = buildSchedule(subjects, selectedIds, resolved);
   const dtstamp = toUtcStamp(now);
+  const subjectById = new Map(subjects.map((s) => [s.id, s]));
 
   const lines: string[] = [
     "BEGIN:VCALENDAR",
@@ -206,9 +299,18 @@ export function buildIcsCalendar(
   for (const group of groups) {
     for (const entry of group.entries) {
       if (entry.kind === "exam" && entry.session) {
-        lines.push(
-          ...examEventLines(entry, entry.session, sessionStartTimes, dtstamp),
-        );
+        const subject = subjectById.get(entry.subjectId);
+        if (subject) {
+          lines.push(
+            ...examEventLines(
+              entry,
+              entry.session,
+              sessionStartTimes,
+              subject.format,
+              dtstamp,
+            ),
+          );
+        }
       } else if (entry.kind === "portfolio") {
         lines.push(...portfolioEventLines(entry, dtstamp));
       }

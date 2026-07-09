@@ -14,7 +14,9 @@
       "lateTesting": { "date": "2026-05-19", "session": "PM" },
       "format": {
         "mcqCount": 60,
+        "mcqMinutes": 70,
         "frqCount": 5,
+        "frqMinutes": "pending",
         "frqType": "1 project-validation written response, 3 short-answer questions, 1 document-based question",
         "totalMinutes": 165,
         "calculator": false,
@@ -31,7 +33,9 @@
       "lateTesting": { "date": "2026-05-21", "session": "PM" },
       "format": {
         "mcqCount": 80,
+        "mcqMinutes": "pending",
         "frqCount": 6,
+        "frqMinutes": "pending",
         "frqType": "6 essay questions (2 long, 4 short)",
         "totalMinutes": 180,
         "calculator": false,
@@ -48,7 +52,9 @@
       "lateTesting": { "date": "2026-05-20", "session": "PM" },
       "format": {
         "mcqCount": 60,
+        "mcqMinutes": 90,
         "frqCount": 6,
+        "frqMinutes": 90,
         "frqType": "6 free-response questions (2 long, 4 short)",
         "totalMinutes": 180,
         "calculator": true,
@@ -66,7 +72,9 @@
       "noExamReason": "First end-of-course exam administration is May 2027; College Board states the 2027 AP Exam dates will be available in summer 2026. No May 2026 exam exists for this course.",
       "format": {
         "mcqCount": 60,
+        "mcqMinutes": "pending",
         "frqCount": 4,
+        "frqMinutes": "pending",
         "frqType": "1 Business Canvas Project validation question + 3 scenario-based free-response questions",
         "totalMinutes": 160,
         "calculator": false,
@@ -83,7 +91,9 @@
       "lateTesting": { "date": "2026-05-21", "session": "PM" },
       "format": {
         "mcqCount": 45,
+        "mcqMinutes": "pending",
         "frqCount": 6,
+        "frqMinutes": "pending",
         "frqType": "6 free-response questions (calculator and no-calculator parts)",
         "totalMinutes": 195,
         "calculator": true,
@@ -100,7 +110,9 @@
       "lateTesting": { "date": "2026-05-21", "session": "PM" },
       "format": {
         "mcqCount": 45,
+        "mcqMinutes": 105,
         "frqCount": 6,
+        "frqMinutes": 90,
         "frqType": "6 free-response questions (calculator and no-calculator parts)",
         "totalMinutes": 195,
         "calculator": true,
@@ -117,7 +129,9 @@
       "lateTesting": { "date": "2026-05-20", "session": "PM" },
       "format": {
         "mcqCount": 60,
+        "mcqMinutes": 90,
         "frqCount": 7,
+        "frqMinutes": 105,
         "frqType": "7 free-response questions (3 long, 4 short)",
         "totalMinutes": 195,
         "calculator": true,
@@ -134,7 +148,9 @@
       "lateTesting": { "date": "2026-05-21", "session": "AM" },
       "format": {
         "mcqCount": "55–75",
+        "mcqMinutes": "pending",
         "frqCount": 4,
+        "frqMinutes": "pending",
         "frqType": "2 written tasks + 2 spoken tasks",
         "totalMinutes": 120,
         "calculator": false,
@@ -151,7 +167,9 @@
       "lateTesting": { "date": "2026-05-18", "session": "AM" },
       "format": {
         "mcqCount": 55,
+        "mcqMinutes": 60,
         "frqCount": 4,
+        "frqMinutes": 90,
         "frqType": "4 free-response questions (concept application, quantitative analysis, comparative analysis, argument essay)",
         "totalMinutes": 150,
         "calculator": false,
@@ -168,7 +186,9 @@
       "lateTesting": { "date": "2026-05-22", "session": "PM" },
       "format": {
         "mcqCount": 42,
+        "mcqMinutes": "pending",
         "frqCount": 4,
+        "frqMinutes": "pending",
         "frqType": "4 code-writing free-response questions",
         "totalMinutes": 180,
         "calculator": false,
@@ -185,7 +205,9 @@
       "lateTesting": { "date": "2026-05-21", "session": "AM" },
       "format": {
         "mcqCount": 70,
+        "mcqMinutes": 120,
         "frqCount": 2,
+        "frqMinutes": 60,
         "frqType": "2 written-response questions about the student's Create performance task",
         "totalMinutes": 180,
         "calculator": false,
@@ -207,7 +229,9 @@
       "noExamReason": "First end-of-course exam administration is May 2027; College Board states the 2027 AP Exam dates will be available in summer 2026. No May 2026 exam exists for this course.",
       "format": {
         "mcqCount": 60,
+        "mcqMinutes": "pending",
         "frqCount": 1,
+        "frqMinutes": "pending",
         "frqType": "1 multi-source analysis free-response question",
         "totalMinutes": 130,
         "calculator": false,
@@ -224,7 +248,9 @@
       "lateTesting": { "date": "2026-05-21", "session": "AM" },
       "format": {
         "mcqCount": 45,
+        "mcqMinutes": "pending",
         "frqCount": 3,
+        "frqMinutes": 135,
         "frqType": "3 essays (synthesis, rhetorical analysis, argument)",
         "totalMinutes": 195,
         "calculator": false,
@@ -241,7 +267,9 @@
       "lateTesting": { "date": "2026-05-18", "session": "PM" },
       "format": {
         "mcqCount": 55,
+        "mcqMinutes": "pending",
         "frqCount": 3,
+        "frqMinutes": "pending",
         "frqType": "3 essays (poetry analysis, prose fiction analysis, thematic analysis)",
         "totalMinutes": 180,
         "calculator": false,
@@ -258,7 +286,9 @@
       "lateTesting": { "date": "2026-05-22", "session": "AM" },
       "format": {
         "mcqCount": 80,
+        "mcqMinutes": 90,
         "frqCount": 3,
+        "frqMinutes": 70,
         "frqType": "3 free-response questions",
         "totalMinutes": 160,
         "calculator": true,
@@ -275,7 +305,9 @@
       "lateTesting": { "date": "2026-05-18", "session": "AM" },
       "format": {
         "mcqCount": 55,
+        "mcqMinutes": "pending",
         "frqCount": 5,
+        "frqMinutes": "pending",
         "frqType": "3 short-answer questions, 1 document-based question, 1 long essay",
         "totalMinutes": 195,
         "calculator": false,
@@ -292,7 +324,9 @@
       "lateTesting": { "date": "2026-05-20", "session": "PM" },
       "format": {
         "mcqCount": 65,
+        "mcqMinutes": "pending",
         "frqCount": 4,
+        "frqMinutes": "pending",
         "frqType": "2 written tasks + 2 spoken tasks",
         "totalMinutes": 180,
         "calculator": false,
@@ -309,7 +343,9 @@
       "lateTesting": { "date": "2026-05-22", "session": "PM" },
       "format": {
         "mcqCount": 65,
+        "mcqMinutes": "pending",
         "frqCount": 4,
+        "frqMinutes": "pending",
         "frqType": "2 written tasks + 2 spoken tasks",
         "totalMinutes": 183,
         "calculator": false,
@@ -326,7 +362,9 @@
       "lateTesting": { "date": "2026-05-18", "session": "PM" },
       "format": {
         "mcqCount": 60,
+        "mcqMinutes": 60,
         "frqCount": 3,
+        "frqMinutes": 75,
         "frqType": "3 free-response questions",
         "totalMinutes": 135,
         "calculator": false,
@@ -343,7 +381,9 @@
       "lateTesting": { "date": "2026-05-21", "session": "PM" },
       "format": {
         "mcqCount": 65,
+        "mcqMinutes": "pending",
         "frqCount": 4,
+        "frqMinutes": "pending",
         "frqType": "2 written tasks + 2 spoken tasks",
         "totalMinutes": 180,
         "calculator": false,
@@ -360,7 +400,9 @@
       "lateTesting": { "date": "2026-05-19", "session": "AM" },
       "format": {
         "mcqCount": "60–75",
+        "mcqMinutes": "pending",
         "frqCount": 4,
+        "frqMinutes": "pending",
         "frqType": "2 written tasks + 2 spoken tasks",
         "totalMinutes": 120,
         "calculator": false,
@@ -377,7 +419,9 @@
       "lateTesting": { "date": "2026-05-18", "session": "PM" },
       "format": {
         "mcqCount": 52,
+        "mcqMinutes": 65,
         "frqCount": 5,
+        "frqMinutes": 115,
         "frqType": "translation, short-answer, and short-essay questions (5 questions)",
         "totalMinutes": 180,
         "calculator": false,
@@ -394,7 +438,9 @@
       "lateTesting": { "date": "2026-05-20", "session": "PM" },
       "format": {
         "mcqCount": 60,
+        "mcqMinutes": 70,
         "frqCount": 3,
+        "frqMinutes": 60,
         "frqType": "3 free-response questions (1 long, 2 short)",
         "totalMinutes": 130,
         "calculator": true,
@@ -411,7 +457,9 @@
       "lateTesting": { "date": "2026-05-20", "session": "AM" },
       "format": {
         "mcqCount": 60,
+        "mcqMinutes": 70,
         "frqCount": 3,
+        "frqMinutes": 60,
         "frqType": "3 free-response questions (1 long, 2 short)",
         "totalMinutes": 130,
         "calculator": true,
@@ -428,7 +476,9 @@
       "lateTesting": { "date": "2026-05-21", "session": "AM" },
       "format": {
         "mcqCount": 75,
+        "mcqMinutes": "pending",
         "frqCount": 9,
+        "frqMinutes": "pending",
         "frqType": "7 written free-response questions + 2 sight-singing questions",
         "totalMinutes": 160,
         "calculator": false,
@@ -445,7 +495,9 @@
       "lateTesting": { "date": "2026-05-22", "session": "AM" },
       "format": {
         "mcqCount": 40,
+        "mcqMinutes": 80,
         "frqCount": 4,
+        "frqMinutes": 100,
         "frqType": "4 free-response questions",
         "totalMinutes": 180,
         "calculator": true,
@@ -462,7 +514,9 @@
       "lateTesting": { "date": "2026-05-21", "session": "PM" },
       "format": {
         "mcqCount": 40,
+        "mcqMinutes": 80,
         "frqCount": 4,
+        "frqMinutes": 100,
         "frqType": "4 free-response questions",
         "totalMinutes": 180,
         "calculator": true,
@@ -479,7 +533,9 @@
       "lateTesting": { "date": "2026-05-22", "session": "PM" },
       "format": {
         "mcqCount": 40,
+        "mcqMinutes": 80,
         "frqCount": 4,
+        "frqMinutes": 100,
         "frqType": "4 free-response questions",
         "totalMinutes": 180,
         "calculator": true,
@@ -496,7 +552,9 @@
       "lateTesting": { "date": "2026-05-21", "session": "PM" },
       "format": {
         "mcqCount": 40,
+        "mcqMinutes": 80,
         "frqCount": 4,
+        "frqMinutes": 100,
         "frqType": "4 free-response questions",
         "totalMinutes": 180,
         "calculator": true,
@@ -513,7 +571,9 @@
       "lateTesting": { "date": "2026-05-21", "session": "AM" },
       "format": {
         "mcqCount": 40,
+        "mcqMinutes": 120,
         "frqCount": 4,
+        "frqMinutes": 60,
         "frqType": "4 free-response questions (calculator and no-calculator parts)",
         "totalMinutes": 180,
         "calculator": true,
@@ -530,7 +590,9 @@
       "lateTesting": { "date": "2026-05-22", "session": "PM" },
       "format": {
         "mcqCount": 75,
+        "mcqMinutes": 90,
         "frqCount": 2,
+        "frqMinutes": 70,
         "frqType": "2 free-response questions (article analysis, evidence-based question)",
         "totalMinutes": 160,
         "calculator": false,
@@ -547,7 +609,9 @@
       "lateTesting": null,
       "format": {
         "mcqCount": 0,
+        "mcqMinutes": "pending",
         "frqCount": 0,
+        "frqMinutes": "pending",
         "frqType": "through-course performance task: academic paper, presentation, and oral defense (no timed end-of-course exam)",
         "totalMinutes": 0,
         "calculator": false,
@@ -568,7 +632,9 @@
       "lateTesting": { "date": "2026-05-20", "session": "AM" },
       "format": {
         "mcqCount": 0,
+        "mcqMinutes": "pending",
         "frqCount": 4,
+        "frqMinutes": 120,
         "frqType": "end-of-course exam: 3 short-answer questions + 1 evidence-based argument essay",
         "totalMinutes": 120,
         "calculator": false,
@@ -589,7 +655,9 @@
       "lateTesting": { "date": "2026-05-22", "session": "AM" },
       "format": {
         "mcqCount": 65,
+        "mcqMinutes": "pending",
         "frqCount": 4,
+        "frqMinutes": "pending",
         "frqType": "2 written tasks + 2 spoken tasks",
         "totalMinutes": 183,
         "calculator": false,
@@ -606,7 +674,9 @@
       "lateTesting": { "date": "2026-05-22", "session": "AM" },
       "format": {
         "mcqCount": 65,
+        "mcqMinutes": "pending",
         "frqCount": 4,
+        "frqMinutes": "pending",
         "frqType": "2 short-answer questions + 2 essay questions",
         "totalMinutes": 180,
         "calculator": false,
@@ -623,7 +693,9 @@
       "lateTesting": { "date": "2026-05-20", "session": "AM" },
       "format": {
         "mcqCount": 40,
+        "mcqMinutes": "pending",
         "frqCount": 6,
+        "frqMinutes": "pending",
         "frqType": "6 free-response questions (5 multipart questions + 1 investigative task)",
         "totalMinutes": 180,
         "calculator": true,
@@ -640,7 +712,9 @@
       "lateTesting": { "date": "2026-05-19", "session": "AM" },
       "format": {
         "mcqCount": 55,
+        "mcqMinutes": 80,
         "frqCount": 4,
+        "frqMinutes": 100,
         "frqType": "4 free-response questions (concept application, quantitative analysis, SCOTUS comparison, argument essay)",
         "totalMinutes": 180,
         "calculator": false,
@@ -657,7 +731,9 @@
       "lateTesting": { "date": "2026-05-19", "session": "PM" },
       "format": {
         "mcqCount": 55,
+        "mcqMinutes": 55,
         "frqCount": 5,
+        "frqMinutes": "pending",
         "frqType": "3 short-answer questions, 1 document-based question, 1 long essay",
         "totalMinutes": 195,
         "calculator": false,
@@ -674,7 +750,9 @@
       "lateTesting": { "date": "2026-05-18", "session": "AM" },
       "format": {
         "mcqCount": 55,
+        "mcqMinutes": 55,
         "frqCount": 5,
+        "frqMinutes": "pending",
         "frqType": "3 short-answer questions, 1 document-based question, 1 long essay",
         "totalMinutes": 195,
         "calculator": false,
@@ -691,7 +769,9 @@
       "lateTesting": null,
       "format": {
         "mcqCount": 0,
+        "mcqMinutes": "pending",
         "frqCount": 0,
+        "frqMinutes": "pending",
         "frqType": "portfolio: sustained investigation (60%) + selected works (40%); no timed exam",
         "totalMinutes": 0,
         "calculator": false,
@@ -712,7 +792,9 @@
       "lateTesting": null,
       "format": {
         "mcqCount": 0,
+        "mcqMinutes": "pending",
         "frqCount": 0,
+        "frqMinutes": "pending",
         "frqType": "portfolio: sustained investigation (60%) + selected works (40%); no timed exam",
         "totalMinutes": 0,
         "calculator": false,
@@ -733,7 +815,9 @@
       "lateTesting": null,
       "format": {
         "mcqCount": 0,
+        "mcqMinutes": "pending",
         "frqCount": 0,
+        "frqMinutes": "pending",
         "frqType": "portfolio: sustained investigation (60%) + selected works (40%); no timed exam",
         "totalMinutes": 0,
         "calculator": false,

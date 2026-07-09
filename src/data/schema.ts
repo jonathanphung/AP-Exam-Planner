@@ -56,9 +56,22 @@ const questionCount = z.union([
   pending,
 ]);
 
+/**
+ * Published length of one exam section in minutes, or "pending" when College
+ * Board does not publish that section's duration (or the section does not exist
+ * for this exam). Never estimated — an unpublished section duration is the
+ * literal "pending" and must never be back-computed from the total minus the
+ * other section (PRD §7.5/§8/§11).
+ */
+const sectionMinutes = z.union([z.number().int().min(0), pending]);
+
 export const formatSchema = z.strictObject({
   mcqCount: questionCount,
+  /** Published duration of the multiple-choice section, or "pending". */
+  mcqMinutes: sectionMinutes,
   frqCount: questionCount,
+  /** Published duration of the free-response section, or "pending". */
+  frqMinutes: sectionMinutes,
   frqType: z.union([z.string().min(1), pending]),
   totalMinutes: z.union([z.number().int().min(0), pending]),
   calculator: z.union([z.boolean(), pending]),

@@ -81,9 +81,32 @@ describe("issue #7 QA — ICS export against the shipped ap-2026.json", () => {
     const raw = ics.replace(/\r\n /g, "");
     expect(raw).toContain("DTSTART:20260504T080000");
     expect(raw).not.toMatch(/DTSTART:\d{8}T\d{6}Z/);
+    // issue #38 — the session suffix is dropped (AM/PM is implicit in DTSTART).
     expect(String(bio?.getFirstPropertyValue("summary"))).toBe(
-      "AP Biology exam (AM session)",
+      "AP Biology exam",
     );
+  });
+
+  it("issue #38 — the kept exam carries a DTEND and a timing-breakdown DESCRIPTION", () => {
+    const raw = ics.replace(/\r\n /g, "");
+    // Biology: 2026-05-04 08:00 + published 180 + 30-min setup = 11:30, floating.
+    expect(raw).toContain("DTEND:20260504T113000");
+    expect(raw).not.toMatch(/DTEND:\d{8}T\d{6}Z/);
+    // Published section timings from College Board's AP Biology assessment page.
+    expect(raw).toContain("MCQ: 60 Questions | 90 Minutes");
+    expect(raw).toContain("FRQ: 6 Questions | 90 Minutes");
+    expect(raw).toContain("Total Length: 180 Minutes");
+    expect(raw).toContain("+ 30 minutes for exam setup time");
+  });
+
+  it("issue #38 — a no-MCQ subject (AP Seminar) omits the MCQ row entirely", () => {
+    const raw = ics.replace(/\r\n /g, "");
+    const vcal = new ICAL.Component(ICAL.parse(ics));
+    // Seminar's end-of-course written exam is all free response, no MCQ section.
+    expect(uid(vcal, "seminar-exam@ap-exam-planner")).toBeDefined();
+    expect(raw).toContain("FRQ: 4 Questions | 120 Minutes");
+    // A zero-count MCQ section is omitted, never printed as a "0" row.
+    expect(raw).not.toContain("MCQ: 0");
   });
 
   it("AC2 — the moved exam exports at its RESOLVED late slot, not its regular slot", () => {
