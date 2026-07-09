@@ -168,22 +168,48 @@ export function foldContentLine(line: string): string {
 }
 
 /**
+ * Format a whole-minute duration as human-readable hours and minutes, e.g.
+ * `195` → `"3 hours and 15 minutes"`, `180` → `"3 hours"`, `60` → `"1 hour"`,
+ * `45` → `"45 minutes"`, `61` → `"1 hour and 1 minute"`.
+ *
+ * Only the exam's PUBLISHED total is phrased this way (issue #38, part A); the
+ * per-section rows keep their raw published minutes (`80 Minutes`). Singular /
+ * plural is handled for both units and zero-valued parts are dropped, so no
+ * output ever reads "0 hours" or "3 hours and 0 minutes". A total of exactly
+ * `0` (never reached for a real exam — portfolio-only subjects emit no exam
+ * DESCRIPTION) degrades to `"0 minutes"` rather than an empty string.
+ */
+export function formatDurationHM(totalMinutes: number): string {
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  const parts: string[] = [];
+  if (hours > 0) parts.push(`${hours} ${hours === 1 ? "hour" : "hours"}`);
+  if (minutes > 0) {
+    parts.push(`${minutes} ${minutes === 1 ? "minute" : "minutes"}`);
+  }
+  if (parts.length === 0) return "0 minutes";
+  return parts.join(" and ");
+}
+
+/**
  * Human-readable timing breakdown for an exam event's DESCRIPTION, e.g.
  *
- *   MCQ: 60 Questions | 90 Minutes
- *   FRQ: 6 Questions | 90 Minutes
- *   Total Length: 180 Minutes
- *   + 30 minutes for exam setup time
+ *   MCQ: 60 Questions | 80 Minutes
+ *   FRQ: 6 Questions | 100 Minutes
+ *   Total Length: 3 hours (+ 30 minutes for exam setup time)
  *
  * Rules (issue #38):
  *  - One row per section that HAS questions; a section with a count of 0 (a
  *    subject with no MCQ or no FRQ) is omitted entirely, never printed as "0".
  *  - A section whose published minutes are "pending" prints "Duration pending"
  *    rather than an invented number — section durations are never estimated.
+ *  - Section rows keep their raw published minutes; only the total is phrased
+ *    as hours-and-minutes (part A).
  *  - "Total Length" is the subject's PUBLISHED `totalMinutes`, not a recomputed
  *    sum of the section minutes (sections may exclude breaks/instructions).
- *  - The setup line is always its own row, clearly separated so a reader can see
- *    the +30 is our product allowance, NOT College Board's stated duration.
+ *  - The 30-minute setup allowance is a parenthetical ON the total row (part B),
+ *    phrased so a reader can see the +30 is OUR product allowance, NOT College
+ *    Board's stated duration.
  *
  * Returns the raw (unescaped, `\n`-joined) description text; the caller escapes
  * it through {@link escapeText}, which turns the newlines into literal `\n`.
@@ -206,12 +232,15 @@ function buildExamDescription(format: ExamFormat): string {
   sectionRow("MCQ", format.mcqCount, format.mcqMinutes);
   sectionRow("FRQ", format.frqCount, format.frqMinutes);
 
-  rows.push(
+  const total =
     typeof format.totalMinutes === "number"
-      ? `Total Length: ${format.totalMinutes} Minutes`
-      : "Total Length: Duration pending",
+      ? formatDurationHM(format.totalMinutes)
+      : "Duration pending";
+  // Part B: the setup allowance is merged into the total row as a parenthetical,
+  // kept distinct from the published length so it never reads as College Board's.
+  rows.push(
+    `Total Length: ${total} (+ ${SETUP_BUFFER_MINUTES} minutes for exam setup time)`,
   );
-  rows.push(`+ ${SETUP_BUFFER_MINUTES} minutes for exam setup time`);
 
   return rows.join("\n");
 }

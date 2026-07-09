@@ -7,6 +7,7 @@ import type { SlotResolution } from "./conflicts";
 import {
   buildIcsCalendar,
   foldContentLine,
+  formatDurationHM,
   parseSessionStartTime,
   ICS_FILE_NAME,
   type SessionStartTimes,
@@ -254,16 +255,39 @@ describe("buildIcsCalendar — exam VEVENTs (AC2)", () => {
     expect(unfolded).not.toMatch(/DTEND:\d{8}T\d{6}Z/);
   });
 
-  it("emits a section-by-section DESCRIPTION with published total + setup line (issue #38)", () => {
+  it("emits a section-by-section DESCRIPTION with the total phrased as hours-and-minutes + merged setup (issue #38 A/B)", () => {
+    // Section rows keep their RAW published minutes (part A2).
     expect(unfolded).toContain("MCQ: 1 Questions | 25 Minutes");
     expect(unfolded).toContain("FRQ: 1 Questions | 35 Minutes");
-    // Total Length is the published totalMinutes (60), not the section sum (60).
-    expect(unfolded).toContain("Total Length: 60 Minutes");
-    // The +30 setup allowance is its own line, clearly separate from the total.
-    expect(unfolded).toContain("+ 30 minutes for exam setup time");
+    // Total Length is the published totalMinutes (60), phrased as hours-and-
+    // minutes (part A), with the +30 setup merged in as a parenthetical (part B).
+    expect(unfolded).toContain(
+      "Total Length: 1 hour (+ 30 minutes for exam setup time)",
+    );
+    // The setup allowance is no longer its own standalone row — it only appears
+    // inside the total row's parenthetical.
+    expect(unfolded).not.toContain("Minutes\\n+ 30 minutes for exam setup time");
     // Rows are joined by an RFC-5545 literal "\n" escape, never a raw newline
     // (the global "no bare LF" check in AC4 guards the whole document).
     expect(unfolded).toContain("25 Minutes\\nFRQ: 1 Questions | 35 Minutes");
+  });
+});
+
+describe("formatDurationHM (issue #38 part A)", () => {
+  // Jon's bounce enumerated these exact cases; each is pinned directly.
+  it.each([
+    [195, "3 hours and 15 minutes"],
+    [180, "3 hours"],
+    [60, "1 hour"],
+    [45, "45 minutes"],
+    [61, "1 hour and 1 minute"],
+    // Extra edges: plural-minute with hours, single-minute alone, and the 0 floor.
+    [90, "1 hour and 30 minutes"],
+    [120, "2 hours"],
+    [1, "1 minute"],
+    [0, "0 minutes"],
+  ])("formats %i minutes as %s", (minutes, expected) => {
+    expect(formatDurationHM(minutes)).toBe(expected);
   });
 });
 

@@ -96,14 +96,43 @@ describe("issue #38 QA — real dataset, invariants re-derived", () => {
     // AP United States History: frqMinutes pending, totalMinutes 195 published.
     expect(u).toContain("MCQ: 55 Questions | 55 Minutes");
     expect(u).toContain("FRQ: 5 Questions | Duration pending");
-    expect(u).toContain("Total Length: 195 Minutes");
+    // issue #38 A/B — 195 published → "3 hours and 15 minutes", +30 setup merged.
+    expect(u).toContain(
+      "Total Length: 3 hours and 15 minutes (+ 30 minutes for exam setup time)",
+    );
     // AP Seminar has mcqCount 0 → MCQ row omitted, FRQ shown, never "MCQ: 0".
     expect(u).toContain("FRQ: 4 Questions | 120 Minutes");
     expect(u).not.toContain("MCQ: 0");
-    // The setup allowance is its own row on every exam (one per exam VEVENT).
+    // The setup allowance now lives in each exam's total row (one per exam
+    // VEVENT), never as a standalone line.
     expect((u.match(/\+ 30 minutes for exam setup time/g) ?? []).length).toBe(
       4,
     );
+    expect(u).not.toContain("Minutes\\n+ 30 minutes for exam setup time");
+  });
+
+  it("issue #38 C5 — portfolio-only subjects emit a portfolio deadline but NO exam DESCRIPTION/breakdown", () => {
+    // research / 2-d / 3-d / drawing have exam: null and a portfolio deadline:
+    // they are not sit-down exams, so no exam VEVENT (and therefore no timing
+    // breakdown) may be produced — only their all-day portfolio DATE event.
+    const portfolioOnly = ["research", "2-d-art-and-design", "drawing"];
+    const pIcs = buildIcsCalendar(
+      SUBJECTS,
+      portfolioOnly,
+      [],
+      SESSION_START,
+      FIXED_NOW,
+    );
+    const pu = unfold(pIcs);
+    // A portfolio deadline event exists for each…
+    expect((pu.match(/portfolio due/g) ?? []).length).toBe(3);
+    // …but there is no exam breakdown anywhere: no section rows, no total row,
+    // and crucially no "Duration pending" leaking from these 0/0 subjects.
+    expect(pu).not.toContain("Total Length:");
+    expect(pu).not.toContain("MCQ:");
+    expect(pu).not.toContain("FRQ:");
+    expect(pu).not.toContain("Duration pending");
+    expect(pu).not.toContain("-exam@ap-exam-planner");
   });
 
   it("AC5 — parses with ical.js; DESCRIPTION rows joined by literal \\n; every physical line ≤75 octets; CRLF-only", () => {

@@ -95,8 +95,11 @@ describe("issue #7 QA — ICS export against the shipped ap-2026.json", () => {
     // Published section timings from College Board's AP Biology assessment page.
     expect(raw).toContain("MCQ: 60 Questions | 90 Minutes");
     expect(raw).toContain("FRQ: 6 Questions | 90 Minutes");
-    expect(raw).toContain("Total Length: 180 Minutes");
-    expect(raw).toContain("+ 30 minutes for exam setup time");
+    // issue #38 A/B — published total phrased as hours-and-minutes, +30 setup
+    // merged into the same row as OUR allowance.
+    expect(raw).toContain(
+      "Total Length: 3 hours (+ 30 minutes for exam setup time)",
+    );
   });
 
   it("issue #38 — a no-MCQ subject (AP Seminar) omits the MCQ row entirely", () => {

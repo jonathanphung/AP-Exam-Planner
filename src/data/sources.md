@@ -61,7 +61,9 @@ labels verbatim.
 ### Per-section timing (`mcqMinutes` / `frqMinutes`)
 
 Added for issue #38 (ICS export timing breakdown). Each value is the published
-duration of that exam section, fetched **2026-07-08** from the AP Students
+duration of that exam section, fetched **2026-07-08** and **re-verified live on
+2026-07-09** (issue #38 human bounce — Jon asked whether the remaining pending
+sections could simply be fetched from College Board) from the AP Students
 assessment page for the course
 (`https://apstudents.collegeboard.org/courses/ap-<slug>/assessment`, the same
 pages already cited above for `totalMinutes`). **No section duration is
@@ -74,6 +76,17 @@ question count and against the published `totalMinutes`; a value was only
 recorded when the fetched page unambiguously stated a single time for exactly
 that section AND its question count matched the dataset. Where a page did not
 survive that check the field is `"pending"` rather than a guess.
+
+**2026-07-09 live re-verification result:** the re-fetch confirmed the pending
+set — no new section time could be honestly populated. The AP Students
+assessment pages publish a per-section MCQ/FRQ **minute** figure for only a
+subset of sit-down exams; for the rest they publish the total exam duration and
+per-section **score weights** but no per-section time. The exact page text for
+every still-pending subject is quoted below so the gap is auditable rather than
+mysterious. Two subjects (`statistics`, `french-language-and-culture`) surfaced
+a live **question-count discrepancy** against the dataset — see the flagged
+sub-list; those minutes stay pending because populating a time next to a count
+the same page contradicts would ship an internally inconsistent row.
 
 Fully populated (both sections stated and cross-checked; `mcqMinutes` +
 `frqMinutes` = published `totalMinutes`):
@@ -116,23 +129,80 @@ sections and College Board publishes only per-part times (never summed here):
   free-response questions); `mcqMinutes: "pending"` (no MC section — `mcqCount`
   is 0, so the ICS breakdown omits the MCQ row entirely).
 
-`"pending"` for both sections, with the reason:
+`"pending"` for both sections, grouped by the reason confirmed on the live
+2026-07-09 re-fetch (assessment page = `…/courses/ap-<slug>/assessment`):
 
-- Page states `totalMinutes` but not the per-section split (as fetched):
-  `calculus-ab`, `computer-science-a`, `art-history`, `european-history`,
-  `english-literature-and-composition`, `music-theory`.
-- Fetched section text disagreed with the dataset's verified question counts,
-  so it was not trusted (cross-check failed): `statistics`,
-  `spanish-language-and-culture`, `french-language-and-culture`.
-- World-language / range-count exams whose listening + reading + speaking +
-  writing structure does not map to a single MCQ time + single FRQ time:
-  `german-language-and-culture`, `italian-language-and-culture`,
-  `spanish-literature-and-culture`, `chinese-language-and-culture`,
-  `japanese-language-and-culture`.
-- No May 2026 exam, so section durations never render in the export: the two
-  Career Kickstart courses (`business-with-personal-finance`, `cybersecurity`)
-  and the portfolio-only courses (`research`, `2-d-art-and-design`,
-  `3-d-art-and-design`, `drawing`).
+**(a) Page publishes the total + per-section score weights but NO per-section
+minutes.** These are genuinely unpublished per-section — the split cannot be
+recovered without back-computing (forbidden), so both stay `"pending"`:
+
+- `calculus-ab` — MC "45 questions 50% of Score"; FR "6 questions 50% of Score";
+  total "3hrs 15mins". No section time stated.
+- `computer-science-a` — MC "42 questions 55% of Score"; FR "4 questions 45% of
+  Score"; total "3 hours". No section time stated. (Counts match the dataset;
+  only the minutes are unpublished.)
+- `art-history` — MC "80 questions 50% of Score"; FR "6 questions 50% of Score";
+  total "3hrs". No section time stated.
+- `english-literature-and-composition` — MC "55 questions 45% of Score"; FR
+  "3 questions 55% of Score"; total "3 hours". No section time stated.
+- `music-theory` — MC 75 questions given only as "~80 minutes combined" split
+  across aural (~45 min) + non-aural (35 min); FR is written (7) + sight-singing
+  (2). No single published MCQ or FRQ minute figure; total "~2hrs 40mins".
+
+**(b) FRQ is split across separately-timed Part A/B components (short-answer,
+document-based, long-essay) that College Board times individually and never
+sums.** The MCQ side is published and populated (see "Partially populated"
+above); the FRQ side stays `"pending"` because summing the parts would be
+back-computation:
+
+- `united-states-history`, `world-history-modern` — Section IB SAQ "3 questions
+  40mins"; Section II DBQ "60 Minutes (includes 15-minute reading period)"; Long
+  Essay "40 Minutes". Timed as three separate parts, never summed.
+- `european-history` — same structure: MC "55 questions 40% of Score" (no time);
+  SAQ "3 questions 20% of Score" (no time); DBQ "60 minutes"; Long Essay
+  "40 minutes". Both sections stay pending (MC time not published either).
+- `african-american-studies` — FRQ project-validation + short-answer +
+  document-based questions timed as separate parts (MCQ side populated at 70).
+
+**(c) Live question-count discrepancy vs the dataset — FLAGGED for a counts
+re-source decision (Jon).** The assessment page publishes a clean per-section
+time, but its question count contradicts the dataset's already-"verified" count.
+Populating the minute next to a mismatched count would ship an internally
+inconsistent breakdown row, so both stay `"pending"` pending a human decision on
+whether to re-source the counts (that is issue #2 dataset territory, outside
+issue #38's per-section-minutes scope):
+
+- `statistics` — live page: MC "42 questions 1hr 30mins"; FR "4 questions 1hr
+  30mins"; total 3 hours. Dataset: `mcqCount 40`, `frqCount 6`. Counts disagree
+  (42/4 live vs 40/6 stored) → minutes held pending.
+- `french-language-and-culture` — live page: MC (listening 25 + reading 30) =
+  "55 questions | 80 minutes"; FR is 3 tasks timed per-task. Dataset:
+  `mcqCount 65`, `frqCount 4`. Counts disagree → minutes held pending.
+
+**(d) World-language exams whose listening + reading + speaking + writing
+structure does not map to a single MCQ time + single FRQ time** (and, like
+French above, generally carry range/aggregate counts that don't cross-check):
+`german-language-and-culture`, `italian-language-and-culture`,
+`spanish-language-and-culture`, `spanish-literature-and-culture`,
+`chinese-language-and-culture`, `japanese-language-and-culture`.
+
+**(e) Not applicable — no such section, or no May 2026 exam, so the field never
+renders in the export.** These `"pending"` values are inert: the ICS breakdown
+omits any section whose `count` is 0, and no exam VEVENT (hence no breakdown at
+all) is produced for a subject with `exam: null`:
+
+- Zero-count section (`mcqCount: 0`): `seminar` (MCQ row omitted; its published
+  FRQ is 120 min).
+- Portfolio-only, `exam: null` (portfolio-deadline events only, no exam
+  breakdown): `research`, `2-d-art-and-design`, `3-d-art-and-design`, `drawing`.
+- Career Kickstart, `exam: null` (first exam May 2027):
+  `business-with-personal-finance`, `cybersecurity`.
+
+So of the "~25 pending" the bounce cited, 14 are class (e) — structurally N/A
+values that never reach the user (the export already omits them, issue #38 part
+C5) — and the rest are genuinely-unpublished-per-section (a/b/d) or blocked on a
+counts discrepancy (c). None can be filled from College Board today without
+estimating or back-computing, which the data rule forbids.
 
 Note on `Total Length` vs the section sum: the ICS breakdown prints the
 published `totalMinutes`, not the sum of `mcqMinutes` + `frqMinutes`. For the
