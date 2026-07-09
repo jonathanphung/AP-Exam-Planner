@@ -47,6 +47,14 @@ const dialog = (page: Page) => page.getByRole("dialog");
 const rowValue = (page: Page, label: string): Locator =>
   dialog(page).locator("dl > div").filter({ hasText: label }).locator("dd");
 
+// Issue #44 port: MCQ/FRQ counts render as rows of the sections table now.
+const sectionRow = (page: Page, name: string | RegExp): Locator =>
+  dialog(page)
+    .getByRole("row")
+    .filter({ has: page.getByRole("rowheader", { name }) });
+const MC_ROW = /multiple.?choice/i;
+const FR_ROW = /free.?response/i;
+
 /** Reveal a subject's Tier-1 panel and open its exam-details dialog (Tier 2). */
 async function openCatalogInfo(page: Page, name: string) {
   await expandButton(page, name).click();
@@ -59,8 +67,13 @@ async function openCatalogInfo(page: Page, name: string) {
  * The seven corrected subjects. `mcq`/`frq` are the published counts; `length`
  * is `formatMinutes(totalMinutes)` — French/German/Italian/Spanish are the
  * corrected 150 -> "2 h 30 min", Chinese/Japanese the reverted 120 -> "2 h",
- * Statistics the unchanged 180 -> "3 h". `frqType` is now a sourced string for
- * every one of the seven (no pending badge should render for any of them).
+ * Statistics the unchanged 180 -> "3 h".
+ *
+ * Issue #44 port: the flat MCQ/FRQ rows became rows of the per-section table,
+ * and the language exams' old aggregate `frqType` strings ("1 written task +
+ * 2 spoken tasks") were superseded by their published Part/Question rows —
+ * `structure` asserts one such published part renders for each. Statistics'
+ * pinned Section-II composition lives on as its free-response section note.
  */
 const CORRECTED = [
   {
@@ -69,49 +82,49 @@ const CORRECTED = [
     frq: "4",
     length: "3 h",
     // The bounce fix: a published composition, never a pending badge.
-    frqType: "3 multi-part questions + 1 inference question (hypothesis test or confidence interval)",
+    structure: "3 multi-part questions + 1 inference question (hypothesis test or confidence interval)",
   },
   {
     name: "AP French Language and Culture",
     mcq: "55",
     frq: "3",
     length: "2 h 30 min",
-    frqType: "1 written task + 2 spoken tasks",
+    structure: "Project Presentation",
   },
   {
     name: "AP German Language and Culture",
     mcq: "55",
     frq: "3",
     length: "2 h 30 min",
-    frqType: "1 written task + 2 spoken tasks",
+    structure: "Project Presentation",
   },
   {
     name: "AP Italian Language and Culture",
     mcq: "55",
     frq: "3",
     length: "2 h 30 min",
-    frqType: "1 written task + 2 spoken tasks",
+    structure: "Project Presentation",
   },
   {
     name: "AP Spanish Language and Culture",
     mcq: "55",
     frq: "3",
     length: "2 h 30 min",
-    frqType: "1 written task + 2 spoken tasks",
+    structure: "Project Presentation",
   },
   {
     name: "AP Chinese Language and Culture",
     mcq: "55",
     frq: "4",
     length: "2 h",
-    frqType: "2 written tasks + 2 spoken tasks",
+    structure: "Project Presentation",
   },
   {
     name: "AP Japanese Language and Culture",
     mcq: "55",
     frq: "4",
     length: "2 h",
-    frqType: "2 written tasks + 2 spoken tasks",
+    structure: "Project Presentation",
   },
 ] as const;
 
@@ -124,26 +137,25 @@ test.describe("issue #45 — corrected counts + durations + statistics frqType r
     for (const s of CORRECTED) {
       await openCatalogInfo(page, s.name);
 
-      await expect(rowValue(page, "Multiple choice"), `${s.name} MCQ`).toContainText(
-        `${s.mcq} questions`,
+      // Issue #44: counts render in the per-section table rows.
+      await expect(sectionRow(page, MC_ROW), `${s.name} MCQ`).toContainText(
+        s.mcq,
       );
-      await expect(rowValue(page, "Free response"), `${s.name} FRQ`).toContainText(
-        `${s.frq} questions`,
-      );
-      // Every one of the seven now publishes an frqType composition — a real
-      // string, never the muted "pending" badge.
       await expect(
-        rowValue(page, "Free response"),
-        `${s.name} frqType`,
-      ).toContainText(s.frqType);
-      await expect(
-        rowValue(page, "Free response").getByText("pending", { exact: true }),
-        `${s.name} frqType must not be pending`,
+        sectionRow(page, MC_ROW).getByText("pending", { exact: true }),
+        `${s.name} MCQ count must not be pending`,
       ).toHaveCount(0);
+      const frCells = sectionRow(page, FR_ROW).first().getByRole("cell");
+      await expect(frCells.first(), `${s.name} FRQ`).toHaveText(s.frq);
+      // The published structure renders — statistics via its section note,
+      // the language exams via their published Part/Question rows.
+      await expect(dialog(page), `${s.name} structure`).toContainText(
+        s.structure,
+      );
       await expect(rowValue(page, "Exam length"), `${s.name} length`).toHaveText(
         s.length,
       );
-      // No stray "pending" duration anywhere in the dialog.
+      // The published overall duration is never a pending badge.
       await expect(
         rowValue(page, "Exam length").getByText("pending"),
         `${s.name} length must not be pending`,
@@ -157,13 +169,13 @@ test.describe("issue #45 — corrected counts + durations + statistics frqType r
   // The headline of this pass: AP Statistics' Section-II composition renders as
   // the sourced string, with each published term present and the dropped
   // "investigative task" absent.
-  test("AC5 — AP Statistics frqType shows the sourced Section-II composition (no investigative task, no pending)", async ({
+  test("AC5 — AP Statistics' free-response section note shows the sourced Section-II composition (no investigative task, no pending)", async ({
     page,
   }) => {
     await page.goto("/");
     await openCatalogInfo(page, "AP Statistics");
-    const frq = rowValue(page, "Free response");
-    await expect(frq).toContainText("4 questions");
+    const frq = sectionRow(page, FR_ROW);
+    await expect(frq.first().getByRole("cell").first()).toHaveText("4");
     await expect(frq).toContainText("multi-part");
     await expect(frq).toContainText("inference");
     await expect(frq).toContainText("hypothesis test or confidence interval");
@@ -182,9 +194,8 @@ test.describe("issue #45 — corrected counts + durations + statistics frqType r
       await page.setViewportSize({ width: vp.width, height: vp.height });
       await page.goto("/");
       await openCatalogInfo(page, "AP Statistics");
-      await expect(rowValue(page, "Multiple choice")).toContainText("42 questions");
-      await expect(rowValue(page, "Free response")).toContainText("4 questions");
-      await expect(rowValue(page, "Free response")).toContainText(
+      await expect(sectionRow(page, MC_ROW)).toContainText("42");
+      await expect(sectionRow(page, FR_ROW)).toContainText(
         "3 multi-part questions + 1 inference question (hypothesis test or confidence interval)",
       );
       await expect(rowValue(page, "Exam length")).toHaveText("3 h");
@@ -199,8 +210,10 @@ test.describe("issue #45 — corrected counts + durations + statistics frqType r
       await page.setViewportSize({ width: vp.width, height: vp.height });
       await page.goto("/");
       await openCatalogInfo(page, "AP French Language and Culture");
-      await expect(rowValue(page, "Multiple choice")).toContainText("55 questions");
-      await expect(rowValue(page, "Free response")).toContainText("3 questions");
+      await expect(sectionRow(page, MC_ROW)).toContainText("55");
+      await expect(
+        sectionRow(page, FR_ROW).first().getByRole("cell").first(),
+      ).toHaveText("3");
       await expect(rowValue(page, "Exam length")).toHaveText("2 h 30 min");
       await dialog(page).screenshot({
         path: `${EVIDENCE_DIR}/catalog-french-${vp.name}.png`,
@@ -241,8 +254,10 @@ test.describe("issue #45 — corrected counts + durations + statistics frqType r
 
     await expect(dialog(page)).toBeVisible();
     await expect(dialog(page)).toContainText("AP French Language and Culture");
-    await expect(rowValue(page, "Multiple choice")).toContainText("55 questions");
-    await expect(rowValue(page, "Free response")).toContainText("3 questions");
+    await expect(sectionRow(page, MC_ROW)).toContainText("55");
+    await expect(
+      sectionRow(page, FR_ROW).first().getByRole("cell").first(),
+    ).toHaveText("3");
     await expect(rowValue(page, "Exam length")).toHaveText("2 h 30 min");
     await dialog(page).screenshot({
       path: `${EVIDENCE_DIR}/calendar-french-desktop.png`,

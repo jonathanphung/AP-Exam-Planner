@@ -10,12 +10,46 @@
       "id": "african-american-studies",
       "name": "AP African American Studies",
       "category": "Humanities",
-      "exam": { "date": "2026-05-07", "session": "PM" },
-      "lateTesting": { "date": "2026-05-19", "session": "PM" },
+      "exam": {
+        "date": "2026-05-07",
+        "session": "PM"
+      },
+      "lateTesting": {
+        "date": "2026-05-19",
+        "session": "PM"
+      },
       "format": {
-        "mcqCount": 60,
-        "frqCount": 5,
-        "frqType": "1 project-validation written response, 3 short-answer questions, 1 document-based question",
+        "sections": [
+          {
+            "name": "Section I: Multiple Choice",
+            "questionCount": 60,
+            "minutes": 70,
+            "weightPercent": 60
+          },
+          {
+            "name": "Section IB: Individual Student Project—Exam Day Validation Question",
+            "questionCount": 1,
+            "minutes": 10,
+            "weightPercent": 1.5
+          },
+          {
+            "name": "Section II: Short-Answer Questions",
+            "questionCount": 3,
+            "minutes": 40,
+            "weightPercent": 18
+          },
+          {
+            "name": "Section II: Document-Based Question",
+            "questionCount": 1,
+            "minutes": 45,
+            "weightPercent": 12
+          },
+          {
+            "name": "Individual Student Project",
+            "minutes": "pending",
+            "weightPercent": 8.5
+          }
+        ],
         "totalMinutes": 165,
         "calculator": false,
         "delivery": "digital"
@@ -27,12 +61,30 @@
       "id": "art-history",
       "name": "AP Art History",
       "category": "Arts",
-      "exam": { "date": "2026-05-14", "session": "AM" },
-      "lateTesting": { "date": "2026-05-21", "session": "PM" },
+      "exam": {
+        "date": "2026-05-14",
+        "session": "AM"
+      },
+      "lateTesting": {
+        "date": "2026-05-21",
+        "session": "PM"
+      },
       "format": {
-        "mcqCount": 80,
-        "frqCount": 6,
-        "frqType": "6 essay questions (2 long, 4 short)",
+        "sections": [
+          {
+            "name": "Multiple Choice",
+            "questionCount": 80,
+            "minutes": 60,
+            "weightPercent": 50
+          },
+          {
+            "name": "Free Response",
+            "questionCount": 6,
+            "minutes": 120,
+            "weightPercent": 50,
+            "note": "6 essay questions (2 long, 4 short)"
+          }
+        ],
         "totalMinutes": 180,
         "calculator": false,
         "delivery": "digital"
@@ -44,12 +96,30 @@
       "id": "biology",
       "name": "AP Biology",
       "category": "STEM",
-      "exam": { "date": "2026-05-04", "session": "AM" },
-      "lateTesting": { "date": "2026-05-20", "session": "PM" },
+      "exam": {
+        "date": "2026-05-04",
+        "session": "AM"
+      },
+      "lateTesting": {
+        "date": "2026-05-20",
+        "session": "PM"
+      },
       "format": {
-        "mcqCount": 60,
-        "frqCount": 6,
-        "frqType": "6 free-response questions (2 long, 4 short)",
+        "sections": [
+          {
+            "name": "Multiple Choice",
+            "questionCount": 60,
+            "minutes": 90,
+            "weightPercent": 50
+          },
+          {
+            "name": "Free Response",
+            "questionCount": 6,
+            "minutes": 90,
+            "weightPercent": 50,
+            "note": "6 free-response questions (2 long, 4 short)"
+          }
+        ],
         "totalMinutes": 180,
         "calculator": true,
         "delivery": "hybrid"
@@ -65,9 +135,26 @@
       "lateTesting": null,
       "noExamReason": "First end-of-course exam administration is May 2027; College Board states the 2027 AP Exam dates will be available in summer 2026. No May 2026 exam exists for this course.",
       "format": {
-        "mcqCount": 60,
-        "frqCount": 4,
-        "frqType": "1 Business Canvas Project validation question + 3 scenario-based free-response questions",
+        "sections": [
+          {
+            "name": "Section I: Multiple Choice",
+            "questionCount": 60,
+            "minutes": 70,
+            "weightPercent": 60
+          },
+          {
+            "name": "Section II, Part A: Free-Response Question 1 (Business Canvas Project Exam-Day Validation)",
+            "questionCount": 1,
+            "minutes": 25,
+            "weightPercent": 15
+          },
+          {
+            "name": "Section II, Part B: Free-Response Questions 2-4",
+            "questionCount": 3,
+            "minutes": 65,
+            "weightPercent": 25
+          }
+        ],
         "totalMinutes": 160,
         "calculator": false,
         "delivery": "digital"
@@ -79,12 +166,57 @@
       "id": "calculus-ab",
       "name": "AP Calculus AB",
       "category": "STEM",
-      "exam": { "date": "2026-05-11", "session": "AM" },
-      "lateTesting": { "date": "2026-05-21", "session": "PM" },
+      "exam": {
+        "date": "2026-05-11",
+        "session": "AM"
+      },
+      "lateTesting": {
+        "date": "2026-05-21",
+        "session": "PM"
+      },
       "format": {
-        "mcqCount": 45,
-        "frqCount": 6,
-        "frqType": "6 free-response questions (calculator and no-calculator parts)",
+        "sections": [
+          {
+            "name": "Multiple Choice",
+            "questionCount": 45,
+            "minutes": 105,
+            "weightPercent": 50,
+            "parts": [
+              {
+                "name": "Part A",
+                "questionCount": 30,
+                "minutes": 60,
+                "note": "calculator not permitted"
+              },
+              {
+                "name": "Part B",
+                "questionCount": 15,
+                "minutes": 45,
+                "note": "graphing calculator required"
+              }
+            ]
+          },
+          {
+            "name": "Free Response",
+            "questionCount": 6,
+            "minutes": 90,
+            "weightPercent": 50,
+            "parts": [
+              {
+                "name": "Part A",
+                "questionCount": 2,
+                "minutes": 30,
+                "note": "graphing calculator required"
+              },
+              {
+                "name": "Part B",
+                "questionCount": 4,
+                "minutes": 60,
+                "note": "calculator not permitted"
+              }
+            ]
+          }
+        ],
         "totalMinutes": 195,
         "calculator": true,
         "delivery": "hybrid"
@@ -96,12 +228,57 @@
       "id": "calculus-bc",
       "name": "AP Calculus BC",
       "category": "STEM",
-      "exam": { "date": "2026-05-11", "session": "AM" },
-      "lateTesting": { "date": "2026-05-21", "session": "PM" },
+      "exam": {
+        "date": "2026-05-11",
+        "session": "AM"
+      },
+      "lateTesting": {
+        "date": "2026-05-21",
+        "session": "PM"
+      },
       "format": {
-        "mcqCount": 45,
-        "frqCount": 6,
-        "frqType": "6 free-response questions (calculator and no-calculator parts)",
+        "sections": [
+          {
+            "name": "Multiple Choice",
+            "questionCount": 45,
+            "minutes": 105,
+            "weightPercent": 50,
+            "parts": [
+              {
+                "name": "Part A",
+                "questionCount": 30,
+                "minutes": 60,
+                "note": "calculator not permitted"
+              },
+              {
+                "name": "Part B",
+                "questionCount": 15,
+                "minutes": 45,
+                "note": "graphing calculator required"
+              }
+            ]
+          },
+          {
+            "name": "Free Response",
+            "questionCount": 6,
+            "minutes": 90,
+            "weightPercent": 50,
+            "parts": [
+              {
+                "name": "Part A",
+                "questionCount": 2,
+                "minutes": 30,
+                "note": "graphing calculator required"
+              },
+              {
+                "name": "Part B",
+                "questionCount": 4,
+                "minutes": 60,
+                "note": "calculator not permitted"
+              }
+            ]
+          }
+        ],
         "totalMinutes": 195,
         "calculator": true,
         "delivery": "hybrid"
@@ -113,12 +290,30 @@
       "id": "chemistry",
       "name": "AP Chemistry",
       "category": "STEM",
-      "exam": { "date": "2026-05-05", "session": "AM" },
-      "lateTesting": { "date": "2026-05-20", "session": "PM" },
+      "exam": {
+        "date": "2026-05-05",
+        "session": "AM"
+      },
+      "lateTesting": {
+        "date": "2026-05-20",
+        "session": "PM"
+      },
       "format": {
-        "mcqCount": 60,
-        "frqCount": 7,
-        "frqType": "7 free-response questions (3 long, 4 short)",
+        "sections": [
+          {
+            "name": "Multiple Choice",
+            "questionCount": 60,
+            "minutes": 90,
+            "weightPercent": 50
+          },
+          {
+            "name": "Free Response",
+            "questionCount": 7,
+            "minutes": 105,
+            "weightPercent": 50,
+            "note": "7 free-response questions (3 long, 4 short)"
+          }
+        ],
         "totalMinutes": 195,
         "calculator": true,
         "delivery": "hybrid"
@@ -130,12 +325,69 @@
       "id": "chinese-language-and-culture",
       "name": "AP Chinese Language and Culture",
       "category": "Languages",
-      "exam": { "date": "2026-05-08", "session": "PM" },
-      "lateTesting": { "date": "2026-05-21", "session": "AM" },
+      "exam": {
+        "date": "2026-05-08",
+        "session": "PM"
+      },
+      "lateTesting": {
+        "date": "2026-05-21",
+        "session": "AM"
+      },
       "format": {
-        "mcqCount": 55,
-        "frqCount": 4,
-        "frqType": "2 written tasks + 2 spoken tasks",
+        "sections": [
+          {
+            "name": "Section I: Free-Response",
+            "questionCount": 4,
+            "minutes": "40–45",
+            "weightPercent": 50,
+            "parts": [
+              {
+                "name": "Question 1: Project Presentation",
+                "questionCount": 1,
+                "minutes": "pending",
+                "note": "20% of Score; 3 minutes prep, 3 minutes presentation"
+              },
+              {
+                "name": "Question 2: Project Q&A",
+                "questionCount": 1,
+                "minutes": "pending",
+                "note": "15% of Score; respond to 4 pre-recorded questions, 40 seconds per response"
+              },
+              {
+                "name": "Question 3: Story Narration",
+                "questionCount": 1,
+                "minutes": "pending",
+                "note": "7.5% of Score; Questions 3 & 4 combined 30 minutes"
+              },
+              {
+                "name": "Question 4: Email Response",
+                "questionCount": 1,
+                "minutes": "pending",
+                "note": "7.5% of Score; Questions 3 & 4 combined 30 minutes"
+              }
+            ]
+          },
+          {
+            "name": "Section II: Multiple-Choice",
+            "questionCount": 55,
+            "minutes": 65,
+            "weightPercent": 50,
+            "parts": [
+              {
+                "name": "Part A: Listening",
+                "questionCount": 25,
+                "minutes": 25,
+                "note": "25% of Score"
+              },
+              {
+                "name": "Part B: Reading",
+                "questionCount": 30,
+                "minutes": 40,
+                "note": "25% of Score"
+              }
+            ]
+          }
+        ],
         "totalMinutes": 120,
         "calculator": false,
         "delivery": "digital"
@@ -147,12 +399,30 @@
       "id": "comparative-government-and-politics",
       "name": "AP Comparative Government and Politics",
       "category": "Humanities",
-      "exam": { "date": "2026-05-06", "session": "PM" },
-      "lateTesting": { "date": "2026-05-18", "session": "AM" },
+      "exam": {
+        "date": "2026-05-06",
+        "session": "PM"
+      },
+      "lateTesting": {
+        "date": "2026-05-18",
+        "session": "AM"
+      },
       "format": {
-        "mcqCount": 55,
-        "frqCount": 4,
-        "frqType": "4 free-response questions (concept application, quantitative analysis, comparative analysis, argument essay)",
+        "sections": [
+          {
+            "name": "Multiple Choice",
+            "questionCount": 55,
+            "minutes": 60,
+            "weightPercent": 50
+          },
+          {
+            "name": "Free Response",
+            "questionCount": 4,
+            "minutes": 90,
+            "weightPercent": 50,
+            "note": "4 free-response questions (concept application, quantitative analysis, comparative analysis, argument essay)"
+          }
+        ],
         "totalMinutes": 150,
         "calculator": false,
         "delivery": "digital"
@@ -164,12 +434,30 @@
       "id": "computer-science-a",
       "name": "AP Computer Science A",
       "category": "STEM",
-      "exam": { "date": "2026-05-15", "session": "PM" },
-      "lateTesting": { "date": "2026-05-22", "session": "PM" },
+      "exam": {
+        "date": "2026-05-15",
+        "session": "PM"
+      },
+      "lateTesting": {
+        "date": "2026-05-22",
+        "session": "PM"
+      },
       "format": {
-        "mcqCount": 42,
-        "frqCount": 4,
-        "frqType": "4 code-writing free-response questions",
+        "sections": [
+          {
+            "name": "Multiple Choice",
+            "questionCount": 42,
+            "minutes": 90,
+            "weightPercent": 55
+          },
+          {
+            "name": "Free Response",
+            "questionCount": 4,
+            "minutes": 90,
+            "weightPercent": 45,
+            "note": "4 code-writing free-response questions"
+          }
+        ],
         "totalMinutes": 180,
         "calculator": false,
         "delivery": "digital"
@@ -181,12 +469,30 @@
       "id": "computer-science-principles",
       "name": "AP Computer Science Principles",
       "category": "STEM",
-      "exam": { "date": "2026-05-14", "session": "PM" },
-      "lateTesting": { "date": "2026-05-21", "session": "AM" },
+      "exam": {
+        "date": "2026-05-14",
+        "session": "PM"
+      },
+      "lateTesting": {
+        "date": "2026-05-21",
+        "session": "AM"
+      },
       "format": {
-        "mcqCount": 70,
-        "frqCount": 2,
-        "frqType": "2 written-response questions about the student's Create performance task",
+        "sections": [
+          {
+            "name": "Multiple Choice",
+            "questionCount": 70,
+            "minutes": 120,
+            "weightPercent": 70
+          },
+          {
+            "name": "Written Response",
+            "questionCount": 2,
+            "minutes": 60,
+            "weightPercent": 30,
+            "note": "2 written-response questions about the student's Create performance task"
+          }
+        ],
         "totalMinutes": 180,
         "calculator": false,
         "delivery": "digital"
@@ -206,9 +512,21 @@
       "lateTesting": null,
       "noExamReason": "First end-of-course exam administration is May 2027; College Board states the 2027 AP Exam dates will be available in summer 2026. No May 2026 exam exists for this course.",
       "format": {
-        "mcqCount": 60,
-        "frqCount": 1,
-        "frqType": "1 multi-source analysis free-response question",
+        "sections": [
+          {
+            "name": "Multiple Choice",
+            "questionCount": 60,
+            "minutes": 80,
+            "weightPercent": 70
+          },
+          {
+            "name": "Free Response",
+            "questionCount": 1,
+            "minutes": 50,
+            "weightPercent": 30,
+            "note": "1 multi-source analysis free-response question"
+          }
+        ],
         "totalMinutes": 130,
         "calculator": false,
         "delivery": "digital"
@@ -220,12 +538,30 @@
       "id": "english-language-and-composition",
       "name": "AP English Language and Composition",
       "category": "Humanities",
-      "exam": { "date": "2026-05-13", "session": "AM" },
-      "lateTesting": { "date": "2026-05-21", "session": "AM" },
+      "exam": {
+        "date": "2026-05-13",
+        "session": "AM"
+      },
+      "lateTesting": {
+        "date": "2026-05-21",
+        "session": "AM"
+      },
       "format": {
-        "mcqCount": 45,
-        "frqCount": 3,
-        "frqType": "3 essays (synthesis, rhetorical analysis, argument)",
+        "sections": [
+          {
+            "name": "Multiple Choice",
+            "questionCount": 45,
+            "minutes": 60,
+            "weightPercent": 45
+          },
+          {
+            "name": "Free Response",
+            "questionCount": 3,
+            "minutes": 135,
+            "weightPercent": 55,
+            "note": "3 essays (synthesis, rhetorical analysis, argument)"
+          }
+        ],
         "totalMinutes": 195,
         "calculator": false,
         "delivery": "digital"
@@ -237,12 +573,30 @@
       "id": "english-literature-and-composition",
       "name": "AP English Literature and Composition",
       "category": "Humanities",
-      "exam": { "date": "2026-05-06", "session": "AM" },
-      "lateTesting": { "date": "2026-05-18", "session": "PM" },
+      "exam": {
+        "date": "2026-05-06",
+        "session": "AM"
+      },
+      "lateTesting": {
+        "date": "2026-05-18",
+        "session": "PM"
+      },
       "format": {
-        "mcqCount": 55,
-        "frqCount": 3,
-        "frqType": "3 essays (poetry analysis, prose fiction analysis, thematic analysis)",
+        "sections": [
+          {
+            "name": "Section I: Multiple Choice",
+            "questionCount": 55,
+            "minutes": 60,
+            "weightPercent": 45
+          },
+          {
+            "name": "Section II: Free Response",
+            "questionCount": 3,
+            "minutes": 120,
+            "weightPercent": 55,
+            "note": "3 essays (poetry analysis, prose fiction analysis, thematic analysis)"
+          }
+        ],
         "totalMinutes": 180,
         "calculator": false,
         "delivery": "digital"
@@ -254,12 +608,30 @@
       "id": "environmental-science",
       "name": "AP Environmental Science",
       "category": "STEM",
-      "exam": { "date": "2026-05-15", "session": "AM" },
-      "lateTesting": { "date": "2026-05-22", "session": "AM" },
+      "exam": {
+        "date": "2026-05-15",
+        "session": "AM"
+      },
+      "lateTesting": {
+        "date": "2026-05-22",
+        "session": "AM"
+      },
       "format": {
-        "mcqCount": 80,
-        "frqCount": 3,
-        "frqType": "3 free-response questions",
+        "sections": [
+          {
+            "name": "Multiple Choice",
+            "questionCount": 80,
+            "minutes": 90,
+            "weightPercent": 60
+          },
+          {
+            "name": "Free Response",
+            "questionCount": 3,
+            "minutes": 70,
+            "weightPercent": 40,
+            "note": "3 free-response questions"
+          }
+        ],
         "totalMinutes": 160,
         "calculator": true,
         "delivery": "digital"
@@ -271,12 +643,49 @@
       "id": "european-history",
       "name": "AP European History",
       "category": "Humanities",
-      "exam": { "date": "2026-05-04", "session": "PM" },
-      "lateTesting": { "date": "2026-05-18", "session": "AM" },
+      "exam": {
+        "date": "2026-05-04",
+        "session": "PM"
+      },
+      "lateTesting": {
+        "date": "2026-05-18",
+        "session": "AM"
+      },
       "format": {
-        "mcqCount": 55,
-        "frqCount": 5,
-        "frqType": "3 short-answer questions, 1 document-based question, 1 long essay",
+        "sections": [
+          {
+            "name": "Section I, Part A: Multiple Choice",
+            "questionCount": 55,
+            "minutes": 55,
+            "weightPercent": 40
+          },
+          {
+            "name": "Section I, Part B: Short Answer",
+            "questionCount": 3,
+            "minutes": 40,
+            "weightPercent": 20
+          },
+          {
+            "name": "Section II: Document-Based Question and Long Essay",
+            "questionCount": 2,
+            "minutes": 100,
+            "weightPercent": 40,
+            "parts": [
+              {
+                "name": "Document-Based Question (DBQ)",
+                "questionCount": 1,
+                "minutes": 60,
+                "note": "includes 15-minute reading period"
+              },
+              {
+                "name": "Long Essay",
+                "questionCount": 1,
+                "minutes": 40,
+                "note": "student chooses from 3 options"
+              }
+            ]
+          }
+        ],
         "totalMinutes": 195,
         "calculator": false,
         "delivery": "digital"
@@ -288,12 +697,58 @@
       "id": "french-language-and-culture",
       "name": "AP French Language and Culture",
       "category": "Languages",
-      "exam": { "date": "2026-05-12", "session": "AM" },
-      "lateTesting": { "date": "2026-05-20", "session": "PM" },
+      "exam": {
+        "date": "2026-05-12",
+        "session": "AM"
+      },
+      "lateTesting": {
+        "date": "2026-05-20",
+        "session": "PM"
+      },
       "format": {
-        "mcqCount": 55,
-        "frqCount": 3,
-        "frqType": "1 written task + 2 spoken tasks",
+        "sections": [
+          {
+            "name": "Section I: Free-Response",
+            "questionCount": 3,
+            "minutes": "65–70",
+            "weightPercent": 50,
+            "parts": [
+              {
+                "name": "Question 1: Project Presentation",
+                "questionCount": 1,
+                "minutes": "pending"
+              },
+              {
+                "name": "Question 2: Project Q&A",
+                "questionCount": 1,
+                "minutes": "pending"
+              },
+              {
+                "name": "Question 3: Argumentative Essay",
+                "questionCount": 1,
+                "minutes": "pending"
+              }
+            ]
+          },
+          {
+            "name": "Section II: Multiple-Choice",
+            "questionCount": 55,
+            "minutes": 80,
+            "weightPercent": 50,
+            "parts": [
+              {
+                "name": "Part A: Listening",
+                "questionCount": 25,
+                "minutes": 40
+              },
+              {
+                "name": "Part B: Reading",
+                "questionCount": 30,
+                "minutes": 40
+              }
+            ]
+          }
+        ],
         "totalMinutes": 150,
         "calculator": false,
         "delivery": "paper"
@@ -305,12 +760,60 @@
       "id": "german-language-and-culture",
       "name": "AP German Language and Culture",
       "category": "Languages",
-      "exam": { "date": "2026-05-13", "session": "AM" },
-      "lateTesting": { "date": "2026-05-22", "session": "PM" },
+      "exam": {
+        "date": "2026-05-13",
+        "session": "AM"
+      },
+      "lateTesting": {
+        "date": "2026-05-22",
+        "session": "PM"
+      },
       "format": {
-        "mcqCount": 55,
-        "frqCount": 3,
-        "frqType": "1 written task + 2 spoken tasks",
+        "sections": [
+          {
+            "name": "Section I: Free-Response",
+            "questionCount": 3,
+            "minutes": "65–70",
+            "weightPercent": 50,
+            "parts": [
+              {
+                "name": "Question 1: Project Presentation",
+                "questionCount": 1,
+                "minutes": "pending",
+                "note": "20% of Score"
+              },
+              {
+                "name": "Question 2: Project Q&A",
+                "minutes": "pending",
+                "note": "4 pre-recorded questions; 15% of Score"
+              },
+              {
+                "name": "Question 3: Argumentative Essay",
+                "questionCount": 1,
+                "minutes": 55,
+                "note": "15% of Score"
+              }
+            ]
+          },
+          {
+            "name": "Section II: Multiple-Choice",
+            "questionCount": 55,
+            "minutes": 80,
+            "weightPercent": 50,
+            "parts": [
+              {
+                "name": "Part A: Listening",
+                "questionCount": 25,
+                "minutes": 40
+              },
+              {
+                "name": "Part B: Reading",
+                "questionCount": 30,
+                "minutes": 40
+              }
+            ]
+          }
+        ],
         "totalMinutes": 150,
         "calculator": false,
         "delivery": "paper"
@@ -322,12 +825,30 @@
       "id": "human-geography",
       "name": "AP Human Geography",
       "category": "Humanities",
-      "exam": { "date": "2026-05-05", "session": "AM" },
-      "lateTesting": { "date": "2026-05-18", "session": "PM" },
+      "exam": {
+        "date": "2026-05-05",
+        "session": "AM"
+      },
+      "lateTesting": {
+        "date": "2026-05-18",
+        "session": "PM"
+      },
       "format": {
-        "mcqCount": 60,
-        "frqCount": 3,
-        "frqType": "3 free-response questions",
+        "sections": [
+          {
+            "name": "Multiple Choice",
+            "questionCount": 60,
+            "minutes": 60,
+            "weightPercent": 50
+          },
+          {
+            "name": "Free Response",
+            "questionCount": 3,
+            "minutes": 75,
+            "weightPercent": 50,
+            "note": "3 free-response questions"
+          }
+        ],
         "totalMinutes": 135,
         "calculator": false,
         "delivery": "digital"
@@ -339,12 +860,61 @@
       "id": "italian-language-and-culture",
       "name": "AP Italian Language and Culture",
       "category": "Languages",
-      "exam": { "date": "2026-05-08", "session": "AM" },
-      "lateTesting": { "date": "2026-05-21", "session": "PM" },
+      "exam": {
+        "date": "2026-05-08",
+        "session": "AM"
+      },
+      "lateTesting": {
+        "date": "2026-05-21",
+        "session": "PM"
+      },
       "format": {
-        "mcqCount": 55,
-        "frqCount": 3,
-        "frqType": "1 written task + 2 spoken tasks",
+        "sections": [
+          {
+            "name": "Section I: Free-Response",
+            "questionCount": 3,
+            "minutes": "pending",
+            "weightPercent": 50,
+            "parts": [
+              {
+                "name": "Project Presentation",
+                "questionCount": 1,
+                "minutes": "pending",
+                "note": "3 minutes to prepare; 3 minutes to present"
+              },
+              {
+                "name": "Project Q&A",
+                "questionCount": 4,
+                "minutes": "pending",
+                "note": "4 pre-recorded questions; 40 seconds for each response"
+              },
+              {
+                "name": "Argumentative Essay",
+                "questionCount": 1,
+                "minutes": 55,
+                "note": "including 2 opportunities to listen to audio"
+              }
+            ]
+          },
+          {
+            "name": "Section II: Multiple-Choice",
+            "questionCount": 55,
+            "minutes": 80,
+            "weightPercent": 50,
+            "parts": [
+              {
+                "name": "Part A: Listening",
+                "questionCount": 25,
+                "minutes": 40
+              },
+              {
+                "name": "Part B: Reading",
+                "questionCount": 30,
+                "minutes": 40
+              }
+            ]
+          }
+        ],
         "totalMinutes": 150,
         "calculator": false,
         "delivery": "paper"
@@ -356,12 +926,62 @@
       "id": "japanese-language-and-culture",
       "name": "AP Japanese Language and Culture",
       "category": "Languages",
-      "exam": { "date": "2026-05-12", "session": "PM" },
-      "lateTesting": { "date": "2026-05-19", "session": "AM" },
+      "exam": {
+        "date": "2026-05-12",
+        "session": "PM"
+      },
+      "lateTesting": {
+        "date": "2026-05-19",
+        "session": "AM"
+      },
       "format": {
-        "mcqCount": 55,
-        "frqCount": 4,
-        "frqType": "2 written tasks + 2 spoken tasks",
+        "sections": [
+          {
+            "name": "Section I: Free Response",
+            "questionCount": 4,
+            "minutes": "pending",
+            "weightPercent": 50,
+            "parts": [
+              {
+                "name": "Question 1: Project Presentation",
+                "questionCount": 1,
+                "minutes": "pending",
+                "note": "3 minutes to prepare; 3 minutes to present"
+              },
+              {
+                "name": "Question 2: Project Q&A",
+                "minutes": "pending",
+                "note": "4 pre-recorded questions; 40 seconds for each response"
+              },
+              {
+                "name": "Question 3: Story Narration + Question 4: Email Response (Writing)",
+                "questionCount": 2,
+                "minutes": 30,
+                "note": "combined time for both writing tasks"
+              }
+            ]
+          },
+          {
+            "name": "Section II: Multiple Choice",
+            "questionCount": 55,
+            "minutes": "pending",
+            "weightPercent": 50,
+            "parts": [
+              {
+                "name": "Part A: Listening",
+                "questionCount": 25,
+                "minutes": 25,
+                "note": "25% of Score"
+              },
+              {
+                "name": "Part B: Reading",
+                "questionCount": 30,
+                "minutes": 40,
+                "note": "25% of Score"
+              }
+            ]
+          }
+        ],
         "totalMinutes": 120,
         "calculator": false,
         "delivery": "digital"
@@ -373,12 +993,30 @@
       "id": "latin",
       "name": "AP Latin",
       "category": "Languages",
-      "exam": { "date": "2026-05-04", "session": "AM" },
-      "lateTesting": { "date": "2026-05-18", "session": "PM" },
+      "exam": {
+        "date": "2026-05-04",
+        "session": "AM"
+      },
+      "lateTesting": {
+        "date": "2026-05-18",
+        "session": "PM"
+      },
       "format": {
-        "mcqCount": 52,
-        "frqCount": 5,
-        "frqType": "translation, short-answer, and short-essay questions (5 questions)",
+        "sections": [
+          {
+            "name": "Multiple Choice",
+            "questionCount": 52,
+            "minutes": 65,
+            "weightPercent": 50
+          },
+          {
+            "name": "Free Response",
+            "questionCount": 5,
+            "minutes": 115,
+            "weightPercent": 50,
+            "note": "translation, short-answer, and short-essay questions (5 questions)"
+          }
+        ],
         "totalMinutes": 180,
         "calculator": false,
         "delivery": "digital"
@@ -390,12 +1028,30 @@
       "id": "macroeconomics",
       "name": "AP Macroeconomics",
       "category": "Humanities",
-      "exam": { "date": "2026-05-08", "session": "PM" },
-      "lateTesting": { "date": "2026-05-20", "session": "PM" },
+      "exam": {
+        "date": "2026-05-08",
+        "session": "PM"
+      },
+      "lateTesting": {
+        "date": "2026-05-20",
+        "session": "PM"
+      },
       "format": {
-        "mcqCount": 60,
-        "frqCount": 3,
-        "frqType": "3 free-response questions (1 long, 2 short)",
+        "sections": [
+          {
+            "name": "Multiple Choice",
+            "questionCount": 60,
+            "minutes": 70,
+            "weightPercent": 66
+          },
+          {
+            "name": "Free Response",
+            "questionCount": 3,
+            "minutes": 60,
+            "weightPercent": 33,
+            "note": "3 free-response questions (1 long, 2 short)"
+          }
+        ],
         "totalMinutes": 130,
         "calculator": true,
         "delivery": "hybrid"
@@ -407,12 +1063,30 @@
       "id": "microeconomics",
       "name": "AP Microeconomics",
       "category": "Humanities",
-      "exam": { "date": "2026-05-04", "session": "PM" },
-      "lateTesting": { "date": "2026-05-20", "session": "AM" },
+      "exam": {
+        "date": "2026-05-04",
+        "session": "PM"
+      },
+      "lateTesting": {
+        "date": "2026-05-20",
+        "session": "AM"
+      },
       "format": {
-        "mcqCount": 60,
-        "frqCount": 3,
-        "frqType": "3 free-response questions (1 long, 2 short)",
+        "sections": [
+          {
+            "name": "Multiple Choice",
+            "questionCount": 60,
+            "minutes": 70,
+            "weightPercent": 66
+          },
+          {
+            "name": "Free Response",
+            "questionCount": 3,
+            "minutes": 60,
+            "weightPercent": 33,
+            "note": "3 free-response questions (1 long, 2 short)"
+          }
+        ],
         "totalMinutes": 130,
         "calculator": true,
         "delivery": "hybrid"
@@ -424,12 +1098,35 @@
       "id": "music-theory",
       "name": "AP Music Theory",
       "category": "Arts",
-      "exam": { "date": "2026-05-11", "session": "PM" },
-      "lateTesting": { "date": "2026-05-21", "session": "AM" },
+      "exam": {
+        "date": "2026-05-11",
+        "session": "PM"
+      },
+      "lateTesting": {
+        "date": "2026-05-21",
+        "session": "AM"
+      },
       "format": {
-        "mcqCount": 75,
-        "frqCount": 9,
-        "frqType": "7 written free-response questions + 2 sight-singing questions",
+        "sections": [
+          {
+            "name": "Section I: Multiple Choice",
+            "questionCount": 75,
+            "minutes": 80,
+            "weightPercent": 45
+          },
+          {
+            "name": "Section IIA: Free Response: Written",
+            "questionCount": 7,
+            "minutes": 70,
+            "weightPercent": 45
+          },
+          {
+            "name": "Section IIB: Free Response: Sight Singing",
+            "questionCount": 2,
+            "minutes": 10,
+            "weightPercent": 10
+          }
+        ],
         "totalMinutes": 160,
         "calculator": false,
         "delivery": "paper"
@@ -441,12 +1138,30 @@
       "id": "physics-1",
       "name": "AP Physics 1: Algebra-Based",
       "category": "STEM",
-      "exam": { "date": "2026-05-06", "session": "PM" },
-      "lateTesting": { "date": "2026-05-22", "session": "AM" },
+      "exam": {
+        "date": "2026-05-06",
+        "session": "PM"
+      },
+      "lateTesting": {
+        "date": "2026-05-22",
+        "session": "AM"
+      },
       "format": {
-        "mcqCount": 40,
-        "frqCount": 4,
-        "frqType": "4 free-response questions",
+        "sections": [
+          {
+            "name": "Multiple Choice",
+            "questionCount": 40,
+            "minutes": 80,
+            "weightPercent": 50
+          },
+          {
+            "name": "Free Response",
+            "questionCount": 4,
+            "minutes": 100,
+            "weightPercent": 50,
+            "note": "4 free-response questions"
+          }
+        ],
         "totalMinutes": 180,
         "calculator": true,
         "delivery": "hybrid"
@@ -458,12 +1173,30 @@
       "id": "physics-2",
       "name": "AP Physics 2: Algebra-Based",
       "category": "STEM",
-      "exam": { "date": "2026-05-07", "session": "AM" },
-      "lateTesting": { "date": "2026-05-21", "session": "PM" },
+      "exam": {
+        "date": "2026-05-07",
+        "session": "AM"
+      },
+      "lateTesting": {
+        "date": "2026-05-21",
+        "session": "PM"
+      },
       "format": {
-        "mcqCount": 40,
-        "frqCount": 4,
-        "frqType": "4 free-response questions",
+        "sections": [
+          {
+            "name": "Multiple Choice",
+            "questionCount": 40,
+            "minutes": 80,
+            "weightPercent": 50
+          },
+          {
+            "name": "Free Response",
+            "questionCount": 4,
+            "minutes": 100,
+            "weightPercent": 50,
+            "note": "4 free-response questions"
+          }
+        ],
         "totalMinutes": 180,
         "calculator": true,
         "delivery": "hybrid"
@@ -475,12 +1208,30 @@
       "id": "physics-c-electricity-and-magnetism",
       "name": "AP Physics C: Electricity and Magnetism",
       "category": "STEM",
-      "exam": { "date": "2026-05-14", "session": "PM" },
-      "lateTesting": { "date": "2026-05-22", "session": "PM" },
+      "exam": {
+        "date": "2026-05-14",
+        "session": "PM"
+      },
+      "lateTesting": {
+        "date": "2026-05-22",
+        "session": "PM"
+      },
       "format": {
-        "mcqCount": 40,
-        "frqCount": 4,
-        "frqType": "4 free-response questions",
+        "sections": [
+          {
+            "name": "Multiple Choice",
+            "questionCount": 40,
+            "minutes": 80,
+            "weightPercent": 50
+          },
+          {
+            "name": "Free Response",
+            "questionCount": 4,
+            "minutes": 100,
+            "weightPercent": 50,
+            "note": "4 free-response questions"
+          }
+        ],
         "totalMinutes": 180,
         "calculator": true,
         "delivery": "hybrid"
@@ -492,12 +1243,30 @@
       "id": "physics-c-mechanics",
       "name": "AP Physics C: Mechanics",
       "category": "STEM",
-      "exam": { "date": "2026-05-13", "session": "PM" },
-      "lateTesting": { "date": "2026-05-21", "session": "PM" },
+      "exam": {
+        "date": "2026-05-13",
+        "session": "PM"
+      },
+      "lateTesting": {
+        "date": "2026-05-21",
+        "session": "PM"
+      },
       "format": {
-        "mcqCount": 40,
-        "frqCount": 4,
-        "frqType": "4 free-response questions",
+        "sections": [
+          {
+            "name": "Section I: Multiple Choice",
+            "questionCount": 40,
+            "minutes": 80,
+            "weightPercent": 50
+          },
+          {
+            "name": "Section II: Free Response",
+            "questionCount": 4,
+            "minutes": 100,
+            "weightPercent": 50,
+            "note": "4 free-response questions"
+          }
+        ],
         "totalMinutes": 180,
         "calculator": true,
         "delivery": "hybrid"
@@ -509,12 +1278,57 @@
       "id": "precalculus",
       "name": "AP Precalculus",
       "category": "STEM",
-      "exam": { "date": "2026-05-12", "session": "AM" },
-      "lateTesting": { "date": "2026-05-21", "session": "AM" },
+      "exam": {
+        "date": "2026-05-12",
+        "session": "AM"
+      },
+      "lateTesting": {
+        "date": "2026-05-21",
+        "session": "AM"
+      },
       "format": {
-        "mcqCount": 40,
-        "frqCount": 4,
-        "frqType": "4 free-response questions (calculator and no-calculator parts)",
+        "sections": [
+          {
+            "name": "Multiple Choice",
+            "questionCount": 40,
+            "minutes": 120,
+            "weightPercent": 62.5,
+            "parts": [
+              {
+                "name": "Part A",
+                "questionCount": 28,
+                "minutes": 80,
+                "note": "calculator not permitted"
+              },
+              {
+                "name": "Part B",
+                "questionCount": 12,
+                "minutes": 40,
+                "note": "graphing calculator required"
+              }
+            ]
+          },
+          {
+            "name": "Free Response",
+            "questionCount": 4,
+            "minutes": 60,
+            "weightPercent": 37.5,
+            "parts": [
+              {
+                "name": "Part A",
+                "questionCount": 2,
+                "minutes": 30,
+                "note": "graphing calculator required"
+              },
+              {
+                "name": "Part B",
+                "questionCount": 2,
+                "minutes": 30,
+                "note": "calculator not permitted"
+              }
+            ]
+          }
+        ],
         "totalMinutes": 180,
         "calculator": true,
         "delivery": "hybrid"
@@ -526,12 +1340,41 @@
       "id": "psychology",
       "name": "AP Psychology",
       "category": "Humanities",
-      "exam": { "date": "2026-05-12", "session": "PM" },
-      "lateTesting": { "date": "2026-05-22", "session": "PM" },
+      "exam": {
+        "date": "2026-05-12",
+        "session": "PM"
+      },
+      "lateTesting": {
+        "date": "2026-05-22",
+        "session": "PM"
+      },
       "format": {
-        "mcqCount": 75,
-        "frqCount": 2,
-        "frqType": "2 free-response questions (article analysis, evidence-based question)",
+        "sections": [
+          {
+            "name": "Multiple Choice",
+            "questionCount": 75,
+            "minutes": 90,
+            "weightPercent": 66.7
+          },
+          {
+            "name": "Free Response",
+            "questionCount": 2,
+            "minutes": 70,
+            "weightPercent": 33.3,
+            "parts": [
+              {
+                "name": "Part A - Article Analysis Question (AAQ)",
+                "questionCount": 1,
+                "minutes": "pending"
+              },
+              {
+                "name": "Part B - Evidence-Based Question (EBQ)",
+                "questionCount": 1,
+                "minutes": "pending"
+              }
+            ]
+          }
+        ],
         "totalMinutes": 160,
         "calculator": false,
         "delivery": "digital"
@@ -546,9 +1389,7 @@
       "exam": null,
       "lateTesting": null,
       "format": {
-        "mcqCount": 0,
-        "frqCount": 0,
-        "frqType": "through-course performance task: academic paper, presentation, and oral defense (no timed end-of-course exam)",
+        "sections": [],
         "totalMinutes": 0,
         "calculator": false,
         "delivery": "digital"
@@ -564,12 +1405,29 @@
       "id": "seminar",
       "name": "AP Seminar",
       "category": "Humanities",
-      "exam": { "date": "2026-05-11", "session": "PM" },
-      "lateTesting": { "date": "2026-05-20", "session": "AM" },
+      "exam": {
+        "date": "2026-05-11",
+        "session": "PM"
+      },
+      "lateTesting": {
+        "date": "2026-05-20",
+        "session": "AM"
+      },
       "format": {
-        "mcqCount": 0,
-        "frqCount": 4,
-        "frqType": "end-of-course exam: 3 short-answer questions + 1 evidence-based argument essay",
+        "sections": [
+          {
+            "name": "End-of-Course Exam – Short-Answer Section",
+            "questionCount": 3,
+            "minutes": 30,
+            "weightPercent": 13.5
+          },
+          {
+            "name": "End-of-Course Exam – Essay Section",
+            "questionCount": 1,
+            "minutes": 90,
+            "weightPercent": 31.5
+          }
+        ],
         "totalMinutes": 120,
         "calculator": false,
         "delivery": "digital"
@@ -585,12 +1443,63 @@
       "id": "spanish-language-and-culture",
       "name": "AP Spanish Language and Culture",
       "category": "Languages",
-      "exam": { "date": "2026-05-14", "session": "AM" },
-      "lateTesting": { "date": "2026-05-22", "session": "AM" },
+      "exam": {
+        "date": "2026-05-14",
+        "session": "AM"
+      },
+      "lateTesting": {
+        "date": "2026-05-22",
+        "session": "AM"
+      },
       "format": {
-        "mcqCount": 55,
-        "frqCount": 3,
-        "frqType": "1 written task + 2 spoken tasks",
+        "sections": [
+          {
+            "name": "Section I: Free-Response",
+            "questionCount": 3,
+            "minutes": "65–70",
+            "weightPercent": 50,
+            "parts": [
+              {
+                "name": "Question 1: Project Presentation",
+                "questionCount": 1,
+                "minutes": "pending",
+                "note": "3 minutes to prepare; 3 minutes to present"
+              },
+              {
+                "name": "Question 2: Project Q&A",
+                "questionCount": 1,
+                "minutes": "pending",
+                "note": "responding to 4 pre-recorded questions, 40 seconds per response"
+              },
+              {
+                "name": "Question 3: Argumentative Essay",
+                "questionCount": 1,
+                "minutes": 55,
+                "note": "55 minutes, including 2 opportunities to listen to audio"
+              }
+            ]
+          },
+          {
+            "name": "Section II: Multiple-Choice",
+            "questionCount": 55,
+            "minutes": 80,
+            "weightPercent": 50,
+            "parts": [
+              {
+                "name": "Part A: Listening",
+                "questionCount": 25,
+                "minutes": 40,
+                "note": "25% of Score"
+              },
+              {
+                "name": "Part B: Reading",
+                "questionCount": 30,
+                "minutes": 40,
+                "note": "25% of Score"
+              }
+            ]
+          }
+        ],
         "totalMinutes": 150,
         "calculator": false,
         "delivery": "paper"
@@ -602,12 +1511,47 @@
       "id": "spanish-literature-and-culture",
       "name": "AP Spanish Literature and Culture",
       "category": "Languages",
-      "exam": { "date": "2026-05-13", "session": "PM" },
-      "lateTesting": { "date": "2026-05-22", "session": "AM" },
+      "exam": {
+        "date": "2026-05-13",
+        "session": "PM"
+      },
+      "lateTesting": {
+        "date": "2026-05-22",
+        "session": "AM"
+      },
       "format": {
-        "mcqCount": 65,
-        "frqCount": 4,
-        "frqType": "2 short-answer questions + 2 essay questions",
+        "sections": [
+          {
+            "name": "Section IA: Multiple Choice",
+            "questionCount": 15,
+            "minutes": 20,
+            "weightPercent": 10
+          },
+          {
+            "name": "Section IB: Multiple Choice",
+            "questionCount": 50,
+            "minutes": 60,
+            "weightPercent": 40
+          },
+          {
+            "name": "Section II: Free Response",
+            "questionCount": 4,
+            "minutes": 100,
+            "weightPercent": 50,
+            "parts": [
+              {
+                "name": "Short-Answer Questions",
+                "questionCount": 2,
+                "minutes": 30
+              },
+              {
+                "name": "Essay Questions",
+                "questionCount": 2,
+                "minutes": 70
+              }
+            ]
+          }
+        ],
         "totalMinutes": 180,
         "calculator": false,
         "delivery": "paper"
@@ -619,12 +1563,30 @@
       "id": "statistics",
       "name": "AP Statistics",
       "category": "STEM",
-      "exam": { "date": "2026-05-07", "session": "PM" },
-      "lateTesting": { "date": "2026-05-20", "session": "AM" },
+      "exam": {
+        "date": "2026-05-07",
+        "session": "PM"
+      },
+      "lateTesting": {
+        "date": "2026-05-20",
+        "session": "AM"
+      },
       "format": {
-        "mcqCount": 42,
-        "frqCount": 4,
-        "frqType": "3 multi-part questions + 1 inference question (hypothesis test or confidence interval)",
+        "sections": [
+          {
+            "name": "Multiple Choice",
+            "questionCount": 42,
+            "minutes": 90,
+            "weightPercent": 50
+          },
+          {
+            "name": "Free Response",
+            "questionCount": 4,
+            "minutes": 90,
+            "weightPercent": 50,
+            "note": "3 multi-part questions + 1 inference question (hypothesis test or confidence interval)"
+          }
+        ],
         "totalMinutes": 180,
         "calculator": true,
         "delivery": "hybrid"
@@ -636,12 +1598,30 @@
       "id": "united-states-government-and-politics",
       "name": "AP United States Government and Politics",
       "category": "Humanities",
-      "exam": { "date": "2026-05-05", "session": "PM" },
-      "lateTesting": { "date": "2026-05-19", "session": "AM" },
+      "exam": {
+        "date": "2026-05-05",
+        "session": "PM"
+      },
+      "lateTesting": {
+        "date": "2026-05-19",
+        "session": "AM"
+      },
       "format": {
-        "mcqCount": 55,
-        "frqCount": 4,
-        "frqType": "4 free-response questions (concept application, quantitative analysis, SCOTUS comparison, argument essay)",
+        "sections": [
+          {
+            "name": "Multiple Choice",
+            "questionCount": 55,
+            "minutes": 80,
+            "weightPercent": 50
+          },
+          {
+            "name": "Free Response",
+            "questionCount": 4,
+            "minutes": 100,
+            "weightPercent": 50,
+            "note": "4 free-response questions (concept application, quantitative analysis, SCOTUS comparison, argument essay)"
+          }
+        ],
         "totalMinutes": 180,
         "calculator": false,
         "delivery": "digital"
@@ -653,12 +1633,49 @@
       "id": "united-states-history",
       "name": "AP United States History",
       "category": "Humanities",
-      "exam": { "date": "2026-05-08", "session": "AM" },
-      "lateTesting": { "date": "2026-05-19", "session": "PM" },
+      "exam": {
+        "date": "2026-05-08",
+        "session": "AM"
+      },
+      "lateTesting": {
+        "date": "2026-05-19",
+        "session": "PM"
+      },
       "format": {
-        "mcqCount": 55,
-        "frqCount": 5,
-        "frqType": "3 short-answer questions, 1 document-based question, 1 long essay",
+        "sections": [
+          {
+            "name": "Section I, Part A: Multiple Choice",
+            "questionCount": 55,
+            "minutes": 55,
+            "weightPercent": 40
+          },
+          {
+            "name": "Section I, Part B: Short Answer",
+            "questionCount": 3,
+            "minutes": 40,
+            "weightPercent": 20
+          },
+          {
+            "name": "Section II: Free Response (Document-Based Question and Long Essay)",
+            "questionCount": 2,
+            "minutes": 100,
+            "weightPercent": 40,
+            "parts": [
+              {
+                "name": "Document-Based Question (DBQ)",
+                "questionCount": 1,
+                "minutes": 60,
+                "note": "Recommended Time: 1 Hour (includes 15-minute reading period)"
+              },
+              {
+                "name": "Long Essay",
+                "questionCount": 1,
+                "minutes": 40,
+                "note": "Recommended time; student chooses from 3 options"
+              }
+            ]
+          }
+        ],
         "totalMinutes": 195,
         "calculator": false,
         "delivery": "digital"
@@ -670,12 +1687,48 @@
       "id": "world-history-modern",
       "name": "AP World History: Modern",
       "category": "Humanities",
-      "exam": { "date": "2026-05-07", "session": "AM" },
-      "lateTesting": { "date": "2026-05-18", "session": "AM" },
+      "exam": {
+        "date": "2026-05-07",
+        "session": "AM"
+      },
+      "lateTesting": {
+        "date": "2026-05-18",
+        "session": "AM"
+      },
       "format": {
-        "mcqCount": 55,
-        "frqCount": 5,
-        "frqType": "3 short-answer questions, 1 document-based question, 1 long essay",
+        "sections": [
+          {
+            "name": "Section IA: Multiple Choice",
+            "questionCount": 55,
+            "minutes": 55,
+            "weightPercent": 40
+          },
+          {
+            "name": "Section IB: Short Answer",
+            "questionCount": 3,
+            "minutes": 40,
+            "weightPercent": 20
+          },
+          {
+            "name": "Section II: Free Response",
+            "questionCount": 2,
+            "minutes": 100,
+            "weightPercent": 40,
+            "parts": [
+              {
+                "name": "Document-Based Question",
+                "questionCount": 1,
+                "minutes": 60,
+                "note": "Recommended Time: 60 Minutes (includes 15-minute reading period)"
+              },
+              {
+                "name": "Long Essay Question",
+                "questionCount": 1,
+                "minutes": 40
+              }
+            ]
+          }
+        ],
         "totalMinutes": 195,
         "calculator": false,
         "delivery": "digital"
@@ -690,9 +1743,7 @@
       "exam": null,
       "lateTesting": null,
       "format": {
-        "mcqCount": 0,
-        "frqCount": 0,
-        "frqType": "portfolio: sustained investigation (60%) + selected works (40%); no timed exam",
+        "sections": [],
         "totalMinutes": 0,
         "calculator": false,
         "delivery": "digital"
@@ -711,9 +1762,7 @@
       "exam": null,
       "lateTesting": null,
       "format": {
-        "mcqCount": 0,
-        "frqCount": 0,
-        "frqType": "portfolio: sustained investigation (60%) + selected works (40%); no timed exam",
+        "sections": [],
         "totalMinutes": 0,
         "calculator": false,
         "delivery": "digital"
@@ -732,9 +1781,7 @@
       "exam": null,
       "lateTesting": null,
       "format": {
-        "mcqCount": 0,
-        "frqCount": 0,
-        "frqType": "portfolio: sustained investigation (60%) + selected works (40%); no timed exam",
+        "sections": [],
         "totalMinutes": 0,
         "calculator": false,
         "delivery": "digital"

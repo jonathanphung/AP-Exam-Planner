@@ -49,6 +49,13 @@ const selectedCount = (page: Page) => page.getByText(/^\d+ selected$/);
 const rowValue = (page: Page, label: string): Locator =>
   dialog(page).locator("dl > div").filter({ hasText: label }).locator("dd");
 
+// Issue #44: a section (or part) row in the questions|length|weight table,
+// located by its row header.
+const sectionRow = (page: Page, name: string | RegExp): Locator =>
+  dialog(page)
+    .getByRole("row")
+    .filter({ has: page.getByRole("rowheader", { name }) });
+
 test.describe("issue #6 — exam info panel", () => {
   test("AC1 — each chip has a details affordance distinct from the select toggle that opens the panel without selecting", async ({
     page,
@@ -83,18 +90,24 @@ test.describe("issue #6 — exam info panel", () => {
     await expect(selectedCount(page)).toHaveText("0 selected");
   });
 
-  test("AC2 — panel shows MCQ/FRQ counts + type, length as h/min, calculator, delivery, and the pass rate labeled 'scored 3 or higher'", async ({
+  test("AC2 — panel shows per-section questions|length|weight rows (issue #44), length as h/min, calculator, delivery, and the pass rate labeled 'scored 3 or higher'", async ({
     page,
   }) => {
     await page.goto("/");
     await openInfo(page, "AP Biology");
     await expect(dialog(page)).toBeVisible();
 
-    await expect(rowValue(page, "Multiple choice")).toContainText("60");
-    await expect(rowValue(page, "Free response")).toContainText("6");
-    await expect(rowValue(page, "Free response")).toContainText(
-      "2 long, 4 short",
-    );
+    // Issue #44: the published sections render as real table rows.
+    const mc = sectionRow(page, "Multiple Choice");
+    await expect(mc).toContainText("60");
+    await expect(mc).toContainText("1 h 30 min");
+    await expect(mc).toContainText("50%");
+    const fr = sectionRow(page, "Free Response");
+    await expect(fr).toContainText("6");
+    await expect(fr).toContainText("1 h 30 min");
+    await expect(fr).toContainText("50%");
+    await expect(fr).toContainText("2 long, 4 short");
+
     // 180 minutes formatted as hours/minutes → "3 h".
     await expect(rowValue(page, "Exam length")).toHaveText("3 h");
     await expect(rowValue(page, "Calculator")).toHaveText("Permitted");

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { ApSubject, ExamSlot, Portfolio } from "../data/schema";
+import type { ApSubject, ExamFormat, ExamSlot, Portfolio } from "../data/schema";
 import {
   findLateLateCollisions,
   findSameSlotConflicts,
@@ -18,14 +18,17 @@ import {
  * shared late slots) is exercised regardless of the real dataset's contents.
  */
 
-const FORMAT = {
-  mcqCount: 1,
-  frqCount: 1,
-  frqType: "fixture",
+// Issue #44: fixture format uses the sections[] model (flat MCQ/FRQ fields
+// were replaced by the ordered per-section breakdown).
+const FORMAT: ExamFormat = {
+  sections: [
+    { name: "Multiple Choice", questionCount: 1, minutes: 30, weightPercent: 50 },
+    { name: "Free Response", questionCount: 1, minutes: 30, weightPercent: 50 },
+  ],
   totalMinutes: 60,
   calculator: false,
   delivery: "digital",
-} as const;
+};
 
 function subject(
   id: string,

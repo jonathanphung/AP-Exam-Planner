@@ -1,17 +1,26 @@
 "use client";
 
-import { type ReactNode, useId, useRef } from "react";
-import type { ApSubject } from "@/data/schema";
+import { Fragment, type ReactNode, useId, useRef } from "react";
+import type { ApSubject, ExamSection } from "@/data/schema";
 import { useModalDialog } from "@/lib/modal";
 import { officialCollegeBoardUrl } from "@/lib/college-board-links";
 import { SubjectName } from "@/components/SubjectName";
 
 /**
- * Accessible exam-info modal (issue #6).
+ * Accessible exam-info modal (issue #6, section breakdown reworked in #44).
  *
- * Answers "what am I walking into on exam day" for one subject: format
- * (MCQ/FRQ counts, length, calculator, delivery), the most recent pass rate,
- * and — for portfolio subjects — the portfolio's weight and deadline.
+ * Answers "what am I walking into on exam day" for one subject: the published
+ * per-section breakdown (questions | length | weight, with Part A/B rows
+ * nested under their section), overall length, calculator, delivery, the most
+ * recent pass rate, and — for portfolio subjects — the portfolio's weight and
+ * deadline.
+ *
+ * Sections render exactly what College Board publishes (issue #44): an exam
+ * that lacks a section omits it (AP Seminar shows no multiple-choice row),
+ * and a portfolio-only subject renders NO section table at all — its
+ * portfolio block carries the story instead. Omission and "not yet
+ * published" are different states: only genuinely unpublished values show
+ * the "pending" badge.
  *
  * A single instance is rendered by {@link CatalogGrid} for the currently open
  * subject (not one per card). The dialog:
@@ -81,6 +90,136 @@ function CountValue({ value }: { value: number | string }) {
   return value === "pending" ? <PendingBadge /> : <>{value}</>;
 }
 
+/** A duration in whole minutes, a published range (verbatim), or "pending". */
+function MinutesValue({ value }: { value: number | string }) {
+  if (value === "pending") return <PendingBadge />;
+  if (typeof value === "number") return <>{formatMinutes(value)}</>;
+  // Published range, e.g. "65–70" — rendered verbatim, never averaged.
+  return <>{value} min</>;
+}
+
+/**
+ * College Board prints no value here (e.g. no question count for a
+ * project-style component) — distinct from "pending", which means a value
+ * exists but is not yet published.
+ */
+function NotPublishedDash() {
+  return (
+    <>
+      <span aria-hidden="true">—</span>
+      <span className="sr-only">none published</span>
+    </>
+  );
+}
+
+const sectionsTableHeaderCell =
+  "py-2 text-left text-xs font-medium text-slate-500 dark:text-slate-400";
+const sectionsTableNumCell = "py-2.5 pl-2 text-right align-baseline";
+
+/**
+ * The per-section questions | length | weight table (issue #44).
+ *
+ * A real `<table>` so screen readers convey each value's column relationship;
+ * every section and part row is a `<th scope="row">`. Part rows are visually
+ * subordinate (indented, lighter weight) and programmatically associated with
+ * their section via an sr-only "<section> — " prefix in the row header.
+ * Design decision (issue #44): parts render as indented sub-rows of the same
+ * table rather than a nested sub-table — one header set, simpler AT output.
+ */
+function SectionsTable({ sections }: { sections: readonly ExamSection[] }) {
+  return (
+    <table className="w-full border-collapse">
+      <caption className="sr-only">
+        Exam sections: questions, length, and share of score
+      </caption>
+      <thead>
+        <tr className="border-b border-slate-200 dark:border-slate-700">
+          <th scope="col" className={`${sectionsTableHeaderCell} pr-2`}>
+            Section
+          </th>
+          <th scope="col" className={`${sectionsTableHeaderCell} pl-2 text-right`}>
+            Questions
+          </th>
+          <th scope="col" className={`${sectionsTableHeaderCell} pl-2 text-right`}>
+            Length
+          </th>
+          <th scope="col" className={`${sectionsTableHeaderCell} pl-2 text-right`}>
+            Weight
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {sections.map((section, sectionIndex) => (
+          <Fragment key={`${sectionIndex}-${section.name}`}>
+            <tr className="border-b border-slate-100 last:border-b-0 dark:border-slate-800">
+              <th
+                scope="row"
+                className="py-2.5 pr-2 text-left align-baseline text-sm font-medium break-words text-slate-900 dark:text-slate-100"
+              >
+                {section.name}
+                {section.note && (
+                  <span className="block text-xs leading-snug font-normal text-slate-500 dark:text-slate-400">
+                    {section.note}
+                  </span>
+                )}
+              </th>
+              <td className={`${sectionsTableNumCell} text-sm text-slate-900 dark:text-slate-100`}>
+                {section.questionCount === undefined ? (
+                  <NotPublishedDash />
+                ) : (
+                  <CountValue value={section.questionCount} />
+                )}
+              </td>
+              <td className={`${sectionsTableNumCell} text-sm whitespace-nowrap text-slate-900 dark:text-slate-100`}>
+                <MinutesValue value={section.minutes} />
+              </td>
+              <td className={`${sectionsTableNumCell} text-sm whitespace-nowrap text-slate-900 dark:text-slate-100`}>
+                {section.weightPercent === "pending" ? (
+                  <PendingBadge />
+                ) : (
+                  `${section.weightPercent}%`
+                )}
+              </td>
+            </tr>
+            {section.parts?.map((part, partIndex) => (
+              <tr
+                key={`${sectionIndex}-${partIndex}-${part.name}`}
+                className="border-b border-slate-100 last:border-b-0 dark:border-slate-800"
+              >
+                <th
+                  scope="row"
+                  className="py-2 pr-2 pl-4 text-left align-baseline text-sm font-normal break-words text-slate-600 dark:text-slate-300"
+                >
+                  <span className="sr-only">{section.name} — </span>
+                  {part.name}
+                  {part.note && (
+                    <span className="block text-xs leading-snug text-slate-500 dark:text-slate-400">
+                      {part.note}
+                    </span>
+                  )}
+                </th>
+                <td className={`${sectionsTableNumCell} text-sm text-slate-600 dark:text-slate-300`}>
+                  {part.questionCount === undefined ? (
+                    <NotPublishedDash />
+                  ) : (
+                    <CountValue value={part.questionCount} />
+                  )}
+                </td>
+                <td className={`${sectionsTableNumCell} text-sm whitespace-nowrap text-slate-600 dark:text-slate-300`}>
+                  <MinutesValue value={part.minutes} />
+                </td>
+                <td className={`${sectionsTableNumCell} text-sm text-slate-600 dark:text-slate-300`}>
+                  <NotPublishedDash />
+                </td>
+              </tr>
+            ))}
+          </Fragment>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
 const DELIVERY_LABELS: Record<"digital" | "paper" | "hybrid", string> = {
   digital: "Digital",
   paper: "Paper",
@@ -98,6 +237,11 @@ export function InfoPanel({ subject, onClose }: InfoPanelProps) {
   useModalDialog(panelRef, onClose, closeButtonRef);
 
   const { format, portfolio } = subject;
+
+  // Issue #44: an empty sections array means "no sit-down exam" (the four
+  // portfolio-only subjects) — the exam-format rows are omitted entirely,
+  // never rendered as zeroed or "pending" placeholders.
+  const hasSections = format.sections.length > 0;
 
   // Tier 3 (issue #22): verified official College Board page — `null` (link
   // omitted) for any subject without an individually verified URL.
@@ -172,63 +316,41 @@ export function InfoPanel({ subject, onClose }: InfoPanelProps) {
         </div>
 
         <div className="p-5 sm:p-6">
-          <dl>
-            <Row label="Multiple choice">
-              <CountValue value={format.mcqCount} />
-              {format.mcqCount !== "pending" && (
-                <span className="text-slate-500 dark:text-slate-400">
-                  {" "}
-                  questions
-                </span>
-              )}
-            </Row>
+          {/* Issue #44: one row per published section, parts nested beneath.
+              A portfolio-only subject has no sections — no table, no zeroed
+              rows; its portfolio block below tells the real story. */}
+          {hasSections && <SectionsTable sections={format.sections} />}
 
-            <Row label="Free response">
-              <div className="flex flex-col gap-0.5 sm:items-end">
-                <span>
-                  <CountValue value={format.frqCount} />
-                  {format.frqCount !== "pending" && (
-                    <span className="text-slate-500 dark:text-slate-400">
-                      {" "}
-                      questions
-                    </span>
+          <dl className={hasSections ? "mt-2" : undefined}>
+            {hasSections && (
+              <>
+                <Row label="Exam length">
+                  {format.totalMinutes === "pending" ? (
+                    <PendingBadge />
+                  ) : (
+                    formatMinutes(format.totalMinutes)
                   )}
-                </span>
-                {format.frqType === "pending" ? (
-                  <PendingBadge />
-                ) : (
-                  <span className="text-xs text-slate-500 dark:text-slate-400">
-                    {format.frqType}
-                  </span>
-                )}
-              </div>
-            </Row>
+                </Row>
 
-            <Row label="Exam length">
-              {format.totalMinutes === "pending" ? (
-                <PendingBadge />
-              ) : (
-                formatMinutes(format.totalMinutes)
-              )}
-            </Row>
+                <Row label="Calculator">
+                  {format.calculator === "pending" ? (
+                    <PendingBadge />
+                  ) : format.calculator ? (
+                    "Permitted"
+                  ) : (
+                    "Not permitted"
+                  )}
+                </Row>
 
-            <Row label="Calculator">
-              {format.calculator === "pending" ? (
-                <PendingBadge />
-              ) : format.calculator ? (
-                "Permitted"
-              ) : (
-                "Not permitted"
-              )}
-            </Row>
-
-            <Row label="Delivery">
-              {format.delivery === "pending" ? (
-                <PendingBadge />
-              ) : (
-                DELIVERY_LABELS[format.delivery]
-              )}
-            </Row>
+                <Row label="Delivery">
+                  {format.delivery === "pending" ? (
+                    <PendingBadge />
+                  ) : (
+                    DELIVERY_LABELS[format.delivery]
+                  )}
+                </Row>
+              </>
+            )}
 
             <Row label="Pass rate">
               <span className="inline-flex flex-wrap items-baseline justify-end gap-x-1.5">

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import ICAL from "ical.js";
 import apData from "../data/ap-2026.json";
-import type { ApSubject, ExamSlot, Portfolio } from "../data/schema";
+import type { ApSubject, ExamFormat, ExamSlot, Portfolio } from "../data/schema";
 import { parseApDataset } from "../data/schema";
 import type { SlotResolution } from "./conflicts";
 import {
@@ -33,14 +33,17 @@ const SESSION_START: SessionStartTimes = {
 const FIXED_NOW = new Date(Date.UTC(2026, 6, 5, 13, 30, 0));
 const EXPECTED_DTSTAMP = "20260705T133000Z";
 
-const FORMAT = {
-  mcqCount: 1,
-  frqCount: 1,
-  frqType: "fixture",
+// Issue #44: fixture format uses the sections[] model (flat MCQ/FRQ fields
+// were replaced by the ordered per-section breakdown).
+const FORMAT: ExamFormat = {
+  sections: [
+    { name: "Multiple Choice", questionCount: 1, minutes: 30, weightPercent: 50 },
+    { name: "Free Response", questionCount: 1, minutes: 30, weightPercent: 50 },
+  ],
   totalMinutes: 60,
   calculator: false,
   delivery: "digital",
-} as const;
+};
 
 function subject(
   id: string,
