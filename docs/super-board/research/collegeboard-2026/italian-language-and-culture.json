@@ -33,7 +33,7 @@
     {
       "name": "Section I: Free-Response",
       "questionCount": "3",
-      "minutes": "pending",
+      "minutes": "65-70",
       "weightPercent": 50,
       "quote": "3 Questions | 65–70 Minutes | 50% of Score",
       "parts": [
@@ -83,5 +83,6 @@
   ],
   "totalMinutesVerbatim": "Approximately 2hrs 30mins",
   "totalMinutesApproximate": true,
-  "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-italian-language-and-culture/assessment"
+  "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-italian-language-and-culture/assessment",
+  "spotCheckPatch2026_07_09": "issue #44 builder spot-check against the live apcentral page (raw HTML): Section I minutes had been recorded as 'pending' although this record's own quote prints '3 Questions | 65–70 Minutes | 50% of Score' — corrected to 65-70."
 }

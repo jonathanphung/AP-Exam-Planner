@@ -108,9 +108,14 @@ describe("ap-2026.json dataset", () => {
   });
 });
 
-describe("ap-2026.json — 2026 digital-redesign question-count corrections (issue #45)", () => {
+describe("ap-2026.json — 2026 digital-redesign question-count corrections (issue #45, ported to sections[] by #44)", () => {
   const dataset = parseApDataset(raw);
   const byId = new Map(dataset.subjects.map((s) => [s.id, s]));
+
+  const sectionByName = (id: string, pattern: RegExp) =>
+    byId.get(id)?.format.sections.find((s) => pattern.test(s.name));
+  const MC = /multiple.?choice/i;
+  const FR = /free.?response/i;
 
   // Pins the seven re-sourced counts (docs/super-board/research/collegeboard-2026/)
   // so a future re-source cannot silently regress them to the pre-redesign values.
@@ -124,11 +129,16 @@ describe("ap-2026.json — 2026 digital-redesign question-count corrections (iss
     "japanese-language-and-culture": { mcqCount: 55, frqCount: 4 },
   };
 
-  it("pins the seven corrected mcq/frq counts as exact published integers", () => {
+  it("pins the seven corrected MC/FR section counts as exact published integers", () => {
     for (const [id, counts] of Object.entries(CORRECTED)) {
-      const format = byId.get(id)?.format;
-      expect(format?.mcqCount, `${id} mcqCount`).toBe(counts.mcqCount);
-      expect(format?.frqCount, `${id} frqCount`).toBe(counts.frqCount);
+      expect(
+        sectionByName(id, MC)?.questionCount,
+        `${id} multiple-choice section count`,
+      ).toBe(counts.mcqCount);
+      expect(
+        sectionByName(id, FR)?.questionCount,
+        `${id} free-response section count`,
+      ).toBe(counts.frqCount);
     }
   });
 
@@ -136,24 +146,32 @@ describe("ap-2026.json — 2026 digital-redesign question-count corrections (iss
   // "Question 3: Inference (Hypothesis Test or Confidence Interval)" + three
   // multi-focus questions; AP Students the same as "multi-part" questions). It
   // was twice regressed to "pending"; pin it to a sourced composition so a
-  // future re-source cannot re-introduce the false pending.
-  it("pins statistics.frqType to the sourced Section-II composition (never 'pending')", () => {
-    const frqType = byId.get("statistics")?.format.frqType;
-    expect(frqType).not.toBe("pending");
-    expect(frqType).toMatch(/inference/i);
-    expect(frqType).toMatch(/multi-part/i);
+  // future re-source cannot re-introduce the false pending. (#44 carried the
+  // flat frqType over as the free-response section's note.)
+  it("pins statistics' free-response note to the sourced Section-II composition (never 'pending')", () => {
+    const note = sectionByName("statistics", FR)?.note;
+    expect(note).not.toBe("pending");
+    expect(note).toMatch(/inference/i);
+    expect(note).toMatch(/multi-part/i);
     // The redesigned exam dropped the investigative task — it must not reappear.
-    expect(frqType).not.toMatch(/investigative/i);
+    expect(note).not.toMatch(/investigative/i);
   });
 
-  it("no subject stores mcq/frq as a range string (all cycles now publish fixed counts)", () => {
+  it("no section or part stores its question count as a range string (all 2026 counts are published as fixed numbers)", () => {
     for (const subject of dataset.subjects) {
-      for (const [field, value] of [
-        ["mcqCount", subject.format.mcqCount],
-        ["frqCount", subject.format.frqCount],
-      ] as const) {
-        const isRange = typeof value === "string" && /–/.test(value);
-        expect(isRange, `${subject.id}.${field} = ${String(value)}`).toBe(false);
+      for (const section of subject.format.sections) {
+        const values: Array<[string, unknown]> = [
+          [`section "${section.name}"`, section.questionCount],
+          ...(section.parts ?? []).map(
+            (p): [string, unknown] => [`part "${p.name}"`, p.questionCount],
+          ),
+        ];
+        for (const [where, value] of values) {
+          const isRange = typeof value === "string" && /–/.test(value);
+          expect(isRange, `${subject.id} ${where} = ${String(value)}`).toBe(
+            false,
+          );
+        }
       }
     }
   });

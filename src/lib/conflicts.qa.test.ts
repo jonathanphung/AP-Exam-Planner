@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { ApSubject, ExamSlot } from "../data/schema";
+import type { ApSubject, ExamFormat, ExamSlot } from "../data/schema";
 import {
   findLateLateCollisions,
   findSameSlotConflicts,
@@ -22,14 +22,17 @@ import {
  * observed end-to-end at the lib layer via `pnpm test:unit`.
  */
 
-const FORMAT = {
-  mcqCount: 1,
-  frqCount: 1,
-  frqType: "fixture",
+// Issue #44: fixture format uses the sections[] model (flat MCQ/FRQ fields
+// were replaced by the ordered per-section breakdown).
+const FORMAT: ExamFormat = {
+  sections: [
+    { name: "Multiple Choice", questionCount: 1, minutes: 30, weightPercent: 50 },
+    { name: "Free Response", questionCount: 1, minutes: 30, weightPercent: 50 },
+  ],
   totalMinutes: 60,
   calculator: false,
   delivery: "digital",
-} as const;
+};
 
 function subject(
   id: string,

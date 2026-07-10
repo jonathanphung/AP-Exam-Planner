@@ -315,8 +315,10 @@ test.describe("issue #22 — mobile category-grouped chips + progressive disclos
     const panel = dialog(page);
     await expect(panel).toBeVisible();
     await expect(panel).toContainText("AP Biology");
-    await expect(panel).toContainText("Multiple choice");
-    await expect(panel).toContainText("Free response");
+    // Issue #44: the flat MCQ/FRQ rows became the per-section table, whose
+    // row headers use College Board's published section titles.
+    await expect(panel).toContainText("Multiple Choice");
+    await expect(panel).toContainText("Free Response");
     await expect(panel).toContainText("Calculator");
     await expect(panel).toContainText("Pass rate");
   });

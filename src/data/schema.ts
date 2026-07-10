@@ -56,10 +56,62 @@ const questionCount = z.union([
   pending,
 ]);
 
+/**
+ * Published durations: exact minutes, a published range (College Board prints
+ * "65–70 Minutes" for the language exams' free-response sections), or
+ * "pending" when the page prints no duration for a section that has one.
+ */
+const minutesValue = z.union([
+  z.number().int().min(0),
+  z.string().regex(/^\d+–\d+$/, 'ranges use an en dash, e.g. "65–70"'),
+  pending,
+]);
+
+/**
+ * A published sub-part of an exam section (issue #44) — e.g. Calculus AB's
+ * no-calculator vs. graphing-calculator halves, or the language exams'
+ * Listening vs. Reading parts.
+ *
+ * `questionCount` is OMITTED (not "pending") when College Board prints no
+ * count for the part — omission means the concept does not apply; "pending"
+ * means a count exists but is not yet published. `note` carries the page's
+ * calculator/tool rule or other printed descriptor, verbatim.
+ */
+export const sectionPartSchema = z.strictObject({
+  name: z.string().min(1),
+  questionCount: questionCount.optional(),
+  minutes: minutesValue,
+  note: z.string().min(1).optional(),
+});
+
+/**
+ * One published exam section (issue #44): the single source of truth for the
+ * per-section questions | length | weight breakdown. Section names are the
+ * ones College Board actually titles ("Section IIB: Free Response: Sight
+ * Singing"), never forced into an MCQ/FRQ mold. `parts` is present only when
+ * the page publishes a Part A/Part B-style split. Values are populated from
+ * the adversarially verified provenance in
+ * docs/super-board/research/collegeboard-2026/ — never estimated, never
+ * back-computed, never summed into aggregates the page does not print.
+ */
+export const examSectionSchema = z.strictObject({
+  name: z.string().min(1),
+  questionCount: questionCount.optional(),
+  minutes: minutesValue,
+  weightPercent: z.union([z.number().min(0).max(100), pending]),
+  note: z.string().min(1).optional(),
+  parts: z.array(sectionPartSchema).min(2).optional(),
+});
+
 export const formatSchema = z.strictObject({
-  mcqCount: questionCount,
-  frqCount: questionCount,
-  frqType: z.union([z.string().min(1), pending]),
+  /**
+   * Ordered, published exam sections (issue #44). Replaces the flat
+   * mcqCount/frqCount/frqType fields: an exam that lacks a section simply
+   * omits it (AP Seminar has no multiple-choice entry), and a portfolio-only
+   * subject (AP Drawing, 2-D/3-D Art and Design, AP Research) has NO
+   * sections at all — an empty array, never zeroed rows.
+   */
+  sections: z.array(examSectionSchema),
   totalMinutes: z.union([z.number().int().min(0), pending]),
   calculator: z.union([z.boolean(), pending]),
   delivery: z.union([z.enum(["digital", "paper", "hybrid"]), pending]),
@@ -133,6 +185,29 @@ export const subjectSchema = z
           "exam may be null only for portfolio-only subjects, or with a sourced noExamReason (Career Kickstart courses whose first exam is May 2027)",
       });
     }
+
+    // Issue #44: omission and "not yet published" are different states.
+    // A portfolio-only subject has no sit-down exam, so it has no sections —
+    // never an empty/zeroed section table, and never "pending" rows.
+    const portfolioOnly = subject.exam === null && subject.portfolio !== null;
+    if (portfolioOnly && subject.format.sections.length > 0) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["format", "sections"],
+        message:
+          "portfolio-only subjects (no sit-down exam) must have no sections",
+      });
+    }
+    // Every subject that sits a 2026 exam has a published section structure
+    // (verified for all 38 in docs/super-board/research/collegeboard-2026/).
+    if (subject.exam !== null && subject.format.sections.length === 0) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["format", "sections"],
+        message:
+          "subjects with a sit-down exam must carry at least one published section",
+      });
+    }
   });
 
 export const apDatasetSchema = z
@@ -165,6 +240,8 @@ export type ApDataset = z.infer<typeof apDatasetSchema>;
 export type ApSubject = z.infer<typeof subjectSchema>;
 export type ExamSlot = z.infer<typeof examSlotSchema>;
 export type ExamFormat = z.infer<typeof formatSchema>;
+export type ExamSection = z.infer<typeof examSectionSchema>;
+export type ExamSectionPart = z.infer<typeof sectionPartSchema>;
 export type Portfolio = z.infer<typeof portfolioSchema>;
 export type Category = (typeof CATEGORIES)[number];
 export type Session = z.infer<typeof sessionSchema>;

@@ -10,9 +10,9 @@
     {
       "name": "Section I: Free Response",
       "questionCount": "4",
-      "minutes": "pending",
+      "minutes": "40-45",
       "weightPercent": 50,
-      "quote": "Section I: Free Response — 4 questions — 50% of Score. Question 1: Project Presentation: 20% of Score. Question 2: Project Q&A: 15% of Score. Question 3: Story Narration: 7.5% of Score. Question 4: Email Response: 7.5% of Score. You'll have 30 minutes to complete both writing tasks (Questions 3 and 4).",
+      "quote": "apcentral (2026-07-09 spot-check): 'Section I: Free-Response — 4 Questions | 40–45 Minutes | 50% of Score'. Section I: Free Response — 4 questions — 50% of Score. Question 1: Project Presentation: 20% of Score. Question 2: Project Q&A: 15% of Score. Question 3: Story Narration: 7.5% of Score. Question 4: Email Response: 7.5% of Score. You'll have 30 minutes to complete both writing tasks (Questions 3 and 4).",
       "parts": [
         {
           "name": "Question 1: Project Presentation",
@@ -40,9 +40,9 @@
     {
       "name": "Section II: Multiple Choice",
       "questionCount": "55",
-      "minutes": "pending",
+      "minutes": 65,
       "weightPercent": 50,
-      "quote": "Section II: Multiple Choice — 55 questions — 50% of Score. Part A: Listening: 25 questions; 25 minutes; 25% of Score. Part B: Reading: 30 questions; 40 minutes; 25% of Score",
+      "quote": "apcentral (2026-07-09 spot-check): 'Section II: Multiple-Choice — 55 Questions | 65 Minutes | 50% of Score'. Section II: Multiple Choice — 55 questions — 50% of Score. Part A: Listening: 25 questions; 25 minutes; 25% of Score. Part B: Reading: 30 questions; 40 minutes; 25% of Score",
       "parts": [
         {
           "name": "Part A: Listening",
@@ -83,5 +83,6 @@
   ],
   "totalMinutesVerbatim": "Approximately 2hrs",
   "totalMinutesApproximate": true,
-  "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-japanese-language-and-culture/assessment"
+  "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-japanese-language-and-culture/assessment",
+  "spotCheckPatch2026_07_09": "issue #44 builder spot-check: this record was fetched from the apstudents assessment page (fallbackUsed: apstudents), which omits per-section times — the research README's lesson 1. The apcentral exam page prints both section durations ('4 Questions | 40–45 Minutes | 50% of Score'; '55 Questions | 65 Minutes | 50% of Score', https://apcentral.collegeboard.org/courses/ap-japanese-language-and-culture/exam, raw HTML 2026-07-09); both false 'pending' values corrected to the printed figures."
 }

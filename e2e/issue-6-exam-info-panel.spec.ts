@@ -46,7 +46,10 @@ const dialog = (page: Page) => page.getByRole("dialog");
 const selectedCount = (page: Page) => page.getByText(/^\d+ selected$/);
 
 // The <dd> value for a labelled row inside the panel's description lists.
-const rowValue = (page: Page, label: string): Locator =>
+// Issue #44 (PR #48 bounce): partless exams (like AP Biology) render their
+// sections as spacious label/value rows in the same list, so this locator
+// also reaches section values ("Multiple Choice", "Free Response").
+const rowValue = (page: Page, label: string | RegExp): Locator =>
   dialog(page).locator("dl > div").filter({ hasText: label }).locator("dd");
 
 test.describe("issue #6 — exam info panel", () => {
@@ -83,18 +86,29 @@ test.describe("issue #6 — exam info panel", () => {
     await expect(selectedCount(page)).toHaveText("0 selected");
   });
 
-  test("AC2 — panel shows MCQ/FRQ counts + type, length as h/min, calculator, delivery, and the pass rate labeled 'scored 3 or higher'", async ({
+  test("AC2 — panel shows per-section questions|length|weight rows (issue #44), length as h/min, calculator, delivery, and the pass rate labeled 'scored 3 or higher'", async ({
     page,
   }) => {
     await page.goto("/");
     await openInfo(page, "AP Biology");
     await expect(dialog(page)).toBeVisible();
 
-    await expect(rowValue(page, "Multiple choice")).toContainText("60");
-    await expect(rowValue(page, "Free response")).toContainText("6");
-    await expect(rowValue(page, "Free response")).toContainText(
-      "2 long, 4 short",
-    );
+    // Issue #44 (PR #48 bounce): Biology has no published part splits, so its
+    // sections render as spacious label/value rows — no table, no header row.
+    await expect(dialog(page).locator("table")).toHaveCount(0);
+    const mc = rowValue(page, "Multiple Choice");
+    await expect(mc).toContainText("60 questions");
+    await expect(mc).toContainText("1 h 30 min");
+    await expect(mc).toContainText("50% of score");
+    const fr = rowValue(page, "Free Response");
+    await expect(fr).toContainText("6 questions");
+    await expect(fr).toContainText("1 h 30 min");
+    await expect(fr).toContainText("50% of score");
+    // The published FRQ-composition note still renders with its section row.
+    await expect(
+      dialog(page).locator("dl > div").filter({ hasText: "Free Response" }),
+    ).toContainText("2 long, 4 short");
+
     // 180 minutes formatted as hours/minutes → "3 h".
     await expect(rowValue(page, "Exam length")).toHaveText("3 h");
     await expect(rowValue(page, "Calculator")).toHaveText("Permitted");

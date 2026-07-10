@@ -31,9 +31,9 @@
         {
           "name": "Question 3: Argumentative Essay",
           "questionCount": "1",
-          "minutes": "pending",
-          "toolNote": "n/a",
-          "quote": "Question 3: Argumentative Essay: 15% of Score"
+          "minutes": 55,
+          "toolNote": "including 2 opportunities to listen to audio",
+          "quote": "apcentral (2026-07-09 spot-check): 'Question 3: Argumentative Essay: 15% of Score ... (55 minutes, including 2 opportunities to listen to audio)' — the same printed figure the german/italian/spanish records captured."
         }
       ]
     },
@@ -83,5 +83,6 @@
   ],
   "totalMinutesVerbatim": "Approximately 2hrs 30mins",
   "totalMinutesApproximate": true,
-  "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-french-language-and-culture/assessment"
+  "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-french-language-and-culture/assessment",
+  "spotCheckPatch2026_07_09": "issue #44 builder spot-check against the live apcentral page (raw HTML 2026-07-09): the page prints '(55 minutes, including 2 opportunities to listen to audio)' for Question 3, matching the german/italian/spanish records — the recorded 'pending' was a fetch omission, corrected to 55."
 }

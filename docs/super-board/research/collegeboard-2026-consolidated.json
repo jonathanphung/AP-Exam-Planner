@@ -717,8 +717,8 @@
             {
               "name": "Question 3: Argumentative Essay",
               "questionCount": "1",
-              "minutes": "pending",
-              "toolNote": "n/a",
+              "minutes": 55,
+              "toolNote": "including 2 opportunities to listen to audio",
               "quote": "Question 3: Argumentative Essay: 15% of Score"
             }
           ]
@@ -910,7 +910,7 @@
         {
           "name": "Section I: Free-Response",
           "questionCount": "3",
-          "minutes": "pending",
+          "minutes": "65-70",
           "weightPercent": 50,
           "quote": "3 Questions | 65–70 Minutes | 50% of Score",
           "parts": [
@@ -970,7 +970,7 @@
         {
           "name": "Section I: Free Response",
           "questionCount": "4",
-          "minutes": "pending",
+          "minutes": "40-45",
           "weightPercent": 50,
           "quote": "Section I: Free Response — 4 questions — 50% of Score. Question 1: Project Presentation: 20% of Score. Question 2: Project Q&A: 15% of Score. Question 3: Story Narration: 7.5% of Score. Question 4: Email Response: 7.5% of Score. You'll have 30 minutes to complete both writing tasks (Questions 3 and 4).",
           "parts": [
@@ -1000,7 +1000,7 @@
         {
           "name": "Section II: Multiple Choice",
           "questionCount": "55",
-          "minutes": "pending",
+          "minutes": 65,
           "weightPercent": 50,
           "quote": "Section II: Multiple Choice — 55 questions — 50% of Score. Part A: Listening: 25 questions; 25 minutes; 25% of Score. Part B: Reading: 30 questions; 40 minutes; 25% of Score",
           "parts": [
@@ -1737,5 +1737,6 @@
         }
       ]
     }
-  ]
+  ],
+  "spotCheckPatch2026_07_09": "issue #44 builder spot-check (raw apcentral HTML): italian S-I 65-70, japanese S-I 40-45 / S-II 65, french Q3 essay 55 — four false 'pending' values corrected; see the per-id records' spotCheckPatch2026_07_09 notes."
 }
