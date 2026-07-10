@@ -12,3 +12,99 @@
  * onto the `.dark` class before first paint).
  */
 @custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Custom document scrollbar + permanently reserved gutter (issue #49).
+ *
+ * Why: every dialog locks background scroll via `useModalDialog`
+ * (src/lib/modal.ts). On Windows/Linux, classic scrollbars occupy ~15–17px
+ * of layout width, so hiding page scroll widened the viewport and shifted
+ * the centered layout a few pixels right on every dialog open (and back on
+ * close). `scrollbar-gutter: stable` on the root keeps that gutter reserved
+ * while overflow is hidden — the width never changes, so nothing shifts.
+ * NOTE the pairing contract: the gutter is only honored by the scroll
+ * container it is set on, so the scroll lock must hide overflow on the ROOT
+ * element (a body-only lock propagates overflow to the viewport but drops
+ * the reservation — measured live in Chromium during this build). modal.ts
+ * locks documentElement AND body for exactly this reason.
+ * When scrollbars are overlay (default macOS/iOS/Android), `stable` reserves
+ * nothing, so no dead strip appears where there is no bug today.
+ *
+ * The macOS trap (issue #49 AC4): styling `::-webkit-scrollbar` forces
+ * Chromium/WebKit OUT of overlay-scrollbar mode — a custom scrollbar without
+ * the gutter reservation would INTRODUCE the shift on macOS. That is why the
+ * gutter rule and the custom styling below ship together and must never be
+ * split. (Safari < 18.2 lacks `scrollbar-gutter`; there the one-place JS
+ * fallback in src/lib/modal.ts pads the body by the measured scrollbar width
+ * while a dialog is open.)
+ *
+ * Palette (Tailwind slate tokens, hardcoded because the default theme's
+ * `--color-*` variables are not guaranteed to be emitted for values unused
+ * by utilities). WCAG 1.4.11 non-text contrast, thumb vs track (≥3:1):
+ *   light: #64748b (slate-500) on #f1f5f9 (slate-100) = 4.34:1
+ *   dark:  #64748b (slate-500) on #0f172a (slate-900) = 3.75:1
+ *   hover: slate-600 on slate-100 = 6.92:1 / slate-400 on slate-900 = 6.96:1
+ */
+:root {
+  --scrollbar-track: #f1f5f9; /* slate-100 */
+  --scrollbar-thumb: #64748b; /* slate-500 */
+  --scrollbar-thumb-hover: #475569; /* slate-600 */
+}
+
+.dark {
+  --scrollbar-track: #0f172a; /* slate-900 */
+  --scrollbar-thumb: #64748b; /* slate-500 */
+  --scrollbar-thumb-hover: #94a3b8; /* slate-400 */
+}
+
+html {
+  /* Keep the document scrollbar's gutter reserved while dialogs hide page
+   * scroll — the root value propagates to the viewport. Reserves nothing in
+   * overlay-scrollbar mode. */
+  scrollbar-gutter: stable;
+}
+
+/*
+ * WebKit/Chromium path — applies to the document scroller AND to inner
+ * scrollables (dialog bodies with overflow-y-auto), builder's call per
+ * issue #49: one consistent themed scrollbar everywhere. 10px sits between
+ * macOS's 15px and "thin"; the 2px track-colored border draws the thumb as
+ * an inset 6px pill.
+ */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 8px;
+  border: 2px solid var(--scrollbar-track);
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+}
+::-webkit-scrollbar-corner {
+  background: var(--scrollbar-track);
+}
+
+/*
+ * Firefox path — standard properties, gated to Firefox on purpose:
+ * `@supports (-moz-appearance: none)` is true only in Gecko. Chromium ≥ 121
+ * also understands scrollbar-width/scrollbar-color, but setting them there
+ * DISABLES the `::-webkit-scrollbar` rules above and hands rendering to a
+ * less controllable native-ish theme; gating keeps every WebKit/Chromium
+ * browser deterministically on the custom path (which the issue-49 e2e
+ * regression test exercises). `scrollbar-color` is inherited, so :root
+ * covers inner scrollables too; `scrollbar-width` is not, hence `*`.
+ */
+@supports (-moz-appearance: none) {
+  * {
+    scrollbar-width: thin;
+  }
+  :root {
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  }
+}
