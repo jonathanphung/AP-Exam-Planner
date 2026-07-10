@@ -83,3 +83,4 @@ Backend: workflow · tier: medium · human_approves_merge: true
 | #49 | dispatched | in-flight | Ready→Building | Slot freed; single-card wave launched (resumes checkpoint 257af4f). Monitor re-armed on PRs #40/#52/#53. NOTE for merges: #52 and #53 both touch InfoPanel.tsx in different hunks — whichever merges second may need a trivial rebase |
 | #38 | — | MERGED | Done | PR #40 merged by Jon. ICS export shipped: no session suffix, real DTEND from published totals + setup buffer, sections[] timing breakdown. #52/#53 unaffected (MERGEABLE) |
 | #50 | — | MERGED | Done | PR #52 merged by Jon. ArrowUpRightIcon shipped — no more Windows emoji arrows. #53 unaffected (InfoPanel hunks auto-merge, still MERGEABLE) |
+| #44 | — | MERGED | Done | PR #53 merged by Jon (5d2723f). 9px-matched spacing shipped — the two-line blocks saga complete (mock-approved, 3 artifact iterations, 4 build passes). All three wave PRs now merged |
