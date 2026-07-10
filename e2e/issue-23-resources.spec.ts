@@ -107,7 +107,7 @@ test("AC2 — every resource link is a real https collegeboard.org URL, no place
 });
 
 // ── AC3: new-tab semantics + external-link affordance ───────────────────────
-test("AC3 — links open in a new tab with rel=noopener noreferrer and an accessible ↗", async ({
+test("AC3 — links open in a new tab with rel=noopener noreferrer and an accessible arrow icon", async ({
   page,
 }) => {
   await page.setViewportSize(DESKTOP);
@@ -124,8 +124,8 @@ test("AC3 — links open in a new tab with rel=noopener noreferrer and an access
     expect(rel).toContain("noopener");
     expect(rel).toContain("noreferrer");
 
-    // Visible external-link indicator ↗ present in the rendered text.
-    await expect(link).toContainText("↗");
+    // Visible external-link indicator (inline SVG icon, issue #50) present.
+    await expect(link.locator('svg[aria-hidden="true"]')).toHaveCount(1);
 
     // The indicator is decorative (aria-hidden) and the new-tab hint is
     // conveyed to assistive tech via visually-hidden text.

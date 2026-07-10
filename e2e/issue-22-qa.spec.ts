@@ -323,7 +323,7 @@ test.describe("issue #22 — mobile category-grouped chips + progressive disclos
     await expect(panel).toContainText("Pass rate");
   });
 
-  test("AC9/AC10 (Tier 3) — verified official College Board link: new tab, noopener noreferrer, ↗, exceptions honored", async ({
+  test("AC9/AC10 (Tier 3) — verified official College Board link: new tab, noopener noreferrer, arrow icon, exceptions honored", async ({
     page,
   }) => {
     await gotoMobile(page);
@@ -340,8 +340,9 @@ test.describe("issue #22 — mobile category-grouped chips + progressive disclos
     );
     await expect(link).toHaveAttribute("target", "_blank");
     await expect(link).toHaveAttribute("rel", "noopener noreferrer");
-    // Visible ↗ affordance + AT announcement of the new tab.
-    await expect(link.locator('span[aria-hidden="true"]')).toHaveText("↗");
+    // Visible arrow-icon affordance (inline SVG, issue #50) + AT announcement
+    // of the new tab.
+    await expect(link.locator('svg[aria-hidden="true"]')).toBeVisible();
     await expect(link.locator(".sr-only")).toHaveText("(opens in a new tab)");
 
     await link.scrollIntoViewIfNeeded();

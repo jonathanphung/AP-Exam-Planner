@@ -425,7 +425,7 @@ for (const [name, viewport, reveal] of [
     for (let i = 0; i < EXPECTED_LINK_COUNT; i++) {
       const link = links.nth(i);
       const label = link.locator("span").first();
-      const arrow = link.locator("span[aria-hidden='true']");
+      const arrow = link.locator("svg[aria-hidden='true']");
       const text = (await label.textContent())!.trim();
 
       // Before hover: nothing is underlined.

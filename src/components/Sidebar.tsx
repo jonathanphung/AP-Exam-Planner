@@ -10,6 +10,7 @@ import {
 import { MySchedules } from "@/components/MySchedules";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { FeedbackDialog } from "@/components/FeedbackDialog";
+import { ArrowUpRightIcon } from "@/components/ArrowUpRightIcon";
 import { toggleSidebarCollapsed, useSidebarCollapsed } from "@/lib/sidebar";
 
 /**
@@ -24,7 +25,7 @@ import { toggleSidebarCollapsed, useSidebarCollapsed } from "@/lib/sidebar";
  *   4. RESOURCES — the #23/#25 curated official links, content unchanged
  *      (links-only per the earlier bounce), with #29's presentation polish:
  *      every label fits on one line, and hovering underlines the text but
- *      never the trailing ↗.
+ *      never the trailing icon (issue #50: an inline SVG, not a text glyph).
  *   5. Footer row (post-approval bounce, Jon 2026-07-08) — "Send us
  *      Feedback" on the left, GitHub icon on the right, pinned below the
  *      content. Issue #42: "Send us Feedback" is now a real `<button>` that
@@ -70,13 +71,13 @@ function ExternalResourceLink({ link }: { link: ResourceLink }) {
         rel="noopener noreferrer"
         className="group inline-flex max-w-full items-baseline gap-1 rounded-sm font-medium text-blue-700 hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:text-blue-300 dark:hover:text-blue-200 dark:focus-visible:outline-blue-400"
       >
-        {/* Underline lives on the label span only, so the trailing ↗ never
+        {/* Underline lives on the label span only, so the trailing icon never
             underlines on hover (issue #29 link polish). `truncate` guards the
             one-label-one-line rule; labels are sized to fit un-truncated. */}
         <span className="truncate underline-offset-2 group-hover:underline group-focus-visible:underline">
           {label}
         </span>
-        <span aria-hidden="true">↗</span>
+        <ArrowUpRightIcon />
         <span className="sr-only"> (opens in a new tab)</span>
       </a>
     </li>
@@ -177,8 +178,8 @@ function GitHubIcon() {
  * Issue #42: "Send us Feedback" is a `<button>` (`aria-haspopup="dialog"`) that
  * opens the in-app FeedbackDialog — it no longer navigates. It keeps the
  * footer's text-with-hover-underline look so the row is visually unchanged; the
- * trailing ↗ / "opens in a new tab" affordances are gone because it opens a
- * dialog, not a tab. The GitHub mark is untouched.
+ * trailing arrow icon / "opens in a new tab" affordances are gone because it
+ * opens a dialog, not a tab. The GitHub mark is untouched.
  *
  * The theme toggle used to live here beside the GitHub mark; the #41 bounce
  * (Jon, 2026-07-09) moved it up into the branding row, so the footer is once
@@ -272,8 +273,9 @@ export function Sidebar() {
         // gaps, and let the sections scroll internally (flex-col below) so
         // the panel is fully usable at any scroll depth.
         "lg:sticky lg:top-10 lg:flex lg:max-h-[calc(100vh-5rem)] lg:flex-col",
-        // w-80 expanded: sized so the longest resource label (with its ↗)
-        // fits on ONE line at desktop widths (issue #29 link polish).
+        // w-80 expanded: sized so the longest resource label (with its
+        // trailing icon) fits on ONE line at desktop widths (issue #29 link
+        // polish; icon is an inline SVG as of #50).
         collapsed ? "lg:w-10" : "lg:w-80",
       ].join(" ")}
     >

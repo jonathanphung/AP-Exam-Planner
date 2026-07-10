@@ -9,6 +9,7 @@ import {
 } from "@/lib/exam-sections";
 import { officialCollegeBoardUrl } from "@/lib/college-board-links";
 import { SubjectName } from "@/components/SubjectName";
+import { ArrowUpRightIcon } from "@/components/ArrowUpRightIcon";
 
 /**
  * Accessible exam-info modal (issue #6, section breakdown reworked in #44).
@@ -520,8 +521,9 @@ export function InfoPanel({ subject, onClose }: InfoPanelProps) {
           )}
 
           {/* Tier 3 (issue #22): the subject's official College Board page.
-              Opens externally in a new tab; the ↗ glyph is the visible
-              affordance and the sr-only text announces it to AT. */}
+              Opens externally in a new tab; the inline SVG arrow (issue #50)
+              is the visible affordance and the sr-only text announces it to
+              AT. */}
           {officialUrl && (
             <a
               href={officialUrl}
@@ -530,7 +532,7 @@ export function InfoPanel({ subject, onClose }: InfoPanelProps) {
               className="mt-5 flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-blue-700 transition hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:border-slate-700 dark:text-blue-300 dark:hover:bg-slate-800"
             >
               Official College Board page
-              <span aria-hidden="true">↗</span>
+              <ArrowUpRightIcon />
               <span className="sr-only">(opens in a new tab)</span>
             </a>
           )}
