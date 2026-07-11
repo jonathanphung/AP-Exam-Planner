@@ -1,0 +1,11 @@
+Issue #49 — real Chrome (channel: chrome) scroll-lock measurements
+InfoPanel (exam details) dialog · 1920x935 · forced classic scrollbar
+forced scrollbar width: 16px
+
+                             closed     open      reclosed
+documentElement.clientWidth  1904       1920      1904
+body padding-right           0px        16px        0px
+shell rect.left              312      312     312
+
+shell drift open - closed:      0px  (must be 0 — no shift)
+shell drift reclosed - closed:  0px  (must be 0 — restored)

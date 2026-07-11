@@ -34,18 +34,21 @@ const FOCUSABLE =
  * layout width and the centered page shifts right — the Windows dialog-open
  * bug. `html { scrollbar-gutter: stable }` (globals.css) is supposed to keep
  * that gutter reserved, but browsers disagree about whether `stable` still
- * applies once overflow is `hidden`: Firefox holds the gutter; Chromium
- * (measured live in this build — clientWidth jumped 1904 → 1920 under the
- * lock) drops it even when the lock is on the root element itself, and
- * Safari < 18.2 has no `scrollbar-gutter` at all. Feature-detecting
+ * applies once overflow is `hidden`: Firefox holds the gutter; some Chromium
+ * builds drop it (clientWidth jumps under the lock) while others RETAIN it,
+ * and Safari < 18.2 has no `scrollbar-gutter` at all. Feature-detecting
  * `CSS.supports` therefore LIES here — Chromium supports the property but
- * not the semantics we need.
+ * not consistently the semantics we need.
  *
- * So the ONE-place compensation is behavior-measured instead: the caller
- * samples `documentElement.clientWidth` before and after applying the lock
- * and passes both. If the viewport got wider, the gutter was dropped and the
- * difference is exactly the padding the body needs; if the gutter held (or
- * scrollbars are overlay), the delta is 0 and CSS alone carries the fix.
+ * This value is only a FIRST GUESS: the caller samples
+ * `documentElement.clientWidth` before and after applying the lock. If the
+ * viewport got wider, the gutter was probably dropped and the difference is
+ * roughly the padding the body needs. But `clientWidth` proved unreliable in
+ * real Chrome (it reported the gutter dropped while the final paint retained
+ * it, so this guess double-compensated and the page drifted LEFT — the Jon
+ * bounce on issue #49). The authoritative correction is position-based and
+ * lives in `scrollLockPaddingCorrection`; this guess just gets the common
+ * case close in one shot.
  *
  * @param unlockedClientWidth `documentElement.clientWidth` before the lock
  * @param lockedClientWidth   `documentElement.clientWidth` after `overflow: hidden`
@@ -56,6 +59,42 @@ export function scrollLockCompensationPx(
   lockedClientWidth: number,
 ): number {
   return Math.max(0, lockedClientWidth - unlockedClientWidth);
+}
+
+/**
+ * Position-invariant scroll-lock correction (issue #49, Jon bounce pass 1) —
+ * pure core, unit-tested in `modal.test.ts`.
+ *
+ * The thing that must not move is the layout, so measure the layout instead of
+ * inferring it from `clientWidth`. The page shell (`[data-scroll-lock-anchor]`,
+ * `src/app/page.tsx`) is centered with auto side margins, so adding P px of
+ * `padding-right` to `<body>` narrows its content box by P and moves the
+ * shell's left edge LEFT by exactly P / 2. Given the shell's left edge before
+ * the lock and its left edge now (after the lock plus whatever padding is
+ * currently applied), the padding that pins it back is:
+ *
+ *     extra' = extra + 2 · (leftNow − leftBefore)
+ *
+ * Because the half-padding relationship is exact, this reaches the fixed point
+ * (leftNow === leftBefore) in a SINGLE step from any starting `extra` — the
+ * caller iterates only to absorb sub-pixel rounding. It is self-correcting
+ * across browsers: a retained gutter (real Chrome) makes the width guess
+ * over-shoot, drift goes negative, and the padding is removed; a dropped
+ * gutter (bundled Chromium, Windows) keeps it; anything in between converges.
+ * Clamped at 0 — negative padding is never the fix for this right-shift bug.
+ *
+ * @param currentExtraPaddingPx  padding-right already added beyond the body's base
+ * @param landmarkLeftUnlocked   shell `getBoundingClientRect().left` before locking
+ * @param landmarkLeftLocked     shell `getBoundingClientRect().left` after locking + current padding
+ * @returns the extra padding-right (beyond base) that pins the shell back
+ */
+export function scrollLockPaddingCorrection(
+  currentExtraPaddingPx: number,
+  landmarkLeftUnlocked: number,
+  landmarkLeftLocked: number,
+): number {
+  const drift = landmarkLeftLocked - landmarkLeftUnlocked;
+  return Math.max(0, currentExtraPaddingPx + 2 * drift);
 }
 
 export function useModalDialog(
@@ -85,30 +124,58 @@ export function useModalDialog(
     // body-only locking is exactly what caused the Windows layout shift. The
     // body is locked too so the pre-#49 observable contract
     // (body.style.overflow === "hidden" while open, asserted by issue-6/a11y
-    // specs) still holds. For browsers that drop the reserved gutter under
-    // the lock (Chromium, measured) or lack `scrollbar-gutter` entirely
-    // (Safari < 18.2), compensate in this ONE place with body padding equal
-    // to the width the lock actually freed: sample
-    // `documentElement.clientWidth` before and after hiding overflow (the
-    // post-lock read forces a synchronous reflow, so the measured layout is
-    // real). Zero delta ⇒ the gutter held (or scrollbars are overlay) and
-    // CSS alone carries the fix.
+    // specs) still holds.
     const root = document.documentElement;
     const body = document.body;
     const previousRootOverflow = root.style.overflow;
     const previousBodyOverflow = body.style.overflow;
     const previousPaddingRight = body.style.paddingRight;
+
+    // Position-invariant compensation (issue #49, Jon bounce pass 1). Sample
+    // the centered page shell's left edge BEFORE locking; whatever the lock
+    // does to the scrollbar gutter, the shell will be pinned back to this exact
+    // pixel afterward. This replaces the earlier width-inference-only approach,
+    // which double-compensated in real Chrome (gutter retained but clientWidth
+    // reported it dropped) and drifted the layout LEFT.
+    const landmark = document.querySelector<HTMLElement>(
+      "[data-scroll-lock-anchor]",
+    );
+    const landmarkLeftUnlocked =
+      landmark?.getBoundingClientRect().left ?? null;
+    const basePaddingRight =
+      Number.parseFloat(window.getComputedStyle(body).paddingRight) || 0;
+
     const unlockedClientWidth = root.clientWidth;
     root.style.overflow = "hidden";
     body.style.overflow = "hidden";
-    const compensation = scrollLockCompensationPx(
+
+    // First guess from the width delta (right in browsers that drop the gutter
+    // under the lock; a no-op when it held or scrollbars are overlay).
+    let extraPadding = scrollLockCompensationPx(
       unlockedClientWidth,
       root.clientWidth,
     );
-    if (compensation > 0) {
-      const basePadding =
-        Number.parseFloat(window.getComputedStyle(body).paddingRight) || 0;
-      body.style.paddingRight = `${basePadding + compensation}px`;
+    if (extraPadding > 0) {
+      body.style.paddingRight = `${basePaddingRight + extraPadding}px`;
+    }
+
+    // Authoritative correction: measure the shell's real box and converge the
+    // padding until its left edge matches the pre-lock pixel. Each
+    // getBoundingClientRect forces a synchronous layout so every read reflects
+    // the real painted box; all of this runs inside the mount effect before the
+    // browser paints, so the convergence is invisible (no flicker). One step
+    // suffices mathematically; the cap of 3 only absorbs sub-pixel rounding.
+    if (landmark && landmarkLeftUnlocked !== null) {
+      for (let i = 0; i < 3; i += 1) {
+        const landmarkLeftLocked = landmark.getBoundingClientRect().left;
+        if (Math.abs(landmarkLeftLocked - landmarkLeftUnlocked) <= 0.5) break;
+        extraPadding = scrollLockPaddingCorrection(
+          extraPadding,
+          landmarkLeftUnlocked,
+          landmarkLeftLocked,
+        );
+        body.style.paddingRight = `${basePaddingRight + extraPadding}px`;
+      }
     }
 
     function onKeyDown(event: KeyboardEvent) {

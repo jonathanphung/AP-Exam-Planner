@@ -7,7 +7,17 @@ export default function Home() {
     // max-w-7xl (was 6xl): the #29 sidebar is wider (20rem expanded, so every
     // resource label fits on one line) — the bump keeps the main planner
     // column at least as wide as before the redesign.
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-6 py-8 lg:flex-row lg:items-start lg:gap-10 lg:py-10">
+    //
+    // data-scroll-lock-anchor (issue #49): this is the centered shell whose
+    // left edge must not move when a dialog locks background scroll. The
+    // scroll-lock hook (src/lib/modal.ts) measures this element's box before
+    // and after locking and pins it back to the same pixel, so the fix is
+    // position-invariant instead of relying on a browser-specific width
+    // inference (which double-compensated in real Chrome — see issue #49).
+    <div
+      data-scroll-lock-anchor
+      className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-6 py-8 lg:flex-row lg:items-start lg:gap-10 lg:py-10"
+    >
       {/* Branded app panel (issue #29): branding + the page h1 live here now
           (the reference-style sidebar replaces the old page header), with the
           My Schedules switcher and the Resources links. Persistent left column
