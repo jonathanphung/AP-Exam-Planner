@@ -13,6 +13,7 @@ import {
   PNG_FILE_NAME,
   TXT_EOL,
   TXT_FILE_NAME,
+  weekPngFileName,
 } from "./exports";
 
 /**
@@ -59,6 +60,41 @@ describe("filename convention (issue #51)", () => {
     expect(JSON_FILE_NAME).toBe(`${EXPORT_BASE_NAME}.json`);
     expect(TXT_FILE_NAME).toBe(`${EXPORT_BASE_NAME}.txt`);
     expect(EXPORT_BASE_NAME).toBe("ap-exams-2026");
+  });
+});
+
+describe("weekPngFileName — per-week, per-view suffix (issue #56 + bounce)", () => {
+  it("derives basename + week slug + view suffix", () => {
+    expect(weekPngFileName("week-1", "list")).toBe(
+      "ap-exams-2026-week-1-list.png",
+    );
+    expect(weekPngFileName("week-2", "calendar")).toBe(
+      "ap-exams-2026-week-2-calendar.png",
+    );
+    expect(weekPngFileName("late-testing", "list")).toBe(
+      "ap-exams-2026-late-testing-list.png",
+    );
+    expect(weekPngFileName("late-testing", "calendar")).toBe(
+      "ap-exams-2026-late-testing-calendar.png",
+    );
+  });
+
+  it("the two view variants never collide for the same week", () => {
+    for (const slug of ["week-1", "week-2", "late-testing"]) {
+      expect(weekPngFileName(slug, "list")).not.toBe(
+        weekPngFileName(slug, "calendar"),
+      );
+    }
+  });
+
+  it("every emitted name starts with the shared, dataset-derived basename", () => {
+    for (const slug of ["week-1", "week-2", "late-testing"]) {
+      for (const view of ["list", "calendar"] as const) {
+        expect(weekPngFileName(slug, view).startsWith(`${EXPORT_BASE_NAME}-`)).toBe(
+          true,
+        );
+      }
+    }
   });
 });
 

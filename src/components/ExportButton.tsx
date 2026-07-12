@@ -29,13 +29,19 @@ import {
   TXT_FILE_NAME,
   TXT_MIME_TYPE,
   weekPngFileName,
+  type ExportView,
 } from "@/lib/exports";
-import { buildWeekCards, type WeekCard } from "@/lib/week-cards";
+import { buildWeekCards } from "@/lib/week-cards";
+import { buildCalendarCards } from "@/lib/calendar-cards";
 import {
   captureWeekCardPng,
   type ExportTheme,
   type WeekCardRenderOptions,
 } from "@/lib/export-png";
+import {
+  captureCalendarCardPng,
+  type CalendarCardRenderOptions,
+} from "@/lib/export-png-calendar";
 
 /**
  * "Export" menu button (issue #51; previously the one-shot "Export to
@@ -44,18 +50,26 @@ import {
  * The trigger is labeled just "Export" (with a tray-and-up-arrow export icon)
  * at EVERY width — the old <360px label-shortening special case is gone
  * because the label is short everywhere now. Clicking it opens a WAI-ARIA
- * menu of four "Save as .<ext>" items:
+ * menu of five "Save as …" items:
  *
- *   .png  — one DESIGNED schedule card per non-empty AP testing week (issue
- *           #56): the week model is built from the SAME calendarWeeks() /
- *           resolveSlots → buildSchedule pipeline as the calendar/list/txt
- *           paths (src/lib/week-cards.ts) and rasterized client-side
- *           (src/lib/export-png.ts). Emits one PNG per week the student has a
- *           placed entry in — not a screenshot of the current view.
- *   .ics  — EXACTLY the pre-#51 calendar export: same buildIcsCalendar call,
- *           same filename, same MIME; src/lib/ics.ts untouched
- *   .json — versioned machine-readable envelope (src/lib/exports.ts)
- *   .txt  — human-readable chronological schedule (src/lib/exports.ts)
+ *   list .png     — one DESIGNED, decluttered LIST card per non-empty AP
+ *                   testing week (issue #56 + Jon's bounce): subject + a small
+ *                   category dot + day/session/clock, no chip/pill. Built from
+ *                   src/lib/week-cards.ts, rendered by src/lib/export-png.ts.
+ *   calendar .png — one DESIGNED WEEK-GRID card per non-empty testing week (the
+ *                   bounce): mirrors the site's Calendar view (day columns,
+ *                   hourly axis, positioned category-colored blocks, legend,
+ *                   off-grid strip). Built from src/lib/calendar-cards.ts via
+ *                   buildCalendarLayout, rendered by export-png-calendar.ts.
+ *   .ics          — EXACTLY the pre-#51 calendar export: same buildIcsCalendar
+ *                   call, same filename, same MIME; src/lib/ics.ts untouched
+ *   .json         — versioned machine-readable envelope (src/lib/exports.ts)
+ *   .txt          — human-readable chronological schedule (src/lib/exports.ts)
+ *
+ * Both `.png` variants share the SAME per-week fan-out (calendarWeeks() /
+ * resolveSlots → buildSchedule) and the SAME design tokens
+ * (src/lib/export-card-theme.ts), so they are the same export in two formats —
+ * one file per week the student has a placed entry in, not a screenshot.
  *
  * Builder decision (issue #51): the calendar row says "Save as .ics", not the
  * mock's ".cal" — the file that lands on disk IS a `.ics`, and labeling it
@@ -99,15 +113,20 @@ const SUBJECTS: readonly ApSubject[] = dataset.subjects;
 const SESSION_START_TIMES: SessionStartTimes = dataset.sessionStartTimes;
 const CYCLE = dataset.cycle;
 
-type ExportFormat = "png" | "ics" | "json" | "txt";
+type ExportFormat = "png-list" | "png-calendar" | "ics" | "json" | "txt";
 
-/** Menu rows in the mock's order: png, calendar, json, txt. */
+/** Menu rows in order: list-png, calendar-png, ics, json, txt (Jon's bounce). */
 const MENU_ITEMS: ReadonlyArray<{
   format: ExportFormat;
   label: string;
   Icon: () => React.JSX.Element;
 }> = [
-  { format: "png", label: "Save as .png", Icon: PngBadgeIcon },
+  { format: "png-list", label: "Save as list view .png", Icon: ListPngIcon },
+  {
+    format: "png-calendar",
+    label: "Save as calendar view .png",
+    Icon: CalendarPngIcon,
+  },
   { format: "ics", label: "Save as .ics", Icon: CalendarIcon },
   { format: "json", label: "Save as .json", Icon: CodeFileIcon },
   { format: "txt", label: "Save as .txt", Icon: TextLinesIcon },
@@ -136,26 +155,29 @@ function downloadBlob(blob: Blob, filename: string): void {
 const PNG_DOWNLOAD_STAGGER_MS = 200;
 
 /**
- * Render + download one designed PNG per week, sequentially (issue #56).
+ * Render + download one designed PNG per week, sequentially (issue #56 + Jon's
+ * bounce — shared by BOTH the list and calendar variants).
  *
  * Each week is a SEPARATE file (Jon asked for separate files per week, not a
  * zip). Firing several Blob downloads back-to-back can trip a browser's "allow
  * multiple downloads?" prompt or throttle, so we await each rasterization and
  * add a small stagger between saves. A single failed week is logged and
  * skipped — client-side rasterization has no server to report to — so one bad
- * card never blocks the rest.
+ * card never blocks the rest. The `view` suffix keeps the two variants' files
+ * from colliding for the same week (see {@link weekPngFileName}).
  */
-async function downloadWeekCards(
-  cards: readonly WeekCard[],
-  options: WeekCardRenderOptions,
+async function downloadWeekPngs<Card extends { slug: string }>(
+  cards: readonly Card[],
+  view: ExportView,
+  render: (card: Card) => Promise<Blob>,
 ): Promise<void> {
   for (let i = 0; i < cards.length; i += 1) {
     const card = cards[i];
     try {
-      const blob = await captureWeekCardPng(card, options);
-      downloadBlob(blob, weekPngFileName(card.slug));
+      const blob = await render(card);
+      downloadBlob(blob, weekPngFileName(card.slug, view));
     } catch (error: unknown) {
-      console.error(`PNG export failed for ${card.slug}`, error);
+      console.error(`PNG export failed for ${view} ${card.slug}`, error);
     }
     if (i < cards.length - 1) {
       await new Promise((resolve) =>
@@ -165,14 +187,31 @@ async function downloadWeekCards(
   }
 }
 
+/** Active theme for the PNG export — matches the app's `.dark` root class. */
+function activeExportTheme(): ExportTheme {
+  return document.documentElement.classList.contains("dark") ? "dark" : "light";
+}
+
+/**
+ * Zero qualifying weeks (every selection is undated — all Career Kickstart, no
+ * May date). Do NOT download an empty/misleading file: inertly no-op with a
+ * console note. The trigger is already disabled at 0 selected, so this only
+ * fires for all-undated selections. Shared by both `.png` variants.
+ */
+function logNoDatedExams(which: string): void {
+  console.info(
+    `No dated exams to export as ${which} — every selected subject has no May 2026 date.`,
+  );
+}
+
 interface MenuPosition {
   top?: number;
   bottom?: number;
   right: number;
 }
 
-/** Estimated open-menu height used only for the flip-up decision. */
-const MENU_HEIGHT_ESTIMATE = 220;
+/** Estimated open-menu height used only for the flip-up decision (5 items). */
+const MENU_HEIGHT_ESTIMATE = 280;
 
 export function ExportButton() {
   const { selectedIds, selectedCount } = useSelection();
@@ -296,10 +335,10 @@ export function ExportButton() {
           downloadBlob(new Blob([txt], { type: TXT_MIME_TYPE }), TXT_FILE_NAME);
           break;
         }
-        case "png": {
-          // One designed card per non-empty testing week (issue #56). The week
-          // partition + effective slots come from the shared pipeline in
-          // week-cards.ts — no screenshot of the current view.
+        case "png-list": {
+          // One designed LIST card per non-empty testing week (issue #56 +
+          // bounce). The week partition + effective slots come from the shared
+          // pipeline in week-cards.ts — no screenshot of the current view.
           const { cards, undated } = buildWeekCards(
             SUBJECTS,
             selectedIds,
@@ -307,26 +346,43 @@ export function ExportButton() {
             SESSION_START_TIMES,
           );
           if (cards.length === 0) {
-            // Zero qualifying weeks: every selection is undated (all Career
-            // Kickstart, no May date). Do NOT download an empty/misleading
-            // file — inertly no-op with a console note (the trigger is already
-            // disabled at 0 selected, so this only fires for all-undated sets).
-            console.info(
-              "No dated exams to export as .png — every selected subject has no May 2026 date.",
-            );
+            logNoDatedExams("list view .png");
             break;
           }
-          const theme: ExportTheme = document.documentElement.classList.contains(
-            "dark",
-          )
-            ? "dark"
-            : "light";
-          void downloadWeekCards(cards, {
-            theme,
+          const options: WeekCardRenderOptions = {
+            theme: activeExportTheme(),
             cycle: CYCLE,
             scheduleName: active.name,
             undatedNames: undated.map((subject) => subject.name),
-          });
+          };
+          void downloadWeekPngs(cards, "list", (card) =>
+            captureWeekCardPng(card, options),
+          );
+          break;
+        }
+        case "png-calendar": {
+          // One designed CALENDAR week-grid card per non-empty testing week
+          // (Jon's bounce). Same per-week fan-out + effective slots as the list
+          // variant, built from buildCalendarLayout (calendar-cards.ts).
+          const { cards, undated } = buildCalendarCards(
+            SUBJECTS,
+            selectedIds,
+            resolutions,
+            SESSION_START_TIMES,
+          );
+          if (cards.length === 0) {
+            logNoDatedExams("calendar view .png");
+            break;
+          }
+          const options: CalendarCardRenderOptions = {
+            theme: activeExportTheme(),
+            cycle: CYCLE,
+            scheduleName: active.name,
+            undatedNames: undated.map((subject) => subject.name),
+          };
+          void downloadWeekPngs(cards, "calendar", (card) =>
+            captureCalendarCardPng(card, options),
+          );
           break;
         }
       }
@@ -506,8 +562,8 @@ function ExportIcon() {
   );
 }
 
-/** "PNG" badge (the mock's image-format row marker). */
-function PngBadgeIcon() {
+/** List-view .png marker: an image badge with list lines. */
+function ListPngIcon() {
   return (
     <svg
       aria-hidden="true"
@@ -519,19 +575,31 @@ function PngBadgeIcon() {
       strokeLinejoin="round"
       className="h-4 w-4 shrink-0"
     >
-      <rect x="1.75" y="4.75" width="16.5" height="10.5" rx="2" />
-      <text
-        x="10"
-        y="12.4"
-        textAnchor="middle"
-        fontSize="5.25"
-        fontWeight="700"
-        fontFamily="ui-sans-serif, system-ui, sans-serif"
-        fill="currentColor"
-        stroke="none"
-      >
-        PNG
-      </text>
+      <rect x="2.25" y="4.25" width="15.5" height="11.5" rx="2" />
+      <path d="M5.5 8h9" />
+      <path d="M5.5 10.5h9" />
+      <path d="M5.5 13h6" />
+    </svg>
+  );
+}
+
+/** Calendar-view .png marker: an image badge with a grid. */
+function CalendarPngIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4 shrink-0"
+    >
+      <rect x="2.25" y="4.25" width="15.5" height="11.5" rx="2" />
+      <path d="M2.25 8h15.5" />
+      <path d="M7.5 8v7.75" />
+      <path d="M12.5 8v7.75" />
     </svg>
   );
 }

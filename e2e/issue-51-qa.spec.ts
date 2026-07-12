@@ -6,7 +6,8 @@ import { pressViewChip } from "./support/view-chip";
  * super-board QA (issue #51) — the "Export" menu button.
  *
  * The one-shot "Export to Calendar" button (issue #7) became a WAI-ARIA menu
- * button with four "Save as .<ext>" items: .png / .ics / .json / .txt. This
+ * button. Since Jon's #56 bounce it carries FIVE "Save as …" items: list-view
+ * .png / calendar-view .png / .ics / .json / .txt. This
  * spec is the browser-observable acceptance gate; the pure `.json` / `.txt`
  * builders are unit-tested in `src/lib/exports.test.ts`, and the `.ics` bytes
  * are additionally asserted by `e2e/issue-7-export-ics.spec.ts` (now driven
@@ -18,7 +19,7 @@ import { pressViewChip } from "./support/view-chip";
  *             disabled at zero selected.
  *   AC3     — WAI-ARIA menu semantics: keyboard open → roving focus
  *             (ArrowUp/Down/Home/End) → Escape returns focus → click-outside.
- *   AC4     — four items in mock order (png, ics, json, txt).
+ *   AC4     — five items in order (png-list, png-calendar, ics, json, txt).
  *   AC5     — NO body scroll lock: opening never shifts the page (#49 class).
  *   AC6     — stacking: the portaled menu paints above the sticky catalog
  *             quick-jump bar (`sticky top-0 z-30`) and every item is the
@@ -134,9 +135,17 @@ test.describe("issue #51 — Export trigger button", () => {
   });
 });
 
-// ── AC4 — four items in mock order ──────────────────────────────────────────
+// ── AC4 — five items in order (Jon's #56 bounce) ────────────────────────────
+const MENU_ITEM_NAMES = [
+  "Save as list view .png",
+  "Save as calendar view .png",
+  "Save as .ics",
+  "Save as .json",
+  "Save as .txt",
+] as const;
+
 test.describe("issue #51 — menu items", () => {
-  test("AC4 — exactly four menuitems in mock order: png, ics, json, txt", async ({
+  test("AC4 — exactly five menuitems in order: png-list, png-calendar, ics, json, txt", async ({
     page,
   }) => {
     await page.goto("/");
@@ -144,18 +153,19 @@ test.describe("issue #51 — menu items", () => {
     await openMenu(page);
 
     const items = exportMenu(page).getByRole("menuitem");
-    await expect(items).toHaveCount(4);
+    await expect(items).toHaveCount(5);
     await expect(items).toHaveText([
-      /Save as \.png/,
+      /Save as list view \.png/,
+      /Save as calendar view \.png/,
       /Save as \.ics/,
       /Save as \.json/,
       /Save as \.txt/,
     ]);
-    // Each item's ACCESSIBLE NAME is exactly "Save as .<ext>" (the aria-hidden
-    // PNG badge glyph must not leak into the png row's accessible name).
-    for (const ext of ["png", "ics", "json", "txt"]) {
+    // Each item's ACCESSIBLE NAME is exactly its label (the aria-hidden badge
+    // glyphs must not leak into the row's accessible name).
+    for (const name of MENU_ITEM_NAMES) {
       await expect(
-        page.getByRole("menuitem", { name: `Save as .${ext}`, exact: true }),
+        page.getByRole("menuitem", { name, exact: true }),
       ).toBeVisible();
     }
   });
@@ -172,22 +182,24 @@ test.describe("issue #51 — keyboard menu semantics", () => {
     const btn = exportButton(page);
     await btn.focus();
 
-    // ArrowDown opens the menu and focuses the FIRST item (png).
+    // ArrowDown opens the menu and focuses the FIRST item (png-list).
     await page.keyboard.press("ArrowDown");
     await expect(exportMenu(page)).toBeVisible();
     await expect(
-      page.getByTestId("export-menu-item-png"),
+      page.getByTestId("export-menu-item-png-list"),
     ).toBeFocused();
 
-    // ArrowDown moves to the next item (ics).
+    // ArrowDown moves to the next item (png-calendar).
     await page.keyboard.press("ArrowDown");
-    await expect(page.getByTestId("export-menu-item-ics")).toBeFocused();
+    await expect(
+      page.getByTestId("export-menu-item-png-calendar"),
+    ).toBeFocused();
 
-    // End jumps to the last item (txt); Home back to the first (png).
+    // End jumps to the last item (txt); Home back to the first (png-list).
     await page.keyboard.press("End");
     await expect(page.getByTestId("export-menu-item-txt")).toBeFocused();
     await page.keyboard.press("Home");
-    await expect(page.getByTestId("export-menu-item-png")).toBeFocused();
+    await expect(page.getByTestId("export-menu-item-png-list")).toBeFocused();
 
     // ArrowUp from the first item wraps to the last (txt).
     await page.keyboard.press("ArrowUp");
@@ -302,10 +314,16 @@ test.describe("issue #51 — stacking (#42 R6 defect class)", () => {
     // Every menu item is the element the browser hit-tests at its own center:
     // nothing (sticky bar included) paints over it, so it is genuinely
     // clickable where it overlaps other chrome.
-    for (const ext of ["png", "ics", "json", "txt"]) {
-      const item = page.getByTestId(`export-menu-item-${ext}`);
+    for (const id of [
+      "png-list",
+      "png-calendar",
+      "ics",
+      "json",
+      "txt",
+    ]) {
+      const item = page.getByTestId(`export-menu-item-${id}`);
       const box = await item.boundingBox();
-      expect(box, `item ${ext} has a box`).not.toBeNull();
+      expect(box, `item ${id} has a box`).not.toBeNull();
       const cx = box!.x + box!.width / 2;
       const cy = box!.y + box!.height / 2;
       const topMostIsItem = await page.evaluate(
@@ -316,7 +334,7 @@ test.describe("issue #51 — stacking (#42 R6 defect class)", () => {
         },
         { x: cx, y: cy },
       );
-      expect(topMostIsItem, `item ${ext} is top-most at its center`).toBe(true);
+      expect(topMostIsItem, `item ${id} is top-most at its center`).toBe(true);
     }
   });
 });
@@ -381,41 +399,46 @@ test.describe("issue #51 — real downloads per format", () => {
     ]);
   });
 
-  test("AC13/AC8 — .png downloads one designed card per non-empty testing week", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    await selectBiologyAndSeminar(page);
+  for (const { view, menuItem } of [
+    { view: "list", menuItem: "Save as list view .png" },
+    { view: "calendar", menuItem: "Save as calendar view .png" },
+  ] as const) {
+    test(`AC13/AC8 — ${view} .png downloads one designed card per non-empty testing week`, async ({
+      page,
+    }) => {
+      await page.goto("/");
+      await selectBiologyAndSeminar(page);
 
-    // Since issue #56 the .png item emits one designed PNG per non-empty
-    // testing week. Biology (Week 1) + Seminar exam (Week 2) + Seminar's
-    // Apr 30 portfolio deadline (rides Week 1) → exactly two week files, in
-    // chronological week order. Collect every download the click triggers.
-    const downloads: Download[] = [];
-    page.on("download", (d) => downloads.push(d));
+      // Since issue #56 (+ bounce) each .png item emits one designed PNG per
+      // non-empty testing week. Biology (Week 1) + Seminar exam (Week 2) +
+      // Seminar's Apr 30 portfolio deadline (rides Week 1) → exactly two week
+      // files, in chronological week order. Collect every triggered download.
+      const downloads: Download[] = [];
+      page.on("download", (d) => downloads.push(d));
 
-    await openMenu(page);
-    await page
-      .getByRole("menuitem", { name: "Save as .png", exact: true })
-      .click();
+      await openMenu(page);
+      await page
+        .getByRole("menuitem", { name: menuItem, exact: true })
+        .click();
 
-    await expect.poll(() => downloads.length, { timeout: 15000 }).toBe(2);
-    expect(downloads.map((d) => d.suggestedFilename())).toEqual([
-      "ap-exams-2026-week-1.png",
-      "ap-exams-2026-week-2.png",
-    ]);
-
-    for (const download of downloads) {
-      const buf = readFileSync(await download.path());
-      // PNG 8-byte signature.
-      expect([...buf.subarray(0, 8)]).toEqual([
-        0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
+      await expect.poll(() => downloads.length, { timeout: 15000 }).toBe(2);
+      expect(downloads.map((d) => d.suggestedFilename())).toEqual([
+        `ap-exams-2026-week-1-${view}.png`,
+        `ap-exams-2026-week-2-${view}.png`,
       ]);
-      // IHDR width/height are big-endian uint32 at byte offsets 16 and 20.
-      expect(buf.readUInt32BE(16)).toBeGreaterThan(0);
-      expect(buf.readUInt32BE(20)).toBeGreaterThan(0);
-    }
-  });
+
+      for (const download of downloads) {
+        const buf = readFileSync(await download.path());
+        // PNG 8-byte signature.
+        expect([...buf.subarray(0, 8)]).toEqual([
+          0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
+        ]);
+        // IHDR width/height are big-endian uint32 at byte offsets 16 and 20.
+        expect(buf.readUInt32BE(16)).toBeGreaterThan(0);
+        expect(buf.readUInt32BE(20)).toBeGreaterThan(0);
+      }
+    });
+  }
 
   test("AC13/AC7 — .ics downloads the unchanged calendar file (blob, valid VCALENDAR)", async ({
     page,
@@ -491,8 +514,8 @@ for (const shot of shots) {
 
     await selectBiologyAndSeminar(page);
     await openMenu(page);
-    // All four items painted before the shot.
-    await expect(exportMenu(page).getByRole("menuitem")).toHaveCount(4);
+    // All five items painted before the shot.
+    await expect(exportMenu(page).getByRole("menuitem")).toHaveCount(5);
     await page.screenshot({ path: `${EVIDENCE_DIR}/${shot.name}.png` });
   });
 }
@@ -505,14 +528,18 @@ test("evidence — export a real .png / .json / .txt and commit the artifacts", 
   await page.goto("/");
   await selectBiologyAndSeminar(page);
 
-  // .png now emits one designed card per week (issue #56); save each.
+  // Each .png variant now emits one designed card per week (issue #56 +
+  // bounce); save every list + calendar week file.
   const pngDownloads: Download[] = [];
   page.on("download", (d) => pngDownloads.push(d));
-  await openMenu(page);
-  await page
-    .getByRole("menuitem", { name: "Save as .png", exact: true })
-    .click();
-  await expect.poll(() => pngDownloads.length, { timeout: 15000 }).toBe(2);
+  for (const menuItem of [
+    "Save as list view .png",
+    "Save as calendar view .png",
+  ]) {
+    await openMenu(page);
+    await page.getByRole("menuitem", { name: menuItem, exact: true }).click();
+  }
+  await expect.poll(() => pngDownloads.length, { timeout: 15000 }).toBe(4);
   for (const download of pngDownloads) {
     writeFileSync(
       `${EVIDENCE_DIR}/${download.suggestedFilename()}`,
@@ -534,8 +561,10 @@ test("evidence — export a real .png / .json / .txt and commit the artifacts", 
 
   // Sanity: every artifact is non-empty on disk.
   for (const f of [
-    "ap-exams-2026-week-1.png",
-    "ap-exams-2026-week-2.png",
+    "ap-exams-2026-week-1-list.png",
+    "ap-exams-2026-week-2-list.png",
+    "ap-exams-2026-week-1-calendar.png",
+    "ap-exams-2026-week-2-calendar.png",
     "exported-schedule.json",
     "exported-schedule.txt",
   ]) {

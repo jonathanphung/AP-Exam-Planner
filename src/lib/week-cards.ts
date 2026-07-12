@@ -117,6 +117,47 @@ export interface WeekCardsResult {
   undated: UndatedSubject[];
 }
 
+/** Position-derived identity for one testing week (label, slug, range). */
+export interface WeekMeta {
+  /** 0-based index into `calendarWeeks()`. */
+  weekIndex: number;
+  /** True for the late-testing window. */
+  late: boolean;
+  /** "Week 1" / "Week 2" / "Late Testing" — derived from position + `late`. */
+  label: string;
+  /** Filename slug: "week-1" / "week-2" / "late-testing". */
+  slug: string;
+  /** "May 4 – 8, 2026" — range label incl. year. */
+  rangeLabel: string;
+}
+
+/**
+ * Position-derived metadata for EVERY testing week, in order. The label/slug
+ * count only the REGULAR weeks (so "Week 2" stays "Week 2" even when Week 1
+ * emits no card), and the late-testing window is always "Late Testing". Shared
+ * by both designed export variants (list + calendar) so their week identities
+ * are guaranteed identical — never hardcoded, always derived from
+ * `calendarWeeks()`.
+ */
+export function weekCardMeta(weeks: readonly CalendarWeek[]): WeekMeta[] {
+  const meta: WeekMeta[] = [];
+  let regularCount = 0;
+  weeks.forEach((week, i) => {
+    if (!week.late) regularCount += 1;
+    const year = week.days[0]?.slice(0, 4) ?? "";
+    meta.push({
+      weekIndex: i,
+      late: week.late,
+      label: week.late ? "Late Testing" : `Week ${regularCount}`,
+      slug: week.late ? "late-testing" : `week-${regularCount}`,
+      rangeLabel: year
+        ? `${weekRangeLabel(week.days)}, ${year}`
+        : weekRangeLabel(week.days),
+    });
+  });
+  return meta;
+}
+
 /** ISO date → "Mon" (local, no timezone shift). */
 function shortWeekday(iso: string): string {
   const [year, month, day] = iso.split("-").map(Number);
@@ -138,7 +179,10 @@ function dayDistance(a: string, b: string): number {
  * deadlines and any off-grid dated entry on a real card instead of dropping
  * them, without ever inventing a date.
  */
-function nearestWeekIndex(weeks: readonly CalendarWeek[], date: string): number {
+export function nearestWeekIndex(
+  weeks: readonly CalendarWeek[],
+  date: string,
+): number {
   for (let i = 0; i < weeks.length; i += 1) {
     if (weeks[i].days.includes(date)) return i;
   }
@@ -273,25 +317,16 @@ export function buildWeekCards(
     );
   }
 
-  // 3. Emit only non-empty weeks, chronological, with position-derived labels.
+  // 3. Emit only non-empty weeks, chronological, with position-derived labels
+  //    (the SAME `weekCardMeta` the calendar variant uses, so the two exports'
+  //    week identities always match).
+  const meta = weekCardMeta(weeks);
   const cards: WeekCard[] = [];
-  let regularCount = 0;
-  weeks.forEach((week, i) => {
-    if (!week.late) regularCount += 1;
+  weeks.forEach((_week, i) => {
     const rows = rowsByWeek[i];
     if (rows.length === 0) return;
     rows.sort(compareRows);
-    const year = week.days[0]?.slice(0, 4) ?? "";
-    cards.push({
-      weekIndex: i,
-      late: week.late,
-      label: week.late ? "Late Testing" : `Week ${regularCount}`,
-      slug: week.late ? "late-testing" : `week-${regularCount}`,
-      rangeLabel: year
-        ? `${weekRangeLabel(week.days)}, ${year}`
-        : weekRangeLabel(week.days),
-      rows,
-    });
+    cards.push({ ...meta[i], rows });
   });
 
   return { cards, undated: schedule.undated };
