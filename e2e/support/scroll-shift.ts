@@ -201,9 +201,9 @@ export function registerDialogShiftTests() {
     await page.goto("/");
     await expectNoShiftThroughDialog(
       page,
-      page
-        .getByTestId("sidebar-footer")
-        .getByRole("button", { name: "Send us Feedback" }),
+      // Issue #60: unscoped role query — one copy in the a11y tree per viewport
+      // (sidebar bottom on desktop, site footer on mobile).
+      page.getByRole("button", { name: "Send us Feedback" }),
       page.getByTestId("feedback-dialog"),
     );
   });

@@ -11,7 +11,8 @@ import AxeBuilder from "@axe-core/playwright";
  * success / failure), focus management, and the responsive + a11y bar.
  *
  * Test hooks (from the Builder's handoff):
- *   data-testid="sidebar-footer"     — footer row hosting the trigger
+ *   data-testid="sidebar-footer"        — desktop support row (sidebar bottom)
+ *   data-testid="footer-support-links"  — mobile support row (site footer, #60)
  *   data-testid="feedback-dialog"    — the dialog panel
  *   data-testid="feedback-success"   — the success (thank-you) view
  *   window.__APX_FEEDBACK_GATE__     — deterministic pending gate (e2e-only)
@@ -28,8 +29,12 @@ const THEME_KEY = "apx.theme.v1";
 const MAX_LEN = 2000;
 const COUNTER_AT = 1800;
 
+// Issue #60: the trigger is rendered twice (desktop sidebar bottom / mobile
+// site footer) with complementary CSS visibility, so exactly ONE is in the
+// accessibility tree per viewport. Query it by role, unscoped: the role engine
+// skips `display:none` subtrees and strict mode catches a leaked duplicate.
 const feedbackButton = (page: Page) =>
-  page.getByTestId("sidebar-footer").getByRole("button", { name: "Send us Feedback" });
+  page.getByRole("button", { name: "Send us Feedback" });
 const dialog = (page: Page) => page.getByTestId("feedback-dialog");
 const emailField = (page: Page) => page.getByLabel("Your email");
 const messageField = (page: Page) => page.getByLabel("Your feedback");
@@ -116,9 +121,7 @@ test("AC1 — footer 'Send us Feedback' is a real <button> that opens the dialog
   await expect(trigger).toHaveAttribute("aria-haspopup", "dialog");
 
   // The GitHub mark beside it is unchanged: still an <a> to the repo.
-  const github = page
-    .getByTestId("sidebar-footer")
-    .getByRole("link", { name: /GitHub repository/ });
+  const github = page.getByRole("link", { name: /GitHub repository/ });
   await expect(github).toHaveAttribute("href", REPO_URL);
   await expect(github).toHaveAttribute("target", "_blank");
 

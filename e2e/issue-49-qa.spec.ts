@@ -87,9 +87,10 @@ function scrollbarLayoutWidth(page: Page): Promise<number> {
 /** Hydration-safe dialog open (same retry rationale as the Builder's spec:
  *  pre-hydration clicks are no-ops). */
 async function openFeedbackDialog(page: Page) {
-  const opener = page
-    .getByTestId("sidebar-footer")
-    .getByRole("button", { name: "Send us Feedback" });
+  // Issue #60: unscoped role query — the pair is rendered in the sidebar
+  // (desktop) and the site footer (mobile) with complementary CSS visibility,
+  // so exactly one copy is in the a11y tree at any viewport.
+  const opener = page.getByRole("button", { name: "Send us Feedback" });
   const dialog = page.getByTestId("feedback-dialog");
   await expect(async () => {
     if ((await dialog.count()) === 0) await opener.click();

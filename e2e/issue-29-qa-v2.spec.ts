@@ -40,17 +40,24 @@ const STICKY_TOP_PX = 40;
 const SIDEBAR = "aside[data-testid='resources-sidebar']";
 const SECTIONS = "#sidebar-sections";
 const FOOTER = "[data-testid='sidebar-footer']";
+const SITE_FOOTER = "footer[data-testid='site-footer']";
 
 const collapseToggle = (page: Page) =>
   page.getByRole("button", { name: /^(Collapse|Expand) sidebar$/ });
 // Issue #42: the feedback control is now a <button> that opens the in-app
 // FeedbackDialog (no navigation); its own contract lives in
-// e2e/issue-42-feedback-dialog.spec.ts. The footer-row placement rules
-// asserted in this file are unchanged.
+// e2e/issue-42-feedback-dialog.spec.ts.
+//
+// Issue #60: the pair is rendered twice with complementary CSS visibility —
+// `sidebar-footer` (desktop, pinned to the bottom of the column) and
+// `footer-support-links` (mobile/tablet, inside the site footer). Exactly one
+// is in the a11y tree per viewport, so these role queries are UNSCOPED on
+// purpose: Playwright's role engine skips `display:none` subtrees, and strict
+// mode fails loudly if a second copy ever leaks in.
 const feedbackButton = (page: Page) =>
-  page.locator(FOOTER).getByRole("button", { name: /Send us Feedback/ });
+  page.getByRole("button", { name: /Send us Feedback/ });
 const githubLink = (page: Page) =>
-  page.locator(FOOTER).getByRole("link", { name: /GitHub repository/ });
+  page.getByRole("link", { name: /GitHub repository/ });
 
 /** Hydration-safe collapse-toggle press (issue-29-qa pattern). */
 async function pressToggle(page: Page, expectExpanded: "true" | "false") {
@@ -61,6 +68,14 @@ async function pressToggle(page: Page, expectExpanded: "true" | "false") {
       timeout: 1000,
     });
   }).toPass();
+}
+
+/** Rendered height of the site footer — the exact amount by which the sticky
+ *  column yields at the very bottom of the page (issue #60; see R1). */
+function siteFooterHeight(page: Page): Promise<number> {
+  return page
+    .locator(SITE_FOOTER)
+    .evaluate((el) => el.getBoundingClientRect().height);
 }
 
 // ── R1: sticky pins at the layout offset (not just "visible at the bottom") ─
@@ -91,12 +106,33 @@ test("R1 — sidebar pins at top-10 (40px) mid-scroll and tracks the viewport", 
   const midBox = (await aside.boundingBox())!;
   expect(Math.abs(midBox.y - STICKY_TOP_PX)).toBeLessThanOrEqual(1);
 
-  // Deeper still (page bottom): same pinned offset (constant while
-  // scrolling = sticky, not merely tall).
-  await page.evaluate((y) => window.scrollTo(0, y), maxScroll);
-  await page.waitForFunction((y) => window.scrollY >= y - 1, maxScroll);
+  // Deeper still, but stopping just before the site footer enters the
+  // viewport: same pinned offset (constant while scrolling = sticky, not
+  // merely tall).
+  const beforeFooter = maxScroll - (await siteFooterHeight(page));
+  await page.evaluate((y) => window.scrollTo(0, y), beforeFooter);
+  await page.waitForFunction((y) => window.scrollY >= y - 1, beforeFooter);
   const deep = (await aside.boundingBox())!;
   expect(Math.abs(deep.y - STICKY_TOP_PX)).toBeLessThanOrEqual(1);
+
+  // Issue #60: at the ABSOLUTE bottom of the page the column yields to the
+  // site footer instead of painting over it. The column is now viewport-tall
+  // (`lg:h-[calc(100vh-5rem)]`, so the support row can pin to the bottom
+  // edge), and a sticky box may never leave its containing block — the page
+  // shell's content box ends where the site footer begins. So the column is
+  // nudged UP by at most the footer's height in the last stretch of scroll.
+  // That is the correct outcome (no overlap), and it is bounded: assert the
+  // nudge direction, its bound, and the no-overlap invariant rather than a
+  // pinning that CSS cannot deliver here.
+  await page.evaluate((y) => window.scrollTo(0, y), maxScroll);
+  await page.waitForFunction((y) => window.scrollY >= y - 1, maxScroll);
+  const atBottom = (await aside.boundingBox())!;
+  const footer = (await page.locator(SITE_FOOTER).boundingBox())!;
+  expect(atBottom.y).toBeLessThanOrEqual(STICKY_TOP_PX + 1); // never pushed down
+  expect(atBottom.y).toBeGreaterThanOrEqual(
+    STICKY_TOP_PX - footer.height - 1, // nudge bounded by the footer's height
+  );
+  expect(atBottom.y + atBottom.height).toBeLessThanOrEqual(footer.y + 1); // no overlap
 
   // Evidence: pinned panel beside deep-scrolled content.
   await page.screenshot({
@@ -219,14 +255,14 @@ test("R4 — lg boundary (1024px): desktop column presentation with the footer r
   expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 1);
 });
 
-test("R4 — mobile: footer visible in the card while BOTH disclosures stay closed (default state)", async ({
+test("R4 — mobile: support row visible in the SITE FOOTER while BOTH disclosures stay closed (default state)", async ({
   page,
 }) => {
   await page.setViewportSize(MOBILE);
   await page.goto("/");
 
-  // Default state: both disclosures closed — the footer must not depend on
-  // opening either one.
+  // Default state: both disclosures closed — the support pair must not depend
+  // on opening either one (it never did; issue #60 just moved where it lives).
   const schedulesTrigger = page.getByRole("button", { name: "My schedules" });
   const resourcesTrigger = page.getByRole("button", { name: "Resources" });
   await expect(schedulesTrigger).toHaveAttribute("aria-expanded", "false");
@@ -237,13 +273,16 @@ test("R4 — mobile: footer visible in the card while BOTH disclosures stay clos
   await expect(feedback).toBeVisible();
   await expect(githubLink(page)).toBeVisible();
 
-  // The footer renders inside the sidebar card, below the (closed)
-  // disclosure triggers.
+  // Issue #60: the sidebar card ENDS after RESOURCES — the pair now renders
+  // inside the site footer, below the whole card.
+  await expect(page.locator(`${SIDEBAR} ${FOOTER}`)).toBeHidden();
+  await expect(page.locator(`${SITE_FOOTER} [data-testid='footer-support-links']`)).toBeVisible();
+
   const card = (await page.locator(SIDEBAR).boundingBox())!;
   const resTrigger = (await resourcesTrigger.boundingBox())!;
   const fb = (await feedback.boundingBox())!;
   expect(fb.y).toBeGreaterThanOrEqual(resTrigger.y + resTrigger.height - 1);
-  expect(fb.y + fb.height).toBeLessThanOrEqual(card.y + card.height + 1);
+  expect(fb.y).toBeGreaterThan(card.y + card.height);
 
   await page.screenshot({ path: `${EVIDENCE_DIR}/mobile-footer.png` });
 });

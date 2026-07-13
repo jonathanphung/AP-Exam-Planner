@@ -20,6 +20,16 @@ import { test, expect, type Page } from "@playwright/test";
  * new-tab / trailing-↗ assertions are superseded (the dialog's own contract
  * lives in e2e/issue-42-feedback-dialog.spec.ts). The row geometry, hover
  * underline, and touch-target rules here are unchanged and stay binding.
+ *
+ * UPDATED for issue #60: the support pair (Feedback + GitHub) is rendered
+ * twice with complementary CSS visibility — `[data-testid='sidebar-footer']`
+ * (desktop, pinned to the bottom of the sticky column) and
+ * `[data-testid='footer-support-links']` (mobile/tablet, inside the site
+ * footer). Only ONE is in the accessibility tree per viewport, so the role
+ * queries below are deliberately UNSCOPED: Playwright's role engine skips
+ * `display:none` subtrees, and strict mode then fails if a second copy ever
+ * leaks into the a11y tree. The mobile row's placement assertions moved from
+ * the sidebar card to the site footer.
  */
 
 const DESKTOP = { width: 1440, height: 900 };
@@ -32,10 +42,11 @@ const REPO_URL = "https://github.com/jonathanphung/AP-Exam-Planner";
 const collapseToggle = (page: Page) =>
   page.getByRole("button", { name: /^(Collapse|Expand) sidebar$/ });
 // Issue #42: the feedback control is a <button> (opens the in-app dialog).
+// Issue #60: unscoped by design — see the header note.
 const feedbackButton = (page: Page) =>
-  page.locator(FOOTER).getByRole("button", { name: /Send us Feedback/ });
+  page.getByRole("button", { name: /Send us Feedback/ });
 const githubLink = (page: Page) =>
-  page.locator(FOOTER).getByRole("link", { name: /GitHub repository/ });
+  page.getByRole("link", { name: /GitHub repository/ });
 
 /** Hydration-safe collapse-toggle press (issue-29-qa pattern). */
 async function pressToggle(page: Page, expectExpanded: "true" | "false") {
@@ -59,13 +70,26 @@ test("desktop sidebar is sticky: pinned and usable while the main content scroll
   const aside = page.locator(SIDEBAR);
   await expect(aside).toHaveCSS("position", "sticky");
 
-  // Scroll deep into the page (catalog + schedule views make it tall).
-  await page.evaluate(() =>
-    window.scrollTo(0, document.documentElement.scrollHeight),
-  );
+  // Scroll deep into the page (catalog + schedule views make it tall), stopping
+  // where the site footer starts to enter the viewport.
+  //
+  // Issue #60: the column is now viewport-tall so the support row can pin to
+  // the bottom edge — and a sticky box may never leave its containing block,
+  // whose content box ends where the site footer begins. So in the LAST
+  // footer-height of scroll the column yields upward rather than painting over
+  // the footer; everywhere before that it is exactly pinned and fully in view.
+  // That final band is asserted separately (below, and in issue-29-qa-v2 R1).
+  const deepButAboveFooter = await page.evaluate(() => {
+    const footer = document.querySelector("footer[data-testid='site-footer']")!;
+    const maxScroll =
+      document.documentElement.scrollHeight - window.innerHeight;
+    return maxScroll - footer.getBoundingClientRect().height;
+  });
+  await page.evaluate((y) => window.scrollTo(0, y), deepButAboveFooter);
   expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(300);
 
-  // The panel is still on screen: branding row + toggle within the viewport.
+  // The panel is still fully on screen: branding row + toggle within the
+  // viewport (nothing clipped at either edge).
   const toggle = collapseToggle(page);
   await expect(toggle).toBeVisible();
   const box = (await toggle.boundingBox())!;
@@ -76,9 +100,21 @@ test("desktop sidebar is sticky: pinned and usable while the main content scroll
   await pressToggle(page, "false");
   await pressToggle(page, "true");
 
-  // The footer row is also reachable (panel scrolls internally if needed).
+  // The support row is also reachable (panel scrolls internally if needed).
   await feedbackButton(page).scrollIntoViewIfNeeded();
   await expect(feedbackButton(page)).toBeVisible();
+
+  // At the ABSOLUTE page bottom the column stops at the site footer's top edge
+  // — it never paints over it, and it is never pushed BELOW the sticky offset.
+  await page.evaluate(() =>
+    window.scrollTo(0, document.documentElement.scrollHeight),
+  );
+  const column = (await aside.boundingBox())!;
+  const siteFooter = (await page
+    .locator("footer[data-testid='site-footer']")
+    .boundingBox())!;
+  expect(column.y).toBeLessThanOrEqual(41);
+  expect(column.y + column.height).toBeLessThanOrEqual(siteFooter.y + 1);
 });
 
 // ── 2. Panel-collapse glyph ─────────────────────────────────────────────────
@@ -138,6 +174,18 @@ test("desktop footer row: Send us Feedback left, GitHub icon right, same row, co
   const sections = (await page.locator("#sidebar-sections").boundingBox())!;
   expect(fb.y).toBeGreaterThanOrEqual(sections.y + sections.height - 1);
 
+  // Issue #60: ...and the row is flush with the BOTTOM of the sidebar column,
+  // which itself now reaches the bottom of the viewport (minus the layout's
+  // 40px bottom gap). Before #60 the column shrank to its content, so this row
+  // floated up under the last RESOURCES link.
+  const column = (await page.locator(SIDEBAR).boundingBox())!;
+  const row = (await page.locator(FOOTER).boundingBox())!;
+  expect(row.y + row.height).toBeLessThanOrEqual(column.y + column.height + 1);
+  expect(row.y + row.height).toBeGreaterThanOrEqual(
+    column.y + column.height - 2,
+  );
+  expect(column.y + column.height).toBeGreaterThanOrEqual(DESKTOP.height - 60);
+
   // Collapsing the desktop column hides the "Send us Feedback" label, but the
   // GitHub mark stays reachable in the rail (issue #41 bounce, Jon 2026-07-09:
   // "the GitHub mark must still be reachable in the rail"). Pre-#41 the whole
@@ -169,7 +217,7 @@ test("footer hover: feedback text underlines, the GitHub icon does not", async (
   expect(await textDecoration(github)).not.toContain("underline");
 });
 
-test("mobile footer row: present in the disclosure card with ≥44px touch targets", async ({
+test("mobile support row: lives in the SITE FOOTER (not the sidebar card) with ≥44px touch targets", async ({
   page,
 }) => {
   await page.setViewportSize(MOBILE);
@@ -181,12 +229,31 @@ test("mobile footer row: present in the disclosure card with ≥44px touch targe
   await expect(feedback).toBeVisible();
   await expect(github).toBeVisible();
 
-  // One row inside the sidebar card, footer below the disclosures.
+  // Issue #60: the pair is OUT of the sidebar card and INSIDE the site footer.
+  for (const control of [feedback, github]) {
+    expect(
+      await control.evaluate((el) => el.closest("aside") !== null),
+      "support control must not be inside the sidebar card on mobile",
+    ).toBe(false);
+    expect(
+      await control.evaluate(
+        (el) => el.closest("footer[data-testid='site-footer']") !== null,
+      ),
+      "support control must be inside the site footer on mobile",
+    ).toBe(true);
+  }
+
+  // The sidebar card now ends after RESOURCES — nothing of the pair below it.
   const card = (await page.locator(SIDEBAR).boundingBox())!;
   const fb = (await feedback.boundingBox())!;
   const gh = (await github.boundingBox())!;
-  expect(fb.y).toBeGreaterThanOrEqual(card.y);
-  expect(Math.abs(fb.y + fb.height / 2 - (gh.y + gh.height / 2))).toBeLessThanOrEqual(2);
+  expect(fb.y).toBeGreaterThan(card.y + card.height);
+
+  // Still one row, feedback left of the GitHub mark.
+  expect(
+    Math.abs(fb.y + fb.height / 2 - (gh.y + gh.height / 2)),
+  ).toBeLessThanOrEqual(2);
+  expect(fb.x + fb.width).toBeLessThanOrEqual(gh.x);
 
   // ≥44px touch targets.
   expect(fb.height).toBeGreaterThanOrEqual(44);
@@ -199,6 +266,53 @@ test("mobile footer row: present in the disclosure card with ≥44px touch targe
     clientWidth: document.documentElement.clientWidth,
   }));
   expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 1);
+});
+
+// ── 5. Issue #60: exactly one of each control in the a11y tree ───────────────
+
+test("#60 — exactly one Send-us-Feedback button and one GitHub link are exposed to assistive tech at every viewport", async ({
+  page,
+}) => {
+  for (const vp of [MOBILE, { width: 768, height: 1024 }, DESKTOP]) {
+    await page.setViewportSize(vp);
+    await page.goto("/");
+    // getByRole only matches elements in the accessibility tree, so the
+    // `display:none` twin is excluded by construction. Counts, not visibility.
+    await expect(
+      feedbackButton(page),
+      `feedback buttons at ${vp.width}px`,
+    ).toHaveCount(1);
+    await expect(
+      githubLink(page),
+      `GitHub links at ${vp.width}px`,
+    ).toHaveCount(1);
+  }
+});
+
+test("#60 — desktop with a tall viewport: the support row pins to the bottom edge, far below the last RESOURCES link", async ({
+  page,
+}) => {
+  // Tall enough that the panel's content cannot fill the column: this is the
+  // "short content" case the card is about. Pre-#60 the row sat directly under
+  // the last resource link; now the flex-1 sections region eats the slack.
+  await page.setViewportSize({ width: 1440, height: 1400 });
+  await page.goto("/");
+
+  const row = (await page.locator(FOOTER).boundingBox())!;
+  const lastLink = (await page
+    .locator("#sidebar-sections #resources-panel a")
+    .last()
+    .boundingBox())!;
+
+  // A real gap opens up between the last link and the pinned row.
+  expect(row.y - (lastLink.y + lastLink.height)).toBeGreaterThan(100);
+
+  // The row is flush with the bottom of the column, near the viewport bottom.
+  const column = (await page.locator(SIDEBAR).boundingBox())!;
+  expect(row.y + row.height).toBeGreaterThanOrEqual(
+    column.y + column.height - 2,
+  );
+  expect(column.y + column.height).toBeGreaterThanOrEqual(1400 - 60);
 });
 
 // ── 4. R6: delete-dialog backdrop dims the catalog filter bar ────────────────

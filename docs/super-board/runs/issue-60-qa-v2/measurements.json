@@ -1,0 +1,146 @@
+[
+  {
+    "ac": "B-AC1",
+    "name": "mobile-375: row BELOW attribution",
+    "pass": true,
+    "detail": "dom-after=true, row.top=607 >= attrib.bottom=603"
+  },
+  {
+    "ac": "B-AC1",
+    "name": "mobile-375: no hairline rule",
+    "pass": true,
+    "detail": "borders=[0px,0px,0px,0px]"
+  },
+  {
+    "ac": "B-AC1",
+    "name": "mobile-375: type matches the footer's OWN copy (computed, not hardcoded)",
+    "pass": true,
+    "detail": "attrib=12px/lab(35.5623 -1.74978 -15.4316) btn=12px/lab(35.5623 -1.74978 -15.4316) link=12px/lab(35.5623 -1.74978 -15.4316)"
+  },
+  {
+    "ac": "B-AC1",
+    "name": "mobile-375: one centered line, middot separator",
+    "pass": true,
+    "detail": "sameLine=true middot=true linkText=\"GitHub\""
+  },
+  {
+    "ac": "B-AC2",
+    "name": "mobile-375: reads as meta, not a button bar",
+    "pass": true,
+    "detail": "bg=rgba(0, 0, 0, 0)/rgba(0, 0, 0, 0) weight=400/400 border=0px 0px/0px 0px"
+  },
+  {
+    "ac": "B-AC3",
+    "name": "mobile-375: touch targets >=44px, HIT-TESTED",
+    "pass": true,
+    "detail": "feedback 120x44 hit=true · github 76x44 hit=true"
+  },
+  {
+    "ac": "B-AC1",
+    "name": "mobile-375: sidebar copy display:none, not in <aside>",
+    "pass": true,
+    "detail": "sidebar copy display=none, row-in-aside=false, row-in-footer=true"
+  },
+  {
+    "ac": "B-AC2",
+    "name": "mobile-375: no horizontal overflow",
+    "pass": true,
+    "detail": "scrollW=375 <= innerW=375"
+  },
+  {
+    "ac": "B-AC4",
+    "name": "mobile-375: GitHub exposes exactly ONE accessible name",
+    "pass": true,
+    "detail": "getByRole(link, \"GitHub repository (opens in a new tab)\") exact => 1; visible repo links => 1"
+  },
+  {
+    "ac": "B-AC1",
+    "name": "tablet-768: row BELOW attribution",
+    "pass": true,
+    "detail": "dom-after=true, row.top=964 >= attrib.bottom=960"
+  },
+  {
+    "ac": "B-AC1",
+    "name": "tablet-768: no hairline rule",
+    "pass": true,
+    "detail": "borders=[0px,0px,0px,0px]"
+  },
+  {
+    "ac": "B-AC1",
+    "name": "tablet-768: type matches the footer's OWN copy (computed, not hardcoded)",
+    "pass": true,
+    "detail": "attrib=12px/lab(35.5623 -1.74978 -15.4316) btn=12px/lab(35.5623 -1.74978 -15.4316) link=12px/lab(35.5623 -1.74978 -15.4316)"
+  },
+  {
+    "ac": "B-AC1",
+    "name": "tablet-768: one centered line, middot separator",
+    "pass": true,
+    "detail": "sameLine=true middot=true linkText=\"GitHub\""
+  },
+  {
+    "ac": "B-AC2",
+    "name": "tablet-768: reads as meta, not a button bar",
+    "pass": true,
+    "detail": "bg=rgba(0, 0, 0, 0)/rgba(0, 0, 0, 0) weight=400/400 border=0px 0px/0px 0px"
+  },
+  {
+    "ac": "B-AC3",
+    "name": "tablet-768: touch targets >=44px, HIT-TESTED",
+    "pass": true,
+    "detail": "feedback 120x44 hit=true · github 76x44 hit=true"
+  },
+  {
+    "ac": "B-AC1",
+    "name": "tablet-768: sidebar copy display:none, not in <aside>",
+    "pass": true,
+    "detail": "sidebar copy display=none, row-in-aside=false, row-in-footer=true"
+  },
+  {
+    "ac": "B-AC2",
+    "name": "tablet-768: no horizontal overflow",
+    "pass": true,
+    "detail": "scrollW=768 <= innerW=768"
+  },
+  {
+    "ac": "B-AC4",
+    "name": "tablet-768: GitHub exposes exactly ONE accessible name",
+    "pass": true,
+    "detail": "getByRole(link, \"GitHub repository (opens in a new tab)\") exact => 1; visible repo links => 1"
+  },
+  {
+    "ac": "B-AC5",
+    "name": "desktop 1440: approved presentation UNCHANGED",
+    "pass": true,
+    "detail": "row.bottom=860 == aside.bottom=860; label 14px/500; mark 36x36 icon-only(text=\"\"); border-t=1px; slack above row=174px; footer copy display=none"
+  },
+  {
+    "ac": "B-AC5",
+    "name": "collapsed rail: mark centered on bottom edge, label hidden, hit-tests",
+    "pass": true,
+    "detail": "rail=40px, mark center offset=0px, on-bottom=true, label hidden=true, hit=true"
+  },
+  {
+    "ac": "B-AC6",
+    "name": "exactly ONE feedback button + ONE GitHub link at 375/768/1024/1440/1920",
+    "pass": true,
+    "detail": "375px: fb=1 gh=1 · 768px: fb=1 gh=1 · 1024px: fb=1 gh=1 · 1440px: fb=1 gh=1 · 1920px: fb=1 gh=1 (both placements present in DOM at every width)"
+  },
+  {
+    "ac": "B-AC8",
+    "name": "mobile: dialog opens from the meta row, traps focus, Escape closes, focus restores to the trigger",
+    "pass": true,
+    "detail": "aria-haspopup=dialog aria-modal=true trapped(12 Tabs)=true shift-tab-inside=true focus-restored-to-footer-trigger=true"
+  },
+  {
+    "ac": "B-AC7",
+    "name": "resize 1440→375→1440 WITHOUT reload: placement flips both ways, counts hold",
+    "pass": true,
+    "detail": "1440: sidebar=flex/footer=none → 375: sidebar=none/footer=flex (in site-footer=true, fb=1, gh=1) → back to 1440: sidebar=flex/footer=none, fb=1"
+  },
+  {
+    "ac": "QA",
+    "name": "no console errors during traversal",
+    "pass": true,
+    "detail": "0 console/page errors"
+  }
+]

@@ -9,7 +9,7 @@ import {
 } from "@/data/resources";
 import { MySchedules } from "@/components/MySchedules";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { FeedbackDialog } from "@/components/FeedbackDialog";
+import { SupportLinks } from "@/components/SupportLinks";
 import { ArrowUpRightIcon } from "@/components/ArrowUpRightIcon";
 import { toggleSidebarCollapsed, useSidebarCollapsed } from "@/lib/sidebar";
 
@@ -26,22 +26,25 @@ import { toggleSidebarCollapsed, useSidebarCollapsed } from "@/lib/sidebar";
  *      (links-only per the earlier bounce), with #29's presentation polish:
  *      every label fits on one line, and hovering underlines the text but
  *      never the trailing icon (issue #50: an inline SVG, not a text glyph).
- *   5. Footer row (post-approval bounce, Jon 2026-07-08) — "Send us
- *      Feedback" on the left, GitHub icon on the right, pinned below the
- *      content. Issue #42: "Send us Feedback" is now a real `<button>` that
- *      opens the in-app FeedbackDialog (a modal form) instead of navigating —
- *      most AP students have no GitHub account, so the old new-issue link
- *      effectively blocked them. Submission is routed through the
- *      `submitFeedback` seam (src/lib/feedback.ts); the GitHub mark beside it
- *      is unchanged and still links to the repo.
+ *   5. Support pair — "Send us Feedback" + the GitHub mark (SupportLinks.tsx).
+ *      Issue #60 moved it OUT of the sidebar's content flow: on desktop it is
+ *      pinned to the BOTTOM EDGE of the sticky column (see below); below `lg`
+ *      it is not in this card at all — it renders inside the site footer
+ *      (Footer.tsx), so it reads as page chrome rather than a third section
+ *      under MY SCHEDULES / RESOURCES. Both placements always render;
+ *      complementary CSS visibility exposes exactly one to assistive tech.
  *
  * Presentation:
  *   • Desktop (≥1024px / `lg`): a persistent left column (20rem when
  *     expanded, sized so the longest resource label fits on one line),
  *     **sticky** (post-approval bounce): it pins at the container's top
- *     offset while the main content scrolls, capped at the viewport height
+ *     offset while the main content scrolls, sized to the viewport height
  *     with its own internal scroll, so the panel stays fully usable at any
- *     scroll depth. The collapse toggle (`aria-expanded`, keyboard-operable,
+ *     scroll depth. Issue #60: the column takes an explicit `lg:h-` (was a
+ *     `lg:max-h-`, which let it shrink to its content and floated the support
+ *     row up under the last resource link) — with a real height, the `flex-1`
+ *     sections region absorbs the slack and the support row lands on the
+ *     bottom edge of the screen. The collapse toggle (`aria-expanded`, keyboard-operable,
  *     panel-collapse glyph per the reference) shrinks it to a slim rail so
  *     the main content widens; the choice is remembered client-side in
  *     `apx.sidebar.v1`. Builder's documented call: the toggle exists only
@@ -50,10 +53,11 @@ import { toggleSidebarCollapsed, useSidebarCollapsed } from "@/lib/sidebar";
  *   • Mobile/tablet (<1024px): no persistent left column (the #22/#23
  *     pattern). Branding renders at the top of the panel card, and MY
  *     SCHEDULES and RESOURCES are separate native disclosures, collapsed by
- *     default to keep the planner above the fold. The footer row renders at
- *     the bottom of the card in this presentation too (always visible —
- *     builder's documented call: hiding feedback behind a disclosure would
- *     bury the only contact channel).
+ *     default to keep the planner above the fold. The card now ENDS after
+ *     RESOURCES (issue #60): the support pair moved into the site footer, so
+ *     it no longer reads as a third section. It is still always visible
+ *     without opening a disclosure — the earlier builder call (never bury the
+ *     only contact channel) still holds, it just holds from the footer.
  *
  * The schedule list and the link list are each rendered ONCE from their
  * single source of truth; CSS decides which heading presentation (plain vs.
@@ -156,89 +160,6 @@ function PanelToggleIcon({ collapsed }: { collapsed: boolean }) {
   );
 }
 
-/** GitHub mark (octocat silhouette) for the sidebar footer row. */
-function GitHubIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 16 16"
-      fill="currentColor"
-      className="h-5 w-5"
-    >
-      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
-    </svg>
-  );
-}
-
-/**
- * Footer row: "Send us Feedback" (left) and the GitHub mark (right). One row,
- * pinned below the content in both presentations. ≥44px touch targets on
- * mobile (h-11, relaxed at `lg` like the other sidebar controls).
- *
- * Issue #42: "Send us Feedback" is a `<button>` (`aria-haspopup="dialog"`) that
- * opens the in-app FeedbackDialog — it no longer navigates. It keeps the
- * footer's text-with-hover-underline look so the row is visually unchanged; the
- * trailing arrow icon / "opens in a new tab" affordances are gone because it
- * opens a dialog, not a tab. The GitHub mark is untouched.
- *
- * The theme toggle used to live here beside the GitHub mark; the #41 bounce
- * (Jon, 2026-07-09) moved it up into the branding row, so the footer is once
- * again just Feedback + GitHub.
- *
- * Collapsed desktop rail: no room for the feedback label, so it hides and the
- * lone GitHub mark centers — it stays reachable in the rail (Jon's explicit
- * bounce requirement). NB: before #41 the whole footer was `lg:hidden` when
- * collapsed, so the GitHub mark was NOT reachable in the rail pre-#41 (verified
- * against e40450e); the bounce's parenthetical "it was, before #41" is
- * inaccurate, but its instruction — keep GitHub reachable — is what this
- * implements. Mobile ignores these `lg:` overrides and keeps the full row.
- */
-function SidebarFooter({
-  collapsed,
-  onOpenFeedback,
-}: {
-  collapsed: boolean;
-  onOpenFeedback: () => void;
-}) {
-  return (
-    <div
-      data-testid="sidebar-footer"
-      className={[
-        "mt-5 flex items-center justify-between gap-2 border-t border-slate-200 pt-3 lg:mt-4 lg:shrink-0 dark:border-slate-800",
-        // Collapsed rail: the feedback label hides (below); center the lone
-        // GitHub mark so it stays reachable icon-only.
-        collapsed ? "lg:justify-center" : "",
-      ].join(" ")}
-    >
-      <button
-        type="button"
-        onClick={onOpenFeedback}
-        aria-haspopup="dialog"
-        className={[
-          "group inline-flex min-h-11 items-center gap-1 rounded-sm text-sm font-medium text-slate-700 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 lg:min-h-9 dark:text-slate-300 dark:hover:text-slate-100 dark:focus-visible:outline-blue-400",
-          // No room for the text label in the collapsed rail; the GitHub mark
-          // stays reachable.
-          collapsed ? "lg:hidden" : "",
-        ].join(" ")}
-      >
-        <span className="underline-offset-2 group-hover:underline group-focus-visible:underline">
-          Send us Feedback
-        </span>
-      </button>
-      <a
-        href="https://github.com/jonathanphung/AP-Exam-Planner"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="GitHub repository (opens in a new tab)"
-        title="GitHub repository"
-        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 lg:h-9 lg:w-9 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 dark:focus-visible:outline-blue-400"
-      >
-        <GitHubIcon />
-      </a>
-    </div>
-  );
-}
-
 /** Shared styling for the mobile disclosure trigger buttons. */
 const DISCLOSURE_BUTTON_CLASS =
   "flex min-h-11 w-full items-center justify-between gap-2 rounded-sm text-xs font-semibold uppercase tracking-wider text-slate-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:text-slate-300 dark:focus-visible:outline-blue-400";
@@ -255,10 +176,6 @@ export function Sidebar() {
   // Mobile disclosures — collapsed by default (#23 behavior, kept for #29).
   const [schedulesOpen, setSchedulesOpen] = useState(false);
   const [resourcesOpen, setResourcesOpen] = useState(false);
-  // In-app feedback dialog (#42). Mounted only while open so useModalDialog's
-  // focus trap + focus-restore run per open/close; closing returns focus to
-  // the "Send us Feedback" button that opened it.
-  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   return (
     <aside
@@ -269,10 +186,18 @@ export function Sidebar() {
         "lg:shrink-0 lg:self-start lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:dark:bg-transparent",
         // Sticky (post-approval bounce): pin at the page container's top
         // padding (top-10 matches the layout's lg:py-10, so there is no jump
-        // when it engages), cap at the viewport minus matching top+bottom
+        // when it engages), size to the viewport minus matching top+bottom
         // gaps, and let the sections scroll internally (flex-col below) so
         // the panel is fully usable at any scroll depth.
-        "lg:sticky lg:top-10 lg:flex lg:max-h-[calc(100vh-5rem)] lg:flex-col",
+        //
+        // Issue #60: `h-`, not `max-h-`. A max-height caps the column without
+        // giving it one, so with short content the box shrank to fit and the
+        // support row floated up under the last RESOURCES link. With a real
+        // height the `lg:flex-1` sections region absorbs the slack and the
+        // support row (lg:mt-auto below) lands on the bottom edge. Same
+        // 5rem = top-10 (2.5rem) + a matching 2.5rem bottom gap, so nothing
+        // jumps when sticky engages.
+        "lg:sticky lg:top-10 lg:flex lg:h-[calc(100vh-5rem)] lg:flex-col",
         // w-80 expanded: sized so the longest resource label (with its
         // trailing icon) fits on ONE line at desktop widths (issue #29 link
         // polish; icon is an inline SVG as of #50).
@@ -396,17 +321,17 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* 5 — Footer row (both presentations). */}
-      <SidebarFooter
+      {/* 5 — Support pair, DESKTOP placement (issue #60).
+          `hidden lg:flex`: below lg this row is not in the card at all (and
+          not in the a11y tree) — the site footer renders the mobile copy.
+          `lg:mt-auto` pins it to the bottom edge of the now-full-height
+          column; it also carries the collapsed rail, where #sidebar-sections
+          is `lg:hidden` and there is no flex-1 child to push it down. */}
+      <SupportLinks
+        testId="sidebar-footer"
         collapsed={collapsed}
-        onOpenFeedback={() => setFeedbackOpen(true)}
+        className="mt-auto hidden shrink-0 items-center justify-between gap-2 border-t border-slate-200 pt-3 lg:flex dark:border-slate-800"
       />
-
-      {/* In-app feedback dialog (#42) — overlays the page (position: fixed), so
-          it escapes the sticky sidebar's own scroll container. */}
-      {feedbackOpen && (
-        <FeedbackDialog onClose={() => setFeedbackOpen(false)} />
-      )}
     </aside>
   );
 }

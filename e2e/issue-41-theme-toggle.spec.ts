@@ -350,11 +350,16 @@ test("AC: lives in the branding row, immediately left of the collapse control, s
   await expect(toggle(page)).toBeVisible();
   await expect(collapseBtn(page)).toBeVisible();
 
-  // In the branding row (above the footer), not the footer.
+  // In the branding row (above the support row), not in either support row.
+  // Issue #60 added a second support row inside the site footer — the toggle
+  // must not have followed it there either.
   const branding = page.getByTestId("sidebar-branding");
   await expect(branding.getByTestId("theme-toggle")).toBeVisible();
   await expect(
     page.getByTestId("sidebar-footer").getByTestId("theme-toggle"),
+  ).toHaveCount(0);
+  await expect(
+    page.getByTestId("footer-support-links").getByTestId("theme-toggle"),
   ).toHaveCount(0);
 
   const t = await toggle(page).boundingBox();
