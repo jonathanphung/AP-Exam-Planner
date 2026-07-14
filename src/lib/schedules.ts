@@ -258,6 +258,58 @@ export function migrateLegacyState(
   return freezeState({ activeId: first.id, schedules: [first] });
 }
 
+// ── Name validation (issue #62) ─────────────────────────────────────────────
+
+/**
+ * Maximum schedule-name length (issue #62). 60 comfortably fits any
+ * human-meaningful plan label ("Ambitious retake plan — spring 2026") while
+ * capping the pathological growth the #39 sweep flagged (a 300-char emoji name
+ * was accepted into `apx.schedules.v1`).
+ *
+ * Counting unit: the store measures with `[...name].length` (Unicode code
+ * points) so one multi-byte emoji counts as one character. The UI pairs this
+ * with `maxLength={MAX_SCHEDULE_NAME_LENGTH}` on the rename input, which
+ * measures UTF-16 code units — always ≤-permissive than code points — so the
+ * input can never accept a name the store would then reject for length.
+ */
+export const MAX_SCHEDULE_NAME_LENGTH = 60;
+
+/** Why a proposed schedule name was rejected (issue #62). */
+export type ScheduleNameError = "blank" | "too-long" | "duplicate";
+
+/**
+ * Validate a proposed schedule name against the store rules (issue #62):
+ * non-blank after trim, ≤ {@link MAX_SCHEDULE_NAME_LENGTH} code points, and not
+ * an exact duplicate of another schedule's name.
+ *
+ * Design decision (AC1) — duplicates are REJECTED, not auto-suffixed
+ * ("Schedule 1 (2)"). For an inline single-field rename, rejection with inline
+ * feedback is the more predictable behavior: the app never silently mutates the
+ * label the user typed, and it reuses the same `role="alert"` surface the
+ * length constraint already needs. Match is exact after trim and
+ * case-sensitive (per the AC wording "exactly matches … after trim") — "Schedule
+ * 1" and "schedule 1" are visually and audibly distinct, so only truly
+ * identical labels collide.
+ *
+ * `selfId` excludes the schedule being renamed, so re-committing a schedule's
+ * own (unchanged) name is never a false "duplicate".
+ *
+ * Returns `null` when the name is acceptable, otherwise the specific reason.
+ */
+export function validateScheduleName(
+  name: string,
+  schedules: readonly Pick<Schedule, "id" | "name">[],
+  selfId?: string,
+): ScheduleNameError | null {
+  const trimmed = name.trim();
+  if (!trimmed) return "blank";
+  if ([...trimmed].length > MAX_SCHEDULE_NAME_LENGTH) return "too-long";
+  const duplicate = schedules.some(
+    (s) => s.id !== selfId && s.name.trim() === trimmed,
+  );
+  return duplicate ? "duplicate" : null;
+}
+
 // ── Pure state transitions (unit-tested in schedules.test.ts) ───────────────
 
 /** "Schedule N" auto-name: one past the highest existing "Schedule k". */
@@ -272,14 +324,26 @@ export function nextScheduleName(
   return `Schedule ${max + 1}`;
 }
 
-/** Append a new empty schedule and make it active. */
+/**
+ * Append a new empty schedule and make it active.
+ *
+ * A caller-supplied `name` is honored only when it passes the same rules as a
+ * rename (issue #62): non-blank, within the length cap, and not a duplicate.
+ * Otherwise — including the common no-arg "New schedule" click — we fall back to
+ * the auto "Schedule N" name, which is unique by construction. Create can never
+ * fail (the button must always produce a schedule), so an invalid explicit name
+ * degrades to the safe auto-name rather than minting a duplicate/over-length
+ * label.
+ */
 export function withScheduleCreated(
   state: SchedulesState,
   name?: string,
 ): SchedulesState {
+  const requested = name?.trim();
+  const usable = requested && !validateScheduleName(requested, state.schedules);
   const schedule = freezeSchedule({
     id: generateId(),
-    name: name?.trim() || nextScheduleName(state.schedules),
+    name: usable ? requested : nextScheduleName(state.schedules),
     selection: EMPTY_IDS,
     resolutions: EMPTY_RESOLUTIONS,
   });
@@ -289,16 +353,23 @@ export function withScheduleCreated(
   });
 }
 
-/** Rename a schedule (no-op for unknown ids or blank names). */
+/**
+ * Rename a schedule. No-op for unknown ids, an unchanged name, or any name that
+ * fails {@link validateScheduleName} — blank, over the length cap, or an exact
+ * duplicate of another schedule (issue #62). The UI validates first and surfaces
+ * the reason via `role="alert"`; this guard is the store-side safety net so a
+ * duplicate/over-length label can never reach `apx.schedules.v1`.
+ */
 export function withScheduleRenamed(
   state: SchedulesState,
   id: string,
   name: string,
 ): SchedulesState {
-  const trimmed = name.trim();
-  if (!trimmed) return state;
   const index = state.schedules.findIndex((s) => s.id === id);
-  if (index === -1 || state.schedules[index].name === trimmed) return state;
+  if (index === -1) return state;
+  if (validateScheduleName(name, state.schedules, id)) return state;
+  const trimmed = name.trim();
+  if (state.schedules[index].name === trimmed) return state;
   const schedules = [...state.schedules];
   schedules[index] = freezeSchedule({ ...schedules[index], name: trimmed });
   return freezeState({ activeId: state.activeId, schedules });

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { SlotResolution } from "./conflicts";
 import {
   DEFAULT_SCHEDULE_NAME,
+  MAX_SCHEDULE_NAME_LENGTH,
   activeSchedule,
   createDefaultState,
   migrateLegacyState,
@@ -9,6 +10,7 @@ import {
   parseSchedulesState,
   sanitizeResolutions,
   sanitizeSelection,
+  validateScheduleName,
   withActiveResolutions,
   withActiveSchedule,
   withActiveSelection,
@@ -261,5 +263,140 @@ describe("per-schedule plan isolation (selection AND resolutions)", () => {
     expect(activeSchedule(state).resolutions).toEqual([]);
     state = withActiveSchedule(state, firstId);
     expect(activeSchedule(state).resolutions).toEqual([RESOLUTION_A]);
+  });
+});
+
+describe("schedule-name validation: duplicates + length cap (issue #62)", () => {
+  /** Two schedules: "Schedule 1" (active) and "Schedule 2". */
+  function twoSchedules(): SchedulesState {
+    return withScheduleCreated(createDefaultState());
+  }
+
+  const overCap = "x".repeat(MAX_SCHEDULE_NAME_LENGTH + 1);
+  const atCap = "x".repeat(MAX_SCHEDULE_NAME_LENGTH);
+
+  describe("validateScheduleName", () => {
+    it("accepts a unique, in-cap name (returns null)", () => {
+      const state = twoSchedules();
+      expect(validateScheduleName("ambitious draft", state.schedules)).toBeNull();
+      expect(validateScheduleName(atCap, state.schedules)).toBeNull();
+    });
+
+    it("rejects blank / whitespace-only names as 'blank'", () => {
+      const state = twoSchedules();
+      expect(validateScheduleName("", state.schedules)).toBe("blank");
+      expect(validateScheduleName("   ", state.schedules)).toBe("blank");
+    });
+
+    it("rejects names over the cap as 'too-long' (trim applied first)", () => {
+      const state = twoSchedules();
+      expect(validateScheduleName(overCap, state.schedules)).toBe("too-long");
+      // Whitespace does not count toward the cap.
+      expect(
+        validateScheduleName(`  ${atCap}  `, state.schedules),
+      ).toBeNull();
+    });
+
+    it("counts length in code points, so emoji are one char each", () => {
+      const state = twoSchedules();
+      // 60 emoji = 120 UTF-16 units but 60 code points → within the cap.
+      expect(
+        validateScheduleName("🎓".repeat(MAX_SCHEDULE_NAME_LENGTH), state.schedules),
+      ).toBeNull();
+      // 61 emoji → one code point over the cap.
+      expect(
+        validateScheduleName(
+          "🎓".repeat(MAX_SCHEDULE_NAME_LENGTH + 1),
+          state.schedules,
+        ),
+      ).toBe("too-long");
+    });
+
+    it("rejects an exact (trimmed) duplicate of another schedule as 'duplicate'", () => {
+      const state = twoSchedules();
+      expect(validateScheduleName("Schedule 1", state.schedules)).toBe(
+        "duplicate",
+      );
+      expect(validateScheduleName("  Schedule 2  ", state.schedules)).toBe(
+        "duplicate",
+      );
+      // Case-sensitive exact match — a different case is a distinct label.
+      expect(validateScheduleName("schedule 1", state.schedules)).toBeNull();
+    });
+
+    it("selfId excludes the schedule being renamed (own name is not a duplicate)", () => {
+      const state = twoSchedules();
+      const first = state.schedules[0].id; // "Schedule 1"
+      expect(validateScheduleName("Schedule 1", state.schedules, first)).toBeNull();
+      // …but it is still a duplicate of the OTHER schedule.
+      expect(validateScheduleName("Schedule 2", state.schedules, first)).toBe(
+        "duplicate",
+      );
+    });
+  });
+
+  describe("withScheduleRenamed enforces the rules (store safety net)", () => {
+    it("rejects a rename to another schedule's exact name (no-op)", () => {
+      const state = twoSchedules();
+      const secondId = state.schedules[1].id; // "Schedule 2"
+      // The issue's repro: rename Schedule 2 → "Schedule 1".
+      expect(withScheduleRenamed(state, secondId, "Schedule 1")).toBe(state);
+      // Trimmed duplicate is caught too.
+      expect(withScheduleRenamed(state, secondId, "  Schedule 1 ")).toBe(state);
+    });
+
+    it("rejects an over-length rename (no-op), accepts an at-cap rename", () => {
+      const state = twoSchedules();
+      const secondId = state.schedules[1].id;
+      expect(withScheduleRenamed(state, secondId, overCap)).toBe(state);
+      const renamed = withScheduleRenamed(state, secondId, atCap);
+      expect(renamed.schedules[1].name).toBe(atCap);
+    });
+
+    it("still accepts a unique in-cap rename, still trims, still no-ops on blank", () => {
+      const state = twoSchedules();
+      const secondId = state.schedules[1].id;
+      expect(
+        withScheduleRenamed(state, secondId, "  ambitious draft  ").schedules[1]
+          .name,
+      ).toBe("ambitious draft");
+      expect(withScheduleRenamed(state, secondId, "   ")).toBe(state);
+      // Re-committing a schedule's own current name is a no-op, not a "dup".
+      expect(withScheduleRenamed(state, secondId, "Schedule 2")).toBe(state);
+    });
+
+    it("accepts a unicode/emoji name within the cap", () => {
+      const state = twoSchedules();
+      const secondId = state.schedules[1].id;
+      const name = "🎓 Spring plan — retakes";
+      expect(withScheduleRenamed(state, secondId, name).schedules[1].name).toBe(
+        name,
+      );
+    });
+  });
+
+  describe("withScheduleCreated sanitizes an explicit name", () => {
+    it("de-dupes an explicit duplicate create to the auto 'Schedule N' name", () => {
+      const state = twoSchedules(); // Schedule 1, Schedule 2
+      const after = withScheduleCreated(state, "Schedule 1"); // duplicate
+      expect(after.schedules).toHaveLength(3);
+      // Falls back to the unique auto-name rather than minting a 2nd "Schedule 1".
+      expect(activeSchedule(after).name).toBe("Schedule 3");
+      expect(after.schedules.filter((s) => s.name === "Schedule 1")).toHaveLength(
+        1,
+      );
+    });
+
+    it("falls back to the auto-name for an over-length explicit name", () => {
+      const state = twoSchedules();
+      const after = withScheduleCreated(state, overCap);
+      expect(activeSchedule(after).name).toBe("Schedule 3");
+    });
+
+    it("keeps a unique, in-cap explicit name (incl. emoji)", () => {
+      const state = twoSchedules();
+      const after = withScheduleCreated(state, "🎓 dream schedule");
+      expect(activeSchedule(after).name).toBe("🎓 dream schedule");
+    });
   });
 });

@@ -2,8 +2,26 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { useSchedules, type Schedule } from "@/lib/schedules";
+import {
+  MAX_SCHEDULE_NAME_LENGTH,
+  useSchedules,
+  validateScheduleName,
+  type Schedule,
+  type ScheduleNameError,
+} from "@/lib/schedules";
 import { useModalDialog } from "@/lib/modal";
+
+/** Inline-alert copy for a rejected rename (issue #62). */
+function renameErrorMessage(error: ScheduleNameError): string {
+  switch (error) {
+    case "blank":
+      return "Enter a name for this schedule.";
+    case "too-long":
+      return `Use ${MAX_SCHEDULE_NAME_LENGTH} characters or fewer.`;
+    case "duplicate":
+      return "You already have a schedule with this name.";
+  }
+}
 
 /**
  * MY SCHEDULES section body (issue #29): the radio-style list of saved
@@ -28,6 +46,15 @@ import { useModalDialog } from "@/lib/modal";
  *     (builder's documented call): schedules are few, creation order is
  *     stable, and reorder adds drag-and-drop a11y complexity with no AC
  *     behind it.
+ *   - Name validation (issue #62): the rename input caps length via
+ *     `maxLength={MAX_SCHEDULE_NAME_LENGTH}`, an always-present
+ *     `aria-describedby` hint states the constraint, and an explicit commit
+ *     (Enter) of a blank / over-length / DUPLICATE name is REJECTED — the field
+ *     stays open and a `role="alert"` message announces the reason (no silent
+ *     truncation, no silently-mutated label). Duplicates are rejected rather
+ *     than auto-suffixed; see {@link validateScheduleName} for the rationale.
+ *     Blur with an invalid name reverts to the old name (same as today's
+ *     blank-on-blur no-op). The store enforces the same rules as a safety net.
  *
  * Switching schedules swaps the entire app state (selection, resolutions,
  * list/calendar views, export) because every consumer reads the same
@@ -117,6 +144,7 @@ export function MySchedules() {
   const [renaming, setRenaming] = useState<{ id: string; draft: string } | null>(
     null,
   );
+  const [renameError, setRenameError] = useState<ScheduleNameError | null>(null);
   const [confirming, setConfirming] = useState<Schedule | null>(null);
 
   const radioRefs = useRef(new Map<string, HTMLButtonElement>());
@@ -158,14 +186,30 @@ export function MySchedules() {
 
   function commitRename(refocusOpener: boolean) {
     if (!renaming) return;
-    rename(renaming.id, renaming.draft); // blank names are ignored by the store
+    const error = validateScheduleName(renaming.draft, schedules, renaming.id);
+    if (error) {
+      // Explicit commit (Enter): surface the reason and keep editing so the
+      // user can fix the name — no silent truncation, no silent mutation.
+      if (refocusOpener) {
+        setRenameError(error);
+        return;
+      }
+      // Blur with an invalid name: revert to the current name (same as today's
+      // blank-on-blur no-op) rather than trapping focus in the field.
+      setRenaming(null);
+      setRenameError(null);
+      return;
+    }
+    rename(renaming.id, renaming.draft);
     setRenaming(null);
+    setRenameError(null);
     if (refocusOpener) renameOpenerRef.current?.focus();
   }
 
   function cancelRename() {
     if (!renaming) return;
     setRenaming(null);
+    setRenameError(null);
     renameOpenerRef.current?.focus();
   }
 
@@ -208,11 +252,20 @@ export function MySchedules() {
                   <input
                     autoFocus
                     value={renaming.draft}
+                    maxLength={MAX_SCHEDULE_NAME_LENGTH}
                     aria-label={`New name for ${schedule.name}`}
-                    onFocus={(event) => event.currentTarget.select()}
-                    onChange={(event) =>
-                      setRenaming({ id: schedule.id, draft: event.target.value })
+                    aria-describedby={
+                      renameError
+                        ? "schedule-rename-hint schedule-rename-error"
+                        : "schedule-rename-hint"
                     }
+                    aria-invalid={renameError ? true : undefined}
+                    onFocus={(event) => event.currentTarget.select()}
+                    onChange={(event) => {
+                      setRenaming({ id: schedule.id, draft: event.target.value });
+                      // Clear a stale rejection as soon as the user edits again.
+                      if (renameError) setRenameError(null);
+                    }}
                     onKeyDown={(event) => {
                       if (event.key === "Escape") {
                         event.preventDefault();
@@ -220,8 +273,29 @@ export function MySchedules() {
                       }
                     }}
                     onBlur={() => commitRename(false)}
-                    className="w-full min-w-0 rounded-md border border-blue-400 bg-white px-2 py-1.5 text-sm text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-600 dark:border-blue-500 dark:bg-slate-900 dark:text-slate-100 dark:focus-visible:outline-blue-400"
+                    className={[
+                      "w-full min-w-0 rounded-md border bg-white px-2 py-1.5 text-sm text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-600 dark:bg-slate-900 dark:text-slate-100 dark:focus-visible:outline-blue-400",
+                      renameError
+                        ? "border-red-500 dark:border-red-500"
+                        : "border-blue-400 dark:border-blue-500",
+                    ].join(" ")}
                   />
+                  <p
+                    id="schedule-rename-hint"
+                    className="mt-1 px-2 text-xs text-slate-500 dark:text-slate-400"
+                  >
+                    Up to {MAX_SCHEDULE_NAME_LENGTH} characters; must differ from
+                    your other schedules.
+                  </p>
+                  {renameError && (
+                    <p
+                      id="schedule-rename-error"
+                      role="alert"
+                      className="mt-1 px-2 text-xs font-medium text-red-600 dark:text-red-400"
+                    >
+                      {renameErrorMessage(renameError)}
+                    </p>
+                  )}
                 </form>
               ) : (
                 <button
@@ -266,6 +340,7 @@ export function MySchedules() {
                 aria-label={`Rename ${schedule.name}`}
                 onClick={(event) => {
                   renameOpenerRef.current = event.currentTarget;
+                  setRenameError(null);
                   setRenaming({ id: schedule.id, draft: schedule.name });
                 }}
                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 lg:h-8 lg:w-8 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 dark:focus-visible:outline-blue-400"
