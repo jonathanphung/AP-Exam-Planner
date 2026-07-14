@@ -1,0 +1,28 @@
+== markdownlint ==
+Finding: README.md
+Linting: 1 file(s)
+Summary: 0 error(s)
+
+== live link http status ==
+https://apexamplanner.vercel.app -> HTTP 200
+
+== dataset facts ==
+cycle: May 2026
+subjects: 42
+categories: ['Arts', 'Career Kickstart', 'Humanities', 'Languages', 'STEM']
+pending literals in dataset: 19
+
+== calendar-default in code ==
+47:  const [view, setView] = useState<ViewMode>("calendar");
+
+== setup buffer constant ==
+src/lib/calendar.ts:23: * {@link SETUP_BUFFER_MINUTES} display allowance for the setup time testing
+src/lib/calendar.ts:45:export const SETUP_BUFFER_MINUTES = 30;
+
+== README image paths resolve on branch ==
+OK docs/screenshots/home-desktop.png (196K)
+OK docs/screenshots/subject-details.png (220K)
+OK docs/screenshots/calendar-desktop.png ( 88K)
+OK docs/screenshots/conflict-dialog.png (140K)
+OK docs/screenshots/sidebar-desktop.png (128K)
+OK docs/screenshots/home-mobile.png ( 92K)
