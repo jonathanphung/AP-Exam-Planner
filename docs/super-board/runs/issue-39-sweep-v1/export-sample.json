@@ -1,0 +1,84 @@
+{
+  "format": "apx-schedule",
+  "version": 1,
+  "exportedAt": "2026-07-14T00:01:15.704Z",
+  "schedule": {
+    "name": "Schedule 1",
+    "subjects": [
+      {
+        "id": "biology",
+        "name": "AP Biology",
+        "category": "STEM",
+        "exam": {
+          "date": "2026-05-04",
+          "session": "AM"
+        },
+        "lateTesting": {
+          "date": "2026-05-20",
+          "session": "PM"
+        },
+        "format": {
+          "sections": [
+            {
+              "name": "Multiple Choice",
+              "questionCount": 60,
+              "minutes": 90,
+              "weightPercent": 50
+            },
+            {
+              "name": "Free Response",
+              "questionCount": 6,
+              "minutes": 90,
+              "weightPercent": 50,
+              "note": "6 free-response questions (2 long, 4 short)"
+            }
+          ],
+          "totalMinutes": 180,
+          "calculator": true,
+          "delivery": "hybrid"
+        },
+        "passRate": 71,
+        "portfolio": null
+      },
+      {
+        "id": "seminar",
+        "name": "AP Seminar",
+        "category": "Humanities",
+        "exam": {
+          "date": "2026-05-11",
+          "session": "PM"
+        },
+        "lateTesting": {
+          "date": "2026-05-20",
+          "session": "AM"
+        },
+        "format": {
+          "sections": [
+            {
+              "name": "End-of-Course Exam – Short-Answer Section",
+              "questionCount": 3,
+              "minutes": 30,
+              "weightPercent": 13.5
+            },
+            {
+              "name": "End-of-Course Exam – Essay Section",
+              "questionCount": 1,
+              "minutes": 90,
+              "weightPercent": 31.5
+            }
+          ],
+          "totalMinutes": 120,
+          "calculator": false,
+          "delivery": "digital"
+        },
+        "passRate": 88,
+        "portfolio": {
+          "deadline": "2026-04-30",
+          "weightPct": 55,
+          "note": "Two performance tasks submitted as final in the AP Digital Portfolio by 11:59 p.m. ET: Team Project and Presentation (20%) and Individual Research-Based Essay and Presentation (35%). The end-of-course exam is the remaining 45%."
+        }
+      }
+    ],
+    "resolutions": []
+  }
+}

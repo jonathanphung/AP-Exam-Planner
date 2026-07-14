@@ -1,0 +1,497 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//AP Exam Planner//AP Exam Planner v1//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:computer-science-principles-portfolio@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART;VALUE=DATE:20260430
+SUMMARY:AP Computer Science Principles portfolio due
+DESCRIPTION:Create performance task submitted as final in the AP Digital Po
+ rtfolio by 11:59 p.m. ET\; together with the exam-day written responses it
+  counts for 30% of the AP score.
+END:VEVENT
+BEGIN:VEVENT
+UID:research-portfolio@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART;VALUE=DATE:20260430
+SUMMARY:AP Research portfolio due
+DESCRIPTION:Academic paper (4\,000–5\,000 words\, 75%) submitted as final
+  in the AP Digital Portfolio by 11:59 p.m. ET\; presentation and oral defe
+ nse (25%) are teacher-scored. There is no end-of-course written exam.
+END:VEVENT
+BEGIN:VEVENT
+UID:seminar-portfolio@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART;VALUE=DATE:20260430
+SUMMARY:AP Seminar portfolio due
+DESCRIPTION:Two performance tasks submitted as final in the AP Digital Port
+ folio by 11:59 p.m. ET: Team Project and Presentation (20%) and Individual
+  Research-Based Essay and Presentation (35%). The end-of-course exam is th
+ e remaining 45%.
+END:VEVENT
+BEGIN:VEVENT
+UID:biology-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260504T080000
+DTEND:20260504T113000
+SUMMARY:AP Biology exam
+DESCRIPTION:Multiple Choice: 60 Questions | 90 Minutes | 50% of Score\nFree
+  Response: 6 Questions | 90 Minutes | 50% of Score\nTotal Length: 3 hours 
+ (+ 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:european-history-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260504T120000
+DTEND:20260504T154500
+SUMMARY:AP European History exam
+DESCRIPTION:Section I\, Part A: Multiple Choice: 55 Questions | 55 Minutes 
+ | 40% of Score\nSection I\, Part B: Short Answer: 3 Questions | 40 Minutes
+  | 20% of Score\nSection II: Document-Based Question and Long Essay: 2 Que
+ stions | 100 Minutes | 40% of Score\n- Document-Based Question (DBQ): 1 Qu
+ estion | 60 Minutes (includes 15-minute reading period)\n- Long Essay: 1 Q
+ uestion | 40 Minutes (student chooses from 3 options)\nTotal Length: 3 hou
+ rs and 15 minutes (+ 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:chemistry-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260505T080000
+DTEND:20260505T114500
+SUMMARY:AP Chemistry exam
+DESCRIPTION:Multiple Choice: 60 Questions | 90 Minutes | 50% of Score\nFree
+  Response: 7 Questions | 105 Minutes | 50% of Score\nTotal Length: 3 hours
+  and 15 minutes (+ 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:united-states-government-and-politics-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260505T120000
+DTEND:20260505T153000
+SUMMARY:AP United States Government and Politics exam
+DESCRIPTION:Multiple Choice: 55 Questions | 80 Minutes | 50% of Score\nFree
+  Response: 4 Questions | 100 Minutes | 50% of Score\nTotal Length: 3 hours
+  (+ 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:english-literature-and-composition-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260506T080000
+DTEND:20260506T113000
+SUMMARY:AP English Literature and Composition exam
+DESCRIPTION:Section I: Multiple Choice: 55 Questions | 60 Minutes | 45% of 
+ Score\nSection II: Free Response: 3 Questions | 120 Minutes | 55% of Score
+ \nTotal Length: 3 hours (+ 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:comparative-government-and-politics-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260506T120000
+DTEND:20260506T150000
+SUMMARY:AP Comparative Government and Politics exam
+DESCRIPTION:Multiple Choice: 55 Questions | 60 Minutes | 50% of Score\nFree
+  Response: 4 Questions | 90 Minutes | 50% of Score\nTotal Length: 2 hours 
+ and 30 minutes (+ 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:physics-2-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260507T080000
+DTEND:20260507T113000
+SUMMARY:AP Physics 2: Algebra-Based exam
+DESCRIPTION:Multiple Choice: 40 Questions | 80 Minutes | 50% of Score\nFree
+  Response: 4 Questions | 100 Minutes | 50% of Score\nTotal Length: 3 hours
+  (+ 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:african-american-studies-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260507T120000
+DTEND:20260507T151500
+SUMMARY:AP African American Studies exam
+DESCRIPTION:Section I: Multiple Choice: 60 Questions | 70 Minutes | 60% of 
+ Score\nSection IB: Individual Student Project—Exam Day Validation Questi
+ on: 1 Question | 10 Minutes | 1.5% of Score\nSection II: Short-Answer Ques
+ tions: 3 Questions | 40 Minutes | 18% of Score\nSection II: Document-Based
+  Question: 1 Question | 45 Minutes | 12% of Score\nIndividual Student Proj
+ ect: Duration pending | 8.5% of Score\nTotal Length: 2 hours and 45 minute
+ s (+ 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:italian-language-and-culture-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260508T080000
+DTEND:20260508T110000
+SUMMARY:AP Italian Language and Culture exam
+DESCRIPTION:Section I: Free-Response: 3 Questions | 65–70 Minutes | 50% o
+ f Score\n- Project Presentation: 1 Question | Duration pending (3 minutes 
+ to prepare\; 3 minutes to present)\n- Project Q&A: 4 Questions | Duration 
+ pending (4 pre-recorded questions\; 40 seconds for each response)\n- Argum
+ entative Essay: 1 Question | 55 Minutes (including 2 opportunities to list
+ en to audio)\nSection II: Multiple-Choice: 55 Questions | 80 Minutes | 50%
+  of Score\n- Part A: Listening: 25 Questions | 40 Minutes\n- Part B: Readi
+ ng: 30 Questions | 40 Minutes\nTotal Length: 2 hours and 30 minutes (+ 30 
+ minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:chinese-language-and-culture-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260508T120000
+DTEND:20260508T143000
+SUMMARY:AP Chinese Language and Culture exam
+DESCRIPTION:Section I: Free-Response: 4 Questions | 40–45 Minutes | 50% o
+ f Score\n- Question 1: Project Presentation: 1 Question | Duration pending
+  (20% of Score\; 3 minutes prep\, 3 minutes presentation)\n- Question 2: P
+ roject Q&A: 1 Question | Duration pending (15% of Score\; respond to 4 pre
+ -recorded questions\, 40 seconds per response)\n- Question 3: Story Narrat
+ ion: 1 Question | Duration pending (7.5% of Score\; Questions 3 & 4 combin
+ ed 30 minutes)\n- Question 4: Email Response: 1 Question | Duration pendin
+ g (7.5% of Score\; Questions 3 & 4 combined 30 minutes)\nSection II: Multi
+ ple-Choice: 55 Questions | 65 Minutes | 50% of Score\n- Part A: Listening:
+  25 Questions | 25 Minutes (25% of Score)\n- Part B: Reading: 30 Questions
+  | 40 Minutes (25% of Score)\nTotal Length: 2 hours (+ 30 minutes for exam
+  setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:2-d-art-and-design-portfolio@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART;VALUE=DATE:20260508
+SUMMARY:AP 2-D Art and Design portfolio due
+DESCRIPTION:Three portfolio components (Sustained Investigation Images\, Su
+ stained Investigation Written Evidence\, Selected Works) submitted as fina
+ l in the AP Digital Portfolio by 8 p.m. ET.
+END:VEVENT
+BEGIN:VEVENT
+UID:3-d-art-and-design-portfolio@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART;VALUE=DATE:20260508
+SUMMARY:AP 3-D Art and Design portfolio due
+DESCRIPTION:Three portfolio components (Sustained Investigation Images\, Su
+ stained Investigation Written Evidence\, Selected Works) submitted as fina
+ l in the AP Digital Portfolio by 8 p.m. ET.
+END:VEVENT
+BEGIN:VEVENT
+UID:drawing-portfolio@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART;VALUE=DATE:20260508
+SUMMARY:AP Drawing portfolio due
+DESCRIPTION:Three portfolio components (Sustained Investigation Images\, Su
+ stained Investigation Written Evidence\, Selected Works) submitted as fina
+ l in the AP Digital Portfolio by 8 p.m. ET.
+END:VEVENT
+BEGIN:VEVENT
+UID:calculus-ab-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260511T080000
+DTEND:20260511T114500
+SUMMARY:AP Calculus AB exam
+DESCRIPTION:Multiple Choice: 45 Questions | 105 Minutes | 50% of Score\n- P
+ art A: 30 Questions | 60 Minutes (calculator not permitted)\n- Part B: 15 
+ Questions | 45 Minutes (graphing calculator required)\nFree Response: 6 Qu
+ estions | 90 Minutes | 50% of Score\n- Part A: 2 Questions | 30 Minutes (g
+ raphing calculator required)\n- Part B: 4 Questions | 60 Minutes (calculat
+ or not permitted)\nTotal Length: 3 hours and 15 minutes (+ 30 minutes for 
+ exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:music-theory-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260511T120000
+DTEND:20260511T151000
+SUMMARY:AP Music Theory exam
+DESCRIPTION:Section I: Multiple Choice: 75 Questions | 80 Minutes | 45% of 
+ Score\nSection IIA: Free Response: Written: 7 Questions | 70 Minutes | 45%
+  of Score\nSection IIB: Free Response: Sight Singing: 2 Questions | 10 Min
+ utes | 10% of Score\nTotal Length: 2 hours and 40 minutes (+ 30 minutes fo
+ r exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:french-language-and-culture-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260512T080000
+DTEND:20260512T110000
+SUMMARY:AP French Language and Culture exam
+DESCRIPTION:Section I: Free-Response: 3 Questions | 65–70 Minutes | 50% o
+ f Score\n- Question 1: Project Presentation: 1 Question | Duration pending
+ \n- Question 2: Project Q&A: 1 Question | Duration pending\n- Question 3: 
+ Argumentative Essay: 1 Question | 55 Minutes (including 2 opportunities to
+  listen to audio)\nSection II: Multiple-Choice: 55 Questions | 80 Minutes 
+ | 50% of Score\n- Part A: Listening: 25 Questions | 40 Minutes\n- Part B: 
+ Reading: 30 Questions | 40 Minutes\nTotal Length: 2 hours and 30 minutes (
+ + 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:japanese-language-and-culture-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260512T120000
+DTEND:20260512T143000
+SUMMARY:AP Japanese Language and Culture exam
+DESCRIPTION:Section I: Free Response: 4 Questions | 40–45 Minutes | 50% o
+ f Score\n- Question 1: Project Presentation: 1 Question | Duration pending
+  (3 minutes to prepare\; 3 minutes to present)\n- Question 2: Project Q&A:
+  Duration pending (4 pre-recorded questions\; 40 seconds for each response
+ )\n- Question 3: Story Narration + Question 4: Email Response (Writing): 2
+  Questions | 30 Minutes (combined time for both writing tasks)\nSection II
+ : Multiple Choice: 55 Questions | 65 Minutes | 50% of Score\n- Part A: Lis
+ tening: 25 Questions | 25 Minutes (25% of Score)\n- Part B: Reading: 30 Qu
+ estions | 40 Minutes (25% of Score)\nTotal Length: 2 hours (+ 30 minutes f
+ or exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:english-language-and-composition-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260513T080000
+DTEND:20260513T114500
+SUMMARY:AP English Language and Composition exam
+DESCRIPTION:Multiple Choice: 45 Questions | 60 Minutes | 45% of Score\nFree
+  Response: 3 Questions | 135 Minutes | 55% of Score\nTotal Length: 3 hours
+  and 15 minutes (+ 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:physics-c-mechanics-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260513T120000
+DTEND:20260513T153000
+SUMMARY:AP Physics C: Mechanics exam
+DESCRIPTION:Section I: Multiple Choice: 40 Questions | 80 Minutes | 50% of 
+ Score\nSection II: Free Response: 4 Questions | 100 Minutes | 50% of Score
+ \nTotal Length: 3 hours (+ 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:art-history-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260514T080000
+DTEND:20260514T113000
+SUMMARY:AP Art History exam
+DESCRIPTION:Multiple Choice: 80 Questions | 60 Minutes | 50% of Score\nFree
+  Response: 6 Questions | 120 Minutes | 50% of Score\nTotal Length: 3 hours
+  (+ 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:computer-science-principles-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260514T120000
+DTEND:20260514T153000
+SUMMARY:AP Computer Science Principles exam
+DESCRIPTION:Multiple Choice: 70 Questions | 120 Minutes | 70% of Score\nWri
+ tten Response: 2 Questions | 60 Minutes | 30% of Score\nTotal Length: 3 ho
+ urs (+ 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:environmental-science-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260515T080000
+DTEND:20260515T111000
+SUMMARY:AP Environmental Science exam
+DESCRIPTION:Multiple Choice: 80 Questions | 90 Minutes | 60% of Score\nFree
+  Response: 3 Questions | 70 Minutes | 40% of Score\nTotal Length: 2 hours 
+ and 40 minutes (+ 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:computer-science-a-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260515T120000
+DTEND:20260515T153000
+SUMMARY:AP Computer Science A exam
+DESCRIPTION:Multiple Choice: 42 Questions | 90 Minutes | 55% of Score\nFree
+  Response: 4 Questions | 90 Minutes | 45% of Score\nTotal Length: 3 hours 
+ (+ 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:world-history-modern-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260518T080000
+DTEND:20260518T114500
+SUMMARY:AP World History: Modern exam
+DESCRIPTION:Section IA: Multiple Choice: 55 Questions | 55 Minutes | 40% of
+  Score\nSection IB: Short Answer: 3 Questions | 40 Minutes | 20% of Score\
+ nSection II: Free Response: 2 Questions | 100 Minutes | 40% of Score\n- Do
+ cument-Based Question: 1 Question | 60 Minutes (Recommended Time: 60 Minut
+ es (includes 15-minute reading period))\n- Long Essay Question: 1 Question
+  | 40 Minutes\nTotal Length: 3 hours and 15 minutes (+ 30 minutes for exam
+  setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:human-geography-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260518T120000
+DTEND:20260518T144500
+SUMMARY:AP Human Geography exam
+DESCRIPTION:Multiple Choice: 60 Questions | 60 Minutes | 50% of Score\nFree
+  Response: 3 Questions | 75 Minutes | 50% of Score\nTotal Length: 2 hours 
+ and 15 minutes (+ 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:latin-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260518T120000
+DTEND:20260518T153000
+SUMMARY:AP Latin exam
+DESCRIPTION:Multiple Choice: 52 Questions | 65 Minutes | 50% of Score\nFree
+  Response: 5 Questions | 115 Minutes | 50% of Score\nTotal Length: 3 hours
+  (+ 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:united-states-history-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260519T120000
+DTEND:20260519T154500
+SUMMARY:AP United States History exam
+DESCRIPTION:Section I\, Part A: Multiple Choice: 55 Questions | 55 Minutes 
+ | 40% of Score\nSection I\, Part B: Short Answer: 3 Questions | 40 Minutes
+  | 20% of Score\nSection II: Free Response (Document-Based Question and Lo
+ ng Essay): 2 Questions | 100 Minutes | 40% of Score\n- Document-Based Ques
+ tion (DBQ): 1 Question | 60 Minutes (Recommended Time: 1 Hour (includes 15
+ -minute reading period))\n- Long Essay: 1 Question | 40 Minutes (Recommend
+ ed time\; student chooses from 3 options)\nTotal Length: 3 hours and 15 mi
+ nutes (+ 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:microeconomics-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260520T080000
+DTEND:20260520T104000
+SUMMARY:AP Microeconomics exam
+DESCRIPTION:Multiple Choice: 60 Questions | 70 Minutes | 66% of Score\nFree
+  Response: 3 Questions | 60 Minutes | 33% of Score\nTotal Length: 2 hours 
+ and 10 minutes (+ 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:seminar-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260520T080000
+DTEND:20260520T103000
+SUMMARY:AP Seminar exam
+DESCRIPTION:End-of-Course Exam – Short-Answer Section: 3 Questions | 30 M
+ inutes | 13.5% of Score\nEnd-of-Course Exam – Essay Section: 1 Question 
+ | 90 Minutes | 31.5% of Score\nTotal Length: 2 hours (+ 30 minutes for exa
+ m setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:statistics-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260520T080000
+DTEND:20260520T113000
+SUMMARY:AP Statistics exam
+DESCRIPTION:Multiple Choice: 42 Questions | 90 Minutes | 50% of Score\nFree
+  Response: 4 Questions | 90 Minutes | 50% of Score\nTotal Length: 3 hours 
+ (+ 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:macroeconomics-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260520T120000
+DTEND:20260520T144000
+SUMMARY:AP Macroeconomics exam
+DESCRIPTION:Multiple Choice: 60 Questions | 70 Minutes | 66% of Score\nFree
+  Response: 3 Questions | 60 Minutes | 33% of Score\nTotal Length: 2 hours 
+ and 10 minutes (+ 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:precalculus-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260521T080000
+DTEND:20260521T113000
+SUMMARY:AP Precalculus exam
+DESCRIPTION:Multiple Choice: 40 Questions | 120 Minutes | 62.5% of Score\n-
+  Part A: 28 Questions | 80 Minutes (calculator not permitted)\n- Part B: 1
+ 2 Questions | 40 Minutes (graphing calculator required)\nFree Response: 4 
+ Questions | 60 Minutes | 37.5% of Score\n- Part A: 2 Questions | 30 Minute
+ s (graphing calculator required)\n- Part B: 2 Questions | 30 Minutes (calc
+ ulator not permitted)\nTotal Length: 3 hours (+ 30 minutes for exam setup 
+ time)
+END:VEVENT
+BEGIN:VEVENT
+UID:calculus-bc-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260521T120000
+DTEND:20260521T154500
+SUMMARY:AP Calculus BC exam
+DESCRIPTION:Multiple Choice: 45 Questions | 105 Minutes | 50% of Score\n- P
+ art A: 30 Questions | 60 Minutes (calculator not permitted)\n- Part B: 15 
+ Questions | 45 Minutes (graphing calculator required)\nFree Response: 6 Qu
+ estions | 90 Minutes | 50% of Score\n- Part A: 2 Questions | 30 Minutes (g
+ raphing calculator required)\n- Part B: 4 Questions | 60 Minutes (calculat
+ or not permitted)\nTotal Length: 3 hours and 15 minutes (+ 30 minutes for 
+ exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:physics-1-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260522T080000
+DTEND:20260522T113000
+SUMMARY:AP Physics 1: Algebra-Based exam
+DESCRIPTION:Multiple Choice: 40 Questions | 80 Minutes | 50% of Score\nFree
+  Response: 4 Questions | 100 Minutes | 50% of Score\nTotal Length: 3 hours
+  (+ 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:spanish-language-and-culture-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260522T080000
+DTEND:20260522T110000
+SUMMARY:AP Spanish Language and Culture exam
+DESCRIPTION:Section I: Free-Response: 3 Questions | 65–70 Minutes | 50% o
+ f Score\n- Question 1: Project Presentation: 1 Question | Duration pending
+  (3 minutes to prepare\; 3 minutes to present)\n- Question 2: Project Q&A:
+  1 Question | Duration pending (responding to 4 pre-recorded questions\, 4
+ 0 seconds per response)\n- Question 3: Argumentative Essay: 1 Question | 5
+ 5 Minutes (55 minutes\, including 2 opportunities to listen to audio)\nSec
+ tion II: Multiple-Choice: 55 Questions | 80 Minutes | 50% of Score\n- Part
+  A: Listening: 25 Questions | 40 Minutes (25% of Score)\n- Part B: Reading
+ : 30 Questions | 40 Minutes (25% of Score)\nTotal Length: 2 hours and 30 m
+ inutes (+ 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:spanish-literature-and-culture-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260522T080000
+DTEND:20260522T113000
+SUMMARY:AP Spanish Literature and Culture exam
+DESCRIPTION:Section IA: Multiple Choice: 15 Questions | 20 Minutes | 10% of
+  Score\nSection IB: Multiple Choice: 50 Questions | 60 Minutes | 40% of Sc
+ ore\nSection II: Free Response: 4 Questions | 100 Minutes | 50% of Score\n
+ - Short-Answer Questions: 2 Questions | 30 Minutes\n- Essay Questions: 2 Q
+ uestions | 70 Minutes\nTotal Length: 3 hours (+ 30 minutes for exam setup 
+ time)
+END:VEVENT
+BEGIN:VEVENT
+UID:german-language-and-culture-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260522T120000
+DTEND:20260522T150000
+SUMMARY:AP German Language and Culture exam
+DESCRIPTION:Section I: Free-Response: 3 Questions | 65–70 Minutes | 50% o
+ f Score\n- Question 1: Project Presentation: 1 Question | Duration pending
+  (20% of Score)\n- Question 2: Project Q&A: Duration pending (4 pre-record
+ ed questions\; 15% of Score)\n- Question 3: Argumentative Essay: 1 Questio
+ n | 55 Minutes (15% of Score)\nSection II: Multiple-Choice: 55 Questions |
+  80 Minutes | 50% of Score\n- Part A: Listening: 25 Questions | 40 Minutes
+ \n- Part B: Reading: 30 Questions | 40 Minutes\nTotal Length: 2 hours and 
+ 30 minutes (+ 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:physics-c-electricity-and-magnetism-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260522T120000
+DTEND:20260522T153000
+SUMMARY:AP Physics C: Electricity and Magnetism exam
+DESCRIPTION:Multiple Choice: 40 Questions | 80 Minutes | 50% of Score\nFree
+  Response: 4 Questions | 100 Minutes | 50% of Score\nTotal Length: 3 hours
+  (+ 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:psychology-exam@ap-exam-planner
+DTSTAMP:20260714T000100Z
+DTSTART:20260522T120000
+DTEND:20260522T151000
+SUMMARY:AP Psychology exam
+DESCRIPTION:Multiple Choice: 75 Questions | 90 Minutes | 66.7% of Score\nFr
+ ee Response: 2 Questions | 70 Minutes | 33.3% of Score\n- Part A - Article
+  Analysis Question (AAQ): 1 Question | Duration pending\n- Part B - Eviden
+ ce-Based Question (EBQ): 1 Question | Duration pending\nTotal Length: 2 ho
+ urs and 40 minutes (+ 30 minutes for exam setup time)
+END:VEVENT
+END:VCALENDAR

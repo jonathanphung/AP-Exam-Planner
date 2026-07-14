@@ -1,0 +1,52 @@
+200 https://apcentral.collegeboard.org/courses/ap-african-american-studies/exam
+200 https://apcentral.collegeboard.org/courses/ap-art-history/exam
+200 https://apcentral.collegeboard.org/courses/ap-biology/exam
+200 https://apcentral.collegeboard.org/courses/ap-calculus-ab/exam
+200 https://apcentral.collegeboard.org/courses/ap-calculus-bc/exam
+200 https://apcentral.collegeboard.org/courses/ap-chemistry/exam
+200 https://apcentral.collegeboard.org/courses/ap-chinese-language-and-culture/exam
+200 https://apcentral.collegeboard.org/courses/ap-comparative-government-and-politics/exam
+200 https://apcentral.collegeboard.org/courses/ap-computer-science-a/exam
+200 https://apcentral.collegeboard.org/courses/ap-computer-science-principles/exam
+200 https://apcentral.collegeboard.org/courses/ap-cybersecurity/exam
+200 https://apcentral.collegeboard.org/courses/ap-english-language-and-composition/exam
+200 https://apcentral.collegeboard.org/courses/ap-english-literature-and-composition/exam
+200 https://apcentral.collegeboard.org/courses/ap-environmental-science/exam
+200 https://apcentral.collegeboard.org/courses/ap-european-history/exam
+200 https://apcentral.collegeboard.org/courses/ap-french-language-and-culture/exam (retried after burst 429)
+200 https://apcentral.collegeboard.org/courses/ap-german-language-and-culture/exam (retried after burst 429)
+200 https://apcentral.collegeboard.org/courses/ap-human-geography/exam (retried after burst 429)
+200 https://apcentral.collegeboard.org/courses/ap-italian-language-and-culture/exam (retried after burst 429)
+200 https://apcentral.collegeboard.org/courses/ap-japanese-language-and-culture/exam (retried after burst 429)
+200 https://apcentral.collegeboard.org/courses/ap-latin/exam (retried after burst 429)
+200 https://apcentral.collegeboard.org/courses/ap-macroeconomics/exam (retried after burst 429)
+200 https://apcentral.collegeboard.org/courses/ap-microeconomics/exam (retried after burst 429)
+200 https://apcentral.collegeboard.org/courses/ap-music-theory/exam (retried after burst 429)
+200 https://apcentral.collegeboard.org/courses/ap-physics-1/exam (retried after burst 429)
+200 https://apcentral.collegeboard.org/courses/ap-physics-2/exam (retried after burst 429)
+200 https://apcentral.collegeboard.org/courses/ap-physics-c-electricity-and-magnetism/exam (retried after burst 429)
+200 https://apcentral.collegeboard.org/courses/ap-physics-c-mechanics/exam (retried after burst 429)
+200 https://apcentral.collegeboard.org/courses/ap-precalculus/exam (retried after burst 429)
+200 https://apcentral.collegeboard.org/courses/ap-psychology/exam
+200 https://apcentral.collegeboard.org/courses/ap-research/exam
+200 https://apcentral.collegeboard.org/courses/ap-seminar/exam
+200 https://apcentral.collegeboard.org/courses/ap-spanish-language-and-culture/exam (retried after burst 429)
+200 https://apcentral.collegeboard.org/courses/ap-spanish-literature-and-culture/exam (retried after burst 429)
+200 https://apcentral.collegeboard.org/courses/ap-statistics/exam (retried after burst 429)
+200 https://apcentral.collegeboard.org/courses/ap-united-states-government-and-politics/exam (retried after burst 429)
+200 https://apcentral.collegeboard.org/courses/ap-united-states-history/exam (retried after burst 429)
+200 https://apcentral.collegeboard.org/courses/ap-business-personal-finance/exam
+200 https://apcentral.collegeboard.org/courses/ap-world-history/exam
+200 https://apcentral.collegeboard.org/courses/ap-2-d-art-and-design/portfolio (retried after burst 429)
+200 https://apcentral.collegeboard.org/courses/ap-3-d-art-and-design/portfolio (retried after burst 429)
+200 https://apcentral.collegeboard.org/courses/ap-drawing/portfolio (retried after burst 429)
+200 https://apcentral.collegeboard.org/exam-administration-ordering-scores/exam-dates
+200 https://apcentral.collegeboard.org/exam-administration-ordering-scores/exam-dates/late-testing-dates (retried after burst 429)
+200 https://apstudents.collegeboard.org/exam-policies-guidelines/calculator-policies
+200 https://apcentral.collegeboard.org/exam-administration-ordering-scores/administering-exams/digital-ap-exams/exam-modes (retried after burst 429)
+200 https://apstudents.collegeboard.org/about-ap-scores/score-distributions
+200 https://apcentral.collegeboard.org/about-ap/ap-coordinators/calendar-deadlines
+200 https://apstudents.collegeboard.org/
+200 https://apstudents.collegeboard.org/course-index-page
+
+All 51 unique external URLs returned HTTP 200. Initial 429s were burst rate-limiting from the checker itself; each retried individually with 6s spacing and returned 200.

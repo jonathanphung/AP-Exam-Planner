@@ -1,0 +1,40 @@
+{"kind":"clean","area":"network","summary":"offline-after-load: selection, view switch, export menu all work with no console/page errors","at":"2026-07-14T00:00:53.437Z"}
+{"kind":"clean","area":"search","summary":"whitespace-only query treated as empty (all subjects shown)","at":"2026-07-14T00:00:53.693Z"}
+{"kind":"clean","area":"search","summary":"search survived: no-match, whitespace, 5000-char, regex metachars, <script>, rapid typing","at":"2026-07-14T00:00:53.910Z"}
+{"kind":"note","area":"limits","summary":"all-42 selection produces 0 same-slot conflict prompts","at":"2026-07-14T00:00:55.280Z"}
+{"kind":"clean","area":"persistence","summary":"multi-tab storage sync works (selection mirrors across tabs)","at":"2026-07-14T00:00:55.386Z"}
+{"kind":"note","area":"limits","summary":"calendar week pager traversed 2 hops to last week at 42 subjects","at":"2026-07-14T00:00:56.037Z"}
+{"kind":"clean","area":"limits","summary":"rapid toggle spam (10x), dblclick, expand+select interleave all deterministic","at":"2026-07-14T00:00:56.155Z"}
+{"kind":"note","area":"conflicts","summary":"post-resolution agreement: list=true calendar=true ics-latin=2026-05-18T12:00:00 ics-bio=2026-05-04T08:00:00","at":"2026-07-14T00:00:57.323Z"}
+{"kind":"note","area":"conflicts","summary":"hand-seeded resolutions {latin:\"moved\"} → 0 prompt(s) shown (self-heal check)","at":"2026-07-14T00:00:57.464Z"}
+{"kind":"clean","area":"export","summary":"export trigger disabled at zero selections","at":"2026-07-14T00:00:57.608Z"}
+{"kind":"clean","area":"schedules","summary":"new schedule starts with empty selection (isolation holds)","at":"2026-07-14T00:00:58.021Z"}
+{"kind":"note","area":"schedules","summary":"300-char emoji rename accepted=true; previous name was \"Schedule 2\"","at":"2026-07-14T00:00:58.380Z"}
+{"kind":"note","area":"schedules","summary":"duplicate name allowed: 2 elements now labelled \"Schedule 1\" (ambiguity risk)","at":"2026-07-14T00:00:58.799Z"}
+{"kind":"clean","area":"schedules","summary":"last remaining schedule's delete button is disabled","at":"2026-07-14T00:00:59.227Z"}
+{"kind":"note","area":"export","summary":"all-42 resolved ICS parses with 42 events","detail":[{"summary":"AP Computer Science Principles portfolio due","start":"2026-04-30","end":"2026-05-01"},{"summary":"AP Research portfolio due","start":"2026-04-30","end":"2026-05-01"},{"summary":"AP Seminar portfolio due","start":"2026-04-30","end":"2026-05-01"}],"at":"2026-07-14T00:01:00.916Z"}
+{"kind":"note","area":"schedules","summary":"created 6 schedules rapidly, deleted down to 1 remaining","at":"2026-07-14T00:01:01.237Z"}
+{"kind":"clean","area":"axe/catalog-default/light","summary":"axe: zero WCAG A/AA violations","at":"2026-07-14T00:01:02.235Z"}
+{"kind":"clean","area":"axe/list-selected/light","summary":"axe: zero WCAG A/AA violations","at":"2026-07-14T00:01:02.817Z"}
+{"kind":"clean","area":"axe/calendar-selected/light","summary":"axe: zero WCAG A/AA violations","at":"2026-07-14T00:01:04.111Z"}
+{"kind":"clean","area":"axe/conflict-prompt/light","summary":"axe: zero WCAG A/AA violations","at":"2026-07-14T00:01:04.589Z"}
+{"kind":"clean","area":"axe/exam-details-dialog/light","summary":"axe: zero WCAG A/AA violations","at":"2026-07-14T00:01:05.658Z"}
+{"kind":"clean","area":"axe/sidebar-collapsed/light","summary":"axe: zero WCAG A/AA violations","at":"2026-07-14T00:01:05.902Z"}
+{"kind":"clean","area":"axe/catalog-default/dark","summary":"axe: zero WCAG A/AA violations","at":"2026-07-14T00:01:06.811Z"}
+{"kind":"clean","area":"axe/list-selected/dark","summary":"axe: zero WCAG A/AA violations","at":"2026-07-14T00:01:07.177Z"}
+{"kind":"clean","area":"axe/calendar-selected/dark","summary":"axe: zero WCAG A/AA violations","at":"2026-07-14T00:01:08.242Z"}
+{"kind":"clean","area":"axe/conflict-prompt/dark","summary":"axe: zero WCAG A/AA violations","at":"2026-07-14T00:01:08.503Z"}
+{"kind":"clean","area":"axe/exam-details-dialog/dark","summary":"axe: zero WCAG A/AA violations","at":"2026-07-14T00:01:09.515Z"}
+{"kind":"clean","area":"axe/sidebar-collapsed/dark","summary":"axe: zero WCAG A/AA violations","at":"2026-07-14T00:01:09.682Z"}
+{"kind":"clean","area":"emoji","summary":"subject emoji are hidden from accessible names","at":"2026-07-14T00:01:09.826Z"}
+{"kind":"clean","area":"reduced-motion","summary":"reduced-motion: conflict resolve + view switching work normally","at":"2026-07-14T00:01:11.448Z"}
+{"kind":"clean","area":"catalog","summary":"all 42 subjects expand and expose a details tier","at":"2026-07-14T00:01:14.721Z"}
+{"kind":"clean","area":"data-honesty","summary":"details dialog for business-with-personal-finance shows literal \"pending\" (hard data rule holds)","detail":"💼 AP Business with Personal Finance\n\nCareer Kickstart · No May 2026 exam\n\nSection I: Multiple Choice\n60 questions · 1 h 10 min · 60% of score\nSection II, Part A: Free-Response Question 1 (Business Canvas Project Exam-Day Validation)\n1 question · 25 min · 15% of score\nSection II, Part B: Free-Response Questions 2-4\n3 questions · 1 h 5 min · 25% of score\nExam length\n2 h 40 min\nCalculator\nNot permit","at":"2026-07-14T00:01:14.994Z"}
+{"kind":"note","area":"links","summary":"details dialog CB link: https://apcentral.collegeboard.org/courses/ap-business-personal-finance/exam","at":"2026-07-14T00:01:15.001Z"}
+{"kind":"note","area":"calendar","summary":"no clickable calendar block found for Biology/Chemistry","at":"2026-07-14T00:01:15.210Z"}
+{"kind":"clean","area":"sidebar","summary":"sidebar collapsed state persists across reload","at":"2026-07-14T00:01:15.463Z"}
+{"kind":"note","area":"links","summary":"collected 10 external links for out-of-band HTTP verification","at":"2026-07-14T00:01:15.490Z"}
+{"kind":"clean","area":"export","summary":"json export contains the selected subjects","detail":"{\n  \"format\": \"apx-schedule\",\n  \"version\": 1,\n  \"exportedAt\": \"2026-07-14T00:01:15.704Z\",\n  \"schedule\": {\n    \"name\": \"Schedule 1\",\n    \"subjects\": [\n      {\n        \"id\": \"biology\",\n        \"name\": \"","at":"2026-07-14T00:01:15.713Z"}
+{"kind":"clean","area":"export","summary":"txt export contains the selected subjects","detail":"Schedule 1 - AP Exams (May 2026 cycle)\r\n\r\nThursday, April 30, 2026 | Portfolio deadline | AP Seminar\r\nMonday, May 4, 2026 | AM session | AP Biology\r\nMonday, May 11, 2026 | PM session | AP Seminar\r\n","at":"2026-07-14T00:01:15.776Z"}
+{"kind":"a11y","area":"touch-targets","summary":"3 interactive elements < 44×44 at 375px","detail":[{"name":"List","w":49,"h":32,"tag":"button","state":"catalog"},{"name":"Calendar","w":84,"h":32,"tag":"button","state":"catalog"},{"name":"Export","w":87,"h":32,"tag":"button","state":"catalog"}],"at":"2026-07-14T00:02:20.687Z"}
+{"kind":"clean","area":"calendar","summary":"calendar block click opens a details dialog; Escape closes it","at":"2026-07-14T00:03:41.005Z"}

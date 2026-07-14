@@ -1,0 +1,26 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//AP Exam Planner//AP Exam Planner v1//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:biology-exam@ap-exam-planner
+DTSTAMP:20260714T000057Z
+DTSTART:20260504T080000
+DTEND:20260504T113000
+SUMMARY:AP Biology exam
+DESCRIPTION:Multiple Choice: 60 Questions | 90 Minutes | 50% of Score\nFree
+  Response: 6 Questions | 90 Minutes | 50% of Score\nTotal Length: 3 hours 
+ (+ 30 minutes for exam setup time)
+END:VEVENT
+BEGIN:VEVENT
+UID:latin-exam@ap-exam-planner
+DTSTAMP:20260714T000057Z
+DTSTART:20260518T120000
+DTEND:20260518T153000
+SUMMARY:AP Latin exam
+DESCRIPTION:Multiple Choice: 52 Questions | 65 Minutes | 50% of Score\nFree
+  Response: 5 Questions | 115 Minutes | 50% of Score\nTotal Length: 3 hours
+  (+ 30 minutes for exam setup time)
+END:VEVENT
+END:VCALENDAR
