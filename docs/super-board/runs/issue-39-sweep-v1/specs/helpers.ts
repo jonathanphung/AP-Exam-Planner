@@ -1,7 +1,6 @@
 import { type Page, expect } from "@playwright/test";
 import fs from "node:fs";
 import path from "node:path";
-import apData from "../../src/data/ap-2026.json";
 
 export type Subject = {
   id: string;
@@ -13,8 +12,30 @@ export type Subject = {
   passRate?: unknown;
 };
 
-export const SUBJECTS = (apData as unknown as { subjects: Subject[] })
-  .subjects;
+/**
+ * Load the dataset at runtime instead of a static relative import so this
+ * file type-checks (and runs) both from its archived home under
+ * docs/super-board/runs/issue-39-sweep-v1/specs/ and from the runnable
+ * sweep/specs/ location. (A static "../../src/..." import only resolves from
+ * sweep/specs/ and broke `pnpm build`, which typechecks docs/ too.)
+ */
+function findRepoRoot(from: string): string {
+  let dir = from;
+  for (;;) {
+    if (fs.existsSync(path.join(dir, "package.json"))) return dir;
+    const parent = path.dirname(dir);
+    if (parent === dir) throw new Error("repo root not found from " + from);
+    dir = parent;
+  }
+}
+
+const REPO_ROOT = findRepoRoot(__dirname);
+
+const apData = JSON.parse(
+  fs.readFileSync(path.join(REPO_ROOT, "src/data/ap-2026.json"), "utf8"),
+) as { subjects: Subject[] };
+
+export const SUBJECTS = apData.subjects;
 export const ALL_IDS = SUBJECTS.map((s) => s.id);
 export const EXAM_IDS = SUBJECTS.filter((s) => s.exam).map((s) => s.id);
 
@@ -23,9 +44,9 @@ export const RESOLUTIONS_KEY = "apx.resolutions.v1";
 export const SCHEDULES_KEY = "apx.schedules.v1";
 export const THEME_KEY = "apx.theme.v1";
 
-export const EVIDENCE_DIR = path.resolve(
-  __dirname,
-  "../../docs/super-board/runs/issue-39-sweep-v1",
+export const EVIDENCE_DIR = path.join(
+  REPO_ROOT,
+  "docs/super-board/runs/issue-39-sweep-v1",
 );
 export const FINDINGS_FILE = path.resolve(__dirname, "../findings.ndjson");
 
