@@ -35,9 +35,9 @@ export const SHOW_SCROLLBARS = {
   launchOptions: { ignoreDefaultArgs: ["--hide-scrollbars"] },
 };
 
-const SELECTION_KEY = "apx.selection.v1";
-const RESOLUTIONS_KEY = "apx.resolutions.v1";
-const SCHEDULES_KEY = "apx.schedules.v1";
+export const SELECTION_KEY = "apx.selection.v1";
+export const RESOLUTIONS_KEY = "apx.resolutions.v1";
+export const SCHEDULES_KEY = "apx.schedules.v1";
 
 export const DESKTOP = { width: 1920, height: 1080 };
 
@@ -55,7 +55,7 @@ const byId = (id: string): Subject => {
   return s;
 };
 export const BIOLOGY = byId("biology");
-const ITALIAN = byId("italian-language-and-culture");
+export const ITALIAN = byId("italian-language-and-culture");
 
 if (
   BIOLOGY.exam!.date !== ITALIAN.exam!.date ||
@@ -67,12 +67,12 @@ if (
 // one week per page; a block moved to late testing lives on the late-testing
 // week's page.
 const WINDOWS = [...REGULAR_WINDOWS, LATE_TESTING_WINDOW];
-function weekIndexOf(iso: string): number {
+export function weekIndexOf(iso: string): number {
   return WINDOWS.findIndex((w) => iso >= w.start && iso <= w.end);
 }
 const pager = (page: Page) => page.getByTestId("calendar-pager");
 const indicator = (page: Page) => page.getByTestId("calendar-week-indicator");
-async function gotoWeek(page: Page, n: number) {
+export async function gotoWeek(page: Page, n: number) {
   for (let guard = 0; guard < 10; guard += 1) {
     const text = (await indicator(page).textContent()) ?? "";
     const match = /Week (\d+) of/.exec(text);
@@ -87,13 +87,13 @@ async function gotoWeek(page: Page, n: number) {
   }
   throw new Error(`could not reach week ${n}`);
 }
-const blockFor = (page: Page, subjectId: string) =>
+export const blockFor = (page: Page, subjectId: string) =>
   page.locator(
     `[data-testid="calendar-block"][data-subject-id="${subjectId}"]`,
   );
 
 // ── Seeding helpers (same addInitScript pattern as the other specs) ─────────
-async function seedKey(page: Page, key: string, value: unknown) {
+export async function seedKey(page: Page, key: string, value: unknown) {
   await page.addInitScript(
     ([k, v]) => window.localStorage.setItem(k, v),
     [key, JSON.stringify(value)] as const,

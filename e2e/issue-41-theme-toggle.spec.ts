@@ -1,6 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { evidenceDir } from "./support/evidence";
+import { activateThemeToggle } from "./support/hydration";
 
 /**
  * super-board QA (issue #41) — theme toggle, REVISED for Jon's 2026-07-09
@@ -19,6 +20,20 @@ import { evidenceDir } from "./support/evidence";
  * storage shell — pre-paint FOUC prevention, persistence, System live-follow
  * before the first click, the class-based dark strategy, both presentations +
  * the collapsed rail, the absence of the monitor glyph, and the #8 a11y bar.
+ *
+ * ## Dead-click hardening (issue #78, fixed under #75)
+ *
+ * `AC: an explicit choice stops following the OS` was intermittently red on
+ * `main`: it clicked the toggle immediately after `goto()`, the click landed
+ * on the server-rendered button before React could dispatch to it, and the
+ * assertion then saw the label settle to the *unchanged* hydrated value. The
+ * component is NOT racy — `toggleThemePreference()` re-reads live state, so a
+ * click that reaches React is always correct even from a stale render. Proof
+ * the click never reached it: `localStorage["apx.theme.v1"]` was still `null`
+ * afterwards. Every activation of the toggle (and of the collapse control)
+ * now goes through a retry-until-effect helper; see support/hydration.ts for
+ * why the obvious gates — asserting the label first, or waiting for React's
+ * props marker — do not close this race.
  *
  * Test hooks (from the Builder's handoff):
  *   data-testid="theme-toggle"        — the toggle button
@@ -97,6 +112,18 @@ async function bodyBg(page: Page): Promise<{ sum: number }> {
   });
 }
 
+/**
+ * Hydration-safe press of the sidebar collapse control (same dead-click
+ * exposure as the theme toggle — see support/hydration.ts). Idempotent: a
+ * successful press reveals the Expand control, so the retry never double-fires.
+ */
+async function pressCollapse(page: Page) {
+  await expect(async () => {
+    await collapseBtn(page).click();
+    await expect(expandBtn(page)).toBeVisible({ timeout: 1000 });
+  }).toPass();
+}
+
 // ── Icon semantics: glyph = resolved theme; monitor is gone ──────────────────
 
 test("AC: glyph reflects the resolved theme on first load — light OS → sun", async ({
@@ -128,11 +155,11 @@ test("AC: the monitor glyph is absent in every state (deleted)", async ({
   await page.goto("/"); // system (moon)
   expect((await glyph(page)).rects, "no monitor on the system default").toBe(0);
 
-  await toggle(page).click(); // system(dark) → explicit light (sun)
+  await activateThemeToggle(page); // system(dark) → explicit light (sun)
   expect((await glyph(page)).rects, "no monitor after first click").toBe(0);
-  await toggle(page).click(); // light → dark (moon)
+  await activateThemeToggle(page); // light → dark (moon)
   expect((await glyph(page)).rects, "no monitor after a second click").toBe(0);
-  await toggle(page).click(); // dark → light (sun)
+  await activateThemeToggle(page); // dark → light (sun)
   expect((await glyph(page)).rects, "no monitor ever").toBe(0);
 });
 
@@ -149,7 +176,7 @@ test("AC: first click out of system picks the opposite of the resolved theme —
   expect(await page.evaluate((k) => localStorage.getItem(k), THEME_KEY)).toBeNull();
 
   // First click writes the explicit OPPOSITE of the resolved (dark) theme.
-  await toggle(page).click();
+  await activateThemeToggle(page);
   await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("light"));
   expect(await glyph(page)).toEqual({ circles: 1, rects: 0 }); // sun
   expect((await htmlState(page)).dark).toBe(false);
@@ -165,7 +192,7 @@ test("AC: first click out of system picks the opposite of the resolved theme —
   await page.goto("/");
 
   await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("light"));
-  await toggle(page).click(); // resolves light → explicit dark
+  await activateThemeToggle(page); // resolves light → explicit dark
   await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("dark"));
   expect((await htmlState(page)).dark).toBe(true);
   expect(await page.evaluate((k) => localStorage.getItem(k), THEME_KEY)).toBe(
@@ -179,11 +206,11 @@ test("AC: after the first click it is a plain two-state light ↔ dark toggle", 
   await page.emulateMedia({ colorScheme: "light" });
   await page.goto("/");
 
-  await toggle(page).click(); // system → dark
+  await activateThemeToggle(page); // system → dark
   await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("dark"));
-  await toggle(page).click(); // dark → light
+  await activateThemeToggle(page); // dark → light
   await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("light"));
-  await toggle(page).click(); // light → dark  (never lands back on system)
+  await activateThemeToggle(page); // light → dark  (never lands back on system)
   await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("dark"));
 });
 
@@ -191,7 +218,7 @@ test("AC: an explicit choice stops following the OS", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "dark" });
   await page.goto("/"); // system, resolves dark
 
-  await toggle(page).click(); // → explicit light
+  await activateThemeToggle(page); // → explicit light
   await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("light"));
 
   // OS is (still) dark, and now flips around — the explicit light must win.
@@ -228,7 +255,7 @@ test("AC: choice persists across reload/session under apx.theme.v1", async ({
   await page.emulateMedia({ colorScheme: "light" });
   await page.goto("/");
 
-  await toggle(page).click(); // system(light) → explicit dark
+  await activateThemeToggle(page); // system(light) → explicit dark
   await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("dark"));
   expect(await page.evaluate((k) => localStorage.getItem(k), THEME_KEY)).toBe(
     "dark",
@@ -268,7 +295,7 @@ test("AC: a malformed stored value degrades to system (no crash)", async ({
   // Degrades to system → follows the (dark) OS, and the control still works.
   await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("dark"));
   expect((await htmlState(page)).dark).toBe(true);
-  await toggle(page).click();
+  await activateThemeToggle(page);
   await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("light"));
 });
 
@@ -296,9 +323,9 @@ test("AC: color-scheme is set to match the active theme (native UI)", async ({
   await page.goto("/");
 
   expect((await htmlState(page)).colorScheme).toBe("light"); // system → light
-  await toggle(page).click(); // → dark
+  await activateThemeToggle(page); // → dark
   expect((await htmlState(page)).colorScheme).toBe("dark");
-  await toggle(page).click(); // → light
+  await activateThemeToggle(page); // → light
   expect((await htmlState(page)).colorScheme).toBe("light");
 });
 
@@ -311,7 +338,7 @@ test("AC: class strategy — .dark on <html> flips existing dark: utilities", as
   const lightBg = await bodyBg(page);
   expect(lightBg.sum, "light body is near-white").toBeGreaterThan(700);
 
-  await toggle(page).click(); // system(light) → explicit dark
+  await activateThemeToggle(page); // system(light) → explicit dark
   expect((await htmlState(page)).dark).toBe(true);
   const darkBg = await bodyBg(page);
   expect(darkBg.sum, "dark body is near-black").toBeLessThan(120);
@@ -417,7 +444,7 @@ test("AC: reachable & operable when the desktop sidebar is collapsed (rail)", as
   await page.goto("/");
 
   await expect(toggle(page)).toBeVisible();
-  await collapseBtn(page).click();
+  await pressCollapse(page);
   await expect(expandBtn(page)).toBeVisible();
 
   // Theme toggle AND the GitHub mark both stay reachable in the ~40px rail.
@@ -426,7 +453,7 @@ test("AC: reachable & operable when the desktop sidebar is collapsed (rail)", as
   await expect(githubLink(page)).toBeVisible();
 
   // Operable from the rail.
-  await toggle(page).click();
+  await activateThemeToggle(page);
   await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("dark"));
 });
 
@@ -450,7 +477,7 @@ test("AC: no horizontal scroll with the collapsed rail (desktop)", async ({
 }) => {
   await page.setViewportSize({ width: 1024, height: 800 });
   await page.goto("/");
-  await collapseBtn(page).click();
+  await pressCollapse(page);
   await expect(expandBtn(page)).toBeVisible();
   const overflow = await page.evaluate(
     () =>
@@ -485,9 +512,9 @@ test("AC: new state announced on activation (polite live region)", async ({
   await expect(announcement(page)).toHaveText(""); // nothing read on load
   expect(await announcement(page).getAttribute("aria-live")).toBe("polite");
 
-  await toggle(page).click(); // → dark
+  await activateThemeToggle(page); // → dark
   await expect(announcement(page)).toHaveText("Theme: dark.");
-  await toggle(page).click(); // → light
+  await activateThemeToggle(page); // → light
   await expect(announcement(page)).toHaveText("Theme: light.");
 });
 
@@ -504,9 +531,9 @@ test("AC: keyboard operable (Enter / Space activate from focus)", async ({
     ),
   ).toBe("theme-toggle");
 
-  await page.keyboard.press("Enter"); // system(light) → dark
+  await activateThemeToggle(page, (p) => p.keyboard.press("Enter")); // system(light) → dark
   await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("dark"));
-  await page.keyboard.press(" "); // dark → light
+  await activateThemeToggle(page, (p) => p.keyboard.press(" ")); // dark → light
   await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("light"));
 });
 
@@ -538,7 +565,7 @@ test("AC: respects prefers-reduced-motion (no theme-transition animation)", asyn
   expect(parseFloat(htmlDur)).toBe(0);
   expect(parseFloat(bodyDur)).toBe(0);
 
-  await toggle(page).click(); // still functions under reduced motion
+  await activateThemeToggle(page); // still functions under reduced motion
   expect((await htmlState(page)).dark).toBe(true);
 });
 
@@ -555,8 +582,8 @@ test("AC: branding control cluster is axe-clean in both themes (AA contrast)", a
       .analyze();
 
   // Light (explicit)
-  await toggle(page).click(); // system(light) → dark
-  await toggle(page).click(); // dark → light
+  await activateThemeToggle(page); // system(light) → dark
+  await activateThemeToggle(page); // dark → light
   const light = await scanBranding();
   const lightSerious = light.violations.filter((v) =>
     ["serious", "critical"].includes(v.impact ?? ""),
@@ -567,7 +594,7 @@ test("AC: branding control cluster is axe-clean in both themes (AA contrast)", a
   ).toEqual([]);
 
   // Dark (explicit)
-  await toggle(page).click(); // light → dark
+  await activateThemeToggle(page); // light → dark
   expect((await htmlState(page)).dark).toBe(true);
   const dark = await scanBranding();
   const darkSerious = dark.violations.filter((v) =>
@@ -594,18 +621,18 @@ test("evidence — branding-row toggle: light & dark, expanded & collapsed, desk
   await page.screenshot({ path: `${EVIDENCE_DIR}/light-desktop.png`, fullPage: true });
 
   // Desktop dark (explicit)
-  await toggle(page).click(); // → dark
+  await activateThemeToggle(page); // → dark
   await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("dark"));
   await page.screenshot({ path: `${EVIDENCE_DIR}/dark-desktop.png`, fullPage: true });
 
   // Collapsed rail — dark, then light (both controls + GitHub reachable)
-  await collapseBtn(page).click();
+  await pressCollapse(page);
   await expect(expandBtn(page)).toBeVisible();
   await page.screenshot({
     path: `${EVIDENCE_DIR}/collapsed-dark-desktop.png`,
     fullPage: true,
   });
-  await toggle(page).click(); // dark → light in the rail
+  await activateThemeToggle(page); // dark → light in the rail
   await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("light"));
   await page.screenshot({
     path: `${EVIDENCE_DIR}/collapsed-light-desktop.png`,
@@ -624,7 +651,7 @@ test("evidence — branding-row toggle: light & dark, expanded & collapsed, desk
   await page.goto("/");
   await expect(toggle(page)).toBeVisible();
   await page.screenshot({ path: `${EVIDENCE_DIR}/mobile.png`, fullPage: true });
-  await toggle(page).click(); // → dark
+  await activateThemeToggle(page); // → dark
   await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("dark"));
   await page.screenshot({ path: `${EVIDENCE_DIR}/mobile-dark.png`, fullPage: true });
 });

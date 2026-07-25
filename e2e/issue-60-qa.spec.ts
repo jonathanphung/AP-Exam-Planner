@@ -77,11 +77,15 @@ async function pressToggle(page: Page, expectExpanded: "true" | "false") {
   }).toPass();
 }
 
+/** How many schedules the "tall content" case seeds; the last one's name is
+ *  also the hydration gate AC2 waits on before it measures. */
+const MANY_SCHEDULES = 25;
+
 /**
  * Seed enough named schedules that MY SCHEDULES overflows the column — the
  * "tall content" case of AC2. Must be installed before `goto`.
  */
-async function seedManySchedules(page: Page, n = 25) {
+async function seedManySchedules(page: Page, n = MANY_SCHEDULES) {
   await page.addInitScript(
     ([k, v]) => window.localStorage.setItem(k, v),
     [
@@ -154,6 +158,27 @@ test("AC2 — desktop (tall content): the sections region scrolls internally, th
   const sections = page.locator(SECTIONS);
   await page.getByRole("button", { name: /^Collapse sidebar$/ }).waitFor();
 
+  // Wait for the SEEDED schedules to actually be on the page before measuring
+  // (issue #78 / fixed under #75). `seedManySchedules` writes localStorage, but
+  // the schedules store is `useSyncExternalStore`-backed: the server and first
+  // client render show the default SINGLE schedule, and the seeded 25 only
+  // appear once hydration adopts the client snapshot. The collapse button
+  // above is server-rendered, so waiting on it does NOT gate hydration — and
+  // measuring at that instant caught the pre-hydration DOM, where the region
+  // holds 4 buttons instead of 76 and `scrollHeight === clientHeight === 615`.
+  // That is the whole "AC2 precondition no longer holds" report: the region
+  // does still overflow (1501 vs 615), the spec was just looking too early.
+  // Intermittent because it is a race — the #74 Tester's run happened to lose it.
+  // `.first()`: each row renders more than one control for the same schedule
+  // (switch / rename / delete all carry the name), and any of them appearing
+  // proves the seeded list is on the page.
+  await expect(
+    page
+      .locator(SECTIONS)
+      .getByRole("button", { name: `Schedule number ${MANY_SCHEDULES}` })
+      .first(),
+  ).toBeAttached();
+
   // The sections region — not the page, not the aside — is what overflows.
   const overflow = await sections.evaluate((el) => ({
     scrollHeight: el.scrollHeight,
@@ -201,7 +226,13 @@ test("AC2 — desktop (tall content): the sections region scrolls internally, th
         document.documentElement.clientWidth,
     ),
     "column height change introduced horizontal overflow",
-  ).toBe(0);
+    // `<= 0`, not `=== 0` — see the note on the AC4 assertion below: #49's
+    // `scrollbar-gutter: stable` reservation is not reflected in
+    // `documentElement.clientWidth`, so the resting delta is −10 whenever the
+    // scrollbar itself takes no layout space. Overflow means a POSITIVE delta.
+    // (The line above already pins `scrollWidth` itself to its pre-scroll
+    // value, so a real layout shift is still caught exactly.)
+  ).toBeLessThanOrEqual(0);
 
   // Focus outlines are not clipped: the row sits OUTSIDE the overflow:auto
   // scroller, so its focus ring cannot be cut off by it.
@@ -392,13 +423,24 @@ for (const [label, vp] of [
     expect(gh.width).toBeGreaterThanOrEqual(TOUCH_FLOOR);
 
     // No horizontal overflow at this width.
+    //
+    // `<= 0`, not `=== 0` (corrected under issue #75). Issue #49 added
+    // `html { scrollbar-gutter: stable }`, which reserves the scrollbar's
+    // strip inside the root's content box; `documentElement.clientWidth`
+    // reports the full viewport and does not subtract that reservation, so the
+    // delta rests at −10 (the gutter width) whenever the bar itself takes no
+    // layout space — which is every default Playwright run, since Chromium is
+    // launched with `--hide-scrollbars`. The assertion's subject is horizontal
+    // OVERFLOW: content wider than the viewport, i.e. a positive delta. A
+    // negative one is the reserved gutter doing its job.
     expect(
       await page.evaluate(
         () =>
           document.documentElement.scrollWidth -
           document.documentElement.clientWidth,
       ),
-    ).toBe(0);
+      `horizontal overflow at ${vp.width}px`,
+    ).toBeLessThanOrEqual(0);
 
     await page.locator(SITE_FOOTER).scrollIntoViewIfNeeded();
     await page.screenshot({

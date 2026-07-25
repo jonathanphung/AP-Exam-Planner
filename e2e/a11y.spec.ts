@@ -410,6 +410,14 @@ test.describe("AC1 — keyboard operability", () => {
 
     // Escape closes the dialog; the same prompt remains available inline
     // (issue #5: conflicts are never a forced gate) and scroll is unlocked.
+    //
+    // Issue #75 changed the lock KEYWORD (`hidden` → `clip`, so the sticky
+    // sidebar keeps resolving against the viewport while a dialog is open).
+    // This assertion is deliberately left alone: it asserts the lock was
+    // RELEASED, i.e. the inline style is back to empty, which is the same
+    // observable under either keyword. Its sibling — the "while open" half —
+    // lives in e2e/issue-6-exam-info-panel.spec.ts and WAS re-pointed, at
+    // SCROLL_LOCK_OVERFLOW exported from src/lib/modal.ts.
     await page.keyboard.press("Escape");
     await expect(dialog(page)).toHaveCount(0);
     await expect(conflictPrompt(page)).toBeVisible();
