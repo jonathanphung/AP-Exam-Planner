@@ -1,0 +1,25 @@
+# issue-41-theme-toggle.spec.ts — 10 consecutive runs at --workers=1 and --workers=2
+
+Captured by the issue #75 Builder on the issue-75 branch (#78 AC1).
+Command per line: PORT=3210 pnpm exec playwright test e2e/issue-41-theme-toggle.spec.ts --workers=<w>
+
+workers=1 run=1 ::   31 passed (39.1s)
+workers=1 run=2 ::   31 passed (52.9s)
+workers=1 run=3 ::   31 passed (38.7s)
+workers=1 run=4 ::   31 passed (39.7s)
+workers=1 run=5 ::   31 passed (35.8s)
+workers=1 run=6 ::   31 passed (43.8s)
+workers=1 run=7 ::   31 passed (37.8s)
+workers=1 run=8 ::   31 passed (43.2s)
+workers=1 run=9 ::   31 passed (35.1s)
+workers=1 run=10 ::   31 passed (48.0s)
+workers=2 run=1 ::   31 passed (26.0s)
+workers=2 run=2 ::   31 passed (33.9s)
+workers=2 run=3 ::   31 passed (24.0s)
+workers=2 run=4 ::   31 passed (26.9s)
+workers=2 run=5 ::   31 passed (23.7s)
+workers=2 run=6 ::   31 passed (27.0s)
+workers=2 run=7 ::   31 passed (19.1s)
+workers=2 run=8 ::   31 passed (19.2s)
+workers=2 run=9 ::   31 passed (28.2s)
+workers=2 run=10 ::   31 passed (23.3s)

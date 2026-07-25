@@ -9,7 +9,8 @@ import { useEffect, useRef, type RefObject } from "react";
  * exact same, already-QA'd machinery. While the host component is mounted it:
  *
  *   - moves focus into the dialog (an explicit `initialFocusRef` when given,
- *     otherwise the first focusable element inside the panel),
+ *     otherwise the first focusable element inside the panel) WITHOUT scrolling
+ *     the page to reach it (issue #75),
  *   - traps Tab / Shift+Tab within the panel,
  *   - calls `onClose` on Escape (stopping propagation so nothing behind the
  *     dialog also reacts),
@@ -26,19 +27,58 @@ const FOCUSABLE =
   'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
 
 /**
+ * The `overflow` keyword the scroll lock writes onto `<html>` and `<body>`
+ * while a dialog is open (issue #75).
+ *
+ * `clip`, not `hidden`. Both block user scrolling; only `hidden` turns the root
+ * into a scroll container, which re-parents every `position: sticky` element on
+ * the page and made the desktop sidebar disappear while scrolled. Exported so
+ * the e2e specs assert the contract by name instead of hardcoding a keyword in
+ * five places.
+ */
+export const SCROLL_LOCK_OVERFLOW = "clip";
+
+/**
+ * Apply the scroll lock to one element, falling back to `hidden` where `clip`
+ * is not supported (Safari < 16, Chrome < 90, Firefox < 81).
+ *
+ * Assign-then-read-back rather than `CSS.supports`: an unsupported keyword is
+ * rejected by CSSOM and leaves the inline style untouched, so the read-back is
+ * the authoritative answer and costs nothing. Without this, an old engine would
+ * silently get NO lock at all and the page would scroll behind every dialog —
+ * a worse bug than the sticky one this file is fixing. Those engines keep the
+ * pre-#75 behaviour: locked, but sticky elements re-parent (issue #75).
+ */
+function applyScrollLock(element: HTMLElement): void {
+  element.style.overflow = SCROLL_LOCK_OVERFLOW;
+  if (element.style.overflow !== SCROLL_LOCK_OVERFLOW) {
+    element.style.overflow = "hidden";
+  }
+}
+
+/**
  * Scroll-lock width compensation (issue #49) — pure core, unit-tested in
  * `modal.test.ts`.
  *
- * Locking background scroll (`overflow: hidden`) removes the document
- * scrollbar. With classic (non-overlay) scrollbars that frees ~15–17px of
- * layout width and the centered page shifts right — the Windows dialog-open
- * bug. `html { scrollbar-gutter: stable }` (globals.css) is supposed to keep
- * that gutter reserved, but browsers disagree about whether `stable` still
- * applies once overflow is `hidden`: Firefox holds the gutter; some Chromium
- * builds drop it (clientWidth jumps under the lock) while others RETAIN it,
- * and Safari < 18.2 has no `scrollbar-gutter` at all. Feature-detecting
- * `CSS.supports` therefore LIES here — Chromium supports the property but
- * not consistently the semantics we need.
+ * Locking background scroll (`overflow: clip` as of issue #75; `hidden`
+ * before it) removes the document scrollbar. With classic (non-overlay)
+ * scrollbars that frees ~15–17px of layout width and the centered page shifts
+ * right — the Windows dialog-open bug. `html { scrollbar-gutter: stable }`
+ * (globals.css) can keep that gutter reserved, but only sometimes: browsers
+ * disagreed about whether `stable` still applies once overflow is `hidden`
+ * (Firefox holds the gutter; some Chromium builds drop it — clientWidth jumps
+ * under the lock — while others RETAIN it), Safari < 18.2 has no
+ * `scrollbar-gutter` at all, and under `clip` the root is not a scroll
+ * container at all, so the reservation is simply dropped everywhere. Feature-
+ * detecting `CSS.supports` therefore LIES here — Chromium supports the
+ * property but not consistently the semantics we need.
+ *
+ * Which is why #49's fix never leaned on the gutter alone: the padding
+ * correction below is what actually pins the layout, in every browser and
+ * under either lock keyword. The gutter still earns its keep OUTSIDE the lock
+ * (short pages don't jump when content grows past the viewport, and the custom
+ * `::-webkit-scrollbar` styling forces classic scrollbars on macOS — see the
+ * globals.css note).
  *
  * This value is only a FIRST GUESS: the caller samples
  * `documentElement.clientWidth` before and after applying the lock. If the
@@ -51,7 +91,7 @@ const FOCUSABLE =
  * case close in one shot.
  *
  * @param unlockedClientWidth `documentElement.clientWidth` before the lock
- * @param lockedClientWidth   `documentElement.clientWidth` after `overflow: hidden`
+ * @param lockedClientWidth   `documentElement.clientWidth` after the lock
  * @returns pixels to add to the body's padding-right while scroll is locked
  */
 export function scrollLockCompensationPx(
@@ -110,21 +150,43 @@ export function useModalDialog(
   useEffect(() => {
     const previouslyFocused = document.activeElement as HTMLElement | null;
 
-    // Move focus into the dialog.
+    // Move focus into the dialog. `preventScroll` (issue #75): focusing an
+    // element is a PROGRAMMATIC scroll-into-view, and programmatic scrolls are
+    // NOT blocked by the lock below — measured: neither `hidden` nor `clip`
+    // stops `scrollTo`. Every dialog here is `position: fixed`, so today the
+    // initially-focused control is already on screen and this is belt-and-
+    // braces; the same guard on the restore path below is not (see there).
+    // Issue #75 reported the page jumping to scrollY 0 on open, so the hook
+    // should not be the thing that can do it.
     const initial =
       initialFocusRef?.current ??
       panelRef.current?.querySelector<HTMLElement>(FOCUSABLE) ??
       null;
-    initial?.focus();
+    initial?.focus({ preventScroll: true });
 
     // Lock background scroll while the dialog is open (issue #49). The lock
     // must land on the ROOT element, not only the body: `scrollbar-gutter:
     // stable` (globals.css) is only honored by the scroll container it is set
     // on, and overflow propagated body → viewport drops the reservation —
-    // body-only locking is exactly what caused the Windows layout shift. The
-    // body is locked too so the pre-#49 observable contract
-    // (body.style.overflow === "hidden" while open, asserted by issue-6/a11y
-    // specs) still holds.
+    // body-only locking is exactly what caused the Windows layout shift.
+    //
+    // The keyword is `clip`, NOT `hidden` (issue #75). Both stop wheel,
+    // trackpad, touch and keyboard scrolling, but `hidden` makes the root a
+    // SCROLL CONTAINER — and a `position: sticky` element resolves against its
+    // nearest scroll container. Under `hidden` the desktop sidebar
+    // (`lg:sticky`, Sidebar.tsx) stopped resolving against the viewport and
+    // snapped back to its static offset, which at scrollY 1200 is a thousand
+    // pixels above the top of the screen: the whole left column vanished for as
+    // long as any dialog was open. `clip` does not establish a scroll
+    // container, so sticky keeps resolving against the viewport and the panel
+    // does not move at all. Measured at 1440×900, scrollY 1064: sidebar
+    // rect.top −45 unlocked → −1024 under `hidden` → −45 under `clip`.
+    //
+    // Reverting to a body-only lock is NOT an alternative — that is exactly the
+    // regression #49 fixed. The body is locked too (same keyword) as
+    // defense-in-depth and to keep the observable `body.style.overflow`
+    // contract the issue-6 / a11y specs assert; those specs were re-pointed
+    // from "hidden" to "clip" in this change.
     const root = document.documentElement;
     const body = document.body;
     const previousRootOverflow = root.style.overflow;
@@ -146,8 +208,8 @@ export function useModalDialog(
       Number.parseFloat(window.getComputedStyle(body).paddingRight) || 0;
 
     const unlockedClientWidth = root.clientWidth;
-    root.style.overflow = "hidden";
-    body.style.overflow = "hidden";
+    applyScrollLock(root);
+    applyScrollLock(body);
 
     // First guess from the width delta (right in browsers that drop the gutter
     // under the lock; a no-op when it held or scrollbars are overlay).
@@ -210,8 +272,14 @@ export function useModalDialog(
       body.style.overflow = previousBodyOverflow;
       body.style.paddingRight = previousPaddingRight;
       // Return focus to the element that opened the dialog (no-op if it has
-      // since left the document).
-      previouslyFocused?.focus();
+      // since left the document). `preventScroll` again (issue #75), and here
+      // it is load-bearing: the lock is already released two lines up, and the
+      // opener can be anywhere in the document. Without it the browser scrolls
+      // the opener back into view on close and the reader loses their place —
+      // measured at 0 → 1421px in
+      // e2e/issue-75-scroll-lock-sticky.spec.ts's AC3 test, which fails
+      // against a bare focus().
+      previouslyFocused?.focus({ preventScroll: true });
     };
     // Mount-scoped by design — see the doc comment above.
     // eslint-disable-next-line react-hooks/exhaustive-deps

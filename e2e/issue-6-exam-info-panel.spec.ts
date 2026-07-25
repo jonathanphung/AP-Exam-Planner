@@ -1,5 +1,6 @@
 import { test, expect, type Locator, type Page } from "@playwright/test";
 import { evidenceDir } from "./support/evidence";
+import { SCROLL_LOCK_OVERFLOW } from "../src/lib/modal";
 
 /**
  * super-board QA (issue #6) — exam info panel with format details + pass rate.
@@ -173,8 +174,16 @@ test.describe("issue #6 — exam info panel", () => {
     await expect(panel).toBeVisible();
     const closeBtn = panel.getByRole("button", { name: "Close" });
     await expect(closeBtn).toBeFocused();
+    // Issue #75 re-pointed this contract DELIBERATELY: the lock keyword moved
+    // from `hidden` to `clip`. `hidden` made <html> a scroll container, which
+    // re-parented every `position: sticky` element (the desktop sidebar
+    // vanished while any dialog was open, see e2e/issue-75-scroll-lock-sticky
+    // .spec.ts). What this assertion is really guarding — "the background is
+    // locked while the panel is open, and released after" — is unchanged, so
+    // it is re-pointed at the new keyword rather than deleted. The keyword is
+    // exported from src/lib/modal.ts so there is exactly one source of truth.
     expect(await page.evaluate(() => document.body.style.overflow)).toBe(
-      "hidden",
+      SCROLL_LOCK_OVERFLOW,
     );
 
     // Escape dismisses, focus returns to the invoking info button, scroll freed.

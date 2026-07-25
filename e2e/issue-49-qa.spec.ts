@@ -375,7 +375,13 @@ test("AC8 — mobile 375: catalog (light) + dialog open (dark), no horizontal ov
         document.documentElement.clientWidth,
     ),
     "no horizontal overflow at 375 with a dialog open (dark)",
-  ).toBe(0);
+    // `<= 0`, not `=== 0` (corrected under issue #75). While a dialog is open
+    // the scroll lock removes the document scrollbar and the position-invariant
+    // compensation pads `<body>` by exactly that width to hold the layout
+    // still — so the root's content box stays 10px narrower than
+    // `clientWidth`, on purpose. That is the fix working, not overflow. The
+    // check that matters is that the delta is never POSITIVE.
+  ).toBeLessThanOrEqual(0);
   await page.screenshot({
     path: evidencePath("ac8-dialog-open-dark-mobile.png"),
   });
