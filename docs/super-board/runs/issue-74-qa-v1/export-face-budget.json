@@ -1,0 +1,230 @@
+[
+  {
+    "text": "AP United States Government and Politics",
+    "segHeight": 132,
+    "segDisplay": "flex",
+    "segFlexDirection": "column",
+    "segPadding": "4px 6px",
+    "nameClamp": 7,
+    "nameMaxHeight": 92.4,
+    "rows": [
+      {
+        "text": "AP United States Government and Politics",
+        "flexShrink": "0",
+        "maxHeight": 92.4,
+        "marginTop": 0,
+        "fontSize": ""
+      },
+      {
+        "text": "8:00 AM – 11:00 AM",
+        "flexShrink": "0",
+        "maxHeight": 26.4,
+        "marginTop": 2,
+        "fontSize": ""
+      }
+    ]
+  },
+  {
+    "text": "8:00 AM – 11:00 AM",
+    "segHeight": 132,
+    "segDisplay": "flex",
+    "segFlexDirection": "column",
+    "segPadding": "4px 6px",
+    "nameClamp": 2,
+    "nameMaxHeight": 26.4,
+    "rows": [
+      {
+        "text": "AP United States Government and Politics",
+        "flexShrink": "0",
+        "maxHeight": 92.4,
+        "marginTop": 0,
+        "fontSize": ""
+      },
+      {
+        "text": "8:00 AM – 11:00 AM",
+        "flexShrink": "0",
+        "maxHeight": 26.4,
+        "marginTop": 2,
+        "fontSize": ""
+      }
+    ]
+  },
+  {
+    "text": "AP Chemistry",
+    "segHeight": 143,
+    "segDisplay": "flex",
+    "segFlexDirection": "column",
+    "segPadding": "4px 6px",
+    "nameClamp": 8,
+    "nameMaxHeight": 105.6,
+    "rows": [
+      {
+        "text": "AP Chemistry",
+        "flexShrink": "0",
+        "maxHeight": 105.6,
+        "marginTop": 0,
+        "fontSize": ""
+      },
+      {
+        "text": "12:00 PM – 3:15 PM",
+        "flexShrink": "0",
+        "maxHeight": 26.4,
+        "marginTop": 2,
+        "fontSize": ""
+      }
+    ]
+  },
+  {
+    "text": "12:00 PM – 3:15 PM",
+    "segHeight": 143,
+    "segDisplay": "flex",
+    "segFlexDirection": "column",
+    "segPadding": "4px 6px",
+    "nameClamp": 2,
+    "nameMaxHeight": 26.4,
+    "rows": [
+      {
+        "text": "AP Chemistry",
+        "flexShrink": "0",
+        "maxHeight": 105.6,
+        "marginTop": 0,
+        "fontSize": ""
+      },
+      {
+        "text": "12:00 PM – 3:15 PM",
+        "flexShrink": "0",
+        "maxHeight": 26.4,
+        "marginTop": 2,
+        "fontSize": ""
+      }
+    ]
+  },
+  {
+    "text": "AP Macroeconomics",
+    "segHeight": 95.3333,
+    "segDisplay": "flex",
+    "segFlexDirection": "column",
+    "segPadding": "4px 6px",
+    "nameClamp": 4,
+    "nameMaxHeight": 52.8,
+    "rows": [
+      {
+        "text": "AP Macroeconomics",
+        "flexShrink": "0",
+        "maxHeight": 52.8,
+        "marginTop": 0,
+        "fontSize": ""
+      },
+      {
+        "text": "12:00 PM – 2:10 PM",
+        "flexShrink": "0",
+        "maxHeight": 26.4,
+        "marginTop": 2,
+        "fontSize": ""
+      }
+    ]
+  },
+  {
+    "text": "12:00 PM – 2:10 PM",
+    "segHeight": 95.3333,
+    "segDisplay": "flex",
+    "segFlexDirection": "column",
+    "segPadding": "4px 6px",
+    "nameClamp": 2,
+    "nameMaxHeight": 26.4,
+    "rows": [
+      {
+        "text": "AP Macroeconomics",
+        "flexShrink": "0",
+        "maxHeight": 52.8,
+        "marginTop": 0,
+        "fontSize": ""
+      },
+      {
+        "text": "12:00 PM – 2:10 PM",
+        "flexShrink": "0",
+        "maxHeight": 26.4,
+        "marginTop": 2,
+        "fontSize": ""
+      }
+    ]
+  },
+  {
+    "text": "AP Networking",
+    "segHeight": 88,
+    "segDisplay": "flex",
+    "segFlexDirection": "column",
+    "segPadding": "4px 6px",
+    "nameClamp": 2,
+    "nameMaxHeight": 26.4,
+    "rows": [
+      {
+        "text": "AP Networking",
+        "flexShrink": "0",
+        "maxHeight": 26.4,
+        "marginTop": 0,
+        "fontSize": ""
+      },
+      {
+        "text": "12:00 PM",
+        "flexShrink": "0",
+        "maxHeight": 26.4,
+        "marginTop": 2,
+        "fontSize": ""
+      },
+      {
+        "text": "Published note",
+        "flexShrink": "0",
+        "maxHeight": 0,
+        "marginTop": 1,
+        "fontSize": "10px"
+      },
+      {
+        "text": "Length pending",
+        "flexShrink": "0",
+        "maxHeight": 0,
+        "marginTop": 1,
+        "fontSize": "10px"
+      }
+    ]
+  },
+  {
+    "text": "12:00 PM",
+    "segHeight": 88,
+    "segDisplay": "flex",
+    "segFlexDirection": "column",
+    "segPadding": "4px 6px",
+    "nameClamp": 2,
+    "nameMaxHeight": 26.4,
+    "rows": [
+      {
+        "text": "AP Networking",
+        "flexShrink": "0",
+        "maxHeight": 26.4,
+        "marginTop": 0,
+        "fontSize": ""
+      },
+      {
+        "text": "12:00 PM",
+        "flexShrink": "0",
+        "maxHeight": 26.4,
+        "marginTop": 2,
+        "fontSize": ""
+      },
+      {
+        "text": "Published note",
+        "flexShrink": "0",
+        "maxHeight": 0,
+        "marginTop": 1,
+        "fontSize": "10px"
+      },
+      {
+        "text": "Length pending",
+        "flexShrink": "0",
+        "maxHeight": 0,
+        "marginTop": 1,
+        "fontSize": "10px"
+      }
+    ]
+  }
+]
