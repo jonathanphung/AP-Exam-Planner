@@ -208,9 +208,14 @@ The initial 2026-07-04 fill carried **pre-redesign** question counts for seven
 subjects. They were re-sourced on **2026-07-09** from each course's AP Central
 exam page (`https://apcentral.collegeboard.org/courses/ap-<slug>/exam`),
 adversarially verified (one fetch agent + one independent refute-skeptic per
-subject), and re-checked by hand. Verbatim page text for all 42 subjects is
-committed under `docs/super-board/research/collegeboard-2027/` (see that
-folder's `README.md`); each subject below cites its file.
+subject), and re-checked by hand. Verbatim page text for all 43 subjects in the
+shipped roster is committed under
+`docs/super-board/research/collegeboard-2027/` (see that folder's `README.md`);
+each subject below cites its file. The one exception to "exam page" is AP
+Networking — no AP Central exam page and no AP Students assessment page exists
+for it yet, so its capture is the adoption page
+(<https://apcentral.collegeboard.org/courses/ap-networking/adopt>) and its whole
+`format` block is `"pending"`.
 
 | subject | field | was | now | verbatim source quote |
 |---|---|---|---|---|

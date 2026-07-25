@@ -1,6 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import apData from "../src/data/ap-2027.json";
 import { pressViewChip } from "./support/view-chip";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #5) — same-slot conflict detection + resolution to
@@ -28,8 +29,7 @@ import { pressViewChip } from "./support/view-chip";
 
 // Env-overridable so a re-verification pass writes a fresh evidence set
 // instead of rewriting a prior run's committed screenshots.
-const EVIDENCE_DIR =
-  process.env.QA_EVIDENCE_DIR ?? "docs/super-board/runs/issue-5-qa-v2";
+const EVIDENCE_DIR = evidenceDir("issue-5-qa-v2");
 
 const SELECTION_KEY = "apx.selection.v1";
 const RESOLUTIONS_KEY = "apx.resolutions.v1";

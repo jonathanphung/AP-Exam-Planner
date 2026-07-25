@@ -1,4 +1,5 @@
 import { test, expect, type Locator, type Page } from "@playwright/test";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA v4 (issue #44, Jon's post-merge "9px matched" spacing
@@ -34,11 +35,13 @@ import { test, expect, type Locator, type Page } from "@playwright/test";
  *      its shipped mt-2 (8px) with NO leaked zone divider or hairlines.
  *
  * Evidence (Jon's mandated set: Biology + AAS, light+dark, desktop+mobile,
- * plus Calc AB unchanged and the three standard viewports) is captured to
- * docs/super-board/runs/issue-44-qa-v4/.
+ * plus Calc AB unchanged and the three standard viewports) is captured to the
+ * `issue-44-qa-v4` evidence folder resolved by `evidenceDir()` — see
+ * e2e/support/evidence.ts for how a lane points it at
+ * docs/super-board/runs/ when it wants committed evidence.
  */
 
-const EVIDENCE_DIR = "docs/super-board/runs/issue-44-qa-v4";
+const EVIDENCE_DIR = evidenceDir("issue-44-qa-v4");
 const THEME_KEY = "apx.theme.v1";
 
 const dialog = (page: Page) => page.getByRole("dialog");

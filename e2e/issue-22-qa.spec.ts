@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #22) — category-grouped mobile chips with
@@ -23,12 +24,12 @@ import { test, expect, type Page } from "@playwright/test";
  * Languages 8, Arts 5, Career Kickstart 3 → 43 subjects.
  *
  * AC10/AC11 (verified-link rule + single source of truth) are additionally
- * pinned at unit level by `src/lib/college-board-links.test.ts` (full 42/42
+ * pinned at unit level by `src/lib/college-board-links.test.ts` (full roster
  * coverage, no-guess rule); the e2e layer spot-checks one URL per exception
  * class below.
  */
 
-const EVIDENCE_DIR = "docs/super-board/runs/issue-22-qa-v1";
+const EVIDENCE_DIR = evidenceDir("issue-22-qa-v1");
 
 const MOBILE = { width: 375, height: 667 } as const;
 
@@ -92,7 +93,7 @@ test.describe("issue #22 — mobile category-grouped chips + progressive disclos
       await expect(region.locator("button[aria-pressed]")).toHaveCount(count);
     }
 
-    // All 42 subjects present overall. Since issue #24 the sectioned layout
+    // Every dataset subject present overall. Since issue #24 the sectioned layout
     // is one shared grid at every width; on mobile each section's list is a
     // SINGLE column of full-width cards (not the flat multi-column desktop
     // grid, and not a width-jumping pill flow — expansion is vertical-only).

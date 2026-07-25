@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #9) — README + in-app data attribution footer.
@@ -18,7 +19,7 @@ import { resolve } from "node:path";
  */
 
 const REPO_ROOT = resolve(__dirname, "..");
-const EVIDENCE_DIR = "docs/super-board/runs/issue-9-qa-v1";
+const EVIDENCE_DIR = evidenceDir("issue-9-qa-v1");
 
 const ATTRIBUTION =
   "Data: College Board AP calendar and score-distribution reports — May 2027 cycle";

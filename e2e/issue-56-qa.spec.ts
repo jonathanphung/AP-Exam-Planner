@@ -1,5 +1,6 @@
 import { test, expect, type Download } from "@playwright/test";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * QA acceptance drive for issue #56 + Jon's pre-merge bounce — designed
@@ -22,7 +23,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
  * without driving the conflict dialog.
  */
 
-const EVIDENCE_DIR = "docs/super-board/runs/issue-56-qa-v2";
+const EVIDENCE_DIR = evidenceDir("issue-56-qa-v2");
 
 /** 680px list / ~800px calendar card at pixelRatio 2 ⇒ ≥ ~1360px raster. */
 const MIN_RASTER_WIDTH = 1300;

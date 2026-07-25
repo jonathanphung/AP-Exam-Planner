@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { pressViewChip } from "./support/view-chip";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #31) — mobile: Export + List/Calendar in ONE
@@ -32,7 +33,7 @@ import { pressViewChip } from "./support/view-chip";
  * ac7-list-view-mobile.png (toolbar identical on the List view).
  */
 
-const EVIDENCE_DIR = "docs/super-board/runs/issue-31-qa-v2";
+const EVIDENCE_DIR = evidenceDir("issue-31-qa-v2");
 
 const SELECTION_KEY = "apx.selection.v1";
 // Non-conflicting selection (same as a11y.spec.ts) so Export is enabled.

@@ -1,0 +1,161 @@
+
+Running 24 tests using 1 worker
+
+  ✓   1 [chromium] › e2e/issue-71-exam-note.spec.ts:59:7 › issue #71 AC6 — published exam qualifier on the schedule surfaces › List view prints the verbatim qualifier on the exam row (1.0s)
+  ✓   2 [chromium] › e2e/issue-71-exam-note.spec.ts:79:7 › issue #71 AC6 — published exam qualifier on the schedule surfaces › List view leaves an unqualified exam row alone (no empty note element) (500ms)
+  ✓   3 [chromium] › e2e/issue-71-exam-note.spec.ts:92:7 › issue #71 AC6 — published exam qualifier on the schedule surfaces › Calendar block carries the marker on its face and the verbatim text in its accessible name (622ms)
+  ✓   4 [chromium] › e2e/issue-71-exam-note.spec.ts:120:7 › issue #71 AC6 — published exam qualifier on the schedule surfaces › Activating the calendar block opens the details dialog with the verbatim qualifier (543ms)
+  ✓   5 [chromium] › e2e/issue-71-exam-note.spec.ts:134:7 › issue #71 AC6 — published exam qualifier on the schedule surfaces › .ics DESCRIPTION and .txt line both carry the verbatim qualifier (635ms)
+  ✓   6 [chromium] › e2e/issue-71-exam-note.spec.ts:176:9 › issue #71 AC6 — published exam qualifier on the schedule surfaces › evidence — List and Calendar qualifier at desktop 1920x1080 with no horizontal overflow (753ms)
+  ✓   7 [chromium] › e2e/issue-71-exam-note.spec.ts:176:9 › issue #71 AC6 — published exam qualifier on the schedule surfaces › evidence — List and Calendar qualifier at tablet 1024x768 with no horizontal overflow (756ms)
+  ✓   8 [chromium] › e2e/issue-71-exam-note.spec.ts:176:9 › issue #71 AC6 — published exam qualifier on the schedule surfaces › evidence — List and Calendar qualifier at mobile 375x667 with no horizontal overflow (713ms)
+  ✓   9 [chromium] › e2e/issue-71-qa.spec.ts:187:7 › issue #71 QA — published qualifier on every schedule surface › fixture guard — the dataset still supplies a qualified exam and a same-slot partner (1ms)
+  ✓  10 [chromium] › e2e/issue-71-qa.spec.ts:199:7 › issue #71 QA — published qualifier on every schedule surface › AC6-QA1 — the rasterized list-view .png prints the verbatim qualifier (not just the card model) (585ms)
+  ✓  11 [chromium] › e2e/issue-71-qa.spec.ts:231:7 › issue #71 QA — published qualifier on every schedule surface › AC6-QA2 — the rasterized calendar-view .png prints the qualifier in a notes strip (737ms)
+  ✓  12 [chromium] › e2e/issue-71-qa.spec.ts:259:7 › issue #71 QA — published qualifier on every schedule surface › AC6-QA3 — the qualifier follows the exam when conflict resolution moves it to late testing (825ms)
+  ✓  13 [chromium] › e2e/issue-71-qa.spec.ts:318:7 › issue #71 QA — published qualifier on every schedule surface › AC6-QA4 — the qualifier is disclosed in dark theme too (627ms)
+  ✓  14 [chromium] › e2e/issue-71-qa.spec.ts:339:7 › issue #71 QA — published qualifier on every schedule surface › AC6-QA5 — no new serious/critical axe violation with the qualifier on screen (2.4s)
+  ✓  15 [chromium] › e2e/issue-71-qa.spec.ts:367:7 › issue #71 QA — published qualifier on every schedule surface › AC6-QA6 — #37's two catalog surfaces still disclose it (this issue adds surfaces, it must not move any) (469ms)
+[WebServer] [browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+[WebServer] 
+[WebServer] - A server/client branch `if (typeof window !== 'undefined')`.
+[WebServer] - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+[WebServer] - Date formatting in a user's locale which doesn't match the server.
+[WebServer] - External changing data without sending a snapshot of it along with the HTML.
+[WebServer] - Invalid HTML tag nesting.
+[WebServer] 
+[WebServer] It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+[WebServer] 
+[WebServer] https://react.dev/link/hydration-mismatch
+[WebServer] 
+[WebServer]   ...
+[WebServer]     <LoadingBoundary name="/" loading={null}>
+[WebServer]       <HTTPAccessFallbackBoundary notFound={{...}} forbidden={undefined} unauthorized={undefined}>
+[WebServer]         <HTTPAccessFallbackErrorBoundary pathname="/" notFound={{...}} forbidden={undefined} unauthorized={undefined} ...>
+[WebServer]           <RedirectBoundary>
+[WebServer]             <RedirectErrorBoundary router={{...}}>
+[WebServer]               <InnerLayoutRouter url="/" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+[WebServer]                 <SegmentViewNode type="page" pagePath="page.tsx">
+[WebServer]                   <SegmentTrieNode>
+[WebServer]                   <Home>
+[WebServer]                     <div data-scroll-lock-anchor={true} className="mx-auto fl...">
+[WebServer]                       <Sidebar>
+[WebServer]                       <main className="flex min-w..." aria-label="Exam planner">
+[WebServer]                         <CatalogGrid>
+[WebServer]                           <section aria-label="Subject ca..." className="flex flex-...">
+[WebServer]                             <div className="flex flex-...">
+[WebServer]                               <div className="flex flex-...">
+[WebServer]                                 <label>
+[WebServer]                                 <input
+[WebServer]                                   id="subject-search"
+[WebServer]                                   type="search"
+[WebServer]                                   value=""
+[WebServer]                                   onChange={function onChange}
+[WebServer]                                   placeholder="e.g. bio"
+[WebServer]                                   autoComplete="off"
+[WebServer]                                   className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 tex..."
+[WebServer] -                                 style={{caret-color:"transparent"}}
+[WebServer]                                 >
+[WebServer]                               ...
+[WebServer]                             ...
+[WebServer]                         ...
+[WebServer]                 ...
+[WebServer]               ...
+[WebServer]  
+  ✓  16 [chromium] › e2e/issue-71-qa.spec.ts:418:11 › issue #71 QA — published qualifier on every schedule surface › AC6-QA7 — the block-face marker actually renders at desktop 1920x1080 (787ms)
+  ✘  17 [chromium] › e2e/issue-71-qa.spec.ts:418:11 › issue #71 QA — published qualifier on every schedule surface › AC6-QA7 — the block-face marker actually renders at desktop 1920x1080 (moved to late testing) (882ms)
+  ✓  18 [chromium] › e2e/issue-71-qa.spec.ts:418:11 › issue #71 QA — published qualifier on every schedule surface › AC6-QA7 — the block-face marker actually renders at tablet 1024x768 (1.1s)
+  ✘  19 [chromium] › e2e/issue-71-qa.spec.ts:418:11 › issue #71 QA — published qualifier on every schedule surface › AC6-QA7 — the block-face marker actually renders at tablet 1024x768 (moved to late testing) (856ms)
+  ✘  20 [chromium] › e2e/issue-71-qa.spec.ts:418:11 › issue #71 QA — published qualifier on every schedule surface › AC6-QA7 — the block-face marker actually renders at mobile 375x667 (714ms)
+  ✘  21 [chromium] › e2e/issue-71-qa.spec.ts:418:11 › issue #71 QA — published qualifier on every schedule surface › AC6-QA7 — the block-face marker actually renders at mobile 375x667 (moved to late testing) (773ms)
+  ✓  22 [chromium] › e2e/issue-71-qa.spec.ts:471:9 › issue #71 QA — published qualifier on every schedule surface › evidence — qualifier on List + Calendar at desktop 1920x1080 (1.1s)
+  ✓  23 [chromium] › e2e/issue-71-qa.spec.ts:471:9 › issue #71 QA — published qualifier on every schedule surface › evidence — qualifier on List + Calendar at tablet 1024x768 (943ms)
+  ✓  24 [chromium] › e2e/issue-71-qa.spec.ts:471:9 › issue #71 QA — published qualifier on every schedule surface › evidence — qualifier on List + Calendar at mobile 375x667 (813ms)
+
+
+  1) [chromium] › e2e/issue-71-qa.spec.ts:418:11 › issue #71 QA — published qualifier on every schedule surface › AC6-QA7 — the block-face marker actually renders at desktop 1920x1080 (moved to late testing) 
+
+    Error: the "Published note" marker is clipped away by its overflow-hidden block face — 1px of 15px rendered, so the grid shows a bare date for an exam only pilot schools may sit
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 15
+    Received: 1
+
+      456 |           clip!.visibleHeight,
+      457 |           `the "${NOTE_LABEL}" marker is clipped away by its overflow-hidden block face — ${clip!.visibleHeight}px of ${clip!.markerHeight}px rendered, so the grid shows a bare date for an exam only pilot schools may sit`,
+    > 458 |         ).toBe(clip!.markerHeight);
+          |           ^
+      459 |       });
+      460 |     }
+      461 |   }
+        at /Users/jon/repos/AP-Exam-Planner/.worktrees/issue-71-qa/e2e/issue-71-qa.spec.ts:458:11
+
+    Error Context: test-results/issue-71-qa-issue-71-QA-—--f6eb1-1080-moved-to-late-testing--chromium/error-context.md
+
+  2) [chromium] › e2e/issue-71-qa.spec.ts:418:11 › issue #71 QA — published qualifier on every schedule surface › AC6-QA7 — the block-face marker actually renders at tablet 1024x768 (moved to late testing) 
+
+    Error: the "Published note" marker is clipped away by its overflow-hidden block face — 0px of 15px rendered, so the grid shows a bare date for an exam only pilot schools may sit
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 15
+    Received: 0
+
+      456 |           clip!.visibleHeight,
+      457 |           `the "${NOTE_LABEL}" marker is clipped away by its overflow-hidden block face — ${clip!.visibleHeight}px of ${clip!.markerHeight}px rendered, so the grid shows a bare date for an exam only pilot schools may sit`,
+    > 458 |         ).toBe(clip!.markerHeight);
+          |           ^
+      459 |       });
+      460 |     }
+      461 |   }
+        at /Users/jon/repos/AP-Exam-Planner/.worktrees/issue-71-qa/e2e/issue-71-qa.spec.ts:458:11
+
+    Error Context: test-results/issue-71-qa-issue-71-QA-—--c77a1-x768-moved-to-late-testing--chromium/error-context.md
+
+  3) [chromium] › e2e/issue-71-qa.spec.ts:418:11 › issue #71 QA — published qualifier on every schedule surface › AC6-QA7 — the block-face marker actually renders at mobile 375x667 
+
+    Error: the "Published note" marker is clipped away by its overflow-hidden block face — 0px of 30px rendered, so the grid shows a bare date for an exam only pilot schools may sit
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 30
+    Received: 0
+
+      456 |           clip!.visibleHeight,
+      457 |           `the "${NOTE_LABEL}" marker is clipped away by its overflow-hidden block face — ${clip!.visibleHeight}px of ${clip!.markerHeight}px rendered, so the grid shows a bare date for an exam only pilot schools may sit`,
+    > 458 |         ).toBe(clip!.markerHeight);
+          |           ^
+      459 |       });
+      460 |     }
+      461 |   }
+        at /Users/jon/repos/AP-Exam-Planner/.worktrees/issue-71-qa/e2e/issue-71-qa.spec.ts:458:11
+
+    Error Context: test-results/issue-71-qa-issue-71-QA-—--df496-y-renders-at-mobile-375x667-chromium/error-context.md
+
+  4) [chromium] › e2e/issue-71-qa.spec.ts:418:11 › issue #71 QA — published qualifier on every schedule surface › AC6-QA7 — the block-face marker actually renders at mobile 375x667 (moved to late testing) 
+
+    Error: the "Published note" marker is clipped away by its overflow-hidden block face — 0px of 30px rendered, so the grid shows a bare date for an exam only pilot schools may sit
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 30
+    Received: 0
+
+      456 |           clip!.visibleHeight,
+      457 |           `the "${NOTE_LABEL}" marker is clipped away by its overflow-hidden block face — ${clip!.visibleHeight}px of ${clip!.markerHeight}px rendered, so the grid shows a bare date for an exam only pilot schools may sit`,
+    > 458 |         ).toBe(clip!.markerHeight);
+          |           ^
+      459 |       });
+      460 |     }
+      461 |   }
+        at /Users/jon/repos/AP-Exam-Planner/.worktrees/issue-71-qa/e2e/issue-71-qa.spec.ts:458:11
+
+    Error Context: test-results/issue-71-qa-issue-71-QA-—--7b611-x667-moved-to-late-testing--chromium/error-context.md
+
+  4 failed
+    [chromium] › e2e/issue-71-qa.spec.ts:418:11 › issue #71 QA — published qualifier on every schedule surface › AC6-QA7 — the block-face marker actually renders at desktop 1920x1080 (moved to late testing) 
+    [chromium] › e2e/issue-71-qa.spec.ts:418:11 › issue #71 QA — published qualifier on every schedule surface › AC6-QA7 — the block-face marker actually renders at tablet 1024x768 (moved to late testing) 
+    [chromium] › e2e/issue-71-qa.spec.ts:418:11 › issue #71 QA — published qualifier on every schedule surface › AC6-QA7 — the block-face marker actually renders at mobile 375x667 
+    [chromium] › e2e/issue-71-qa.spec.ts:418:11 › issue #71 QA — published qualifier on every schedule surface › AC6-QA7 — the block-face marker actually renders at mobile 375x667 (moved to late testing) 
+  20 passed (24.6s)

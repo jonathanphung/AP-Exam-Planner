@@ -1,5 +1,6 @@
 import { test, expect, type Locator, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #44) — exam details popup: per-section
@@ -39,7 +40,7 @@ import AxeBuilder from "@axe-core/playwright";
  * count-based.
  */
 
-const EVIDENCE_DIR = "docs/super-board/runs/issue-44-qa-v1";
+const EVIDENCE_DIR = evidenceDir("issue-44-qa-v1");
 const SELECTION_KEY = "apx.selection.v1";
 const THEME_KEY = "apx.theme.v1";
 

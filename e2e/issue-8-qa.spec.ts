@@ -4,6 +4,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import apData from "../src/data/ap-2027.json";
 import { pressViewChip } from "./support/view-chip";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #8) — Tester evidence spec.
@@ -24,8 +25,7 @@ import { pressViewChip } from "./support/view-chip";
  *   - AC5: info panel screenshot showing the textual "pending" badge.
  */
 
-const EVIDENCE_DIR =
-  process.env.QA_EVIDENCE_DIR ?? "docs/super-board/runs/issue-8-qa-v1";
+const EVIDENCE_DIR = evidenceDir("issue-8-qa-v1");
 
 const SELECTION_KEY = "apx.selection.v1";
 const RESOLUTIONS_KEY = "apx.resolutions.v1";

@@ -1,5 +1,6 @@
 import { test, expect, type Locator, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA v3 (issue #44, Jon's PR #48 design bounce, pass 2) —
@@ -37,10 +38,11 @@ import AxeBuilder from "@axe-core/playwright";
  *      light, AAS dark) — the #8 bar.
  *
  * Evidence (Jon's mandated set: Biology + AAS, light+dark, desktop+mobile,
- * plus Calc AB unchanged) is captured to docs/super-board/runs/issue-44-qa-v3/.
+ * plus Calc AB unchanged) is captured to the `issue-44-qa-v3` evidence folder
+ * resolved by `evidenceDir()` (e2e/support/evidence.ts).
  */
 
-const EVIDENCE_DIR = "docs/super-board/runs/issue-44-qa-v3";
+const EVIDENCE_DIR = evidenceDir("issue-44-qa-v3");
 const SELECTION_KEY = "apx.selection.v1";
 const THEME_KEY = "apx.theme.v1";
 

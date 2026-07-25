@@ -7,6 +7,7 @@ import {
   weekdayLabel,
   type CalendarBlock,
 } from "./calendar";
+import { EXAM_NOTE_LABEL } from "./schedule";
 import {
   captureCardPng,
   CATEGORY_PALETTE,
@@ -126,6 +127,11 @@ function renderBlock(
     overflow: "hidden",
     padding: "4px 6px",
   });
+  // Row order mirrors the site's block face exactly (see the ORDERING CONTRACT
+  // in src/components/CalendarView.tsx): the segment is a fixed height with
+  // `overflow: hidden`, so the qualifier marker goes ABOVE the markers that a
+  // non-text cue already carries, and the secondary markers share one line so
+  // the stack cannot grow with their count.
   examSeg.append(
     el(
       "div",
@@ -137,22 +143,51 @@ function renderBlock(
     el(
       "div",
       { marginTop: "2px" },
+      // Clock only — "length pending" is carried by the marker row below and by
+      // the block's dashed border, never twice on one face.
       block.approximate
-        ? `${block.startClock} · length pending`
+        ? block.startClock
         : `${block.startClock} – ${block.endClock}`,
     ),
   );
-  if (block.approximate) {
-    examSeg.append(
-      el("div", { marginTop: "1px", fontStyle: "italic" }, "Length pending"),
-    );
-  }
-  if (block.movedToLate) {
+  // Published-qualifier marker (issue #71) — the verbatim text is printed in the
+  // card's notes strip below the grid, which is the only place on a fixed-size
+  // block grid that can hold a paragraph without truncating it.
+  if (block.examNote) {
     examSeg.append(
       el(
         "div",
-        { marginTop: "1px", fontStyle: "italic", fontWeight: "500" },
-        "Moved to late testing",
+        {
+          marginTop: "1px",
+          fontStyle: "italic",
+          fontWeight: "500",
+          fontSize: "10px",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        },
+        EXAM_NOTE_LABEL,
+      ),
+    );
+  }
+  const secondaryMarkers = [
+    block.movedToLate ? "Moved to late testing" : null,
+    block.approximate ? "Length pending" : null,
+  ].filter((marker): marker is string => marker !== null);
+  if (secondaryMarkers.length > 0) {
+    examSeg.append(
+      el(
+        "div",
+        {
+          marginTop: "1px",
+          fontStyle: "italic",
+          fontWeight: "500",
+          fontSize: "10px",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        },
+        secondaryMarkers.join(" · "),
       ),
     );
   }
@@ -416,6 +451,87 @@ function renderOffGridStrip(
 }
 
 /**
+ * "Published notes" strip (issue #71) — one entry per block on THIS week's grid
+ * whose subject carries a verbatim `examNote`.
+ *
+ * Why the card needs it: the block face has room only for the
+ * {@link EXAM_NOTE_LABEL} marker, and a PNG has no tooltip, no accessible name,
+ * and no details dialog to defer the full text to. Without this strip the export
+ * would show a bare "May 7 · PM" for an exam only pilot schools may sit. The
+ * qualifier is printed verbatim from the dataset, never summarised.
+ */
+function renderNotesStrip(
+  card: CalendarCard,
+  tokens: ThemeTokens,
+  theme: ExportTheme,
+): HTMLElement | null {
+  const noted: CalendarBlock[] = [];
+  for (const day of card.week.days) {
+    for (const block of day.blocks) if (block.examNote) noted.push(block);
+  }
+  if (noted.length === 0) return null;
+
+  const strip = el("div", {
+    boxSizing: "border-box",
+    border: `1px solid ${tokens.divider}`,
+    borderRadius: "10px",
+    padding: "12px 14px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+  });
+  strip.append(
+    el(
+      "div",
+      { fontSize: "13px", fontWeight: "600", color: tokens.body },
+      `${EXAM_NOTE_LABEL}s`,
+    ),
+  );
+
+  const list = el("div", {
+    display: "flex",
+    flexDirection: "column",
+    gap: "6px",
+  });
+  for (const block of noted) {
+    const accent = block.category
+      ? CATEGORY_PALETTE[theme][block.category].accent
+      : NEUTRAL_ACCENT[theme];
+    const row = el("div", {
+      display: "flex",
+      alignItems: "flex-start",
+      gap: "6px",
+      fontSize: "12px",
+      lineHeight: "1.4",
+      color: tokens.muted,
+    });
+    row.append(
+      el("span", {
+        width: "8px",
+        height: "8px",
+        borderRadius: "9999px",
+        background: accent,
+        flex: "0 0 auto",
+        marginTop: "5px",
+      }),
+    );
+    const text = el("span", { minWidth: "0" });
+    text.append(
+      el(
+        "span",
+        { fontWeight: "600", color: tokens.body },
+        `${block.subjectName}: `,
+      ),
+    );
+    text.append(el("span", {}, block.examNote!));
+    row.append(text);
+    list.append(row);
+  }
+  strip.append(list);
+  return strip;
+}
+
+/**
  * Build the designed calendar-card DOM node for one week. Pure DOM (not
  * attached) — the caller attaches it off-screen for rasterization.
  */
@@ -548,6 +664,8 @@ export function renderCalendarCardNode(
     options.theme,
   );
   if (strip) body.append(strip);
+  const notes = renderNotesStrip(card, tokens, options.theme);
+  if (notes) body.append(notes);
   cardBox.append(body);
 
   // ── Footer: schedule name + credit ─────────────────────────────────────────

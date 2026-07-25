@@ -1,5 +1,6 @@
 import { test, expect, type Download } from "@playwright/test";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * Builder evidence + acceptance drive for issue #56 + Jon's pre-merge bounce —
@@ -19,7 +20,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
  *     → the Late Testing week.
  */
 
-const EVIDENCE_DIR = "docs/super-board/runs/issue-56-build-v2";
+const EVIDENCE_DIR = evidenceDir("issue-56-build-v2");
 
 interface Scenario {
   key: string;

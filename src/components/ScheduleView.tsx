@@ -6,6 +6,7 @@ import { CYCLE } from "@/data/cycle";
 import type { ApDataset, ApSubject } from "@/data/schema";
 import { useSelection } from "@/lib/selection";
 import {
+  EXAM_NOTE_LABEL,
   buildSchedule,
   formatDateLabel,
   type ScheduleEntry,
@@ -80,6 +81,23 @@ function ScheduleRow({ entry }: { entry: ScheduleEntry }) {
       {entry.movedToLate && (
         <p className="text-xs italic break-words text-slate-600 dark:text-slate-400">
           {COORDINATOR_NOTE}
+        </p>
+      )}
+
+      {/* A published qualifier on the exam itself (AP Networking's May 2027 date
+          is "2026-27 pilot schools only"). Issue #71: the catalog chip and the
+          details dialog already disclosed it, but this row printed a bare
+          "May 7 · PM" — a published date without its published restriction
+          reads as an exam any student can sit. Verbatim from the dataset,
+          never editorialised (PROJECT.md data rule); the label only names what
+          the text IS. */}
+      {entry.examNote && (
+        <p
+          data-testid="schedule-exam-note"
+          className="text-xs leading-relaxed break-words text-slate-600 dark:text-slate-300"
+        >
+          <span className="font-semibold">{EXAM_NOTE_LABEL}:</span>{" "}
+          {entry.examNote}
         </p>
       )}
 

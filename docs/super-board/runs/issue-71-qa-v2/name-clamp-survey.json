@@ -1,0 +1,75 @@
+{
+  "desktop": {
+    "laneWidth": 159,
+    "nameWidth": 143,
+    "faceHeight": 132,
+    "faceUsed": 30,
+    "total": 39,
+    "clampedCount": 3,
+    "clamped": [
+      "AP Comparative Government and Politics",
+      "AP Physics C: Electricity and Magnetism",
+      "AP United States Government and Politics"
+    ]
+  },
+  "tablet": {
+    "laneWidth": 113,
+    "nameWidth": 97,
+    "faceHeight": 132,
+    "faceUsed": 45,
+    "total": 39,
+    "clampedCount": 17,
+    "clamped": [
+      "AP African American Studies",
+      "AP Business with Personal Finance",
+      "AP Chinese Language and Culture",
+      "AP Comparative Government and Politics",
+      "AP Computer Science Principles",
+      "AP English Language and Composition",
+      "AP English Literature and Composition",
+      "AP Environmental Science",
+      "AP French Language and Culture",
+      "AP German Language and Culture",
+      "AP Italian Language and Culture",
+      "AP Japanese Language and Culture",
+      "AP Macroeconomics",
+      "AP Physics C: Electricity and Magnetism",
+      "AP Spanish Language and Culture",
+      "AP Spanish Literature and Culture",
+      "AP United States Government and Politics"
+    ]
+  },
+  "mobile": {
+    "laneWidth": 97,
+    "nameWidth": 81,
+    "faceHeight": 132,
+    "faceUsed": 45,
+    "total": 39,
+    "clampedCount": 23,
+    "clamped": [
+      "AP African American Studies",
+      "AP Business with Personal Finance",
+      "AP Chinese Language and Culture",
+      "AP Comparative Government and Politics",
+      "AP Computer Science Principles",
+      "AP Cybersecurity",
+      "AP English Language and Composition",
+      "AP English Literature and Composition",
+      "AP Environmental Science",
+      "AP French Language and Culture",
+      "AP German Language and Culture",
+      "AP Italian Language and Culture",
+      "AP Japanese Language and Culture",
+      "AP Macroeconomics",
+      "AP Microeconomics",
+      "AP Physics 1: Algebra-Based",
+      "AP Physics 2: Algebra-Based",
+      "AP Physics C: Electricity and Magnetism",
+      "AP Spanish Language and Culture",
+      "AP Spanish Literature and Culture",
+      "AP United States Government and Politics",
+      "AP United States History",
+      "AP World History: Modern"
+    ]
+  }
+}

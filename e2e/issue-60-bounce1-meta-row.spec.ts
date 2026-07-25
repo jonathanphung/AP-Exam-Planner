@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board Build (issue #60, Jon bounce pass 1) — the mobile support pair is
@@ -40,6 +41,8 @@ import { test, expect } from "@playwright/test";
  * one, which would leave both copies — or neither — in the a11y tree) would ship
  * silently.
  */
+
+const EVIDENCE_DIR = evidenceDir("issue-60-build-bounce1");
 
 const MOBILE = { width: 375, height: 667 };
 const TABLET = { width: 768, height: 1024 };
@@ -226,7 +229,7 @@ for (const [label, vp] of [
     ).toBe(0);
 
     await page.screenshot({
-      path: `docs/super-board/runs/issue-60-build-bounce1/${label}-quiet-meta-row.png`,
+      path: `${EVIDENCE_DIR}/${label}-quiet-meta-row.png`,
     });
   });
 }

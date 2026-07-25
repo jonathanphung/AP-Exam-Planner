@@ -93,6 +93,12 @@ export interface WeekCardRow {
   movedToLate: boolean;
   /** Portfolio submission note (verbatim); null for exams. */
   note: string | null;
+  /**
+   * The exam's published qualifier (verbatim `examNote`), or null (issue #71).
+   * A `.png` has no popup and no tooltip, so this text is PRINTED on the card
+   * under the subject name — the card is the whole disclosure surface.
+   */
+  examNote: string | null;
 }
 
 export interface WeekCard {
@@ -226,6 +232,7 @@ function examRow(block: CalendarBlock, date: string): WeekCardRow {
     lengthPending: block.approximate,
     movedToLate: block.movedToLate,
     note: null,
+    examNote: block.examNote,
   };
 }
 
@@ -255,6 +262,7 @@ function offGridRow(
     lengthPending: false,
     movedToLate: entry.movedToLate,
     note: entry.note,
+    examNote: entry.examNote,
   };
 }
 

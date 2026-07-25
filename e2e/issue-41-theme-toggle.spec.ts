@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #41) — theme toggle, REVISED for Jon's 2026-07-09
@@ -28,7 +29,7 @@ import AxeBuilder from "@axe-core/playwright";
  */
 
 const THEME_KEY = "apx.theme.v1";
-const EVIDENCE_DIR = "docs/super-board/runs/issue-41-qa-v2";
+const EVIDENCE_DIR = evidenceDir("issue-41-qa-v2");
 
 type Resolved = "light" | "dark";
 /** The accessible name the button renders for a given resolved theme:

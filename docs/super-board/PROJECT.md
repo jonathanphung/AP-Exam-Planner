@@ -17,6 +17,7 @@ A public, no-login, client-side web app for AP students. The student picks the A
   - `src/data/` — `ap-2027.json` (the one swappable data file), `schema.ts` (zod + the `REGULAR_WINDOWS` / `LATE_TESTING_WINDOW` constants), `cycle.ts` (the single accessor for the cycle label — never hand-write "May 2027" in a component), `sources.md` (citation URLs).
   - `e2e/` — Playwright specs. QA lane appends here; one spec file per issue (`e2e/issue-<N>-*.spec.ts`).
 - Playwright is configured with `webServer` so `pnpm test:e2e` boots the app itself. Standard viewports for evidence: 1920×1080, 1024×768, 375×667.
+- **Evidence screenshots (issue #71):** specs never hardcode `docs/super-board/runs/…` — they call `evidenceDir("<slug>")` from `e2e/support/evidence.ts`. A default `pnpm test:e2e` writes to gitignored `test-results/evidence/<slug>/`, so a full run can never rewrite the committed PNGs that older issue/PR comments embed by raw URL. To capture committed evidence for your card, point one spec at your folder: `QA_EVIDENCE_DIR=docs/super-board/runs/issue-<N>-qa-v1 pnpm exec playwright test e2e/issue-<N>-*.spec.ts`. No lane needs `git checkout -- docs/super-board/runs/` any more.
 
 ## Commands
 

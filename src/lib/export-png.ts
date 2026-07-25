@@ -1,4 +1,5 @@
 import type { WeekCard, WeekCardRow } from "./week-cards";
+import { EXAM_NOTE_LABEL } from "./schedule";
 import {
   captureCardPng,
   categoryAccent,
@@ -147,6 +148,19 @@ function renderRow(
         "span",
         { fontSize: "12px", color: tokens.muted, lineHeight: "1.35" },
         row.note,
+      ),
+    );
+  }
+
+  // A published qualifier on the exam itself (issue #71). Printed in full on the
+  // card because a PNG has no popup or tooltip to defer it to: the exported
+  // image is the only thing the student ends up looking at.
+  if (row.examNote) {
+    left.append(
+      el(
+        "span",
+        { fontSize: "12px", color: tokens.muted, lineHeight: "1.35" },
+        `${EXAM_NOTE_LABEL}: ${row.examNote}`,
       ),
     );
   }

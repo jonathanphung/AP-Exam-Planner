@@ -16,6 +16,22 @@ import type { ResolvedSlot } from "./conflicts";
 /** A schedule entry is either a sit-down exam or a portfolio submission deadline. */
 export type ScheduleEntryKind = "exam" | "portfolio";
 
+/**
+ * The label every schedule surface prefixes a verbatim {@link
+ * ScheduleEntry.examNote} with (issue #71).
+ *
+ * It names the CLASS of the text — "what follows is College Board's own note on
+ * this exam" — and never paraphrases or shortens the qualifier itself, which is
+ * always printed verbatim from the dataset (PROJECT.md data rule). A derived
+ * short badge would be editorial: "2026-27 pilot schools only" is College
+ * Board's wording for AP Networking today, but nothing guarantees the next
+ * cycle's qualifier compresses the same way.
+ *
+ * Shared by the list view, the calendar block, the ICS DESCRIPTION, the `.txt`
+ * export, and both `.png` card variants so the wording cannot drift per surface.
+ */
+export const EXAM_NOTE_LABEL = "Published note";
+
 export interface ScheduleEntry {
   /** Stable React key: `${subjectId}:${kind}` (a subject can yield both). */
   key: string;
@@ -28,6 +44,18 @@ export interface ScheduleEntry {
   session: Session | null;
   /** Portfolio submission note from the dataset; `null` for exams. */
   note: string | null;
+  /**
+   * The dataset's verbatim `examNote` — a published qualifier College Board
+   * attaches to this subject's exam (AP Networking's May 2027 sitting is
+   * "2026-27 pilot schools only"). `null` for portfolio entries and for exams
+   * with no qualifier.
+   *
+   * Carried on the entry rather than looked up per surface so EVERY surface that
+   * prints this entry's date can print its restriction too (issue #71): a date
+   * without its published restriction reads as an exam any student can sit. See
+   * {@link EXAM_NOTE_LABEL}.
+   */
+  examNote: string | null;
   /** True when a conflict resolution moved this exam to its late-testing slot. */
   movedToLate: boolean;
 }
@@ -79,6 +107,9 @@ function withinDayRank(entry: ScheduleEntry): number {
  * - Portfolio-only subjects yield a single portfolio entry (never an exam).
  * - `resolvedSlots` (from `resolveSlots` in conflicts.ts) re-points exam
  *   entries to their effective slot; portfolio entries are never affected.
+ * - Each exam entry carries the subject's verbatim `examNote` so every
+ *   downstream surface (list view, calendar block, ICS/TXT/PNG exports) can
+ *   print the published restriction next to the date it prints.
  */
 export function buildSchedule(
   subjects: readonly ApSubject[],
@@ -105,6 +136,7 @@ export function buildSchedule(
         date: resolved?.date ?? subject.exam.date,
         session: resolved?.session ?? subject.exam.session,
         note: null,
+        examNote: subject.examNote ?? null,
         movedToLate: resolved?.movedToLate ?? false,
       });
     }
@@ -119,6 +151,7 @@ export function buildSchedule(
         date: subject.portfolio.deadline,
         session: null,
         note: subject.portfolio.note,
+        examNote: null,
         movedToLate: false,
       });
     }

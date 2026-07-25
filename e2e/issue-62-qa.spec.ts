@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { MAX_SCHEDULE_NAME_LENGTH } from "../src/lib/schedules";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #62) — reject duplicate + over-length schedule names
@@ -27,8 +28,7 @@ import { MAX_SCHEDULE_NAME_LENGTH } from "../src/lib/schedules";
  * viewports lands in the run folder and is committed to the issue branch.
  */
 
-const EVIDENCE_DIR =
-  process.env.QA_EVIDENCE_DIR ?? "docs/super-board/runs/issue-62-qa-v1";
+const EVIDENCE_DIR = evidenceDir("issue-62-qa-v1");
 
 const DESKTOP = { width: 1920, height: 1080 };
 const TABLET = { width: 1024, height: 768 };

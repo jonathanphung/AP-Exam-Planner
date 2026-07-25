@@ -235,7 +235,7 @@ export function registerDialogShiftTests() {
   test("moved-to-late action dialog (CalendarView) opens with zero horizontal shift under classic scrollbars", async ({
     page,
   }) => {
-    // Resolution keeps Latin → Biology sits on its late-testing week.
+    // Resolution keeps AP Italian → Biology sits on its late-testing week.
     await seedKey(page, SELECTION_KEY, [BIOLOGY.id, ITALIAN.id]);
     await seedKey(page, RESOLUTIONS_KEY, [
       {

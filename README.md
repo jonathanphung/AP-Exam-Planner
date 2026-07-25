@@ -14,7 +14,7 @@ Why it exists: College Board publishes exam dates, late-testing dates, portfolio
 
 ### Category-grouped catalog with per-course details
 
-The full 42-subject AP catalog is grouped into labeled sections (STEM, Humanities, Languages, Arts, and Career Kickstart) with search and a quick-jump nav, each subject carrying a topical emoji. Adding an exam is one tap.
+The catalog carries every AP course College Board lists for the cycle, grouped into labeled sections (STEM, Humanities, Languages, Arts, and Career Kickstart) with search and a quick-jump nav, each subject carrying a topical emoji. Adding an exam is one tap.
 
 Every course chip expands in place through three tiers of detail:
 

@@ -22,7 +22,11 @@ import {
   unresolvedConflicts,
   type SlotResolution,
 } from "@/lib/conflicts";
-import { buildSchedule, formatDateLabel } from "@/lib/schedule";
+import {
+  EXAM_NOTE_LABEL,
+  buildSchedule,
+  formatDateLabel,
+} from "@/lib/schedule";
 import {
   buildCalendarLayout,
   defaultWeekIndex,
@@ -246,12 +250,26 @@ function ExamBlock({
       ? CATEGORY_STYLES[block.category].block
       : FALLBACK_BLOCK_STYLE;
 
+  // The face prints the clock ONLY. An approximate block used to repeat
+  // "· length pending" here and again as its own italic marker below; on a
+  // narrow column that suffix wrapped the clock onto three lines and pushed the
+  // markers under it off the face (issue #71 QA v1). One carrier each: the
+  // dashed border and the "Length pending" marker say the length is a guess,
+  // the accessible name says it in words, and the clock stays one line.
   const spanLabel = block.approximate
-    ? `${block.startClock} · length pending`
+    ? block.startClock
     : `${block.startClock} – ${block.endClock}`;
   const spokenSpan = block.approximate
     ? `starts ${block.startClock}, exam length pending, approximate block`
     : `${block.startClock} to ${block.endClock} (${minutesLabel(block.examMinutes!)})`;
+  // Secondary face markers, highest-value first. They share ONE line (joined
+  // by "·") so the stack height cannot grow with the number of markers — see
+  // the face's ordering contract below.
+  const secondaryMarkers = [
+    conflicted ? "Time conflict" : null,
+    block.movedToLate ? "Moved to late testing" : null,
+    block.approximate ? "Length pending" : null,
+  ].filter((marker): marker is string => marker !== null);
   // The conflict is carried in WORDS in the accessible name — never by the
   // orange fill or the ⚠️ glyph alone (both are aria-hidden decoration).
   const accessibleName = [
@@ -261,6 +279,10 @@ function ExamBlock({
     spokenSpan,
     `plus ${SETUP_BUFFER_MINUTES} minutes setup buffer`,
     block.movedToLate ? "moved to late testing" : null,
+    // Issue #71: the block face has room only for the marker, so the VERBATIM
+    // qualifier travels in the accessible name (and the title tooltip below),
+    // and in full in the details dialog this block opens.
+    block.examNote ? `${EXAM_NOTE_LABEL}: ${block.examNote}` : null,
   ]
     .filter(Boolean)
     .join(", ");
@@ -285,12 +307,40 @@ function ExamBlock({
         title={`${block.subjectName} — ${accessibleName.slice(block.subjectName.length + 2)}`}
         className={`flex h-full w-full flex-col overflow-hidden rounded-md border-l-4 text-left text-xs leading-tight transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:ring-offset-white dark:hover:brightness-110 dark:focus-visible:ring-offset-slate-950 ${style} ${block.approximate ? "border-dashed border-t border-r border-b" : ""}`}
       >
+        {/* Exam segment — the labelled, duration-proportional portion.
+            ORDERING CONTRACT (issue #71 QA v1): this box has a FIXED height and
+            `overflow-hidden`, so whatever sits last is what disappears, and
+            `toBeVisible()` still reports true for a row clipped to zero pixels.
+            Rows are therefore ordered by how little the reader can recover from
+            elsewhere, and every row after the subject name is height-capped:
+
+              1. subject name        — clamped to 2 lines
+              2. clock               — clamped to 2 lines
+              3. published qualifier — ONE line; nothing else on the grid
+                                       discloses it, so it must never be last
+              4. secondary markers   — ONE shared line; each of these is also
+                                       carried by a non-text cue (orange fill +
+                                       ⚠️, the LATE TESTING week badge, the
+                                       dashed border), so this is the row that
+                                       may ellipsise on a narrow column
+
+            Do not append a row after (3) or un-cap (1)/(2): both re-open the
+            clipped-marker defect that `AC6-QA7` in e2e/issue-71-qa.spec.ts
+            measures at 1920/1024/375, in the regular and moved-to-late states.
+
+            Known and deliberate: below roughly a 64px-wide lane (two or more
+            same-slot blocks sharing a phone-width column) the marker rows
+            ellipsise HORIZONTALLY. That is a legible "there is more" affordance
+            — the verbatim qualifier is still in the button's accessible name,
+            its `title` tooltip, and the details dialog the block opens — and it
+            is the only outcome available in a column that cannot fit 14
+            characters at any readable size. */}
         <span
           aria-hidden="true"
           className="block min-h-0 flex-none overflow-hidden px-1.5 py-1"
           style={{ height: `${examHeight}px` }}
         >
-          <span className="block font-semibold break-words">
+          <span className="line-clamp-2 font-semibold break-words">
             {conflicted && (
               // Decorative caution glyph — a SHAPE cue, not colour; the words
               // live in the button's accessible name and the caption below.
@@ -300,18 +350,27 @@ function ExamBlock({
             )}
             {block.subjectName}
           </span>
-          <span className="mt-0.5 block">{spanLabel}</span>
-          {conflicted && (
-            <span className="mt-0.5 block font-medium italic">
-              Time conflict
+          <span className="mt-0.5 line-clamp-2">{spanLabel}</span>
+          {/* Published qualifier marker (issue #71). A duration-proportional
+              block cannot legibly hold a paragraph, so the face carries the
+              label and the verbatim text rides the accessible name / tooltip
+              and the details dialog this block opens on activation. */}
+          {block.examNote && (
+            <span
+              data-testid="block-exam-note"
+              className="mt-0.5 block overflow-hidden text-[10px] font-medium text-ellipsis whitespace-nowrap italic"
+            >
+              {EXAM_NOTE_LABEL}
             </span>
           )}
-          {block.approximate && (
-            <span className="mt-0.5 block italic">Length pending</span>
-          )}
-          {block.movedToLate && (
-            <span className="mt-0.5 block font-medium italic">
-              Moved to late testing
+          {secondaryMarkers.length > 0 && (
+            <span className="mt-0.5 block overflow-hidden text-[10px] font-medium text-ellipsis whitespace-nowrap italic">
+              {secondaryMarkers.map((marker, index) => (
+                <span key={marker}>
+                  {index > 0 && <span aria-hidden="true"> · </span>}
+                  <span>{marker}</span>
+                </span>
+              ))}
             </span>
           )}
         </span>

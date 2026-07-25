@@ -206,7 +206,7 @@ describe("issue #38 QA — real dataset, invariants re-derived", () => {
     // remaining gap by re-deriving every row for ALL dataset subjects, one
     // selection at a time (no conflict resolutions needed for singletons). It
     // is the regression guard for this run's recurring defect class — a false
-    // "pending" (or an invented number) anywhere in the 42 subjects, including
+    // "pending" (or an invented number) anywhere in the roster, including
     // part-level rows (psychology's AAQ/EBQ, the language exams' Q1–Q4) that
     // the fixtures don't individually enumerate.
     const derivedQuestion = (
