@@ -15,7 +15,7 @@ import { groupSubjectsByCategory, matchesSubjectQuery } from "./catalog-groups";
 const dataset = parseApDataset(apData);
 
 describe("groupSubjectsByCategory", () => {
-  it("groups all 42 subjects under their category in canonical order for an empty query", () => {
+  it("groups every dataset subject under their category in canonical order for an empty query", () => {
     const groups = groupSubjectsByCategory(dataset.subjects);
 
     // Every category is represented (the shipped dataset has ≥1 per category)

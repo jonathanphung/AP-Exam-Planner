@@ -98,9 +98,13 @@ export const sectionPartSchema = z.strictObject({
  * ones College Board actually titles ("Section IIB: Free Response: Sight
  * Singing"), never forced into an MCQ/FRQ mold. `parts` is present only when
  * the page publishes a Part A/Part B-style split. Values are populated from
- * the adversarially verified provenance in
- * docs/super-board/research/collegeboard-2026/ — never estimated, never
- * back-computed, never summed into aggregates the page does not print.
+ * the adversarially verified provenance for the SHIPPED cycle —
+ * docs/super-board/research/collegeboard-2027/ — never estimated, never
+ * back-computed, never summed into aggregates the page does not print. (The
+ * sibling collegeboard-2026/ folder is the superseded prior cycle, kept only
+ * as the audit trail for how May 2026 values were sourced; seven subjects'
+ * sections changed in the 2027 swap, so a 2027 value must be verified against
+ * the 2027 folder.)
  */
 export const examSectionSchema = z.strictObject({
   name: z.string().min(1),

@@ -175,7 +175,7 @@ test.describe("issue #24 — desktop catalog grouped by category by default", ()
     await expect(catalog(page).locator("button[aria-pressed]")).toHaveCount(3);
     await expect(quickJump(page).getByRole("button")).toHaveCount(1);
 
-    // No matches → empty state; clearing restores all 42.
+    // No matches → empty state; clearing restores the whole roster.
     await search.fill("zzzz-no-such-subject");
     await expect(
       catalog(page).getByText("No subjects match your search."),

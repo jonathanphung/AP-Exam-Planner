@@ -12,7 +12,7 @@ import { pressViewChip } from "./support/view-chip";
  * on the issue / PR.
  *
  * ACs covered here (browser-observable):
- *   AC1 — complete coverage: every one of the 42 catalog cards renders a
+ *   AC1 — complete coverage: every catalog card in the dataset renders a
  *         non-blank leading emoji glyph.
  *   AC2 — the emoji appears next to the name on every surface: catalog grid,
  *         schedule list, conflict prompt's subject list, and info-panel title.
@@ -78,7 +78,7 @@ async function openList(page: Page) {
 }
 
 test.describe("issue #20 — decorative subject emoji everywhere the name shows", () => {
-  test("AC1 — every catalog card renders a non-blank leading emoji (complete coverage, all 42)", async ({
+  test("AC1 — every catalog card renders a non-blank leading emoji (complete coverage, whole roster)", async ({
     page,
   }) => {
     await page.goto("/");
