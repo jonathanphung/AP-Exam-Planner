@@ -224,8 +224,10 @@ test.describe("issue #37 — annual dataset swap to the May 2027 cycle", () => {
     const cards = catalog(page).locator("ul > li button[aria-pressed]");
     await expect(cards).toHaveCount(SUBJECTS.length);
 
-    // Any subject whose exam carries a published qualifier must render it —
-    // a bare date would read as an exam any student can sit.
+    // Any subject whose exam carries a published qualifier must render it on
+    // BOTH surfaces that print the exam date — a bare date would read as an
+    // exam any student can sit. Tier 1 is the chip's disclosure; Tier 2 is the
+    // "Full exam details" dialog, which prints the date in its own header.
     const noted = SUBJECTS.filter((s) => s.examNote);
     expect(
       noted.length,
@@ -234,6 +236,14 @@ test.describe("issue #37 — annual dataset swap to the May 2027 cycle", () => {
     for (const subject of noted) {
       await expandChip(page, subject);
       await expect(page.getByText(subject.examNote!)).toBeVisible();
+
+      await page
+        .getByRole("button", { name: `View exam details for ${subject.name}` })
+        .click();
+      const dialog = page.getByRole("dialog");
+      await expect(dialog).toContainText(subject.examNote!);
+      await page.keyboard.press("Escape");
+      await expect(dialog).toBeHidden();
     }
   });
 

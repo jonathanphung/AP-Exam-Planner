@@ -527,6 +527,19 @@ export function InfoPanel({ subject, onClose }: InfoPanelProps) {
             </div>
           )}
 
+          {/* A published qualifier on the exam itself (AP Networking's May
+              2027 date is "2026-27 pilot schools only"). Same reason as the
+              chip's disclosure renders it (SubjectChip.tsx): the header above
+              prints a bare `Exam May 7 · PM`, which without its published
+              restriction reads as an exam any student can sit. Sibling of
+              `noExamReason` — mutually exclusive in this cycle's data, but the
+              schema does not require that, so both branches stand alone. */}
+          {subject.examNote && (
+            <p className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs leading-relaxed text-slate-600 dark:border-slate-800 dark:bg-slate-800/40 dark:text-slate-300">
+              {subject.examNote}
+            </p>
+          )}
+
           {subject.noExamReason && (
             <p className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs leading-relaxed text-slate-600 dark:border-slate-800 dark:bg-slate-800/40 dark:text-slate-300">
               {subject.noExamReason}

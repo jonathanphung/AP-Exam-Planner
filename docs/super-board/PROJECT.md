@@ -4,7 +4,7 @@ Context file for super-board lane agents. Read this before touching any card. Th
 
 ## What this app is
 
-A public, no-login, client-side web app for AP students. The student picks the AP exams they're taking from the full subject catalog and gets: official May 2026 exam dates and AM/PM sessions, digital-portfolio deadlines (for the handful of subjects that have them), same-slot conflict detection with late-testing resolution, per-subject format and pass-rate info, and an ICS calendar export. Portfolio project — no branding, no lead capture, no backend.
+A public, no-login, client-side web app for AP students. The student picks the AP exams they're taking from the full subject catalog and gets: official May 2027 exam dates and AM/PM sessions, digital-portfolio deadlines (for the handful of subjects that have them), same-slot conflict detection with late-testing resolution, per-subject format and pass-rate info, and an ICS calendar export. Portfolio project — no branding, no lead capture, no backend.
 
 ## Stack and layout
 
@@ -14,7 +14,7 @@ A public, no-login, client-side web app for AP students. The student picks the A
   - `src/app/` — routes and layout (single-page app: catalog + schedule on one screen is fine).
   - `src/components/` — UI components.
   - `src/lib/` — pure logic: selection store, conflict detection, ICS generation. Keep logic out of components so it's unit-testable.
-  - `src/data/` — `ap-2026.json` (the one swappable data file), `schema.ts` (zod), `sources.md` (citation URLs).
+  - `src/data/` — `ap-2027.json` (the one swappable data file), `schema.ts` (zod + the `REGULAR_WINDOWS` / `LATE_TESTING_WINDOW` constants), `cycle.ts` (the single accessor for the cycle label — never hand-write "May 2027" in a component), `sources.md` (citation URLs).
   - `e2e/` — Playwright specs. QA lane appends here; one spec file per issue (`e2e/issue-<N>-*.spec.ts`).
 - Playwright is configured with `webServer` so `pnpm test:e2e` boots the app itself. Standard viewports for evidence: 1920×1080, 1024×768, 375×667.
 
@@ -34,9 +34,9 @@ A public, no-login, client-side web app for AP students. The student picks the A
 
 ## The data rule (hard requirement, from PRD §7.5/§8/§11)
 
-- **Never invent or estimate dates, deadlines, or pass rates.** Every value in `src/data/ap-2026.json` must come from College Board's published pages (AP calendar, late-testing calendar, score distribution report). Anything not yet verifiable is the literal string `"pending"`.
-- All dates reflect the **May 2026 cycle**. The May 2027 calendar is unpublished — do not project it. The JSON file is the single swap point for next year.
-- Known anchors (from the PRD): AP Seminar / AP Research / AP CSP portfolio deadline = **2026-04-30**; AP Art & Design portfolio submission = **2026-05-08**. Portfolio deadlines get equal visual weight to exam dates, and the UI notes that schools often set earlier internal deadlines.
+- **Never invent or estimate dates, deadlines, or pass rates.** Every value in `src/data/ap-2027.json` must come from College Board's published pages (AP calendar, late-testing calendar, score distribution report). Anything not yet verifiable is the literal string `"pending"`.
+- All dates reflect the **May 2027 cycle** (regular testing May 3–7 and May 10–14; late testing May 17–21 — `REGULAR_WINDOWS` / `LATE_TESTING_WINDOW` in `schema.ts`). The rule is about the *next* cycle, not a fixed year: whichever calendar College Board has not published yet must never be projected. The JSON file is the single swap point when it is.
+- Known anchors (verified 2026-07-24 against College Board; provenance in `src/data/sources.md`): AP Seminar / AP Research / AP CSP portfolio deadline = **2027-04-30**; AP Art & Design portfolio submission = **2027-05-07**, 11:59 p.m. ET. Six world-language courses also carry a published Personalized Project Reference deadline — per-subject, only where the course page prints it. Portfolio deadlines get equal visual weight to exam dates, and the UI notes that schools often set earlier internal deadlines.
 
 ## Definition of done (per card and overall)
 
