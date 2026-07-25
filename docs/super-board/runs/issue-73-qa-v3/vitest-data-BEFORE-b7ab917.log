@@ -1,0 +1,41 @@
+
+> ap-exam-planner@0.1.0 test:data C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-73-qa
+> vitest run src/data
+
+
+ RUN  v4.1.9 C:/Users/jonat/repos/AP-Exam-Planner/AP-Exam-Planner/.worktrees/issue-73-qa
+
+ ❯ src/data/doc-freshness.test.ts (8 tests | 1 failed) 99ms
+     × AC5 — no test title counts the roster to a number the dataset disagrees with 61ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/data/doc-freshness.test.ts > issue #71 — documentation cannot silently outlive the dataset > AC5 — no test title counts the roster to a number the dataset disagrees with
+AssertionError: a title counts the roster to a number the dataset does not produce (allowed: 3, 5, 8, 13, 14, 43) — derive it from dataset.subjects.length (issue #71 AC5): expected [ …(2) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "e2e\\issue-73-qa-v2.spec.ts — \"bounce AC1 — each of the 18 subjects Jon named renders the table, and the PR #48 prose block survives in no form: no dl row carries a section name, no stat phrase, no zone divider\" claims 18",
++   "e2e\\issue-73-qa-v2.spec.ts — \"bounce AC3 — never a blank cell: every value cell of every section and part row, across all 38 sit-down subjects, renders something\" claims 38",
++ ]
+
+ ❯ src/data/doc-freshness.test.ts:167:7
+    165|       offenders,
+    166|       `a title counts the roster to a number the dataset does not prod…
+    167|     ).toEqual([]);
+       |       ^
+    168|   });
+    169|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  1 failed | 76 passed (77)
+   Start at  16:17:37
+   Duration  978ms (transform 492ms, setup 0ms, import 1.49s, tests 614ms, environment 1ms)
+
+ ELIFECYCLE  Command failed with exit code 1.

@@ -34,6 +34,17 @@ import apData from "../src/data/ap-2027.json";
  *
  * The 320px clip detector proves itself against a forced positive before any
  * assertion trusts it (same discipline as the #44 v3 suite).
+ *
+ * **Why no test title here carries a literal subject count.** `#71 AC5`
+ * (`src/data/doc-freshness.test.ts`) allows a roster count in a title only when
+ * the dataset itself produces that number — ROSTER_SIZE plus the per-category
+ * counts. `18` ("sections but no parts") and `38` ("has sections") are real
+ * dataset facts but not members of that set, and widening a #71 guard to admit
+ * them would bake in a predicate THIS branch just deleted: after the port,
+ * "sections but no parts" is no longer a rendering branch at all. So the counts
+ * live in `expect()` calls at the top of the sweeps that depend on them, where
+ * they fail loudly if the scope drifts — a title that merely says "18" cannot
+ * fail. Don't put the literals back in the titles.
  */
 
 const EVIDENCE_DIR = evidenceDir("issue-73-qa-v2");
@@ -136,9 +147,15 @@ async function seedSelection(page: Page, ids: string[]) {
 }
 
 test.describe("issue #73 bounce (QA v2) — one presentation, honestly degraded", () => {
-  test("bounce AC1 — each of the 18 subjects Jon named renders the table, and the PR #48 prose block survives in no form: no dl row carries a section name, no stat phrase, no zone divider", async ({
+  test("bounce AC1 — every subject on Jon's bounce list renders the table, and the PR #48 prose block survives in no form: no dl row carries a section name, no stat phrase, no zone divider", async ({
     page,
   }) => {
+    // The scope claim, asserted rather than stated in the title (see the
+    // "why no literal count" note at the top of this file): if the transcribed
+    // list ever loses an entry, this sweep must fail rather than quietly cover
+    // less than the bounce asked for.
+    expect(BOUNCE_18, "Jon's bounce lists 18 subjects").toHaveLength(18);
+
     await page.goto("/");
 
     const noTable: string[] = [];
@@ -181,9 +198,15 @@ test.describe("issue #73 bounce (QA v2) — one presentation, honestly degraded"
     expect(proseSurvivors, "prose-block markup survivors").toEqual([]);
   });
 
-  test("bounce AC3 — never a blank cell: every value cell of every section and part row, across all 38 sit-down subjects, renders something", async ({
+  test("bounce AC3 — never a blank cell: every value cell of every section and part row, across every sit-down subject, renders something", async ({
     page,
   }) => {
+    // `WITH_SECTIONS` is derived, so it is the one sweep here that could shrink
+    // silently — a dataset edit that dropped a subject's sections would narrow
+    // the walk with nothing failing. Pin the sit-down count (43 roster − 5
+    // portfolio-only).
+    expect(WITH_SECTIONS, "sit-down subjects swept").toHaveLength(38);
+
     await page.goto("/");
 
     const blanks: string[] = [];
@@ -246,7 +269,7 @@ test.describe("issue #73 bounce (QA v2) — one presentation, honestly degraded"
     );
   });
 
-  test("bounce AC4 — the a11y contract the dt/dd pairing used to give the 18: same caption, four column headers, a scoped row header on every row, and the sr-only section prefix still scoping part rows", async ({
+  test("bounce AC4 — the a11y contract the dt/dd pairing used to give the newly-tabled subjects: same caption, four column headers, a scoped row header on every row, and the sr-only section prefix still scoping part rows", async ({
     page,
   }) => {
     await page.goto("/");
