@@ -34,6 +34,7 @@ function examEntry(
   date: string,
   session: "AM" | "PM",
   movedToLate = false,
+  examNote: string | null = null,
 ): ScheduleEntry {
   return {
     key: `${subjectId}:exam`,
@@ -43,6 +44,7 @@ function examEntry(
     date,
     session,
     note: null,
+    examNote,
     movedToLate,
   };
 }
@@ -56,6 +58,7 @@ function portfolioEntry(subjectId: string, date: string): ScheduleEntry {
     date,
     session: null,
     note: "fixture note",
+    examNote: null,
     movedToLate: false,
   };
 }

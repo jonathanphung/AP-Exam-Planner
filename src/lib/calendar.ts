@@ -94,6 +94,14 @@ export interface CalendarBlock {
   endClock: string;
   /** True when a conflict resolution moved this exam to its late-testing slot. */
   movedToLate: boolean;
+  /**
+   * The schedule entry's verbatim `examNote` (issue #71), or null. A block is
+   * far too small to print a paragraph, so the views render a short
+   * `EXAM_NOTE_LABEL` marker on the block face and carry this full text in the
+   * block's accessible name / tooltip (site) or the card's notes strip (PNG) —
+   * the qualifier is never dropped and never paraphrased.
+   */
+  examNote: string | null;
   /** Horizontal lane when several blocks share one day+start (0-based). */
   laneIndex: number;
   /** Total lanes sharing this block's day+start. */
@@ -269,6 +277,7 @@ export function buildCalendarLayout(
         startClock: clockLabel(startHour),
         endClock: clockLabel(endHour),
         movedToLate: entry.movedToLate,
+        examNote: entry.examNote,
         laneIndex: 0,
         laneCount: 1,
       };

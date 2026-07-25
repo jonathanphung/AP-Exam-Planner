@@ -9,7 +9,11 @@ import { CYCLE_YEAR } from "../data/cycle";
 import { SETUP_BUFFER_MINUTES } from "./calendar";
 import type { SlotResolution } from "./conflicts";
 import { resolveSlots } from "./conflicts";
-import { buildSchedule, type ScheduleEntry } from "./schedule";
+import {
+  EXAM_NOTE_LABEL,
+  buildSchedule,
+  type ScheduleEntry,
+} from "./schedule";
 
 /**
  * Client-side ICS (iCalendar / RFC 5545) generator for the "Export to Calendar"
@@ -266,12 +270,23 @@ function partRow(part: ExamSectionPart): string {
  *  - The 30-minute setup allowance is a parenthetical ON the total row (part B),
  *    phrased so a reader can see the +30 is OUR product allowance, NOT College
  *    Board's stated duration.
+ *  - A published qualifier on the exam itself (`examNote` — AP Networking's May
+ *    2027 sitting is "2026-27 pilot schools only") LEADS the description, above
+ *    the section rows (issue #71). It is the one fact that changes whether the
+ *    reader can sit this exam at all, and an .ics event carries no other
+ *    disclosure surface: dropping it exports a date that reads as bookable.
+ *    Verbatim from the dataset, prefixed with {@link EXAM_NOTE_LABEL}.
  *
  * Returns the raw (unescaped, `\n`-joined) description text; the caller escapes
  * it through {@link escapeText}, which turns the newlines into literal `\n`.
  */
-function buildExamDescription(format: ExamFormat): string {
+function buildExamDescription(
+  format: ExamFormat,
+  examNote: string | null,
+): string {
   const rows: string[] = [];
+
+  if (examNote) rows.push(`${EXAM_NOTE_LABEL}: ${examNote}`, "");
 
   for (const section of format.sections) {
     const weight =
@@ -311,6 +326,9 @@ function examEventLines(
   format: ExamFormat,
   dtstamp: string,
 ): string[] {
+  // The entry (not the subject record) owns the qualifier — same source the
+  // list view and the txt/png exports read, so the four cannot drift.
+
   const { hour, minute } = parseSessionStartTime(sessionStartTimes[session]);
   const lines = [
     "BEGIN:VEVENT",
@@ -334,7 +352,9 @@ function examEventLines(
   // The AM/PM session is already implicit in DTSTART, so the summary no longer
   // carries the "(AM session)" / "(PM session)" suffix (issue #38).
   lines.push(`SUMMARY:${escapeText(`${entry.subjectName} exam`)}`);
-  lines.push(`DESCRIPTION:${escapeText(buildExamDescription(format))}`);
+  lines.push(
+    `DESCRIPTION:${escapeText(buildExamDescription(format, entry.examNote))}`,
+  );
   lines.push("END:VEVENT");
   return lines;
 }

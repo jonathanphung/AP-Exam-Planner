@@ -22,7 +22,11 @@ import {
   unresolvedConflicts,
   type SlotResolution,
 } from "@/lib/conflicts";
-import { buildSchedule, formatDateLabel } from "@/lib/schedule";
+import {
+  EXAM_NOTE_LABEL,
+  buildSchedule,
+  formatDateLabel,
+} from "@/lib/schedule";
 import {
   buildCalendarLayout,
   defaultWeekIndex,
@@ -261,6 +265,10 @@ function ExamBlock({
     spokenSpan,
     `plus ${SETUP_BUFFER_MINUTES} minutes setup buffer`,
     block.movedToLate ? "moved to late testing" : null,
+    // Issue #71: the block face has room only for the marker, so the VERBATIM
+    // qualifier travels in the accessible name (and the title tooltip below),
+    // and in full in the details dialog this block opens.
+    block.examNote ? `${EXAM_NOTE_LABEL}: ${block.examNote}` : null,
   ]
     .filter(Boolean)
     .join(", ");
@@ -312,6 +320,18 @@ function ExamBlock({
           {block.movedToLate && (
             <span className="mt-0.5 block font-medium italic">
               Moved to late testing
+            </span>
+          )}
+          {/* Published qualifier marker (issue #71). A duration-proportional
+              block cannot legibly hold a paragraph, so the face carries the
+              label and the verbatim text rides the accessible name / tooltip
+              and the details dialog this block opens on activation. */}
+          {block.examNote && (
+            <span
+              data-testid="block-exam-note"
+              className="mt-0.5 block font-medium italic"
+            >
+              {EXAM_NOTE_LABEL}
             </span>
           )}
         </span>

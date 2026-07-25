@@ -1,6 +1,6 @@
 import type { ApSubject } from "@/data/schema";
 import { resolveSlots, type SlotResolution } from "./conflicts";
-import { buildSchedule, formatDateLabel } from "./schedule";
+import { EXAM_NOTE_LABEL, buildSchedule, formatDateLabel } from "./schedule";
 import { ICS_FILE_NAME } from "./ics";
 
 /**
@@ -149,6 +149,14 @@ export const TXT_EOL = "\r\n";
  * - Portfolio deadlines get their own lines ("Portfolio deadline" in the
  *   session column): they carry equal weight to exam dates in this app
  *   (PROJECT.md), and the ICS exports them as events too.
+ * - An exam carrying a published qualifier (`examNote`) gets it appended as a
+ *   final `| Published note: <verbatim>` column (issue #71):
+ *
+ *       Friday, May 7, 2027 | PM session | AP Networking | Published note: College Board schedules this exam for 2026-27 pilot schools only. ...
+ *
+ *   Same reason the `(<sourced reason>)` suffix exists on the undated lines —
+ *   a date without its published restriction reads as an exam any student can
+ *   sit. The `|` keeps the ASCII-separator rule above; the text is verbatim.
  */
 export function buildTxtExport(
   subjects: readonly ApSubject[],
@@ -170,7 +178,10 @@ export function buildTxtExport(
           ? "Portfolio deadline"
           : `${entry.session} session`;
       const suffix = entry.movedToLate ? " (moved to late testing)" : "";
-      lines.push(`${when} | ${slot} | ${entry.subjectName}${suffix}`);
+      const note = entry.examNote
+        ? ` | ${EXAM_NOTE_LABEL}: ${entry.examNote}`
+        : "";
+      lines.push(`${when} | ${slot} | ${entry.subjectName}${suffix}${note}`);
     }
   }
 
