@@ -190,7 +190,16 @@ test.describe("issue #71 AC6 — published exam qualifier on the schedule surfac
       });
       // PROJECT.md convention: no horizontal scroll (asserted at every width,
       // not just 375, because the note is the widest string on the row).
-      expect(await horizontalOverflow(page)).toBe(0);
+      //
+      // `<= 0`, not `=== 0` (corrected under issue #80). Issue #49's
+      // `scrollbar-gutter: stable` reserves the scrollbar's strip inside the
+      // root's content box; `documentElement.clientWidth` reports the full
+      // viewport and does not subtract that reservation, so the resting delta
+      // is −10 whenever the bar itself takes no layout space — every default
+      // Playwright run, since Chromium launches with `--hide-scrollbars`.
+      // Overflow means a POSITIVE delta; a negative one is the gutter doing
+      // its job.
+      expect(await horizontalOverflow(page)).toBeLessThanOrEqual(0);
 
       await pressViewChip(page, "Calendar");
       await expect(page.getByTestId("block-exam-note")).toBeVisible();
@@ -210,7 +219,10 @@ test.describe("issue #71 AC6 — published exam qualifier on the schedule surfac
         path: `${EVIDENCE_DIR}/ac6-calendar-${vp.name}.png`,
         fullPage: true,
       });
-      expect(await horizontalOverflow(page)).toBe(0);
+      // `<= 0`, not `=== 0` — see the note on the List-view assertion above:
+      // #49's reserved gutter rests at −10, not 0, whenever the scrollbar
+      // itself takes no layout space.
+      expect(await horizontalOverflow(page)).toBeLessThanOrEqual(0);
     });
   }
 });
