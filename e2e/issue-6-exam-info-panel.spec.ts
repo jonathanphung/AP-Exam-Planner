@@ -9,14 +9,14 @@ import { test, expect, type Locator, type Page } from "@playwright/test";
  * run evidence folder and committed to the issue branch so they render inline
  * on the issue / PR.
  *
- * Fixtures (from src/data/ap-2026.json):
+ * Fixtures (from src/data/ap-2027.json):
  *   - AP Biology           — full exam: mcq 60, frq 6 (2 long/4 short),
  *                            180 min → "3 h", calculator Permitted,
  *                            delivery Hybrid, pass rate 71%.
  *   - AP Cybersecurity     — passRate "pending" (only pending value in the
  *                            dialog → tests the muted badge, AC3).
  *   - AP Seminar           — portfolio weight 55% of final, deadline
- *                            2026-04-30 (AC4).
+ *                            2027-04-30 (AC4).
  */
 
 const EVIDENCE_DIR = "docs/super-board/runs/issue-6-qa-v1";
@@ -62,7 +62,7 @@ test.describe("issue #6 — exam info panel", () => {
     // (issues #22/#24: the info button moved into the expanded Tier-1 panel).
     await expect(
       page.getByRole("button", { name: /^Show exam dates for / }),
-    ).toHaveCount(42);
+    ).toHaveCount(43);
 
     // Both controls exist for a subject and are distinct elements.
     const bioToggle = toggle(page, "AP Biology");
@@ -153,8 +153,8 @@ test.describe("issue #6 — exam info panel", () => {
     const weight = rowValue(page, "Weight");
     await expect(weight).toContainText("55%");
     await expect(weight).toContainText("of final score");
-    // Deadline 2026-04-30 rendered as a local calendar date.
-    await expect(rowValue(page, "Deadline")).toContainText("Apr 30, 2026");
+    // Deadline 2027-04-30 rendered as a local calendar date.
+    await expect(rowValue(page, "Deadline")).toContainText("Apr 30, 2027");
   });
 
   test("AC5 — accessible: focus moves in on open, Escape and close button dismiss, focus returns, scroll locked while open", async ({

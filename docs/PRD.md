@@ -78,6 +78,8 @@ Four data requirements, all public, all refreshed annually by College Board:
 
 Known constraint: as of this writing, College Board has not published the 2026-27 (May 2027) exam calendar, late-testing dates, or portfolio deadlines. Expected in fall 2026. Recommendation: ship v1 seeded with the most recently confirmed calendar (the 2026 cycle: primary exam dates, late-testing dates, and portfolio deadlines), store all three as one swappable JSON file, and show a visible note on the schedule view stating which testing year the dates reflect. Update the JSON once the 2027 grid posts. Do not project future dates as confirmed.
 
+> **Status update (2026-07-24, issue #37):** that constraint is resolved. College Board published the May 2027 calendar, late-testing dates, and portfolio deadlines, and the swap has been executed — the live dataset is `src/data/ap-2027.json` and the 2026 portfolio anchors quoted above are superseded by **2027-04-30** (Seminar / Research / CSP) and **2027-05-07** (Art and Design). The paragraph above is kept as written for provenance. The standing rule is unchanged and is about whichever cycle is *next*: do not project an unpublished calendar.
+
 ## 9. Technical Recommendation
 - Next.js, React, TypeScript, Tailwind. Matches both reference apps and needs no backend.
 - All data ships as static JSON bundled with the app. No database for v1. State is entirely client side.

@@ -1,5 +1,5 @@
 import { test, expect, type Page, type Locator } from "@playwright/test";
-import apData from "../../src/data/ap-2026.json";
+import apData from "../../src/data/ap-2027.json";
 import { LATE_TESTING_WINDOW, REGULAR_WINDOWS } from "../../src/data/schema";
 import { pressViewChip } from "./view-chip";
 
@@ -55,13 +55,13 @@ const byId = (id: string): Subject => {
   return s;
 };
 export const BIOLOGY = byId("biology");
-const LATIN = byId("latin");
+const ITALIAN = byId("italian-language-and-culture");
 
 if (
-  BIOLOGY.exam!.date !== LATIN.exam!.date ||
-  BIOLOGY.exam!.session !== LATIN.exam!.session
+  BIOLOGY.exam!.date !== ITALIAN.exam!.date ||
+  BIOLOGY.exam!.session !== ITALIAN.exam!.session
 )
-  throw new Error("fixture drift: biology/latin no longer share a slot");
+  throw new Error("fixture drift: biology/italian no longer share a slot");
 
 // Week paging (mirrors e2e/issue-19-calendar-view.spec.ts): the calendar shows
 // one week per page; a block moved to late testing lives on the late-testing
@@ -222,7 +222,7 @@ export function registerDialogShiftTests() {
     // Unresolved same-slot conflict; the calendar (default view) surfaces the
     // prompt on block activation, giving us a clean before-measurement (the
     // list view auto-opens it on load).
-    await seedKey(page, SELECTION_KEY, [BIOLOGY.id, LATIN.id]);
+    await seedKey(page, SELECTION_KEY, [BIOLOGY.id, ITALIAN.id]);
     await page.goto("/");
     await pressViewChip(page, "Calendar");
     await expectNoShiftThroughDialog(
@@ -236,13 +236,13 @@ export function registerDialogShiftTests() {
     page,
   }) => {
     // Resolution keeps Latin → Biology sits on its late-testing week.
-    await seedKey(page, SELECTION_KEY, [BIOLOGY.id, LATIN.id]);
+    await seedKey(page, SELECTION_KEY, [BIOLOGY.id, ITALIAN.id]);
     await seedKey(page, RESOLUTIONS_KEY, [
       {
         date: BIOLOGY.exam!.date,
         session: BIOLOGY.exam!.session,
-        keeperId: LATIN.id,
-        memberIds: [BIOLOGY.id, LATIN.id],
+        keeperId: ITALIAN.id,
+        memberIds: [BIOLOGY.id, ITALIAN.id],
       },
     ]);
     await page.goto("/");

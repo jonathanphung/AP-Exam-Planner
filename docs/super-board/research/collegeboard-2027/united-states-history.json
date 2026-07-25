@@ -1,0 +1,66 @@
+{
+ "id": "united-states-history",
+ "name": "AP United States History",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-united-states-history/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-united-states-history/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": false,
+ "totalMinutesStated": 195,
+ "sectionsSumToTotal": true,
+ "changedFor2027": null,
+ "sections": [
+  {
+   "name": "Section I, Part A: Multiple Choice",
+   "questionCount": "55",
+   "minutes": 55,
+   "weightPercent": 40,
+   "quote": "55 Questions | 55 Minutes | 40% of Exam Score"
+  },
+  {
+   "name": "Section I, Part B: Short Answer",
+   "questionCount": "3",
+   "minutes": 40,
+   "weightPercent": 20,
+   "quote": "3 Questions | 40 Minutes | 20% of Exam Score"
+  },
+  {
+   "name": "Section II: Free Response (Document-Based Question and Long Essay)",
+   "questionCount": "2",
+   "minutes": 100,
+   "weightPercent": 40,
+   "quote": "2 questions | 1 Hour, 40 minutes | 40% of Exam Score",
+   "parts": [
+    {
+     "name": "Document-Based Question (DBQ)",
+     "questionCount": "1",
+     "minutes": 60,
+     "toolNote": "Recommended Time: 1 Hour (includes 15-minute reading period)",
+     "quote": "Recommended Time: 1 Hour (includes 15-minute reading period) | 25% of Exam Score"
+    },
+    {
+     "name": "Long Essay",
+     "questionCount": "1",
+     "minutes": 40,
+     "toolNote": "Recommended time; student chooses from 3 options",
+     "quote": "Recommended time: 40 Minutes | 15% of Exam Score"
+    }
+   ]
+  }
+ ],
+ "datasetDiscrepancies": [
+  {
+   "field": "mcqMinutes",
+   "dataset": "55",
+   "page": "55",
+   "quote": "55 Questions | 55 Minutes | 40% of Exam Score"
+  },
+  {
+   "field": "frqMinutes",
+   "dataset": "pending",
+   "page": "40 (Short Answer) + 100 (Section II) published separately",
+   "quote": "Section I Part B: 3 Questions | 40 Minutes; Section II: 2 questions | 1 Hour, 40 minutes"
+  }
+ ]
+}

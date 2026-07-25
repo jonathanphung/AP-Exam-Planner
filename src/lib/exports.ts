@@ -15,10 +15,10 @@ import { ICS_FILE_NAME } from "./ics";
  * single home.
  *
  * Filename convention (builder decision, issue #51): every format shares the
- * basename of today's ICS download (`ap-exams-2026`) with only the extension
- * varying — `ap-exams-2026.ics/.png/.json/.txt`. The basename is DERIVED from
- * `ICS_FILE_NAME` rather than duplicated, so a future dataset-cycle rename in
- * ics.ts propagates to all four files automatically.
+ * basename of today's ICS download (`ap-exams-2027`) with only the extension
+ * varying — `ap-exams-2027.ics/.png/.json/.txt`. The basename is DERIVED from
+ * `ICS_FILE_NAME`, which itself reads the year off the dataset cycle, so the
+ * annual swap renames all four files with no edit here.
  */
 
 /** Shared basename for every export format (derived, never duplicated). */
@@ -28,7 +28,7 @@ export const EXPORT_BASE_NAME = ICS_FILE_NAME.replace(/\.ics$/, "");
  * Base `.png` name. Retained as the single-file convention (and asserted by
  * the filename unit test), but the `.png` export is now per testing week
  * (issue #56): `ExportButton` names each week's file via {@link weekPngFileName}
- * — `ap-exams-2026-week-1-list.png`, `ap-exams-2026-late-testing-calendar.png`,
+ * — `ap-exams-2027-week-1-list.png`, `ap-exams-2027-late-testing-calendar.png`,
  * … — so a dataset-cycle rename still propagates to every emitted file
  * automatically.
  */
@@ -47,7 +47,7 @@ export type ExportView = "list" | "calendar";
  * slug (`week-1` / `week-2` / `late-testing`, from the card's `slug`), AND a
  * view suffix (`list` / `calendar`). The view suffix keeps the two variants
  * from colliding when a user saves both for the same week
- * (`ap-exams-2026-week-1-list.png` vs `ap-exams-2026-week-1-calendar.png`).
+ * (`ap-exams-2027-week-1-list.png` vs `ap-exams-2027-week-1-calendar.png`).
  * Derived from `EXPORT_BASE_NAME`, so a future dataset-cycle rename re-names
  * every week file with no edit here.
  */
@@ -128,15 +128,16 @@ export const TXT_EOL = "\r\n";
  * that moved an exam to late testing shows the LATE date, flagged
  * "(moved to late testing)"):
  *
- *     Schedule 1 - AP Exams (May 2026 cycle)
+ *     Schedule 1 - AP Exams (May 2027 cycle)
  *
- *     Thursday, April 30, 2026 | Portfolio deadline | AP Seminar
- *     Monday, May 4, 2026 | AM session | AP Biology
- *     Friday, May 22, 2026 | AM session | AP Latin (moved to late testing)
+ *     Friday, April 30, 2027 | Portfolio deadline | AP Seminar
+ *     Monday, May 3, 2027 | PM session | AP Biology
+ *     Thursday, May 20, 2027 | AM session | AP Latin (moved to late testing)
  *
- * Selected subjects with no dated May-2026 entry at all (the Career Kickstart
- * courses) are appended after the dated lines so a selection is never
- * silently dropped: `No <cycle> date | <name> (<sourced reason>)`.
+ * Selected subjects with no dated entry in the cycle at all (none in the May
+ * 2027 dataset — every listed course is scheduled) are appended after the
+ * dated lines so a selection is never silently dropped:
+ * `No <cycle> date | <name> (<sourced reason>)`.
  *
  * Builder decisions (issue #51), documented:
  * - EOL is CRLF (`\r\n`): pre-1809 Windows Notepad renders bare-LF files as

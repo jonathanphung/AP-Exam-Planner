@@ -1,0 +1,45 @@
+{
+ "id": "computer-science-a",
+ "name": "AP Computer Science A",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-computer-science-a/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-computer-science-a/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": false,
+ "totalMinutesStated": 180,
+ "totalMinutesVerbatim": "3hrs",
+ "totalMinutesApproximate": false,
+ "sectionsSumToTotal": true,
+ "changedFor2027": null,
+ "sections": [
+  {
+   "name": "Multiple Choice",
+   "questionCount": "42",
+   "minutes": 90,
+   "weightPercent": 55,
+   "quote": "42 Questions | 1 Hour 30 Minutes | 55% of Exam Score"
+  },
+  {
+   "name": "Free Response",
+   "questionCount": "4",
+   "minutes": 90,
+   "weightPercent": 45,
+   "quote": "4 Questions | 1 Hour 30 Minutes | 45% of Exam Score"
+  }
+ ],
+ "datasetDiscrepancies": [
+  {
+   "field": "mcqMinutes",
+   "dataset": "pending",
+   "page": "90",
+   "quote": "42 Questions | 1 Hour 30 Minutes | 55% of Exam Score"
+  },
+  {
+   "field": "frqMinutes",
+   "dataset": "pending",
+   "page": "90",
+   "quote": "4 Questions | 1 Hour 30 Minutes | 45% of Exam Score"
+  }
+ ]
+}

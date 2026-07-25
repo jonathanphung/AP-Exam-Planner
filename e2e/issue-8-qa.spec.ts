@@ -2,7 +2,7 @@ import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import apData from "../src/data/ap-2026.json";
+import apData from "../src/data/ap-2027.json";
 import { pressViewChip } from "./support/view-chip";
 
 /**
@@ -44,21 +44,21 @@ const byId = (id: string): Subject => {
 };
 
 const BIOLOGY = byId("biology");
-const LATIN = byId("latin");
+const ITALIAN = byId("italian-language-and-culture");
+const AAS = byId("african-american-studies");
 const CHEMISTRY = byId("chemistry");
-const HUMAN_GEO = byId("human-geography");
 
-const RESOLVED_BIO_LATIN = {
+const RESOLVED_BIO_ITALIAN = {
   date: BIOLOGY.exam!.date,
   session: BIOLOGY.exam!.session,
-  keeperId: LATIN.id,
-  memberIds: [BIOLOGY.id, LATIN.id],
+  keeperId: ITALIAN.id,
+  memberIds: [BIOLOGY.id, ITALIAN.id],
 };
-const RESOLVED_CHEM_HGEO = {
-  date: CHEMISTRY.exam!.date,
-  session: CHEMISTRY.exam!.session,
-  keeperId: HUMAN_GEO.id,
-  memberIds: [CHEMISTRY.id, HUMAN_GEO.id],
+const RESOLVED_AAS_CHEM = {
+  date: AAS.exam!.date,
+  session: AAS.exam!.session,
+  keeperId: CHEMISTRY.id,
+  memberIds: [AAS.id, CHEMISTRY.id],
 };
 
 async function seed(page: Page, ids: string[], resolutions?: unknown[]) {
@@ -171,8 +171,8 @@ async function contrastRatio(page: Page, selector: string): Promise<number> {
   });
 }
 
-const RESOLVED_IDS = [BIOLOGY.id, LATIN.id, CHEMISTRY.id, HUMAN_GEO.id];
-const RESOLUTIONS = [RESOLVED_BIO_LATIN, RESOLVED_CHEM_HGEO];
+const RESOLVED_IDS = [BIOLOGY.id, ITALIAN.id, AAS.id, CHEMISTRY.id];
+const RESOLUTIONS = [RESOLVED_BIO_ITALIAN, RESOLVED_AAS_CHEM];
 
 test.describe("issue #8 QA evidence", () => {
   test("standard viewports — resolved schedule with moved badge + late warning", async ({
@@ -221,7 +221,7 @@ test.describe("issue #8 QA evidence", () => {
   test("AC1 evidence — conflict modal open with focus inside", async ({
     page,
   }) => {
-    await seed(page, [BIOLOGY.id, LATIN.id]);
+    await seed(page, [BIOLOGY.id, ITALIAN.id]);
     await page.goto("/");
     await openList(page); // the modal-on-collision behavior lives in the list view
     const modal = page.getByRole("dialog");
@@ -280,7 +280,7 @@ test.describe("issue #8 QA evidence", () => {
 
     const ctx2 = await browser.newContext();
     const conflict = await ctx2.newPage();
-    await seed(conflict, [BIOLOGY.id, LATIN.id]);
+    await seed(conflict, [BIOLOGY.id, ITALIAN.id]);
     await conflict.goto("/");
     await openList(conflict);
     await expect(conflict.getByRole("dialog")).toBeVisible();
@@ -330,7 +330,7 @@ test.describe("issue #8 QA evidence", () => {
     for (const scheme of ["light", "dark"] as const) {
       const ctx = await browser.newContext({ colorScheme: scheme });
       const page = await ctx.newPage();
-      await seed(page, [BIOLOGY.id, LATIN.id]);
+      await seed(page, [BIOLOGY.id, ITALIAN.id]);
       await page.goto("/");
       await openList(page);
       await expect(page.getByTestId("conflict-prompt")).toBeVisible();
@@ -395,7 +395,7 @@ test.describe("issue #8 QA evidence", () => {
       viewport: { width: 375, height: 667 },
     });
     const page = await ctx.newPage();
-    await seed(page, [BIOLOGY.id, LATIN.id]);
+    await seed(page, [BIOLOGY.id, ITALIAN.id]);
     await page.goto("/");
     await openList(page);
     await expect(page.getByRole("dialog")).toBeVisible();

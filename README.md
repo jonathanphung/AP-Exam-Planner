@@ -1,6 +1,6 @@
 # AP Exam Planner
 
-A public, no-login web app that helps AP students plan their **May 2026** exam season. Pick your subjects from the full College Board catalog and the app builds a dated schedule: exam days and AM/PM sessions, portfolio deadlines, same-slot conflict detection that resolves to official late-testing dates, per-subject format and pass-rate details, a week-by-week calendar, and exports for Google, Apple, or Outlook calendars.
+A public, no-login web app that helps AP students plan their **May 2027** exam season. Pick your subjects from the full College Board catalog and the app builds a dated schedule: exam days and AM/PM sessions, portfolio deadlines, same-slot conflict detection that resolves to official late-testing dates, per-subject format and pass-rate details, a week-by-week calendar, and exports for Google, Apple, or Outlook calendars.
 
 **▶ Try it live: <https://apexamplanner.vercel.app>**
 
@@ -18,7 +18,7 @@ The full 42-subject AP catalog is grouped into labeled sections (STEM, Humanitie
 
 Every course chip expands in place through three tiers of detail:
 
-1. **Timing**: the regular exam date and AM/PM session (with the published session start time), the official late-testing slot, and any portfolio deadline. Career Kickstart subjects with no May 2026 exam show the sourced reason instead of an invented date.
+1. **Timing**: the regular exam date and AM/PM session (with the published session start time), the official late-testing slot, and any portfolio deadline. A subject with no exam in the cycle (none in May 2027 — every listed course is scheduled) shows the sourced reason instead of an invented date.
 2. **Full exam details**: a dialog with the multiple-choice and free-response section breakdown (question counts, timing, weight), total length, calculator policy, delivery mode (paper / digital / hybrid), and the published "scored 3 or higher" pass rate. Anything College Board hasn't published shows as a muted **pending** badge instead of a guess.
 3. **Official College Board page**: a link straight to that subject's exam page on College Board.
 
@@ -52,9 +52,9 @@ Keep several draft plans (a full load, a STEM-only shortlist, a backup) and swit
 
 ## Data and the annual swap
 
-All dates, deadlines, and pass rates reflect the **May 2026 AP exam cycle** and come from College Board's published pages. [`src/data/sources.md`](src/data/sources.md) lists the exact URL behind every field. Anything College Board hasn't published is stored as the literal string `"pending"` and renders as a pending badge rather than a guess.
+All dates, deadlines, and pass rates reflect the **May 2027 AP exam cycle** and come from College Board's published pages. [`src/data/sources.md`](src/data/sources.md) lists the exact URL behind every field. Anything College Board hasn't published is stored as the literal string `"pending"` and renders as a pending badge rather than a guess.
 
-The dataset lives in a single file, **`src/data/ap-2026.json`**. That's the one swap point for next year: when College Board posts the May 2027 calendar, drop in an `ap-2027.json` and update the testing-window constants in [`src/data/schema.ts`](src/data/schema.ts). No component changes required. The UI reads the cycle label straight from the dataset, so the schedule banner and footer attribution re-label themselves automatically.
+The dataset lives in a single file, **`src/data/ap-2027.json`**. That's the one swap point for next year: when College Board posts the May 2028 calendar, drop in an `ap-2028.json`, re-point [`src/data/cycle.ts`](src/data/cycle.ts), and update the testing-window constants in [`src/data/schema.ts`](src/data/schema.ts). No component changes required. Every user-visible cycle label — schedule banner, footer attribution, empty states, page description, export filenames — is read from the dataset, so it all re-labels itself automatically.
 
 ## Quickstart
 
@@ -82,7 +82,7 @@ A static Next.js (App Router) single-page app: no server, no database, no API ro
 - `src/app/`: the route, layout, and global styles.
 - `src/components/`: presentational UI (catalog, schedule views, dialogs, sidebar). Components stay dumb.
 - `src/lib/`: pure, unit-tested logic (the multi-schedule store, conflict detection, calendar layout, and the ICS / PNG / JSON / text exporters).
-- `src/data/`: `ap-2026.json` (the one swappable data file), `schema.ts` (zod validation + testing-window constants), and `sources.md` (citation URLs).
+- `src/data/`: `ap-2027.json` (the one swappable data file), `cycle.ts` (the single cycle-label accessor), `schema.ts` (zod validation + testing-window constants), and `sources.md` (citation URLs).
 
 Client state only: schedules persist in `localStorage` under a versioned key, so plans survive a reload but never leave the browser.
 
@@ -109,4 +109,4 @@ Bug reports and feature requests are welcome as GitHub issues. If you spot a sou
 
 ## Not affiliated with College Board
 
-This is an independent student tool. AP and College Board are trademarks of the College Board, which does not endorse and is not involved in this project. Data is drawn from College Board's public AP calendar, late-testing calendar, portfolio-deadline, and score-distribution pages for the May 2026 cycle.
+This is an independent student tool. AP and College Board are trademarks of the College Board, which does not endorse and is not involved in this project. Data is drawn from College Board's public AP calendar, late-testing calendar, portfolio-deadline, and score-distribution pages for the May 2027 cycle.

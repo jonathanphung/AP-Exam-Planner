@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import ICAL from "ical.js";
-import apData from "../data/ap-2026.json";
+import apData from "../data/ap-2027.json";
 import type { ApSubject, ExamFormat, ExamSlot, Portfolio } from "../data/schema";
 import { parseApDataset } from "../data/schema";
 import type { SlotResolution } from "./conflicts";
@@ -63,35 +63,35 @@ function subject(
     passRate: "pending",
     portfolio,
     ...(exam === null && portfolio === null
-      ? { noExamReason: "fixture: no May 2026 exam" }
+      ? { noExamReason: "fixture: no May 2027 exam" }
       : {}),
   } as ApSubject;
 }
 
-const MAY11AM: ExamSlot = { date: "2026-05-11", session: "AM" };
+const MAY11AM: ExamSlot = { date: "2027-05-10", session: "AM" };
 
 // bio & chem share May 11 AM → a same-slot conflict.
 const bio = subject("bio", "AP Biology", MAY11AM, {
-  date: "2026-05-18",
+  date: "2027-05-17",
   session: "AM",
 });
 const chem = subject("chem", "AP Chemistry", MAY11AM, {
-  date: "2026-05-19",
+  date: "2027-05-18",
   session: "AM",
 });
 // A PM exam, to prove the PM session start time (12 p.m.) is used.
 const calc = subject(
   "calc",
   "AP Calculus BC",
-  { date: "2026-05-12", session: "PM" },
-  { date: "2026-05-20", session: "PM" },
+  { date: "2027-05-11", session: "PM" },
+  { date: "2027-05-19", session: "PM" },
 );
 // Portfolio-only subject with a note carrying commas + a semicolon (escaping)
 // long enough to force line folding.
 const PORTFOLIO_NOTE =
   "Two performance tasks, submitted as final in the AP Digital Portfolio by 11:59 p.m. ET: Team Project and Presentation (20%); Individual Research-Based Essay and Presentation (35%).";
 const seminar = subject("seminar", "AP Seminar", null, null, {
-  deadline: "2026-04-30",
+  deadline: "2027-04-30",
   weightPct: "pending",
   note: PORTFOLIO_NOTE,
 } as Portfolio);
@@ -100,7 +100,7 @@ const cyber = subject("cyber", "AP Cybersecurity", null, null);
 
 /** Keep bio at the regular slot; chem moves to its own late slot. */
 const KEEP_BIO: SlotResolution = {
-  date: "2026-05-11",
+  date: "2027-05-10",
   session: "AM",
   keeperId: "bio",
   memberIds: ["bio", "chem"],
@@ -223,15 +223,15 @@ describe("buildIcsCalendar — exam VEVENTs (AC2)", () => {
   const unfolded = ics.replace(/\r\n /g, "");
 
   it("uses the RESOLVED slot: the moved exam exports at its late date", () => {
-    // chem was moved to late testing (2026-05-19 AM) by KEEP_BIO.
-    expect(unfolded).toContain("DTSTART:20260519T080000");
-    // bio stays at the regular slot (2026-05-11 AM).
-    expect(unfolded).toContain("DTSTART:20260511T080000");
+    // chem was moved to late testing (2027-05-18 AM) by KEEP_BIO.
+    expect(unfolded).toContain("DTSTART:20270518T080000");
+    // bio stays at the regular slot (2027-05-10 AM).
+    expect(unfolded).toContain("DTSTART:20270510T080000");
   });
 
   it("combines the date with the AM/PM session start time as floating local time", () => {
     // PM session start (12 p.m.) → 120000, no trailing Z.
-    expect(unfolded).toContain("DTSTART:20260512T120000");
+    expect(unfolded).toContain("DTSTART:20270511T120000");
     expect(unfolded).not.toMatch(/DTSTART:\d{8}T\d{6}Z/); // no UTC-marked starts
   });
 
@@ -244,14 +244,14 @@ describe("buildIcsCalendar — exam VEVENTs (AC2)", () => {
   });
 
   it("gives each exam a DTEND = start + totalMinutes + 30-min setup buffer (issue #38)", () => {
-    // bio kept at 2026-05-11 AM (08:00): 08:00 + 60 + 30 = 09:30, floating.
-    expect(unfolded).toContain("DTSTART:20260511T080000");
-    expect(unfolded).toContain("DTEND:20260511T093000");
+    // bio kept at 2027-05-10 AM (08:00): 08:00 + 60 + 30 = 09:30, floating.
+    expect(unfolded).toContain("DTSTART:20270510T080000");
+    expect(unfolded).toContain("DTEND:20270510T093000");
     // calc PM (12:00): 12:00 + 60 + 30 = 13:30.
-    expect(unfolded).toContain("DTSTART:20260512T120000");
-    expect(unfolded).toContain("DTEND:20260512T133000");
-    // chem moved to its late slot 2026-05-19 AM: 08:00 + 60 + 30 = 09:30.
-    expect(unfolded).toContain("DTEND:20260519T093000");
+    expect(unfolded).toContain("DTSTART:20270511T120000");
+    expect(unfolded).toContain("DTEND:20270511T133000");
+    // chem moved to its late slot 2027-05-18 AM: 08:00 + 60 + 30 = 09:30.
+    expect(unfolded).toContain("DTEND:20270518T093000");
     // DTEND stays floating — never UTC-marked.
     expect(unfolded).not.toMatch(/DTEND:\d{8}T\d{6}Z/);
   });
@@ -309,8 +309,8 @@ describe("buildIcsCalendar — issue #38 sections[] edge handling", () => {
     ...subject(
       "pend",
       "AP Pending",
-      { date: "2026-05-13", session: "AM" },
-      { date: "2026-05-20", session: "AM" },
+      { date: "2027-05-12", session: "AM" },
+      { date: "2027-05-19", session: "AM" },
     ),
     format: {
       sections: [
@@ -338,8 +338,8 @@ describe("buildIcsCalendar — issue #38 sections[] edge handling", () => {
     ...subject(
       "parts",
       "AP Parts",
-      { date: "2026-05-14", session: "AM" },
-      { date: "2026-05-21", session: "AM" },
+      { date: "2027-05-13", session: "AM" },
+      { date: "2027-05-20", session: "AM" },
     ),
     format: {
       sections: [
@@ -380,11 +380,11 @@ describe("buildIcsCalendar — issue #38 sections[] edge handling", () => {
   const unfolded = ics.replace(/\r\n /g, "");
 
   it("emits NO DTEND when totalMinutes is pending (never invents a duration)", () => {
-    expect(unfolded).toContain("DTSTART:20260513T080000");
+    expect(unfolded).toContain("DTSTART:20270512T080000");
     // The parts exam (published total) still gets its DTEND; the pending one
     // has exactly none — one DTEND across the two events.
     expect((unfolded.match(/DTEND:/g) ?? []).length).toBe(1);
-    expect(unfolded).toContain("DTEND:20260514T114500"); // 08:00 + 195 + 30
+    expect(unfolded).toContain("DTEND:20270513T114500"); // 08:00 + 195 + 30
   });
 
   it('renders a pending section duration as "Duration pending", not a number', () => {
@@ -419,7 +419,7 @@ describe("buildIcsCalendar — portfolio VEVENTs (AC3)", () => {
   const unfolded = ics.replace(/\r\n /g, "");
 
   it("emits an all-day DATE event on the deadline date", () => {
-    expect(unfolded).toContain("DTSTART;VALUE=DATE:20260430");
+    expect(unfolded).toContain("DTSTART;VALUE=DATE:20270430");
   });
 
   it('formats SUMMARY as "AP <Subject> portfolio due"', () => {
@@ -465,7 +465,7 @@ describe("buildIcsCalendar — parses with ical.js (AC5)", () => {
       );
     expect(chemEvent).toBeDefined();
     expect(String(chemEvent?.getFirstPropertyValue("dtstart"))).toContain(
-      "2026-05-19",
+      "2027-05-18",
     );
   });
 });
@@ -507,7 +507,7 @@ describe("buildIcsCalendar — export stays emoji-free (issue #20 AC4)", () => {
 });
 
 describe("export constants", () => {
-  it("names the downloaded file ap-exams-2026.ics", () => {
-    expect(ICS_FILE_NAME).toBe("ap-exams-2026.ics");
+  it("names the downloaded file ap-exams-2027.ics", () => {
+    expect(ICS_FILE_NAME).toBe("ap-exams-2027.ics");
   });
 });

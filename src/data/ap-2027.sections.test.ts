@@ -8,7 +8,7 @@ import { parseApDataset } from "./schema";
  *
  * Every subject's format.sections must be derivable, value for value, from
  * the adversarially verified re-source at
- * docs/super-board/research/collegeboard-2026/<id>.json (fetched 2026-07-09,
+ * docs/super-board/research/collegeboard-2027/<id>.json (fetched 2026-07-09,
  * patched at 171cb15) using the normalization rules documented in
  * src/data/sources.md. This test re-applies those rules to the provenance and
  * deep-equals the result with the dataset, so no section value can be edited
@@ -23,11 +23,11 @@ import { parseApDataset } from "./schema";
 
 const PROVENANCE_DIR = join(
   __dirname,
-  "../../docs/super-board/research/collegeboard-2026",
+  "../../docs/super-board/research/collegeboard-2027",
 );
 
 const dataset = parseApDataset(
-  JSON.parse(readFileSync(join(__dirname, "ap-2026.json"), "utf-8")),
+  JSON.parse(readFileSync(join(__dirname, "ap-2027.json"), "utf-8")),
 );
 const byId = new Map(dataset.subjects.map((s) => [s.id, s]));
 
@@ -215,7 +215,7 @@ function expectedSections(record: ProvenanceRecord) {
 
 // ---------------------------------------------------------------------------
 
-describe("ap-2026.json sections[] (issue #44)", () => {
+describe("ap-2027.json sections[] (issue #44)", () => {
   it("round-trips every subject's sections from the committed provenance", () => {
     for (const subject of dataset.subjects) {
       const record = JSON.parse(
@@ -242,15 +242,27 @@ describe("ap-2026.json sections[] (issue #44)", () => {
     }
   });
 
-  it("every subject with a sit-down 2026 exam has at least one published section", () => {
+  it("every subject with a sit-down 2027 exam has at least one published section — unless College Board publishes no format at all", () => {
+    // AP Networking is the single 2027 exception: the exam is on the published
+    // May 2027 schedule (pilot schools only) but the course has no AP Central
+    // exam page yet, so there is nothing to publish. That state is not a licence
+    // to guess — every other format field must be "pending" too, and no other
+    // subject may take this branch.
+    const noFormat: string[] = [];
     for (const subject of dataset.subjects) {
-      if (subject.exam !== null) {
-        expect(
-          subject.format.sections.length,
-          `${subject.id} sections`,
-        ).toBeGreaterThan(0);
-      }
+      if (subject.exam === null) continue;
+      if (subject.format.sections.length > 0) continue;
+      noFormat.push(subject.id);
+      expect(subject.format.totalMinutes, `${subject.id} totalMinutes`).toBe(
+        "pending",
+      );
+      expect(subject.format.delivery, `${subject.id} delivery`).toBe("pending");
+      expect(subject.format.calculator, `${subject.id} calculator`).toBe(
+        "pending",
+      );
+      expect(subject.examNote, `${subject.id} examNote`).toBeTruthy();
     }
+    expect(noFormat).toEqual(["networking"]);
   });
 
   it("AP Seminar lacks a multiple-choice section entirely — omitted, never 'pending'", () => {
@@ -291,14 +303,17 @@ describe("ap-2026.json sections[] (issue #44)", () => {
     expect(aas.map((s) => s.questionCount)).toEqual([60, 1, 3, 1, undefined]);
   });
 
-  it("nests Calculus AB's published no-calculator vs. calculator halves as parts", () => {
+  it("nests Calculus AB's published no-calculator vs. calculator halves as parts (re-sourced for 2027)", () => {
+    // 2027 change, verified 2026-07-24 on the AP Central exam page: Section I
+    // went 45 → 42 questions and 1hr45 → 1hr40, with both part splits re-cut
+    // (30q/60min + 15q/45min → 29q/62min + 13q/38min). Calculus BC matches.
     const sections = byId.get("calculus-ab")?.format.sections ?? [];
     const mc = sections.find((s) => /multiple.?choice/i.test(s.name));
-    expect(mc?.questionCount).toBe(45);
+    expect(mc?.questionCount).toBe(42);
     expect(mc?.parts?.map((p) => [p.name, p.questionCount, p.minutes])).toEqual(
       [
-        ["Part A", 30, 60],
-        ["Part B", 15, 45],
+        ["Part A", 29, 62],
+        ["Part B", 13, 38],
       ],
     );
     expect(mc?.parts?.[0].note).toMatch(/calculator not permitted/i);

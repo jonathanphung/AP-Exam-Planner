@@ -1,0 +1,45 @@
+{
+ "id": "cybersecurity",
+ "name": "AP Cybersecurity",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-cybersecurity/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-cybersecurity/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": false,
+ "totalMinutesStated": 130,
+ "totalMinutesVerbatim": "2hrs 10mins",
+ "totalMinutesApproximate": false,
+ "sectionsSumToTotal": "pending",
+ "changedFor2027": null,
+ "sections": [
+  {
+   "name": "Multiple Choice",
+   "questionCount": "60",
+   "minutes": 80,
+   "weightPercent": 70,
+   "quote": "Section I: Multiple Choice — 60 Questions | 80 minutes | 70% of Exam Score. The multiple-choice section includes individual questions as well as sets of 2, 3, or 4 questions."
+  },
+  {
+   "name": "Free Response",
+   "questionCount": "1",
+   "minutes": 50,
+   "weightPercent": 30,
+   "quote": "Section II: Free Response — 1 Question | 50 minutes | 30% of Exam Score. The free-response question gives students different sources of information from the same device, including: a set of firewall rules, several system and application logs, a list of files with their permissions, a device policy."
+  }
+ ],
+ "datasetDiscrepancies": [
+  {
+   "field": "mcqMinutes",
+   "dataset": "pending",
+   "page": "80",
+   "quote": "Section I: Multiple Choice — 60 Questions | 80 minutes | 70% of Exam Score"
+  },
+  {
+   "field": "frqMinutes",
+   "dataset": "pending",
+   "page": "50",
+   "quote": "Section II: Free Response — 1 Question | 50 minutes | 30% of Exam Score"
+  }
+ ]
+}

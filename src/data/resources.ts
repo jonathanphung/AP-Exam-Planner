@@ -1,4 +1,4 @@
-import apData from "./ap-2026.json";
+import apData from "./ap-2027.json";
 
 /**
  * Curated, verified official College Board resources for the Resources page (#23).

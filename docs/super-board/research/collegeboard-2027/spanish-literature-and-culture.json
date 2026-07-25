@@ -1,0 +1,55 @@
+{
+ "id": "spanish-literature-and-culture",
+ "name": "AP Spanish Literature and Culture",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-spanish-literature-and-culture/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-spanish-literature-and-culture/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": false,
+ "totalMinutesStated": 180,
+ "totalMinutesVerbatim": "3hrs",
+ "totalMinutesApproximate": false,
+ "sectionsSumToTotal": "pending",
+ "changedFor2027": null,
+ "sections": [
+  {
+   "name": "Section IA: Multiple Choice",
+   "questionCount": "15",
+   "minutes": 20,
+   "weightPercent": 10,
+   "quote": "Section IA: Multiple Choice — 15 Questions | 20 Minutes | 10% of Exam Score. Comprises 3 sets of questions based on authentic audio texts."
+  },
+  {
+   "name": "Section IB: Multiple Choice",
+   "questionCount": "50",
+   "minutes": 60,
+   "weightPercent": 40,
+   "quote": "Section IB: Multiple Choice — 50 Questions | 1 Hour | 40% of Exam Score. Contains 6 sets of 7–10 questions from various readings."
+  },
+  {
+   "name": "Section II: Free Response",
+   "questionCount": "4",
+   "minutes": 100,
+   "weightPercent": 50,
+   "quote": "Section II: Free Response — 4 Questions | 1 Hour, 40 Minutes | 50% of Exam Score.",
+   "parts": [
+    {
+     "name": "Short-Answer Questions",
+     "questionCount": "2",
+     "minutes": 30,
+     "toolNote": "n/a",
+     "quote": "Short-Answer Questions: Suggested time: 15 minutes each (~30 minutes)"
+    },
+    {
+     "name": "Essay Questions",
+     "questionCount": "2",
+     "minutes": 70,
+     "toolNote": "n/a",
+     "quote": "Essay Questions: Suggested time: 35 minutes each (~70 minutes)"
+    }
+   ]
+  }
+ ],
+ "datasetDiscrepancies": []
+}

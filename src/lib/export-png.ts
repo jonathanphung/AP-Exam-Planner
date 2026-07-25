@@ -50,7 +50,7 @@ export type { ExportTheme };
 export interface WeekCardRenderOptions {
   /** Active theme — decides the card's palette + the solid PNG background. */
   theme: ExportTheme;
-  /** Dataset cycle, e.g. "May 2026" (shown in the header). */
+  /** Dataset cycle, e.g. "May 2027" (shown in the header). */
   cycle: string;
   /** Active schedule name, shown in the footer (e.g. "Schedule 1"). */
   scheduleName: string;

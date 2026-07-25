@@ -1,0 +1,66 @@
+{
+ "id": "world-history-modern",
+ "name": "AP World History: Modern",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-world-history/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-world-history-modern/assessment",
+ "fallbackUsed": "apstudents",
+ "noSitDownExam": false,
+ "totalMinutesStated": 195,
+ "sectionsSumToTotal": true,
+ "changedFor2027": null,
+ "sections": [
+  {
+   "name": "Section IA: Multiple Choice",
+   "questionCount": "55",
+   "minutes": 55,
+   "weightPercent": 40,
+   "quote": "Section IA: Multiple Choice — 55 questions 55mins 40% of Score"
+  },
+  {
+   "name": "Section IB: Short Answer",
+   "questionCount": "3",
+   "minutes": 40,
+   "weightPercent": 20,
+   "quote": "Section IB: Short Answer — 3 questions 40mins 20% of Score"
+  },
+  {
+   "name": "Section II: Free Response",
+   "questionCount": "2",
+   "minutes": 100,
+   "weightPercent": 40,
+   "quote": "Section II: Free Response — 2 questions 1hr 40mins 40% of Score",
+   "parts": [
+    {
+     "name": "Document-Based Question",
+     "questionCount": "1",
+     "minutes": 60,
+     "toolNote": "Recommended Time: 60 Minutes (includes 15-minute reading period)",
+     "quote": "Document-Based Question | Recommended Time: 60 Minutes (includes 15-minute reading period) | 25% of Score"
+    },
+    {
+     "name": "Long Essay Question",
+     "questionCount": "1",
+     "minutes": 40,
+     "toolNote": "none",
+     "quote": "Long Essay Question | 40 Minutes | 15% of Score"
+    }
+   ]
+  }
+ ],
+ "datasetDiscrepancies": [
+  {
+   "field": "frqMinutes",
+   "dataset": "pending",
+   "page": "Section II Free Response = 1hr 40mins (100 min); Section IB Short Answer = 40mins",
+   "quote": "Section II: Free Response — 2 questions 1hr 40mins 40% of Score"
+  },
+  {
+   "field": "frqCount",
+   "dataset": "5",
+   "page": "Section IB Short Answer = 3 questions; Section II Free Response = 2 questions (2 DBQ+LEQ). Dataset lumps SAQ+FRQ into 5.",
+   "quote": "Section IB: Short Answer — 3 questions ... Section II: Free Response — 2 questions"
+  }
+ ]
+}

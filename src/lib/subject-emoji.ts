@@ -6,7 +6,7 @@ import type { Category } from "@/data/schema";
  * A purely visual aid: a topically relevant emoji shown next to each subject
  * name so the catalog and schedules are faster to scan. It is NOT College Board
  * data, so — per the PROJECT.md data rule (the annually-swapped
- * `src/data/ap-2026.json` holds only sourced values, `"pending"` for anything
+ * `src/data/ap-2027.json` holds only sourced values, `"pending"` for anything
  * unpublished) — it deliberately lives here in a pure `src/lib` lookup, keyed by
  * subject `id`, rather than as a field in the sourced dataset. This keeps the
  * emoji out of the annual data swap and off the `"pending"` rule entirely.
@@ -15,7 +15,7 @@ import type { Category } from "@/data/schema";
  * adding or changing one entry here updates the catalog grid, schedule list,
  * info panel, conflict dialog (and the future calendar view, issue #19) at once.
  *
- * Coverage is complete for every subject shipped in `ap-2026.json` (a unit test
+ * Coverage is complete for every subject shipped in `ap-2027.json` (a unit test
  * pins this); a category fallback guarantees any future/unmapped subject still
  * renders a sensible emoji instead of a blank. Glyphs are broadly-supported,
  * unambiguous codepoints (no skin-tone modifiers, nothing niche that renders as
@@ -75,6 +75,7 @@ export const SUBJECT_EMOJI: Readonly<Record<string, string>> = {
   // Career Kickstart
   "business-with-personal-finance": "💼",
   cybersecurity: "🛡️",
+  networking: "🌐",
 };
 
 /**

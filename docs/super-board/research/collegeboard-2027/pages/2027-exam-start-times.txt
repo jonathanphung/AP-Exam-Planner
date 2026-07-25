@@ -1,0 +1,64 @@
+Active Page:
+2027 AP Exam Start Times
+Back
+2027 AP Exam Start Times
+Get details about AP Exam start times for 2027.
+Beginning with the 2027 AP Exam administration, some schools will follow updated AP Exam start times to prevent the disclosure of secure exam content across time zones.
+What’s Not Changing
+For most schools, including all schools in the lower 48 United States, Hawaii, and Washington, D.C., exams still begin at 8 a.m. local time and 12 p.m. local time.
+Exams can still begin up to 1 hour after the officially listed exam start time.
+What’s Changing
+Exams will begin at start times based on specified time zones.
+AP Exams are offered as
+Session 1
+and
+Session 2
+—replacing the former morning and afternoon designations.
+Alaska:
+Session 1 exams start at 7 a.m. local time and Session 2 exams start at 11 a.m. local time.
+Find Your AP Exam Start Time
+Look for your location’s May UTC offset in the table below to see your Session 1 and Session 2 start times for the 2027 AP Exams.
+The table is organized by UTC (Coordinated Universal Time), the world’s standard reference clock.
+The UTC offsets listed are where AP Exams are currently administered.
+The UTC offsets used are for May 2027, when AP Exams are administered. If your location observes daylight saving time, use the appropriate UTC offset for your location in May.
+For locations in the United States, the time zone is noted in parentheses after the UTC offset.
+Online lookup tool coming this fall:
+In addition to the UTC offset start time table available now, an online lookup tool will be available in the fall that schools can use to see their AP Exam start times. We will notify schools when the online lookup tool is available.
+[TABLE]
+Review the 2027 Exam Dates
+See the Schedule
+Related Topics
+2027 AP Exam Dates
+2027 AP Exam Late-Testing Dates
+Review the 2027 Exam Dates
+See the Schedule
+Related Topics
+2027 AP Exam Dates
+2027 AP Exam Late-Testing Dates
+
+=== TABLE 0 ===
+UTC Offset in May ~~ Session 1 Start Time (Local Time) ~~ Session 2 Start Time (Local Time)
+-11:00 ~~ 7:00 a.m. ~~ 11:00 a.m.
+-10:00 (HAST) ~~ 8:00 a.m. ~~ 12:00 p.m.
+-08:00 (AKDT) ~~ 7:00 a.m. ~~ 11:00 a.m.
+-07:00 (PDT) ~~ 8:00 a.m. ~~ 12:00 p.m.
+-06:00 (MDT) ~~ 8:00 a.m. ~~ 12:00 p.m.
+-05:00 (CDT) ~~ 8:00 a.m. ~~ 12:00 p.m.
+-04:00 (EDT) ~~ 8:00 a.m. ~~ 12:00 p.m.
+-03:00 ~~ 9:00 a.m. ~~ 1:00 p.m.
+-02:30 ~~ 9:30 a.m. ~~ 1:30 p.m.
++00:00 ~~ 7:00 a.m. ~~ 11:00 a.m.
++01:00 ~~ 8:00 a.m. ~~ 12:00 p.m.
++02:00 ~~ 9:00 a.m. ~~ 1:00 p.m.
++03:00 ~~ 10:00 a.m. ~~ 2:00 p.m.
++04:00 ~~ 11:00 a.m. ~~ 3:00 p.m.
++05:00 ~~ 12:00 p.m. ~~ 4:00 p.m.
++05:30 ~~ 6:30 a.m. ~~ 10:30 a.m.
++05:45 ~~ 6:45 a.m. ~~ 10:45 a.m.
++06:00 ~~ 7:00 a.m. ~~ 11:00 a.m.
++06:30 ~~ 7:30 a.m. ~~ 11:30 a.m.
++07:00 ~~ 8:00 a.m. ~~ 12:00 p.m.
++08:00 ~~ 9:00 a.m. ~~ 1:00 p.m.
++09:00 ~~ 10:00 a.m. ~~ 2:00 p.m.
++10:00 ~~ 11:00 a.m. ~~ 3:00 p.m.
++12:00 ~~ 1:00 p.m. ~~ 5:00 p.m.

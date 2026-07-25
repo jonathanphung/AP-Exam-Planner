@@ -104,7 +104,7 @@ export interface WeekCard {
   label: string;
   /** Filename suffix: "week-1" / "week-2" / "late-testing". */
   slug: string;
-  /** "May 4 – 8, 2026" — range label incl. year. */
+  /** "May 3 – 7, 2027" — range label incl. year. */
   rangeLabel: string;
   /** Exam + portfolio rows for this week, chronological. */
   rows: WeekCardRow[];
@@ -127,7 +127,7 @@ export interface WeekMeta {
   label: string;
   /** Filename slug: "week-1" / "week-2" / "late-testing". */
   slug: string;
-  /** "May 4 – 8, 2026" — range label incl. year. */
+  /** "May 3 – 7, 2027" — range label incl. year. */
   rangeLabel: string;
 }
 

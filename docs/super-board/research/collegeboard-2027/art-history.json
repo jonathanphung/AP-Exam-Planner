@@ -1,0 +1,32 @@
+{
+ "id": "art-history",
+ "name": "AP Art History",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-art-history/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-art-history/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": false,
+ "totalMinutesStated": 180,
+ "totalMinutesVerbatim": "3hrs",
+ "totalMinutesApproximate": false,
+ "sectionsSumToTotal": "pending",
+ "changedFor2027": null,
+ "sections": [
+  {
+   "name": "Multiple Choice",
+   "questionCount": "80",
+   "minutes": 60,
+   "weightPercent": 50,
+   "quote": "80 Questions | 1 Hour | 50% of Exam Score"
+  },
+  {
+   "name": "Free Response",
+   "questionCount": "6",
+   "minutes": 120,
+   "weightPercent": 50,
+   "quote": "6 Questions | 2 Hours | 50% of Exam Score"
+  }
+ ],
+ "datasetDiscrepancies": []
+}

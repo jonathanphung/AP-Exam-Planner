@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import apData from "../data/ap-2026.json";
+import apData from "../data/ap-2027.json";
 import { CATEGORIES, parseApDataset } from "../data/schema";
 import { groupSubjectsByCategory, matchesSubjectQuery } from "./catalog-groups";
 

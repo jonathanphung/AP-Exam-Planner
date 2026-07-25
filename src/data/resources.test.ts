@@ -7,7 +7,7 @@ import {
   resolveLabel,
   type ResourceLink,
 } from "./resources";
-import apData from "./ap-2026.json";
+import apData from "./ap-2027.json";
 
 /**
  * Sourcing-discipline tests for the Resources list (#23).

@@ -1,0 +1,30 @@
+{
+ "id": "computer-science-principles",
+ "name": "AP Computer Science Principles",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-computer-science-principles/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-computer-science-principles/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": false,
+ "totalMinutesStated": 180,
+ "sectionsSumToTotal": true,
+ "changedFor2027": null,
+ "sections": [
+  {
+   "name": "Multiple Choice",
+   "questionCount": "70",
+   "minutes": 120,
+   "weightPercent": 70,
+   "quote": "Multiple Choice Section (Section I): 70 multiple-choice questions | 120 minutes | 70% of score"
+  },
+  {
+   "name": "Written Response",
+   "questionCount": "2",
+   "minutes": 60,
+   "weightPercent": 30,
+   "quote": "Written Response Section (Section II): 60-minute end-of-course exam | 30% of score; 2 written response questions with 4 distinct prompts"
+  }
+ ],
+ "datasetDiscrepancies": []
+}

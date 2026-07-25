@@ -1,0 +1,32 @@
+{
+ "id": "human-geography",
+ "name": "AP Human Geography",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-human-geography/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-human-geography/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": false,
+ "totalMinutesStated": 135,
+ "totalMinutesVerbatim": "2hrs 15mins",
+ "totalMinutesApproximate": false,
+ "sectionsSumToTotal": "pending",
+ "changedFor2027": null,
+ "sections": [
+  {
+   "name": "Multiple Choice",
+   "questionCount": "60",
+   "minutes": 60,
+   "weightPercent": 50,
+   "quote": "Section I: Multiple Choice — Questions: 60 — Time: 1 Hour (60 minutes) — Exam Score: 50%. Approximately 30%–40% of the multiple-choice questions will reference stimulus material, including maps, tables, charts, graphs, images, infographics, and/or landscapes."
+  },
+  {
+   "name": "Free Response",
+   "questionCount": "3",
+   "minutes": 75,
+   "weightPercent": 50,
+   "quote": "Section II: Free Response — Questions: 3 — Time: 1 Hour 15 Minutes (75 minutes) — Exam Score: 50%."
+  }
+ ],
+ "datasetDiscrepancies": []
+}

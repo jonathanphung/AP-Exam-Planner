@@ -1,0 +1,37 @@
+{
+ "id": "seminar",
+ "name": "AP Seminar",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-seminar/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-seminar/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": false,
+ "totalMinutesStated": 120,
+ "sectionsSumToTotal": true,
+ "changedFor2027": null,
+ "sections": [
+  {
+   "name": "End-of-Course Exam – Short-Answer Section",
+   "questionCount": "3",
+   "minutes": 30,
+   "weightPercent": 13.5,
+   "quote": "Short-Answer Section: 3 short-answer questions analyzing arguments, suggested 30 minutes, College Board scored (30% of 45%). End-of-Course Exam (45% of Score, 2 Hours Total)."
+  },
+  {
+   "name": "End-of-Course Exam – Essay Section",
+   "questionCount": "1",
+   "minutes": 90,
+   "weightPercent": 31.5,
+   "quote": "Essay Section: 1 long essay presenting evidence-based argument, suggested 90 minutes, College Board scored (70% of 45%). End-of-Course Exam (45% of Score, 2 Hours Total)."
+  }
+ ],
+ "datasetDiscrepancies": [
+  {
+   "field": "frqMinutes",
+   "dataset": "120",
+   "page": "30 + 90 suggested (2 Hours Total)",
+   "quote": "End-of-Course Exam (45% of Score, 2 Hours Total); Short-Answer suggested 30 minutes; Essay suggested 90 minutes"
+  }
+ ]
+}

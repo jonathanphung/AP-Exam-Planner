@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import apData from "../data/ap-2026.json";
+import apData from "../data/ap-2027.json";
+import { withUndatedSubject } from "./test-fixtures";
 import { subjectSchema, type ApDataset } from "../data/schema";
 import type { SlotResolution } from "./conflicts";
 import { ICS_FILE_NAME } from "./ics";
@@ -21,34 +22,34 @@ import {
  * and the shared filename convention, driven with the REAL shipped dataset
  * (the ics.qa.test.ts fixture-selection precedent):
  *
- *   - AP Biology (2026-05-04 AM) + AP Latin (2026-05-04 AM) share a slot; the
- *     resolution keeps Biology, so Latin exports at its real late-testing
- *     slot (2026-05-18 PM) and must be flagged as moved.
- *   - AP Seminar has BOTH an exam (2026-05-11 PM) and a portfolio deadline
- *     (2026-04-30) → two lines in the txt, chronologically placed.
- *   - AP Cybersecurity (Career Kickstart) has no dated 2026 entry → the txt
+ *   - AP Physics C: Mechanics (2027-05-03 AM) + AP Human Geography (2027-05-03 AM) share a slot; the
+ *     resolution keeps Physics C: Mechanics, so Human Geography exports at its real late-testing
+ *     slot (2027-05-17 PM) and must be flagged as moved.
+ *   - AP Seminar has BOTH an exam (2027-05-10 PM) and a portfolio deadline
+ *     (2027-04-30) → two lines in the txt, chronologically placed.
+ *   - A synthetic undated subject (no May 2027 course is undated) → the txt
  *     must surface it rather than silently drop it.
  *   - AP African American Studies carries literal "pending" values → the
  *     hard data rule extends to exports (a "pending" survives round-trip).
  */
 
 const dataset = apData as unknown as ApDataset;
-const SUBJECTS = dataset.subjects;
+const SUBJECTS = withUndatedSubject(dataset.subjects);
 
 const SELECTED = [
-  "biology",
-  "latin",
+  "physics-c-mechanics",
+  "human-geography",
   "seminar",
-  "cybersecurity",
+  "test-undated-course",
   "african-american-studies",
 ];
 
-// Keep Biology at 2026-05-04 AM; Latin is bumped to its real late slot.
-const KEEP_BIOLOGY: SlotResolution = {
-  date: "2026-05-04",
+// Keep Physics C: Mechanics at 2027-05-03 AM; Human Geography is bumped to its real late slot.
+const KEEP_PHYSICS_C: SlotResolution = {
+  date: "2027-05-03",
   session: "AM",
-  keeperId: "biology",
-  memberIds: ["biology", "latin"],
+  keeperId: "physics-c-mechanics",
+  memberIds: ["physics-c-mechanics", "human-geography"],
 };
 
 const FIXED_NOW = new Date(Date.UTC(2026, 6, 5, 13, 30, 0));
@@ -59,23 +60,23 @@ describe("filename convention (issue #51)", () => {
     expect(PNG_FILE_NAME).toBe(`${EXPORT_BASE_NAME}.png`);
     expect(JSON_FILE_NAME).toBe(`${EXPORT_BASE_NAME}.json`);
     expect(TXT_FILE_NAME).toBe(`${EXPORT_BASE_NAME}.txt`);
-    expect(EXPORT_BASE_NAME).toBe("ap-exams-2026");
+    expect(EXPORT_BASE_NAME).toBe("ap-exams-2027");
   });
 });
 
 describe("weekPngFileName — per-week, per-view suffix (issue #56 + bounce)", () => {
   it("derives basename + week slug + view suffix", () => {
     expect(weekPngFileName("week-1", "list")).toBe(
-      "ap-exams-2026-week-1-list.png",
+      "ap-exams-2027-week-1-list.png",
     );
     expect(weekPngFileName("week-2", "calendar")).toBe(
-      "ap-exams-2026-week-2-calendar.png",
+      "ap-exams-2027-week-2-calendar.png",
     );
     expect(weekPngFileName("late-testing", "list")).toBe(
-      "ap-exams-2026-late-testing-list.png",
+      "ap-exams-2027-late-testing-list.png",
     );
     expect(weekPngFileName("late-testing", "calendar")).toBe(
-      "ap-exams-2026-late-testing-calendar.png",
+      "ap-exams-2027-late-testing-calendar.png",
     );
   });
 
@@ -101,7 +102,7 @@ describe("weekPngFileName — per-week, per-view suffix (issue #56 + bounce)", (
 describe("buildJsonExport", () => {
   const parse = () =>
     JSON.parse(
-      buildJsonExport(SUBJECTS, SELECTED, [KEEP_BIOLOGY], "My Plan", FIXED_NOW),
+      buildJsonExport(SUBJECTS, SELECTED, [KEEP_PHYSICS_C], "My Plan", FIXED_NOW),
     ) as {
       format: string;
       version: number;
@@ -152,21 +153,21 @@ describe("buildJsonExport", () => {
 
   it("carries the stored resolutions verbatim", () => {
     const doc = parse();
-    expect(doc.schedule.resolutions).toEqual([KEEP_BIOLOGY]);
+    expect(doc.schedule.resolutions).toEqual([KEEP_PHYSICS_C]);
   });
 
   it("skips selected ids with no dataset record instead of inventing one", () => {
     const doc = JSON.parse(
       buildJsonExport(
         SUBJECTS,
-        ["biology", "ghost-subject"],
+        ["physics-c-mechanics", "ghost-subject"],
         [],
         "S",
         FIXED_NOW,
       ),
     ) as { schedule: { subjects: Array<{ id: string }> } };
     expect(doc.schedule.subjects.map((subject) => subject.id)).toEqual([
-      "biology",
+      "physics-c-mechanics",
     ]);
   });
 
@@ -178,7 +179,7 @@ describe("buildJsonExport", () => {
 
 describe("buildTxtExport", () => {
   const txt = () =>
-    buildTxtExport(SUBJECTS, SELECTED, [KEEP_BIOLOGY], "My Plan", "May 2026");
+    buildTxtExport(SUBJECTS, SELECTED, [KEEP_PHYSICS_C], "My Plan", "May 2027");
   const lines = () => txt().split(TXT_EOL);
 
   it("uses CRLF EOLs exclusively and ends with a trailing newline (Notepad-safe)", () => {
@@ -190,7 +191,7 @@ describe("buildTxtExport", () => {
 
   it("starts with the schedule-name header and a blank separator line", () => {
     const all = lines();
-    expect(all[0]).toBe("My Plan - AP Exams (May 2026 cycle)");
+    expect(all[0]).toBe("My Plan - AP Exams (May 2027 cycle)");
     expect(all[1]).toBe("");
   });
 
@@ -199,26 +200,26 @@ describe("buildTxtExport", () => {
     const body = all.slice(2, -1).filter((line) => line !== "");
     expect(body).toEqual([
       // Seminar's portfolio deadline is the earliest dated entry.
-      "Thursday, April 30, 2026 | Portfolio deadline | AP Seminar",
-      "Monday, May 4, 2026 | AM session | AP Biology",
-      "Thursday, May 7, 2026 | PM session | AP African American Studies",
-      "Monday, May 11, 2026 | PM session | AP Seminar",
-      // Latin was moved by the resolution to its real late slot (May 18 PM).
-      "Monday, May 18, 2026 | PM session | AP Latin (moved to late testing)",
+      "Friday, April 30, 2027 | Portfolio deadline | AP Seminar",
+      "Monday, May 3, 2027 | AM session | AP Physics C: Mechanics",
+      "Thursday, May 6, 2027 | PM session | AP African American Studies",
+      "Monday, May 10, 2027 | PM session | AP Seminar",
+      // Human Geography was moved by the resolution to its real late slot (May 17 PM).
+      "Monday, May 17, 2027 | PM session | AP Human Geography (moved to late testing)",
       // Career Kickstart selection is surfaced, never silently dropped.
-      "No May 2026 date | AP Cybersecurity (First end-of-course exam administration is May 2027; College Board states the 2027 AP Exam dates will be available in summer 2026. No May 2026 exam exists for this course.)",
+      "No May 2027 date | AP Test Undated Course (Test fixture: a listed course whose first exam administration has not been scheduled yet.)",
     ]);
   });
 
   it("shows the regular slot when no resolution moved the exam", () => {
     const raw = buildTxtExport(
       SUBJECTS,
-      ["biology"],
+      ["physics-c-mechanics"],
       [],
       "Solo",
-      "May 2026",
+      "May 2027",
     );
-    expect(raw).toContain("Monday, May 4, 2026 | AM session | AP Biology");
+    expect(raw).toContain("Monday, May 3, 2027 | AM session | AP Physics C: Mechanics");
     expect(raw).not.toContain("(moved to late testing)");
   });
 });

@@ -1,0 +1,15 @@
+{
+ "id": "research",
+ "name": "AP Research",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-research/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-research/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": true,
+ "totalMinutesStated": "n/a",
+ "sectionsSumToTotal": "n/a",
+ "changedFor2027": null,
+ "sections": [],
+ "datasetDiscrepancies": []
+}

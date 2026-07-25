@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
-import apData from "../src/data/ap-2026.json";
+import apData from "../src/data/ap-2027.json";
 import { pressViewChip } from "./support/view-chip";
 
 /**
@@ -13,17 +13,17 @@ import { pressViewChip } from "./support/view-chip";
  * issue / PR.
  *
  * AC4 (3+ subjects on one slot) cannot be exercised in the browser: the
- * shipped May-2026 dataset contains only 2-way collisions. Its observable
+ * shipped May-2027 dataset is exercised through 2-way collisions here. Its observable
  * test lives at the pure-function layer instead — see
  * `src/lib/conflicts.qa.test.ts` (runs under `pnpm test:unit`).
  *
  * Dataset-driven fixtures (asserted from the shipped JSON, never hardcoded
  * beyond ids):
- *   - AP Biology   2026-05-04 AM  → late 2026-05-20 PM
- *   - AP Latin     2026-05-04 AM  → late 2026-05-18 PM   (collides w/ Biology)
- *   - AP Chemistry 2026-05-05 AM  → late 2026-05-20 PM   (late slot = Biology's)
- *   - AP Human Geography 2026-05-05 AM → late 2026-05-18 PM (collides w/ Chem)
- *   - AP Drawing + AP 2-D Art and Design — portfolio-only, deadline 2026-05-08
+ *   - AP Biology   2027-05-03 AM  → late 2027-05-19 PM
+ *   - AP Italian Language and Culture     2027-05-03 AM  → late 2027-05-17 PM   (collides w/ Biology)
+ *   - AP Chemistry 2027-05-04 AM  → late 2027-05-19 PM   (late slot = Biology's)
+ *   - AP Human Geography 2027-05-04 AM → late 2027-05-17 PM (collides w/ Chem)
+ *   - AP Drawing + AP 2-D Art and Design — portfolio-only, deadline 2027-05-07
  */
 
 // Env-overridable so a re-verification pass writes a fresh evidence set
@@ -53,28 +53,28 @@ const byId = (id: string): Subject => {
 };
 
 const BIOLOGY = byId("biology");
-const LATIN = byId("latin");
+const ITALIAN = byId("italian-language-and-culture");
+const AAS = byId("african-american-studies");
 const CHEMISTRY = byId("chemistry");
-const HUMAN_GEO = byId("human-geography");
 const DRAWING = byId("drawing");
 const TWO_D = byId("2-d-art-and-design");
 
 // Guard the fixture assumptions against dataset edits — if these ever fail,
 // the spec's scenario (not the app) needs re-picking.
 if (
-  BIOLOGY.exam!.date !== LATIN.exam!.date ||
-  BIOLOGY.exam!.session !== LATIN.exam!.session
+  BIOLOGY.exam!.date !== ITALIAN.exam!.date ||
+  BIOLOGY.exam!.session !== ITALIAN.exam!.session
 )
-  throw new Error("fixture drift: biology/latin no longer share a slot");
+  throw new Error("fixture drift: biology/italian no longer share a slot");
 if (
-  BIOLOGY.lateTesting!.date !== CHEMISTRY.lateTesting!.date ||
-  BIOLOGY.lateTesting!.session !== CHEMISTRY.lateTesting!.session
+  BIOLOGY.lateTesting!.date !== AAS.lateTesting!.date ||
+  BIOLOGY.lateTesting!.session !== AAS.lateTesting!.session
 )
   throw new Error("fixture drift: biology/chemistry late slots differ");
 if (DRAWING.portfolio!.deadline !== TWO_D.portfolio!.deadline)
   throw new Error("fixture drift: drawing/2-d portfolio deadlines differ");
 
-/** "Monday, May 4, 2026" — must match src/lib/schedule.ts formatDateLabel. */
+/** "Monday, May 3, 2027" — must match src/lib/schedule.ts formatDateLabel. */
 function dateLabel(iso: string): string {
   const [year, month, day] = iso.split("-").map(Number);
   return new Intl.DateTimeFormat("en-US", {
@@ -229,12 +229,12 @@ test.describe("issue #5 — same-slot conflicts resolve to official late-testing
     await openList(page);
     await select(page, BIOLOGY.name);
     await expect(prompt(page)).toHaveCount(0); // one subject → no conflict
-    await select(page, LATIN.name);
+    await select(page, ITALIAN.name);
 
     await expect(prompt(page)).toHaveCount(1);
     await expect(prompt(page)).toContainText("Exam time conflict");
     await expect(prompt(page)).toContainText(BIOLOGY.name);
-    await expect(prompt(page)).toContainText(LATIN.name);
+    await expect(prompt(page)).toContainText(ITALIAN.name);
     // The shared slot: date + session.
     await expect(prompt(page)).toContainText(dateLabel(BIOLOGY.exam!.date));
     await expect(prompt(page)).toContainText(
@@ -251,38 +251,38 @@ test.describe("issue #5 — same-slot conflicts resolve to official late-testing
     ).toBeVisible();
     await expect(
       prompt(page).getByRole("button", {
-        name: `Keep ${LATIN.name} at the regular time`,
+        name: `Keep ${ITALIAN.name} at the regular time`,
       }),
     ).toBeVisible();
 
     // Path 2: a persisted colliding selection loads → prompt appears on load.
     const isolated = await browser.newContext();
     const fresh = await isolated.newPage();
-    await seedSelection(fresh, [BIOLOGY.id, LATIN.id]);
+    await seedSelection(fresh, [BIOLOGY.id, ITALIAN.id]);
     await fresh.goto("/");
     await openList(fresh);
     await expect(prompt(fresh)).toHaveCount(1);
     await expect(prompt(fresh)).toContainText(BIOLOGY.name);
-    await expect(prompt(fresh)).toContainText(LATIN.name);
+    await expect(prompt(fresh)).toContainText(ITALIAN.name);
     await isolated.close();
   });
 
   test("AC2 — choosing the keeper moves each non-keeper to ITS OWN late-testing slot, shown under the late date with a 'Moved to late testing' tag", async ({
     page,
   }) => {
-    await seedSelection(page, [BIOLOGY.id, LATIN.id]);
+    await seedSelection(page, [BIOLOGY.id, ITALIAN.id]);
     await page.goto("/");
     await openList(page);
-    await keep(page, LATIN.name);
+    await keep(page, ITALIAN.name);
 
     await expect(prompt(page)).toHaveCount(0);
 
     // Keeper stays at the regular slot.
-    const regularRows = rowsIn(page, LATIN.exam!.date);
+    const regularRows = rowsIn(page, ITALIAN.exam!.date);
     await expect(regularRows).toHaveCount(1);
-    await expect(regularRows.first()).toContainText(LATIN.name);
+    await expect(regularRows.first()).toContainText(ITALIAN.name);
 
-    // Non-keeper renders under ITS OWN late-testing date (2026-05-20 for
+    // Non-keeper renders under ITS OWN late-testing date (2027-05-19 for
     // Biology — NOT Latin's 05-18) with the visible moved tag.
     const lateRows = rowsIn(page, BIOLOGY.lateTesting!.date);
     await expect(lateRows).toHaveCount(1);
@@ -298,10 +298,10 @@ test.describe("issue #5 — same-slot conflicts resolve to official late-testing
   test("AC3 — resolution persists in apx.resolutions.v1 across reload; deselecting an involved subject clears it and restores the regular slot; re-creating the collision re-prompts", async ({
     page,
   }) => {
-    await seedSelection(page, [BIOLOGY.id, LATIN.id]);
+    await seedSelection(page, [BIOLOGY.id, ITALIAN.id]);
     await page.goto("/");
     await openList(page);
-    await keep(page, LATIN.name);
+    await keep(page, ITALIAN.name);
     await expect(rowsIn(page, BIOLOGY.lateTesting!.date)).toHaveCount(1);
 
     // Persisted under the versioned key with the chosen keeper.
@@ -315,9 +315,9 @@ test.describe("issue #5 — same-slot conflicts resolve to official late-testing
       memberIds: string[];
     }>;
     expect(parsed).toHaveLength(1);
-    expect(parsed[0].keeperId).toBe(LATIN.id);
+    expect(parsed[0].keeperId).toBe(ITALIAN.id);
     expect([...parsed[0].memberIds].sort()).toEqual(
-      [BIOLOGY.id, LATIN.id].sort(),
+      [BIOLOGY.id, ITALIAN.id].sort(),
     );
 
     // Survives reload: no prompt, exam still on the late date. The reload
@@ -329,7 +329,7 @@ test.describe("issue #5 — same-slot conflicts resolve to official late-testing
     await expect(rowsIn(page, BIOLOGY.lateTesting!.date)).toHaveCount(1);
 
     // Deselect the keeper → resolution cleared, Biology back at its regular slot.
-    await deselect(page, LATIN.name);
+    await deselect(page, ITALIAN.name);
     await expect(rowsIn(page, BIOLOGY.exam!.date)).toHaveCount(1);
     await expect(rowsIn(page, BIOLOGY.exam!.date).first()).toContainText(
       BIOLOGY.name,
@@ -347,13 +347,13 @@ test.describe("issue #5 — same-slot conflicts resolve to official late-testing
       .toBe("[]");
 
     // Re-create the same collision → the prompt must come back (no silent re-apply).
-    await select(page, LATIN.name);
+    await select(page, ITALIAN.name);
     await expect(prompt(page)).toHaveCount(1);
   });
 
   // AC4 (three or more subjects on one slot → same choose-one flow, all
   // non-keepers move to their own late slots) has no browser-reachable fixture:
-  // the shipped 2026 dataset has no slot shared by 3+ subjects. Observable
+  // the shipped 2027 dataset's 3-way slots are covered by unit tests. Observable
   // coverage lives in `src/lib/conflicts.qa.test.ts` (pnpm test:unit), which
   // chains grouping → keeper choice → resolveSlots exactly as the UI does.
 
@@ -362,23 +362,23 @@ test.describe("issue #5 — same-slot conflicts resolve to official late-testing
   }) => {
     await seedSelection(page, [
       BIOLOGY.id,
-      LATIN.id,
+      ITALIAN.id,
+      AAS.id,
       CHEMISTRY.id,
-      HUMAN_GEO.id,
     ]);
     await page.goto("/");
     await openList(page);
 
-    // Two independent conflicts (May 4 AM, May 5 AM) → two prompts.
+    // Two independent conflicts (May 3 PM, May 6 PM) → two prompts.
     await expect(prompt(page)).toHaveCount(2);
-    await keep(page, LATIN.name); // Biology → late 2026-05-20 PM
-    await keep(page, HUMAN_GEO.name); // Chemistry → late 2026-05-20 PM
+    await keep(page, ITALIAN.name); // Biology → its late slot
+    await keep(page, CHEMISTRY.name); // Chemistry → late 2027-05-19 PM
 
-    // Both moved exams now share 2026-05-20 PM → visible warning naming them.
+    // Both moved exams now share Biology's late slot → warning naming them.
     await expect(lateWarning(page)).toBeVisible();
     await expect(lateWarning(page)).toContainText("Late-testing slots overlap");
     await expect(lateWarning(page)).toContainText(BIOLOGY.name);
-    await expect(lateWarning(page)).toContainText(CHEMISTRY.name);
+    await expect(lateWarning(page)).toContainText(AAS.name);
     // The shared slot must be named READABLY: "<date> (<session> session)".
     // Guards the JSX whitespace-collapse regression that renders
     // "(PMsession)" — the compiled text node loses the space between the
@@ -394,7 +394,7 @@ test.describe("issue #5 — same-slot conflicts resolve to official late-testing
       lateRows.filter({ hasText: BIOLOGY.name }),
     ).toHaveCount(1);
     await expect(
-      lateRows.filter({ hasText: CHEMISTRY.name }),
+      lateRows.filter({ hasText: AAS.name }),
     ).toHaveCount(1);
 
     // No forced second resolution: zero conflict prompts remain.
@@ -404,13 +404,13 @@ test.describe("issue #5 — same-slot conflicts resolve to official late-testing
   test("AC6 — both the prompt and the moved-exam tag carry the AP-coordinator planning-choice wording", async ({
     page,
   }) => {
-    await seedSelection(page, [BIOLOGY.id, LATIN.id]);
+    await seedSelection(page, [BIOLOGY.id, ITALIAN.id]);
     await page.goto("/");
     await openList(page);
 
     await expect(prompt(page)).toContainText(COORDINATOR_NOTE);
 
-    await keep(page, LATIN.name);
+    await keep(page, ITALIAN.name);
     const movedRow = rowsIn(page, BIOLOGY.lateTesting!.date).first();
     await expect(movedRow).toContainText("Moved to late testing");
     await expect(movedRow).toContainText(COORDINATOR_NOTE);
@@ -450,9 +450,9 @@ test.describe("issue #5 — same-slot conflicts resolve to official late-testing
   }) => {
     await seedSelection(page, [
       BIOLOGY.id,
-      LATIN.id,
+      ITALIAN.id,
+      AAS.id,
       CHEMISTRY.id,
-      HUMAN_GEO.id,
     ]);
     await page.goto("/");
     await openList(page);
@@ -465,8 +465,8 @@ test.describe("issue #5 — same-slot conflicts resolve to official late-testing
       `prompt text contrast (light) = ${lightPrompt.toFixed(2)}:1`,
     ).toBeGreaterThanOrEqual(4.5);
 
-    await keep(page, LATIN.name);
-    await keep(page, HUMAN_GEO.name);
+    await keep(page, ITALIAN.name);
+    await keep(page, CHEMISTRY.name);
 
     // Resolved slots render — the moved exams appear ONLY under their late
     // dates; their regular slots no longer list them.
@@ -475,7 +475,7 @@ test.describe("issue #5 — same-slot conflicts resolve to official late-testing
       rowsIn(page, BIOLOGY.exam!.date).filter({ hasText: BIOLOGY.name }),
     ).toHaveCount(0);
     await expect(
-      rowsIn(page, CHEMISTRY.exam!.date).filter({ hasText: CHEMISTRY.name }),
+      rowsIn(page, AAS.exam!.date).filter({ hasText: AAS.name }),
     ).toHaveCount(0);
 
     // Contrast of the late-collision warning text, light mode.
@@ -499,7 +499,7 @@ test.describe("issue #5 — same-slot conflicts resolve to official late-testing
     // context: no stored resolution can pre-resolve it).
     const isolated = await browser.newContext({ colorScheme: "dark" });
     const fresh = await isolated.newPage();
-    await seedSelection(fresh, [BIOLOGY.id, LATIN.id]);
+    await seedSelection(fresh, [BIOLOGY.id, ITALIAN.id]);
     await fresh.goto("/");
     await openList(fresh);
     await expect(prompt(fresh)).toHaveCount(1);
@@ -533,7 +533,7 @@ for (const vp of viewports) {
     page,
   }) => {
     await page.setViewportSize({ width: vp.width, height: vp.height });
-    await seedSelection(page, [BIOLOGY.id, LATIN.id]);
+    await seedSelection(page, [BIOLOGY.id, ITALIAN.id]);
     await page.goto("/");
     await openList(page);
     await expect(prompt(page)).toBeVisible();
@@ -550,10 +550,10 @@ test("evidence — resolved state (moved tag) and late-late warning at desktop",
   browser,
 }) => {
   await page.setViewportSize({ width: 1920, height: 1080 });
-  await seedSelection(page, [BIOLOGY.id, LATIN.id]);
+  await seedSelection(page, [BIOLOGY.id, ITALIAN.id]);
   await page.goto("/");
   await openList(page);
-  await keep(page, LATIN.name);
+  await keep(page, ITALIAN.name);
   await expect(
     rowsIn(page, BIOLOGY.lateTesting!.date).first(),
   ).toContainText("Moved to late testing");
@@ -568,14 +568,14 @@ test("evidence — resolved state (moved tag) and late-late warning at desktop",
   const fresh = await isolated.newPage();
   await seedSelection(fresh, [
     BIOLOGY.id,
-    LATIN.id,
+    ITALIAN.id,
+    AAS.id,
     CHEMISTRY.id,
-    HUMAN_GEO.id,
   ]);
   await fresh.goto("/");
   await openList(fresh);
-  await keep(fresh, LATIN.name);
-  await keep(fresh, HUMAN_GEO.name);
+  await keep(fresh, ITALIAN.name);
+  await keep(fresh, CHEMISTRY.name);
   await expect(lateWarning(fresh)).toBeVisible();
   await fresh.screenshot({
     path: `${EVIDENCE_DIR}/ac5-late-late-warning-desktop.png`,

@@ -41,7 +41,7 @@ export interface ScheduleDateGroup {
 export interface UndatedSubject {
   id: string;
   name: string;
-  /** Sourced reason there is no May 2026 date (e.g. Career Kickstart courses). */
+  /** Sourced reason there is no dated entry in this cycle (none in May 2027). */
   reason: string | null;
 }
 
@@ -157,7 +157,7 @@ export function buildSchedule(
  * Format an ISO calendar date as a *local* long date label (shared by the
  * schedule headings and the conflict UI). Dates are floating (no timezone);
  * building the Date from explicit parts avoids the UTC-parse day-shift of
- * `new Date("2026-05-04")` in negative-offset zones.
+ * `new Date("2027-05-03")` in negative-offset zones.
  */
 export function formatDateLabel(iso: string): string {
   const [year, month, day] = iso.split("-").map(Number);

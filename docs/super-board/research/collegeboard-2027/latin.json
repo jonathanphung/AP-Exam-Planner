@@ -1,0 +1,30 @@
+{
+ "id": "latin",
+ "name": "AP Latin",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-latin/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-latin/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": false,
+ "totalMinutesStated": 180,
+ "sectionsSumToTotal": true,
+ "changedFor2027": null,
+ "sections": [
+  {
+   "name": "Multiple Choice",
+   "questionCount": "52",
+   "minutes": 65,
+   "weightPercent": 50,
+   "quote": "Section I: Multiple Choice — 52 Questions | 1 Hour 5 minutes | 50% of Exam Score"
+  },
+  {
+   "name": "Free Response",
+   "questionCount": "5",
+   "minutes": 115,
+   "weightPercent": 50,
+   "quote": "Section II: Free Response — 5 Questions | 1 Hour 55 minutes | 50% of Exam Score"
+  }
+ ],
+ "datasetDiscrepancies": []
+}

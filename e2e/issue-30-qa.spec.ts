@@ -1,5 +1,5 @@
 import { test, expect, type Page, type Browser } from "@playwright/test";
-import apData from "../src/data/ap-2026.json";
+import apData from "../src/data/ap-2027.json";
 import { REGULAR_WINDOWS, LATE_TESTING_WINDOW } from "../src/data/schema";
 import { pressViewChip } from "./support/view-chip";
 
@@ -50,27 +50,29 @@ const byId = (id: string): Subject => {
 // Same fixture set as the Builder spec (cross-category conflict + one clean
 // block per block-bearing category), plus two off-grid subjects for AC8.
 const BIOLOGY = byId("biology"); // STEM — conflicts with Latin (05-04 AM)
-const LATIN = byId("latin"); // Languages — conflicts with Biology
+const ITALIAN = byId("italian-language-and-culture"); // Languages — conflicts with Biology
 const CHEMISTRY = byId("chemistry"); // STEM, clean
 const EURO_HISTORY = byId("european-history"); // Humanities, clean
-const CHINESE = byId("chinese-language-and-culture"); // Languages, clean
+const FRENCH = byId("french-language-and-culture"); // Languages, clean
 const MUSIC_THEORY = byId("music-theory"); // Arts, clean
 const DRAWING = byId("drawing"); // Arts — portfolio only → off-grid row
-const CYBERSECURITY = byId("cybersecurity"); // Career Kickstart — undated → off-grid row
+const CYBERSECURITY = byId("cybersecurity"); // Career Kickstart — sits its first exam in May 2027
 
-if (BIOLOGY.exam!.date !== LATIN.exam!.date || BIOLOGY.exam!.session !== LATIN.exam!.session)
-  throw new Error("fixture drift: biology/latin no longer share a slot");
-if (DRAWING.exam !== null || CYBERSECURITY.exam !== null)
-  throw new Error("fixture drift: off-grid fixtures now have exam dates");
+if (BIOLOGY.exam!.date !== ITALIAN.exam!.date || BIOLOGY.exam!.session !== ITALIAN.exam!.session)
+  throw new Error("fixture drift: biology/italian no longer share a slot");
+if (DRAWING.exam !== null)
+  throw new Error("fixture drift: the off-grid fixture now has an exam date");
+if (CYBERSECURITY.exam === null)
+  throw new Error("fixture drift: cybersecurity lost its exam date");
 if (CYBERSECURITY.category !== "Career Kickstart")
   throw new Error("fixture drift: cybersecurity left Career Kickstart");
 
 const CONFLICT_SET = [
   BIOLOGY.id,
-  LATIN.id,
+  ITALIAN.id,
   CHEMISTRY.id,
   EURO_HISTORY.id,
-  CHINESE.id,
+  FRENCH.id,
   MUSIC_THEORY.id,
 ];
 
@@ -108,8 +110,8 @@ async function seedResolution(page: Page) {
         {
           date: BIOLOGY.exam!.date,
           session: BIOLOGY.exam!.session,
-          keeperId: LATIN.id,
-          memberIds: [BIOLOGY.id, LATIN.id],
+          keeperId: ITALIAN.id,
+          memberIds: [BIOLOGY.id, ITALIAN.id],
         },
       ]),
     ] as const,
@@ -210,7 +212,7 @@ for (const vp of viewports) {
     await openCalendar(page);
     await gotoWeek(page, weekNumberOf(BIOLOGY.exam!.date));
 
-    for (const s of [BIOLOGY, LATIN]) {
+    for (const s of [BIOLOGY, ITALIAN]) {
       const cls = (await blockButton(page, s.id).getAttribute("class")) ?? "";
       expect(cls, `${s.id} must wear the orange conflict style`).toContain(
         "bg-[#FDBA74]",
@@ -240,8 +242,8 @@ test("AC3 evidence — resolved conflict: keeper pastel, mover keeps the 'Moved 
   await openCalendar(page);
 
   // Regular week — Latin (keeper) is green (#C9E89B) again, zero markers.
-  await gotoWeek(page, weekNumberOf(LATIN.exam!.date));
-  const latinCls = (await blockButton(page, LATIN.id).getAttribute("class")) ?? "";
+  await gotoWeek(page, weekNumberOf(ITALIAN.exam!.date));
+  const latinCls = (await blockButton(page, ITALIAN.id).getAttribute("class")) ?? "";
   expect(latinCls).toContain("bg-[#C9E89B]");
   expect(latinCls).not.toContain("bg-[#FDBA74]");
   await expect(
@@ -303,8 +305,8 @@ test("AC4/AC6 — dark mode: category fills distinct from each other and from or
   await gotoWeek(page, weekNumberOf(CHEMISTRY.exam!.date));
   catalog.STEM = await bgColor(page, CHEMISTRY.id);
   catalog.Humanities = await bgColor(page, EURO_HISTORY.id);
-  catalog.Languages = await bgColor(page, CHINESE.id);
-  const orange = await bgColor(page, LATIN.id); // conflicted → orange (dark)
+  catalog.Languages = await bgColor(page, FRENCH.id);
+  const orange = await bgColor(page, ITALIAN.id); // conflicted → orange (dark)
 
   await gotoWeek(page, weekNumberOf(BIOLOGY.exam!.date));
   await expect(page.getByTestId("block-conflict-marker")).toHaveCount(2);
@@ -341,9 +343,9 @@ test("AC4/AC6 — dark mode: category fills distinct from each other and from or
   await seedResolution(page2);
   await page2.goto("/");
   await openCalendar(page2);
-  await gotoWeek(page2, weekNumberOf(LATIN.exam!.date));
+  await gotoWeek(page2, weekNumberOf(ITALIAN.exam!.date));
   expect(
-    await bgColor(page2, LATIN.id),
+    await bgColor(page2, ITALIAN.id),
     "resolved keeper must not render the dark orange conflict fill",
   ).not.toBe(orange);
   await expect(
@@ -358,8 +360,9 @@ test("AC4/AC6 — dark mode: category fills distinct from each other and from or
 
 // ---------------------------------------------------------------------------
 // AC8 — legend dots + off-grid list markers carry the SAME pastel accents,
-// including the two categories that render no grid block here (Arts portfolio
-// row + Career Kickstart undated row), light and dark class variants.
+// light and dark class variants. For May 2027 the Career Kickstart accent is
+// exercised on the legend (those courses now sit exams, so they render blocks);
+// the Arts portfolio row still exercises the off-grid marker path.
 // ---------------------------------------------------------------------------
 test("AC8 — legend and off-grid markers use the pastel accent scheme (incl. Career Kickstart)", async ({
   page,
@@ -368,10 +371,10 @@ test("AC8 — legend and off-grid markers use the pastel accent scheme (incl. Ca
   await seedSelection(page, [
     CHEMISTRY.id,
     EURO_HISTORY.id,
-    CHINESE.id,
+    FRENCH.id,
     MUSIC_THEORY.id,
     DRAWING.id, // Arts portfolio deadline → off-grid row (pink dot)
-    CYBERSECURITY.id, // Career Kickstart, no 2026 exam → off-grid row (lavender dot)
+    CYBERSECURITY.id, // Career Kickstart, May 2027 exam → grid block (lavender dot)
   ]);
   await page.goto("/");
   await openCalendar(page);
@@ -385,6 +388,7 @@ test("AC8 — legend and off-grid markers use the pastel accent scheme (incl. Ca
     ["Humanities", "bg-[#CBA53A]", "dark:bg-[#E3C766]"],
     ["Languages", "bg-[#7EB84A]", "dark:bg-[#A0D172]"],
     ["Arts", "bg-[#EF5D6A]", "dark:bg-[#F98A93]"],
+    ["Career Kickstart", "bg-[#9866C0]", "dark:bg-[#B98FD8]"],
   ];
   for (const [label, lightDot, darkDot] of expectedLegend) {
     const dot = legend
@@ -399,13 +403,12 @@ test("AC8 — legend and off-grid markers use the pastel accent scheme (incl. Ca
     );
   }
 
-  // Off-grid rows: the portfolio (Arts) and undated (Career Kickstart) list
-  // markers wear the same pastel accents as the legend/block scheme.
+  // Off-grid rows: the portfolio (Arts) list marker wears the same pastel
+  // accent as the legend/block scheme.
   const offGrid = page.getByTestId("calendar-off-grid");
   await expect(offGrid).toBeVisible();
   const offGridCases: Array<[string, string, string]> = [
     [DRAWING.name, "bg-[#EF5D6A]", "dark:bg-[#F98A93]"], // Arts (pink)
-    [CYBERSECURITY.name, "bg-[#9866C0]", "dark:bg-[#B98FD8]"], // Career Kickstart (lavender)
   ];
   for (const [name, lightDot, darkDot] of offGridCases) {
     const dot = offGrid

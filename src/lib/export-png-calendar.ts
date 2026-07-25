@@ -47,7 +47,7 @@ import {
 export interface CalendarCardRenderOptions {
   /** Active theme — decides the palette + the solid PNG background. */
   theme: ExportTheme;
-  /** Dataset cycle, e.g. "May 2026" (shown in the header). */
+  /** Dataset cycle, e.g. "May 2027" (shown in the header). */
   cycle: string;
   /** Active schedule name, shown in the footer. */
   scheduleName: string;

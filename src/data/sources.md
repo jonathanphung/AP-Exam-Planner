@@ -1,34 +1,168 @@
-# Data sources for `ap-2026.json`
+# Data sources for `ap-2027.json`
 
-Every value in `ap-2026.json` was taken from a College Board page fetched on
-**2026-07-04** (the file's `lastVerified` date). Nothing is estimated; any
-value College Board has not published is the literal string `"pending"`
-(PRD §7.5/§8/§11).
+Every value in `ap-2027.json` was taken from a College Board page fetched on
+**2026-07-24** (the file's `lastVerified` date) during the annual dataset swap
+(issue #37). Nothing is estimated; any value College Board has not published is
+the literal string `"pending"` (PRD §7.5/§8/§11).
+
+**No value was carried over from `ap-2026.json` unverified.** Every subject's
+AP Central exam page and AP Students assessment page was re-fetched and diffed
+against the 2026 dataset; every difference found is listed under "May 2027
+changes" below. The extracted text of every page fetched is committed under
+`docs/super-board/research/collegeboard-2027/pages/`, so the claims here are
+checkable without re-fetching.
+
+## What happened to `ap-2026.json` (issue #37 AC — decision recorded)
+
+**Deleted, not kept alongside.** The app imports exactly one dataset either
+way, so the only question is whether a second file earns its place in the tree.
+It does not:
+
+- The full May 2026 file is one `git show cffa1d4:src/data/ap-2026.json` away —
+  nothing is lost.
+- Its provenance survives in the tree as
+  `docs/super-board/research/collegeboard-2026/`, which is the part anyone
+  actually re-reads when checking how a value was sourced.
+- Leaving a second, superseded dataset next to the live one is how an import
+  silently points at last year's calendar. `src/data/cycle.ts` is now the single
+  import point; there is one dataset for it to name.
+
+The 2026 test suites moved with the file: `ap-2026.test.ts` /
+`ap-2026.qa.test.ts` / `ap-2026.sections.test.ts` are now the `ap-2027.*`
+equivalents, retargeted rather than duplicated.
 
 ## The four data classes (issue #2 AC)
 
 | Data class | Exact URL used |
 |---|---|
-| Exam calendar (regular dates + AM/PM sessions + session start times) | <https://apcentral.collegeboard.org/exam-administration-ordering-scores/exam-dates> |
-| Late-testing calendar | <https://apcentral.collegeboard.org/exam-administration-ordering-scores/exam-dates/late-testing-dates> |
-| Portfolio deadlines | <https://apcentral.collegeboard.org/about-ap/ap-coordinators/calendar-deadlines> (Apr 30, 2026 11:59 p.m. ET for AP Seminar / AP Research / AP CSP performance tasks; May 8, 2026 8 p.m. ET for AP Art and Design portfolios — the Art and Design deadline is also stated on the exam-dates page above) |
+| Exam calendar (regular dates + session slots + session start times) | <https://apcentral.collegeboard.org/exam-administration-ordering-scores/exam-dates> — "2027 AP Exam Dates" |
+| Late-testing calendar | <https://apcentral.collegeboard.org/exam-administration-ordering-scores/exam-dates/late-testing-dates> — "2027 AP Exam Late-Testing Dates" |
+| Portfolio deadlines | <https://apcentral.collegeboard.org/exam-administration-ordering-scores/exam-dates> §"AP Digital Portfolio Submission Deadlines" — Apr 30, 2027 11:59 p.m. ET for AP CSP / AP Seminar / AP Research and (new for 2027) the world-language Personalized Project Reference; May 7, 2027 11:59 p.m. ET for AP Art and Design. Each world-language PPR deadline is additionally printed on that course's own exam page. |
 | Score distributions (pass rates) | <https://apstudents.collegeboard.org/about-ap-scores/score-distributions> |
+
+### Why the coordinator calendar is not the portfolio-deadline source this cycle
+
+<https://apcentral.collegeboard.org/about-ap/ap-coordinators/calendar-deadlines>
+was the 2026 source. On 2026-07-24 it still publishes the **2025-26** key dates
+("AP 2025-26 Key Dates and Deadlines"); the 2026-27 edition is not out yet.
+Using it would have shipped 2026 deadlines into a 2027 dataset. The 2027
+deadlines come from the 2027 exam-dates page, which publishes all four verbatim.
 
 ### Notes on the score distributions
 
-The issue expected the 2025 administration to be the most recent published
-data. As of 2026-07-04 College Board's score-distributions page already
-carries the **2026 administration** results for all subjects (released on a
-rolling basis in July 2026), so `passRate` is the published "3+" percentage
-from the 2026 tables — the most recent published data, per the AC. The two
-Career Kickstart courses have no administrations yet and are `"pending"`.
+No 2027 administration has happened, so the most recent published distributions
+are still the **2026 administration** tables — the same source the 2026 dataset
+used. Every `passRate` was re-read from the live tables on 2026-07-24 and
+matched the shipped value for all 40 subjects with a published distribution.
+The three Career Kickstart courses have no administrations yet and are
+`"pending"`.
 
 ## Session start times
 
-The exam-calendar tables label sessions "Morning 8 a.m. Local Time" and
-"Afternoon 12 p.m. Local Time"; the same page states exams must begin between
-8–9 a.m. / 12–1 p.m. local time. `sessionStartTimes` records the published
-labels verbatim.
+New for 2027, College Board renamed the slots: "AP Exams are offered as
+Session 1 and Session 2 — replacing the former morning and afternoon
+designations", and start times now vary by UTC offset
+(<https://apcentral.collegeboard.org/exam-administration-ordering-scores/exam-dates/start-times>).
+The dataset keeps `AM`/`PM` as its internal slot keys (Session 1 → `AM`,
+Session 2 → `PM`) because the published page states that mapping directly:
+"Session 1 and Session 2 represent the timeslots that are typically the morning
+and afternoon, respectively."
+
+`sessionStartTimes` records the times the page publishes for the majority case,
+verbatim: "For most schools, including all schools in the lower 48 United
+States, Hawaii, and Washington, D.C., exams still begin at 8 a.m. local time
+and 12 p.m. local time." Locations on other UTC offsets have their own published
+start times in the table on the start-times page; the app stores no
+per-time-zone table because it cannot know which offset a given visitor tests
+under, and guessing one would be an invented time.
+
+## May 2027 changes (diffed against `ap-2026.json` on 2026-07-24)
+
+### Calendar
+
+- Regular windows: **May 3–7** and **May 10–14, 2027** (2026: May 4–8, May 11–15).
+- Late-testing window: **May 17–21, 2027** (2026: May 18–22).
+- Every subject's exam and late-testing slot was re-read from the two 2027
+  tables. None was shifted arithmetically from a 2026 date — the 2027 grid
+  re-orders subjects as well as moving the week (AP Biology, for example, went
+  from Mon May 4 AM to Mon May 3 PM).
+
+### Roster
+
+- **Added: AP Networking** (`networking`). The 2027 schedule lists
+  "Networking (2026-27 pilot schools only)" on Fri May 7 Session 2, with late
+  testing Mon May 17 Session 1. No AP Central exam page and no AP Students
+  assessment page exists for it yet (both 404 on 2026-07-24) — the course is in
+  its third and final pilot in 2026-27 and launches in fall 2027 — so its whole
+  `format` block is `"pending"` and `examNote` carries the published pilot-only
+  restriction. Its official page is the adoption page,
+  <https://apcentral.collegeboard.org/courses/ap-networking/adopt>.
+- **No course was removed or renamed.** The other 42 ids are unchanged, so no
+  saved selection loses a subject in this swap.
+- **AP Business with Personal Finance** and **AP Cybersecurity** sit their first
+  exams (Tue May 4 and Wed May 5, both Session 1), so their 2026 `noExamReason`
+  is gone. No subject carries a `noExamReason` this cycle.
+
+### Exam format
+
+| subject | field | 2026 | 2027 | verbatim 2027 source quote |
+|---|---|---|---|---|
+| `calculus-ab`, `calculus-bc` | Section I | 45 Q / 105 min (Part A 30 Q/60 min, Part B 15 Q/45 min) | **42 Q / 100 min** (Part A **29 Q/62 min**, Part B **13 Q/38 min**) | "Section I: Multiple Choice / 42 Questions \| 1 Hour 40 Minutes \| 50% of Exam Score"; "Part A: 29 questions; 62 minutes (calculator not permitted)."; "Part B: 13 questions; 38 minutes (graphing calculator required)." |
+| `calculus-ab`, `calculus-bc` | `totalMinutes` | 195 | **190** | AP Students "Exam Duration — 3hrs 10mins" |
+| `precalculus` | Section I | 40 Q / 120 min (Part A 28 Q/80 min, Part B 12 Q/40 min) | **42 Q / 105 min** (Part A **29 Q/65 min**, Part B **13 Q/40 min**) | "Section I: Multiple Choice / 42 Questions \| 1 Hour and 45 Minutes \| 62.5% of Exam Score" |
+| `precalculus` | Section II | 4 Q / 60 min (Part A 30, Part B 30) | **4 Q / 70 min** (Part A **35**, Part B **35**) | "Section II: Free Response / 4 Questions \| 1 Hour and 10 Minutes \| 37.5% of Exam Score" |
+| `precalculus` | `totalMinutes` | 180 | **175** | AP Students "Exam Duration — 2hrs 55mins" |
+| `physics-1`, `physics-2`, `physics-c-mechanics`, `physics-c-electricity-and-magnetism` | Section I | 40 Q / 80 min | **42 Q / 85 min** | "Section I: Multiple Choice / 42 Questions \| 85 Minutes \| 50% of Exam Score" |
+| the same four physics exams | Section II | 4 Q / 100 min | **4 Q / 95 min** | "Section II: Free Response / 4 Questions \| 95 Minutes \| 50% of Exam Score" (`totalMinutes` unchanged at 180 — "3hrs") |
+
+Every other subject's `sections[]`, `totalMinutes`, `questionCount`, and
+`weightPercent` re-verified **identical** to the 2026 values.
+
+### Delivery mode
+
+The 2026 source for `delivery` ("AP Exams: How Are They Administered?") is
+explicitly scoped to "the 2026 AP Exams" and had not been updated on 2026-07-24,
+so it does not speak to the 2027 cycle. Each course's own exam page does, and
+several announce a 2027 move:
+
+| subject | 2026 | 2027 | verbatim 2027 source quote |
+|---|---|---|---|
+| `french-`, `german-`, `italian-`, `spanish-language-and-culture` | `paper` | **`digital`** | "The AP world language and culture courses and exams were revised for the 2026-27 school year. Starting in May 2027, the exams will also transition to a digital exam format in Bluebook." / "This is a fully digital exam." |
+| `spanish-literature-and-culture` | `paper` | **`digital`** | "The AP Spanish Literature and Culture Exam will move to a fully digital format in May 2027, with no changes to the exam structure." |
+| `music-theory` | `paper` | **`hybrid`** | "Starting in May 2027, the AP Music Theory Exam will move to a hybrid digital format through the Bluebook digital testing app, with no changes to the exam structure." |
+| `statistics` | `hybrid` | **`digital`** | "AP Statistics has been revised for the 2026-27 school year…" / "This is a fully digital exam. Students complete multiple-choice and free-response questions in the Bluebook testing app, with all responses automatically submitted at the end of the exam." |
+
+### Calculator policy
+
+`business-with-personal-finance` moved `false` → **`true`**. The 2026 value came
+solely from the calculator-policies list, which still omits the Career Kickstart
+courses; the course's own exam page states it outright: "Calculators are
+permitted for this course's exam. Students can use either a handheld 4-function
+calculator or the built-in Desmos 4-function calculator through Bluebook." No
+other subject's policy changed.
+
+### Portfolio deadlines
+
+- `computer-science-principles`, `seminar`, `research`: 2026-04-30 →
+  **2027-04-30** (11:59 p.m. ET, unchanged cutoff).
+- `2-d-art-and-design`, `3-d-art-and-design`, `drawing`: 2026-05-08 (8 p.m. ET)
+  → **2027-05-07 (11:59 p.m. ET)** — "AP Art and Design: May 7, 2027 (11:59
+  p.m. ET), is the deadline for students to submit their 3 portfolio components
+  as final." The cutoff time moved as well as the date, so the note text changed
+  too.
+- **New:** `chinese-`, `french-`, `german-`, `italian-`,
+  `japanese-language-and-culture`, and `spanish-language-and-culture` now carry
+  a portfolio entry for the **Personalized Project Reference (PPR)**, due
+  **2027-04-30**, 11:59 p.m. ET. `weightPct` is `"pending"`: College Board
+  publishes no separate score weight for the PPR itself (it is the reference
+  students use during the Project Presentation and Project Q&A questions, which
+  are weighted as part of the exam). The deadline is printed on each of those
+  six course pages individually ("Fri, Apr 30, 2027 — 11:59 PM ET — Deadline:
+  Students Submit Personalized Project Reference (PPR) through the AP Digital
+  Portfolio"), so no subject was given one by analogy — notably **AP Latin** and
+  **AP Spanish Literature and Culture** publish no PPR deadline and therefore
+  have none, even though the exam-dates page's summary line says "AP World
+  Languages and Cultures".
 
 ## Exam format, delivery mode, and calculator policy (per-subject)
 
@@ -75,7 +209,7 @@ subjects. They were re-sourced on **2026-07-09** from each course's AP Central
 exam page (`https://apcentral.collegeboard.org/courses/ap-<slug>/exam`),
 adversarially verified (one fetch agent + one independent refute-skeptic per
 subject), and re-checked by hand. Verbatim page text for all 42 subjects is
-committed under `docs/super-board/research/collegeboard-2026/` (see that
+committed under `docs/super-board/research/collegeboard-2027/` (see that
 folder's `README.md`); each subject below cites its file.
 
 | subject | field | was | now | verbatim source quote |
@@ -223,19 +357,22 @@ cycle, so retaining the type keeps the model able to represent a published range
 without a schema migration. The data test below pins the seven counts as exact
 integers so a future re-source cannot silently regress them back to a range.
 
-## Per-section `sections[]` breakdown (issue #44, populated 2026-07-09)
+## Per-section `sections[]` breakdown (issue #44; re-verified for 2027 on 2026-07-24)
 
 `format.sections` replaced the flat `mcqCount`/`frqCount`/`frqType` fields.
-Every value was populated from the adversarially verified re-source of all 42
-subjects committed at `docs/super-board/research/collegeboard-2026/<id>.json`
-(fetched **2026-07-09** from `apcentral.collegeboard.org/courses/ap-<slug>/exam`,
-with `apstudents.collegeboard.org/courses/ap-<slug>/assessment` as the second
-opinion; records patched at 171cb15). Section **weights** and **Part A/B
+Every value is populated from the provenance records for all 43 subjects
+committed at `docs/super-board/research/collegeboard-2027/<id>.json` (fetched
+**2026-07-24** from `apcentral.collegeboard.org/courses/ap-<slug>/exam`, with
+`apstudents.collegeboard.org/courses/ap-<slug>/assessment` as the second
+opinion; the extracted text of every page fetched is committed alongside them
+under `.../pages/<id>.txt`). Section **weights** and **Part A/B
 structures** come from the AP Central exam pages — the AP Students assessment
-page usually omits per-section times. The dataset was NOT re-fetched; the
-committed provenance is the source, and
-`src/data/ap-2026.sections.test.ts` re-derives every section from it on each
-test run, so a hand-edit or fabrication fails CI.
+page usually omits per-section times. Values unchanged from May 2026 kept their
+2026 provenance quote after the 2027 page was diffed against it and matched;
+the seven subjects whose numbers moved carry fresh 2027 quotes and a
+`changedFor2027` note. `src/data/ap-2027.sections.test.ts` re-derives every
+section from the provenance on each test run, so a hand-edit or fabrication
+fails CI.
 
 ### Normalization rules (provenance record → dataset)
 
@@ -298,10 +435,10 @@ live page"). Calculus AB and Music Theory matched exactly; four provenance
 
 All four were corrected in the dataset AND in the provenance records (per-id
 and consolidated, `spotCheckPatch2026_07_09` notes), and
-`src/data/ap-2026.sections.test.ts` pins them so a future re-source cannot
+`src/data/ap-2027.sections.test.ts` pins them so a future re-source cannot
 regress them back to "pending".
 
-### `"pending"` inventory (exact URLs checked 2026-07-09, re-verified against raw page HTML)
+### `"pending"` inventory (re-checked against the live pages 2026-07-24)
 
 Genuinely unpublished values — each was hunted for a "false pending" by an
 independent refute-skeptic and survived, then re-verified by the builder
@@ -317,6 +454,9 @@ against the live page's raw HTML:
 | `german-language-and-culture` | Section I Questions 1–2 part `minutes` (Question 3 is published: 55) | <https://apcentral.collegeboard.org/courses/ap-german-language-and-culture/exam> |
 | `spanish-language-and-culture` | Section I Questions 1–2 part `minutes` (Question 3 is published: 55) | <https://apcentral.collegeboard.org/courses/ap-spanish-language-and-culture/exam> |
 | `psychology` | Free Response parts (AAQ / EBQ) `minutes` (only the section's 70 is printed; it is never divided between the two questions) | <https://apcentral.collegeboard.org/courses/ap-psychology/exam> |
+| `networking` | the ENTIRE `format` block — `sections: []`, `totalMinutes`, `calculator`, `delivery` — plus `passRate` | <https://apcentral.collegeboard.org/courses/ap-networking/adopt> (no `/exam` page and no AP Students assessment page exists; both 404 on 2026-07-24) |
+| `business-with-personal-finance`, `cybersecurity`, `networking` | `passRate` | no administration has happened, so no score distribution exists |
+| the six world-language courses with a PPR | `portfolio.weightPct` | the PPR deadline is published; no separate score weight for it is |
 
 Slug exception (as everywhere): AP Business with Personal Finance lives at
 `ap-business-personal-finance`.
@@ -326,22 +466,29 @@ multiple-choice section, and the four portfolio-only subjects (AP Drawing,
 2-D/3-D Art and Design, AP Research) have `sections: []` — the popup shows
 their portfolio information instead of an empty or zeroed table.
 
-## Course list (42 subjects, including Career Kickstart)
+## Course list (43 subjects, including three Career Kickstart courses)
 
-<https://apstudents.collegeboard.org/course-index-page> — "Find course and
-exam information for 42 AP subjects." The list includes the two AP Career
-Kickstart courses (AP Business with Personal Finance, AP Cybersecurity).
+<https://apcentral.collegeboard.org/courses> — the course index, read on
+2026-07-24. It lists the 42 courses the May 2026 dataset carried plus **AP
+Networking**, whose page is <https://apcentral.collegeboard.org/courses/ap-networking/adopt>.
+No 2026 course was removed and none was renamed (AP World History: Modern still
+lives at the `ap-world-history` slug).
 
-### Career Kickstart courses have no May 2026 exam
+### Career Kickstart in May 2027
 
-Both courses' assessment pages state: "Note: The 2027 AP Exam dates will be
-available in summer 2026" — their first end-of-course exams are in May 2027
-(<https://apstudents.collegeboard.org/courses/ap-cybersecurity/assessment>,
-<https://apstudents.collegeboard.org/courses/ap-business-personal-finance/assessment>).
-They are therefore listed with `exam: null`, `lateTesting: null`, a sourced
-`noExamReason`, and `passRate: "pending"`. Their published exam formats (for
-the 2027 first administration) are included as College Board publishes them
-today.
+All three AP Career Kickstart courses appear on the 2027 exam schedule:
+AP Business with Personal Finance (Tue May 4, Session 1), AP Cybersecurity
+(Wed May 5, Session 1), and AP Networking (Fri May 7, Session 2, restricted to
+2026-27 pilot schools). The AP Career Kickstart overview page's timeline
+confirms the first two — "MAY 2027 · AP Business with Personal Finance, AP
+Cybersecurity Exams administered" — and puts AP Networking's own launch in fall
+2027 with its exam in **May 2028**
+(<https://apcentral.collegeboard.org/courses/ap-career-kickstart>), which is why
+the 2027 AP Networking administration is pilot-only and why no exam page for it
+exists yet.
+
+None of the three has a score distribution, so all three keep
+`passRate: "pending"`. No subject carries a `noExamReason` in this cycle.
 
 ## Official course/exam pages (issue #22 — Tier 3 links)
 

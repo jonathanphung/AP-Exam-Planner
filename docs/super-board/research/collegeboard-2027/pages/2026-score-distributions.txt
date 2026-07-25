@@ -1,0 +1,127 @@
+Active Page:
+2026 AP Score Distributions
+Back
+2026 AP Score Distributions
+See how all AP students performed on the most recent exams. The score distribution tables on this page show the percentages of 1s, 2s, 3s, 4s, and 5s for each AP subject.
+We will be updating this page on a rolling basis as 2026 scores are announced on
+@AP_Trevo
+r on X (Twitter) and on
+@ap-trevor
+on Bluesky. Access last year’s scores on the
+2025 AP Score Distributions page.
+[TABLE][TABLE][TABLE][TABLE][TABLE][TABLE][TABLE]
+Resources
+Article
+2025 AP Score Distributions
+See how students performed on each AP Exam for the exams administered in 2025.
+Related Topics
+Special Score Structure: Calculus BC
+Special Score Structure: Music Theory
+AP Score Scale Table
+2025 AP Score Distributions
+2024 AP Score Distributions
+2023 AP Score Distributions
+2022 AP Score Distributions
+2021 AP Score Distributions
+2020 AP Score Distributions
+2019 AP Score Distributions
+2018 AP Score Distributions
+2017 AP Score Distributions
+2016 AP Score Distributions
+2015 AP Score Distributions
+2014 AP Score Distributions
+2013 AP Score Distributions
+2012 AP Score Distributions
+2011 AP Score Distributions
+2010 AP Score Distributions
+2009 AP Score Distributions
+2008 AP Score Distributions
+2007 AP Score Distributions
+2006 AP Score Distributions
+2005 AP Score Distributions
+2004 AP Score Distributions
+2003 AP Score Distributions
+2002 AP Score Distributions
+Related Topics
+Special Score Structure: Calculus BC
+Special Score Structure: Music Theory
+AP Score Scale Table
+2025 AP Score Distributions
+2024 AP Score Distributions
+2023 AP Score Distributions
+2022 AP Score Distributions
+2021 AP Score Distributions
+2020 AP Score Distributions
+2019 AP Score Distributions
+2018 AP Score Distributions
+2017 AP Score Distributions
+2016 AP Score Distributions
+2015 AP Score Distributions
+2014 AP Score Distributions
+2013 AP Score Distributions
+2012 AP Score Distributions
+2011 AP Score Distributions
+2010 AP Score Distributions
+2009 AP Score Distributions
+2008 AP Score Distributions
+2007 AP Score Distributions
+2006 AP Score Distributions
+2005 AP Score Distributions
+2004 AP Score Distributions
+2003 AP Score Distributions
+2002 AP Score Distributions
+
+=== TABLE 0 ===
+Exam ~~ 5 ~~ 4 ~~ 3 ~~ 2 ~~ 1 ~~ 3+
+AP Research ~~ 17% ~~ 31% ~~ 42% ~~ 8% ~~ 2% ~~ 90%
+AP Seminar ~~ 10% ~~ 21% ~~ 57% ~~ 10% ~~ 2% ~~ 88%
+=== TABLE 1 ===
+Exam ~~ 5 ~~ 4 ~~ 3 ~~ 2 ~~ 1 ~~ 3+
+AP 2D Art & Design ~~ 12% ~~ 30% ~~ 43% ~~ 12% ~~ 3% ~~ 85%
+AP 3D Art & Design ~~ 7% ~~ 25% ~~ 43% ~~ 23% ~~ 2% ~~ 75%
+AP Art History ~~ 15% ~~ 25% ~~ 27% ~~ 24% ~~ 9% ~~ 67%
+AP Drawing ~~ 16% ~~ 31% ~~ 36% ~~ 14% ~~ 3% ~~ 83%
+AP Music Theory ~~ 18% ~~ 17% ~~ 24% ~~ 26% ~~ 15% ~~ 59%
+=== TABLE 2 ===
+Exam ~~ 5 ~~ 4 ~~ 3 ~~ 2 ~~ 1 ~~ 3+
+AP English Language & Composition ~~ 15% ~~ 28% ~~ 32% ~~ 15% ~~ 10% ~~ 75%
+AP English Literature & Composition ~~ 16% ~~ 26% ~~ 31% ~~ 16% ~~ 11% ~~ 73%
+=== TABLE 3 ===
+Exam ~~ 5 ~~ 4 ~~ 3 ~~ 2 ~~ 1 ~~ 3+
+AP African American Studies ~~ 20% ~~ 30% ~~ 27% ~~ 17% ~~ 6% ~~ 77%
+AP Comparative Government & Politics ~~ 15% ~~ 22% ~~ 33% ~~ 18% ~~ 12% ~~ 70%
+AP European History ~~ 16% ~~ 33% ~~ 25% ~~ 18% ~~ 8% ~~ 74%
+AP Human Geography ~~ 19% ~~ 26% ~~ 21% ~~ 24% ~~ 10% ~~ 66%
+AP Macroeconomics ~~ 19% ~~ 22% ~~ 25% ~~ 20% ~~ 14% ~~ 66%
+AP Microeconomics ~~ 19% ~~ 26% ~~ 23% ~~ 20% ~~ 12% ~~ 68%
+AP Psychology ~~ 15% ~~ 35% ~~ 24% ~~ 18% ~~ 8% ~~ 74%
+AP United States Government & Politics ~~ 23% ~~ 28% ~~ 25% ~~ 16% ~~ 8% ~~ 76%
+AP United States History ~~ 14% ~~ 37% ~~ 23% ~~ 18% ~~ 8% ~~ 74%
+AP World History: Modern ~~ 14% ~~ 36% ~~ 16% ~~ 26% ~~ 8% ~~ 66%
+=== TABLE 4 ===
+Exam ~~ 5 ~~ 4 ~~ 3 ~~ 2 ~~ 1 ~~ 3+
+AP Calculus AB ~~ 20% ~~ 28% ~~ 17% ~~ 24% ~~ 11% ~~ 65%
+AP Calculus BC ~~ 46% ~~ 22% ~~ 14% ~~ 14% ~~ 4% ~~ 82%
+AP Computer Science A ~~ 25% ~~ 26% ~~ 15% ~~ 11% ~~ 23% ~~ 66%
+AP Computer Science Principles ~~ 10% ~~ 23% ~~ 30% ~~ 21% ~~ 16% ~~ 63%
+AP Precalculus ~~ 29% ~~ 29% ~~ 24% ~~ 11% ~~ 7% ~~ 82%
+AP Statistics ~~ 17% ~~ 23% ~~ 22% ~~ 17% ~~ 21% ~~ 62%
+=== TABLE 5 ===
+Exam ~~ 5 ~~ 4 ~~ 3 ~~ 2 ~~ 1 ~~ 3+
+AP Biology ~~ 15% ~~ 25% ~~ 31% ~~ 21% ~~ 8% ~~ 71%
+AP Chemistry ~~ 15% ~~ 31% ~~ 30% ~~ 18% ~~ 6% ~~ 75%
+AP Environmental Science ~~ 13% ~~ 29% ~~ 27% ~~ 15% ~~ 16% ~~ 69%
+AP Physics 1 ~~ 19% ~~ 24% ~~ 25% ~~ 15% ~~ 17% ~~ 68%
+AP Physics 2 ~~ 20% ~~ 29% ~~ 23% ~~ 21% ~~ 7% ~~ 72%
+AP Physics C: Electricity and Magnetism ~~ 24% ~~ 24% ~~ 27% ~~ 17% ~~ 8% ~~ 75%
+AP Physics C: Mechanics ~~ 20% ~~ 25% ~~ 27% ~~ 17% ~~ 11% ~~ 72%
+=== TABLE 6 ===
+Exam ~~ 5 ~~ 4 ~~ 3 ~~ 2 ~~ 1 ~~ 3+
+AP Chinese Language and Culture ~~ 48% ~~ 19% ~~ 18% ~~ 6% ~~ 9% ~~ 85%
+AP French Language and Culture ~~ 15% ~~ 23% ~~ 33% ~~ 23% ~~ 6% ~~ 71%
+AP German Language and Culture ~~ 24% ~~ 17% ~~ 27% ~~ 22% ~~ 10% ~~ 68%
+AP Italian Language and Culture ~~ 19% ~~ 22% ~~ 28% ~~ 20% ~~ 11% ~~ 69%
+AP Japanese Language and Culture ~~ 47% ~~ 10% ~~ 15% ~~ 7% ~~ 21% ~~ 72%
+AP Latin ~~ 20% ~~ 29% ~~ 24% ~~ 17% ~~ 10% ~~ 73%
+AP Spanish Language and Culture ~~ 21% ~~ 31% ~~ 31% ~~ 14% ~~ 3% ~~ 83%
+AP Spanish Literature and Culture ~~ 20% ~~ 23% ~~ 28% ~~ 20% ~~ 9% ~~ 71%

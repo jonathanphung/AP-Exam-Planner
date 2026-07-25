@@ -1,0 +1,15 @@
+{
+ "id": "drawing",
+ "name": "AP Drawing",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-drawing/portfolio",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-drawing/assessment",
+ "fallbackUsed": "apstudents",
+ "noSitDownExam": true,
+ "totalMinutesStated": "n/a",
+ "sectionsSumToTotal": "n/a",
+ "changedFor2027": null,
+ "sections": [],
+ "datasetDiscrepancies": []
+}

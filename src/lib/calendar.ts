@@ -53,7 +53,7 @@ export const SETUP_BUFFER_MINUTES = 30;
 export const NOMINAL_EXAM_MINUTES = 120;
 
 export interface CalendarWeek {
-  /** ISO dates of every day in the window, in order (Mon–Fri for 2026). */
+  /** ISO dates of every day in the window, in order (Mon–Fri for 2027). */
   days: string[];
   /** True for the late-testing window (rendered with a distinct header). */
   late: boolean;

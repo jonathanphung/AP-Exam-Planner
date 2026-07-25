@@ -13,9 +13,9 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
  * store migrates on first load (`apx.selection.v1` / `apx.resolutions.v1`), so
  * the 3-week case gets its moved-to-late Latin exam without driving the
  * conflict dialog:
- *   - Biology (2026-05-04 AM) → Week 1
- *   - Seminar exam (2026-05-11 PM) → Week 2, plus its Apr 30 portfolio → Week 1
- *   - Latin shares Biology's slot; keeping Biology bumps Latin to 2026-05-18 PM
+ *   - Biology (2027-05-03 PM) → Week 1
+ *   - Seminar exam (2027-05-10 PM) → Week 2, plus its Apr 30 portfolio → Week 1
+ *   - Latin shares Biology's slot; keeping Biology bumps Latin to 2027-05-17 PM
  *     → the Late Testing week.
  */
 
@@ -35,10 +35,10 @@ interface Variant {
 }
 
 const KEEP_BIOLOGY = {
-  date: "2026-05-04",
-  session: "AM",
+  date: "2027-05-03",
+  session: "PM",
   keeperId: "biology",
-  memberIds: ["biology", "latin"],
+  memberIds: ["biology", "italian-language-and-culture"],
 };
 
 const SCENARIOS: Scenario[] = [
@@ -51,7 +51,7 @@ const SCENARIOS: Scenario[] = [
   },
   {
     key: "3week",
-    selection: ["biology", "latin", "seminar"],
+    selection: ["biology", "italian-language-and-culture", "seminar"],
     resolutions: [KEEP_BIOLOGY],
     weeks: ["week-1", "week-2", "late-testing"],
   },
@@ -65,7 +65,7 @@ const VARIANTS: Variant[] = [
 const THEMES = ["light", "dark"] as const;
 
 const fileFor = (slug: string, view: Variant["view"]) =>
-  `ap-exams-2026-${slug}-${view}.png`;
+  `ap-exams-2027-${slug}-${view}.png`;
 
 test.beforeAll(() => {
   mkdirSync(EVIDENCE_DIR, { recursive: true });

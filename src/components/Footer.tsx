@@ -1,10 +1,5 @@
-import apData from "@/data/ap-2026.json";
+import { CYCLE } from "@/data/cycle";
 import { SupportLinks } from "@/components/SupportLinks";
-
-// Read the cycle from the dataset so the annual swap (a future `ap-2027.json`)
-// re-labels the attribution automatically — the JSON stays the single swap
-// point, mirroring how ScheduleView derives its banner from `dataset.cycle`.
-const CYCLE = (apData as { cycle: string }).cycle;
 
 /**
  * Site-wide footer: the support pair (mobile/tablet), data attribution, and a

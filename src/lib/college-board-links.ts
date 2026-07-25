@@ -19,10 +19,9 @@
 const PATTERN_PREFIX = "https://apcentral.collegeboard.org/courses/ap-";
 
 /**
- * Subject ids whose `ap-<id>/exam` page was individually verified (HTTP 200,
- * 2026-07-07). 37 of the 42 shipped subjects follow the pattern — including
- * AP Cybersecurity, whose exam page exists even though its first exam
- * administration is May 2027.
+ * Subject ids whose `ap-<id>/exam` page was individually verified (HTTP 200 —
+ * originally 2026-07-07, re-verified in full during the May 2027 dataset swap
+ * on 2026-07-24). 37 of the 43 shipped subjects follow the pattern.
  */
 export const VERIFIED_PATTERN_IDS: ReadonlySet<string> = new Set([
   "african-american-studies",
@@ -74,6 +73,9 @@ export const VERIFIED_PATTERN_IDS: ReadonlySet<string> = new Set([
  *   (no "-modern" suffix); the patterned URL 404s.
  * - The three Art & Design portfolio-only courses have no `/exam` page —
  *   their assessment is the portfolio, documented at `/portfolio`.
+ * - `networking` — new for the May 2027 cycle. The course is still in pilot
+ *   (launches fall 2027), so `ap-networking/exam` 404s; the only official page
+ *   is the adoption page, verified HTTP 200 on 2026-07-24.
  */
 export const OFFICIAL_PAGE_EXCEPTIONS: Readonly<Record<string, string>> = {
   "business-with-personal-finance":
@@ -85,6 +87,8 @@ export const OFFICIAL_PAGE_EXCEPTIONS: Readonly<Record<string, string>> = {
   "3-d-art-and-design":
     "https://apcentral.collegeboard.org/courses/ap-3-d-art-and-design/portfolio",
   drawing: "https://apcentral.collegeboard.org/courses/ap-drawing/portfolio",
+  networking:
+    "https://apcentral.collegeboard.org/courses/ap-networking/adopt",
 };
 
 /**

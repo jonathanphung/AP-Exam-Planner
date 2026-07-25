@@ -6,7 +6,7 @@ import { pressViewChip } from "./support/view-chip";
  * super-board QA (issue #7) — export selected exams as an ICS calendar file.
  *
  * AC1 is the browser-observable acceptance criterion (button placement +
- * enabled/disabled state + client-side download of `ap-exams-2026.ics` with
+ * enabled/disabled state + client-side download of `ap-exams-2027.ics` with
  * zero network requests) and is verified here end-to-end through the real app
  * and the real dataset. AC2–AC5 (the RFC 5545 / ical.js generator contract) are
  * covered at the unit layer by `src/lib/ics.test.ts` and, against the shipped
@@ -101,15 +101,15 @@ test.describe("issue #7 — export to calendar", () => {
     await expect(btn).toBeDisabled();
   });
 
-  test("AC1 — clicking downloads ap-exams-2026.ics generated client-side (blob, zero network) with the selected exam + portfolio events", async ({
+  test("AC1 — clicking downloads ap-exams-2027.ics generated client-side (blob, zero network) with the selected exam + portfolio events", async ({
     page,
   }) => {
     await page.goto("/");
 
     // A selection that yields an exam VEVENT (Biology) and both an exam and a
     // portfolio VEVENT (Seminar) — no same-slot conflict between the two.
-    await select(page, "AP Biology"); // 2026-05-04 AM exam
-    await select(page, "AP Seminar"); // 2026-05-11 PM exam + 2026-04-30 portfolio
+    await select(page, "AP Biology"); // 2027-05-03 AM exam
+    await select(page, "AP Seminar"); // 2027-05-10 PM exam + 2027-04-30 portfolio
 
     const btn = exportButton(page);
     await expect(btn).toBeEnabled();
@@ -132,8 +132,8 @@ test.describe("issue #7 — export to calendar", () => {
 
     const download = await downloadIcsViaMenu(page);
 
-    // Named exactly ap-exams-2026.ics…
-    expect(download.suggestedFilename()).toBe("ap-exams-2026.ics");
+    // Named exactly ap-exams-2027.ics…
+    expect(download.suggestedFilename()).toBe("ap-exams-2027.ics");
     // …and generated entirely client-side: a blob: URL is not a server fetch.
     expect(download.url()).toMatch(/^blob:/);
     // …with no app-level network requests triggered by the export.
@@ -161,9 +161,9 @@ test.describe("issue #7 — export to calendar", () => {
     // Exam start times are floating local (no trailing Z).
     expect(unfolded).not.toMatch(/DTSTART:\d{8}T\d{6}Z/);
     // issue #38 — each exam carries a floating DTEND = start + published length
-    // + a 30-min setup buffer. Biology (AM 08:00, 180 min) → 11:30; Seminar
+    // + a 30-min setup buffer. Biology (PM 12:00, 180 min) → 15:30; Seminar
     // (PM 12:00, 120 min) → 14:30.
-    expect(unfolded).toMatch(/DTEND:\d{8}T113000/);
+    expect(unfolded).toMatch(/DTEND:\d{8}T153000/);
     expect(unfolded).toMatch(/DTEND:\d{8}T143000/);
     expect(unfolded).not.toMatch(/DTEND:\d{8}T\d{6}Z/);
     // issue #38 A/B — the DESCRIPTION carries the published section-by-section

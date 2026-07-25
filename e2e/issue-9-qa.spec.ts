@@ -21,7 +21,7 @@ const REPO_ROOT = resolve(__dirname, "..");
 const EVIDENCE_DIR = "docs/super-board/runs/issue-9-qa-v1";
 
 const ATTRIBUTION =
-  "Data: College Board AP calendar and score-distribution reports — May 2026 cycle";
+  "Data: College Board AP calendar and score-distribution reports — May 2027 cycle";
 const NON_AFFILIATION = "Not affiliated with College Board.";
 const COORDINATOR_NOTE =
   "This is a planning choice — the actual late-testing swap is arranged through your school’s AP coordinator.";
@@ -32,7 +32,7 @@ test("AC1 — README has what/why, feature list, stack, pnpm quickstart, and the
 
   // what/why intro
   expect(readme).toMatch(/AP Exam Planner/);
-  expect(readme).toMatch(/May 2026/);
+  expect(readme).toMatch(/May 2027/);
   expect(readme.toLowerCase()).toContain("portfolio piece");
 
   // feature list — one assertion per required clause
@@ -54,7 +54,7 @@ test("AC1 — README has what/why, feature list, stack, pnpm quickstart, and the
   expect(readme).toMatch(/pnpm test:e2e/);
 
   // data note + swap point
-  expect(readme).toContain("src/data/ap-2026.json");
+  expect(readme).toContain("src/data/ap-2027.json");
   expect(readme.toLowerCase()).toMatch(/2027/);
 });
 

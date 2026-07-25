@@ -28,7 +28,7 @@ import { pressViewChip } from "./support/view-chip";
  *   AC12    — no horizontal scroll at 320/375/1024/1920.
  *   AC13    — one real Playwright download per format: json parses + matches
  *             the selection; txt is CRLF + chronologically sorted; png has
- *             non-zero pixel dimensions; ics lands as ap-exams-2026.ics with a
+ *             non-zero pixel dimensions; ics lands as ap-exams-2027.ics with a
  *             valid VCALENDAR (identical-to-pre-change is guaranteed by the
  *             zero-byte src/lib/ics.ts diff + the same buildIcsCalendar call).
  *
@@ -348,7 +348,7 @@ test.describe("issue #51 — real downloads per format", () => {
     await selectBiologyAndSeminar(page);
 
     const download = await downloadVia(page, "Save as .json");
-    expect(download.suggestedFilename()).toBe("ap-exams-2026.json");
+    expect(download.suggestedFilename()).toBe("ap-exams-2027.json");
     expect(download.url()).toMatch(/^blob:/);
 
     const raw = readFileSync(await download.path(), "utf8");
@@ -378,7 +378,7 @@ test.describe("issue #51 — real downloads per format", () => {
     await selectBiologyAndSeminar(page);
 
     const download = await downloadVia(page, "Save as .txt");
-    expect(download.suggestedFilename()).toBe("ap-exams-2026.txt");
+    expect(download.suggestedFilename()).toBe("ap-exams-2027.txt");
 
     const raw = readFileSync(await download.path(), "utf8");
     // CRLF EOLs exclusively, trailing newline (Notepad-safe).
@@ -386,16 +386,16 @@ test.describe("issue #51 — real downloads per format", () => {
     expect(raw.replaceAll("\r\n", "")).not.toMatch(/[\r\n]/);
 
     const lines = raw.split("\r\n");
-    expect(lines[0]).toBe("Schedule 1 - AP Exams (May 2026 cycle)");
+    expect(lines[0]).toBe("Schedule 1 - AP Exams (May 2027 cycle)");
     expect(lines[1]).toBe("");
 
     const body = lines.slice(2).filter((l) => l !== "");
-    // Seminar's portfolio deadline (Apr 30) precedes Biology's exam (May 4),
-    // which precedes Seminar's exam (May 11) — chronological order.
+    // Seminar's portfolio deadline (Apr 30) precedes Biology's exam (May 3),
+    // which precedes Seminar's exam (May 10) — chronological order.
     expect(body).toEqual([
-      "Thursday, April 30, 2026 | Portfolio deadline | AP Seminar",
-      "Monday, May 4, 2026 | AM session | AP Biology",
-      "Monday, May 11, 2026 | PM session | AP Seminar",
+      "Friday, April 30, 2027 | Portfolio deadline | AP Seminar",
+      "Monday, May 3, 2027 | PM session | AP Biology",
+      "Monday, May 10, 2027 | PM session | AP Seminar",
     ]);
   });
 
@@ -423,8 +423,8 @@ test.describe("issue #51 — real downloads per format", () => {
 
       await expect.poll(() => downloads.length, { timeout: 15000 }).toBe(2);
       expect(downloads.map((d) => d.suggestedFilename())).toEqual([
-        `ap-exams-2026-week-1-${view}.png`,
-        `ap-exams-2026-week-2-${view}.png`,
+        `ap-exams-2027-week-1-${view}.png`,
+        `ap-exams-2027-week-2-${view}.png`,
       ]);
 
       for (const download of downloads) {
@@ -447,7 +447,7 @@ test.describe("issue #51 — real downloads per format", () => {
     await selectBiologyAndSeminar(page);
 
     const download = await downloadVia(page, "Save as .ics");
-    expect(download.suggestedFilename()).toBe("ap-exams-2026.ics");
+    expect(download.suggestedFilename()).toBe("ap-exams-2027.ics");
     expect(download.url()).toMatch(/^blob:/);
 
     const ics = readFileSync(await download.path(), "utf8");
@@ -561,10 +561,10 @@ test("evidence — export a real .png / .json / .txt and commit the artifacts", 
 
   // Sanity: every artifact is non-empty on disk.
   for (const f of [
-    "ap-exams-2026-week-1-list.png",
-    "ap-exams-2026-week-2-list.png",
-    "ap-exams-2026-week-1-calendar.png",
-    "ap-exams-2026-week-2-calendar.png",
+    "ap-exams-2027-week-1-list.png",
+    "ap-exams-2027-week-2-list.png",
+    "ap-exams-2027-week-1-calendar.png",
+    "ap-exams-2027-week-2-calendar.png",
     "exported-schedule.json",
     "exported-schedule.txt",
   ]) {

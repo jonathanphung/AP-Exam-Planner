@@ -1,0 +1,289 @@
+===== central =====
+Active Page:
+The Exam
+The Exam
+AP Computer Science Principles
+Sign In to AP Classroom
+Article
+Review the Free-Response Questions from the AP Exam
+The Course
+Course Audit
+Classroom Resources
+The Exam
+Professional Learning
+Exam Overview
+The AP Computer Science Principles Exam assesses student understanding of the computational thinking practices and learning objectives outlined in the course framework. The AP Exam consists of the Create performance task and an end-of-course exam. The end-of-course exam is a fully digital exam in the Bluebook testing app, and it includes multiple-choice questions and two written-response questions that require students to demonstrate their understanding of the Create performance task. All responses in Bluebook will be automatically submitted at the end of the exam.
+For more information, download the
+AP Computer Science Principles Course and Exam Description (.pdf)
+(CED).
+Encourage your students to visit the
+AP Computer Science Principles student page
+for exam information.
+Assessment Dates
+Thu, Apr 30, 2026
+11:59 PM ET
+Performance Task Submission Deadline
+This is the deadline for students to complete all required components of the Create performance task and submit as final in the AP Digital Portfolio.
+Add
+to Calendar
+Thu, May 14, 2026
+12 PM Local
+AP Computer Science Principles End-of-Course Exam
+Add
+to Calendar
+Exam Format
+The AP Computer Science Principles end-of-course exam has consistent question types and weighting every year, so you and your students know what to expect on exam day.
+Section I: End-of-Course Multiple-Choice Exam
+70 multiple-choice questions | 120 minutes | 70% of score | 4 answer options
+57 single-select multiple-choice
+5 single-select with reading passage about a computing innovation
+8 multiple-select multiple-choice: select 2 answers
+Section II: Create Performance Task and Written Response
+30% of score
+Create performance task program code, video, and Personalized Project Reference | 9 hours in-class
+2 written response questions | 60-minute end-of-course exam
+The second section of the AP Computer Science Principles Exam consists of a through-course Create performance task where students will develop a computer program of their choice and an end-of-course written response section where students demonstrate their understanding of their personal Create performance task by answering two questions. Students will be provided 9 hours of in-class time to complete their program, record a video of their program running, and develop a Personalized Project Reference.
+On the end-of-course exam, students will respond to two questions related to the code in their Personalized Project Reference. The two questions include four distinct prompts: Written Response 1, Written Response 2(a), Written Response 2(b), and Written Response 2(c). Students will have access to their Personalized Project Reference while responding to these prompts. The four categories listed below align to the four prompts.
+Prompt Category
+Required Learning Objectives
+Written Response 1: Program Design, Function, and Purpose
+Students should be prepared to respond to prompts about their program that assess any of the following learning objectives:
+CRD-2.A: Describe the purpose of a computing innovation.
+CRD-2.B: Explain how a program or code segment functions.
+CRD-2.C: Identify input(s) to a program.
+CRD-2.D: Identify output(s) produced by a program.
+CRD-2.E: Develop a program using a development process.
+CRD-2.F: Design a program and its user interface.
+CRD-2.G: Describe the purpose of a code segment or program by writing documentation.
+Written Response 2(a): Algorithm Development
+Students should be prepared to respond to prompts about their program that assess any of the following learning objectives:
+CRD-2.B: Explain how a program or code segment functions.
+AAP-2.E.b: Evaluate expressions that use relational operators.
+AAP-2.F.b: Evaluate expressions that use logic operators.
+AAP-2.H.b: Determine the result of conditional statements.
+AAP-2.J: Express an algorithm that uses iteration without using a programming language.
+AAP-2.K.b: Determine the result or side effect of iteration statements.
+AAP-2.L: Compare multiple algorithms to determine if they yield the same side effect or result.
+AAP-2.M.a: Create algorithms.
+AAP-2.M.b: Combine and modify existing algorithms.
+Written Response 2(b): Errors and Testing
+Students should be prepared to respond to prompts about their program that assess any of the following learning objectives:
+CRD-2.I.a: Identify the error.
+CRD-2.I.b: Correct the error.
+CRD-2.J: Identify inputs and corresponding expected outputs or behaviors that can be used to check the correctness of an algorithm or program.
+Written Response 2(c): Data and Procedural Abstraction
+Students should be prepared to respond to prompts about their program that assess any of the following learning objectives:
+AAP-1.D.a: Develop data abstraction using lists to store multiple elements.
+AAP-1.D.b: Explain how the use of data abstraction manages complexity in program code.
+AAP-2.O.a: Write iteration statements to traverse a list.
+AAP-2.O.b: Determine the result of an algorithm that includes list traversals.
+AAP-3.B: Explain how the use of procedural abstraction manages complexity in a program.
+AP Digital Portfolio
+Review these resources for guidance on how to use the AP Digital Portfolio and sign in.
+Link
+Sign In to the AP Digital Portfolio
+Sign in to the AP Digital Portfolio using your College Board account.
+Article
+About the AP Digital Portfolio
+Get an overview of what the AP Digital Portfolio is and how it works.
+Download
+AP Digital Portfolio: Teacher User Guide
+Review this guide to learn how to navigate the AP Digital Portfolio and complete tasks specific to your courses.
+PDF
+2.12 MB
+Download
+AP Digital Portfolio: Student User Guide
+Share this guide with students to help them navigate the AP Digital Portfolio.
+PDF
+1.29 MB
+Test Previews for Digital AP Exams
+Link
+Practice on Bluebook
+Download the Bluebook app and log in with your College Board account information to access test previews for the digital AP Exams.
+Reference Information
+Reference materials are available for this course and will be printed and mailed to schools, in addition to being available in Bluebook in the test preview and on exam day.
+Article
+Reference Information for Specific AP Exams
+Access reference sheets and exam day details.
+Resources
+Download
+AP Computer Science Principles Student Handouts
+Get detailed directions for completing the Create performance task.
+PDF
+374.81 KB
+Download
+AP Computer Science Principles Personalized Project Reference Tip Sheet
+This tip sheet will help your students understand the guidelines for creating a readable Personalized Project Reference, which must be submitted as final by the deadline in the AP Digital Portfolio for access on exam day.
+PDF
+207.93 KB
+Link
+AP Classroom Resources
+Access formative topic questions—including those to help scaffold the Create performance task written responses—summative practice questions, and AP Videos on each course topic.
+Article
+Frequently Asked Questions
+Find answers to common questions about the course, exam, digital portfolio, Create performance task, plagiarism and AI, AP Course Audit, and more.
+Exam Questions and Scoring Information
+Article
+AP Computer Science Principles Exam Questions and Scoring Information
+View exam materials and scoring information from past exams.
+Score Reporting
+Link
+AP Score Reports for Educators
+Access your score reports.
+===== student =====
+Active Page:
+AP Computer Science Principles
+AP Computer Science Principles
+Learn all about the course and exam. Already enrolled? Join your class in My AP.
+Go to My AP
+See How to Join Your Class
+Not a Student?
+Go
+to AP Central
+for resources for teachers, administrators, and coordinators.
+AP Computer Science Principles
+Why Take the Course
+About the Course
+About the Exam
+Go to My AP
+Why Take the Course
+About the Course
+About the Exam
+About
+the Exam
+The AP Computer Science Principles Exam has two sections: an end-of-course exam and the Create performance task. The end-of-course exam is a fully digital exam in the Bluebook testing app, and it includes multiple-choice questions and two written-response questions that require you to demonstrate your understanding of the Create performance task. The two written-response questions will relate to code contained in a Personalized Project Reference that you’ll develop in class as part of your performance task. You’ll have access to your Personalized Project Reference while answering these questions on exam day. All responses in Bluebook will be automatically submitted at the end of the exam.
+You’ll complete the Create performance task over the course of the year and submit all three performance task components—program code, video, and Personalized Project Reference—online through the AP Digital Portfolio for scoring. Both measure your proficiency in and grasp of the course content and skills, and both contribute to your final AP score on a scale of 1–5.
+Reference materials, such as equations sheets and reference tables, are available for this course. Go to
+Reference Information for Specific AP Exams
+to find reference materials for AP Computer Science Principles and exam day details.
+Create Performance Task
+To learn more about the Create performance task and the exam, you can watch AP Videos on the Create performance task in
+AP Classroom.
+To access these videos, navigate to the Course Guide section in the left navigation pane of the AP Classroom homepage, select the Overview page, and then click on the Student Resources header to expand the list of available resources. The Create performance task videos include:
+Create Performance Task: Overview
+Create Performance Task: Guidelines
+Create Performance Task: Pacing Your Project
+Create Performance Task: Categories and Questions
+Exam Duration
+3hrs
+Exam
+Dates
+Thu, Apr 30, 2026
+11:59 PM ET
+AP Computer Science Principles Create Performance Task Due Date
+Submit all three components of your AP Computer Science Principles (CSP) Create performance task as final in the AP Digital Portfolio by this date.
+Add
+to Calendar
+Review the AP CSP Exam Timeline
+Thu, May 14, 2026
+12 PM Local
+AP Computer Science Principles Exam
+This is the regularly scheduled date for the AP Computer Science Principles Exam.
+Details
+Add
+to Calendar
+Exam Components
+Expand All
+Collapse All
+Section I: End-of-Course Multiple-Choice Exam
+70 multiple-choice questions | 120 minutes | 70% of score | 4 answer options
+57 single-select multiple-choice
+5 single-select with reading passage about a computing innovation
+8 multiple-select multiple-choice: select 2 answers
+The AP Computer Science Principles end-of-course exam has consistent question types, weighting, and scoring guidelines every year, so you know what to expect on exam day.
+Section II: Create Performance Task
+30% of score
+Create performance task program code, video, and student-authored Personalized Project Reference | 9 hours in-class
+2 written response questions | 60 minutes end-of-course exam
+The second section of the AP Computer Science Principles Exam consists of a through-course Create performance task where you will develop a computer program of your choice an end-of-course written response section where you will demonstrate your understanding of your Create performance task by answering four prompts. You will be provided 9 hours of in-class time to complete your program, video, and develop a Personalized Project Reference.
+On the end-of-course exam, you will respond to two questions related to the code in your Personalized Project Reference. The two questions include four distinct prompts: Written Response 1, Written Response 2(a), Written Response 2(b), and Written Response 2(c). You will have access to your Personalized Project Reference while responding to these prompts. The four categories listed below align to the four prompts.
+Prompt Category
+Students should be prepared to:
+Written Response 1: Program Design, Function, and Purpose
+Students should be prepared to respond to prompts about their program that assess any of the following learning objectives:
+CRD-2.A: Describe the purpose of a computing innovation.
+CRD-2.B: Explain how a program or code segment functions.
+CRD-2.C: Identify input(s) to a program.
+CRD-2.D: Identify output(s) produced by a program.
+CRD-2.E: Develop a program using a development process.
+CRD-2.F: Design a program and its user interface.
+CRD-2.G: Describe the purpose of a code segment or program by writing documentation.
+Written Response 2(a): Algorithm Development
+Students should be prepared to respond to prompts about their program that assess any of the following learning objectives:
+CRD-2.B: Explain how a program or code segment functions.
+AAP-2.E.b: Evaluate expressions that use relational operators.
+AAP-2.F.b: Evaluate expressions that use logic operators.
+AAP-2.H.b: Determine the result of conditional statements.
+AAP-2.J: Express an algorithm that uses iteration without using a programming language.
+AAP-2.K.b: Determine the result or side effect of iteration statements.
+AAP-2.L: Compare multiple algorithms to determine if they yield the same side effect or result.
+AAP-2.M.a: Create algorithms.
+AAP-2.M.b: Combine and modify existing algorithms.
+Written Response 2(b): Errors and Testing
+Students should be prepared to respond to prompts about their program that assess any of the following learning objectives:
+CRD-2.I.a: Identify the error.
+CRD-2.I.b: Correct the error.
+CRD-2.J: Identify inputs and corresponding expected outputs or behaviors that can be used to check the correctness of an algorithm or program.
+Written Response 2(c): Data and Procedural Abstraction
+Students should be prepared to respond to prompts about their program that assess any of the following learning objectives:
+AAP-1.D.a: Develop data abstraction using lists to store multiple elements.
+AAP-1.D.b: Explain how the use of data abstraction manages complexity in program code.
+AAP-2.O.a: Write iteration statements to traverse a list.
+AAP-2.O.b: Determine the result of an algorithm that includes list traversals.
+AAP-3.B: Explain how the use of procedural abstraction manages complexity in a program.
+How We Score Your Work
+The Create performance task, like the end-of-course exam given in May, is scored by trained, experienced educators called AP readers.
+Exam
+Essentials
+Sign In to AP Digital Portfolio
+Learn How to Submit Your Work
+See Exam Day Policies
+Read About Accommodations
+Review the AP CSP Exam Timeline
+Exam
+Preparation
+Link
+AP Classroom Resources
+Once you join your AP class section online, you’ll be able to access AP Videos and topic question assignments from your teacher in AP Classroom. AP Videos cover every topic and skill outlined in the AP Computer Science Principles Course and Exam Description. You can use these on your own for additional support as you prepare for your assessment task models. Sign in to access them.
+Link
+Practice on Bluebook
+Download the Bluebook app and log in with your College Board account information to access test previews for the digital AP Exams.
+Download
+AP Computer Science Principles Student Handouts
+Get detailed directions for completing the Create performance task.
+PDF
+Download
+AP Computer Science Principles Personalized Project Reference Tip Sheet
+This tip sheet will help you understand the guidelines for creating a readable Personalized Project Reference, which must be submitted as final by the deadline in the AP Digital Portfolio for access on exam day.
+PDF
+Download
+AP Digital Portfolio: Student User Guide
+This guide will help you navigate the AP Digital Portfolio.
+PDF
+Link
+Free-Response Questions and Scoring Information
+Go to AP Central to review free-response questions, sample student responses, and scoring commentary from past AP Computer Science Principles exams.
+Link
+AP Computer Science Principles Course and Exam Description
+This is the core document for the course. It clearly lays out the course content and describes the exam and the AP Program in general.
+Link
+Reference Information for Specific AP Exams
+Access reference sheets and exam day details.
+Link
+Services for Students with Disabilities
+Students with documented disabilities may be eligible for accommodations for the through-course assessment and the end-of-course exam. If you’re using assistive technology and need help accessing the PDFs in this section in another format, contact Services for Students with Disabilities at 212-713-8333 or by email at
+[email protected]
+. For information about taking AP Exams, or other College Board assessments, with accommodations, visit the Services for Students with Disabilities website.
+Link
+Guidance for Artificial Intelligence Tools and Other Services
+Learn more about the AP Program’s policy on AI tools.
+Credit and Placement
+Search AP Credit Policies
+Find colleges that grant credit and/or placement for AP Exam scores in this and other AP courses.
+Start a Search
+Additional Information
+Register for AP Exams
+How to Practice for AP Exams
+What to Bring on AP Exam Day
+View Your AP Scores
+Sending AP Scores

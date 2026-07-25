@@ -2,6 +2,7 @@
 
 import { Fragment, type ReactNode, useId, useRef } from "react";
 import type { ApSubject, ExamSection } from "@/data/schema";
+import { CYCLE } from "@/data/cycle";
 import { useModalDialog } from "@/lib/modal";
 import {
   questionCountLabel,
@@ -87,7 +88,7 @@ function formatMinutes(total: number): string {
 /**
  * Format an ISO calendar date as a *local* date (floating — no timezone).
  * Building the Date from explicit parts avoids the UTC-parse day-shift of
- * `new Date("2026-04-30")` in negative-offset zones.
+ * `new Date("2027-04-30")` in negative-offset zones.
  */
 function formatDeadline(iso: string): string {
   const [year, month, day] = iso.split("-").map(Number);
@@ -363,7 +364,7 @@ export function InfoPanel({ subject, onClose }: InfoPanelProps) {
       )} · ${subject.exam.session}`
     : portfolio
       ? "Portfolio-only — no written exam"
-      : "No May 2026 exam";
+      : `No ${CYCLE} exam`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4">
@@ -524,6 +525,19 @@ export function InfoPanel({ subject, onClose }: InfoPanelProps) {
                 your teacher.
               </p>
             </div>
+          )}
+
+          {/* A published qualifier on the exam itself (AP Networking's May
+              2027 date is "2026-27 pilot schools only"). Same reason as the
+              chip's disclosure renders it (SubjectChip.tsx): the header above
+              prints a bare `Exam May 7 · PM`, which without its published
+              restriction reads as an exam any student can sit. Sibling of
+              `noExamReason` — mutually exclusive in this cycle's data, but the
+              schema does not require that, so both branches stand alone. */}
+          {subject.examNote && (
+            <p className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs leading-relaxed text-slate-600 dark:border-slate-800 dark:bg-slate-800/40 dark:text-slate-300">
+              {subject.examNote}
+            </p>
           )}
 
           {subject.noExamReason && (

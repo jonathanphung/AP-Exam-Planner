@@ -1,0 +1,33 @@
+{
+ "id": "physics-2",
+ "name": "AP Physics 2: Algebra-Based",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-physics-2/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-physics-2/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": false,
+ "totalMinutesStated": 180,
+ "totalMinutesVerbatim": "3hrs",
+ "totalMinutesApproximate": false,
+ "sectionsSumToTotal": "n/a",
+ "changedFor2027": "Section I: 40 → 42 questions and 80 → 85 minutes; Section II: 100 → 95 minutes. Exam Duration unchanged at 3hrs.",
+ "notes": "Page does not print a combined total exam time; the two section times (80 + 100 = 180) match the dataset totalMinutes=180 but the page itself does not state the total, so totalMinutesStated is pending. No Part A/Part B splits are published for either section. All values match the current dataset (mcqCount=40, frqCount=4, mcqMinutes=80, frqMinutes=100).",
+ "sections": [
+  {
+   "name": "Multiple Choice",
+   "questionCount": "42",
+   "minutes": 85,
+   "weightPercent": 50,
+   "quote": "Section I: Multiple Choice — 42 Questions | 85 Minutes | 50% of Exam Score"
+  },
+  {
+   "name": "Free Response",
+   "questionCount": "4",
+   "minutes": 95,
+   "weightPercent": 50,
+   "quote": "Section II: Free Response — 4 Questions | 95 Minutes | 50% of Exam Score"
+  }
+ ],
+ "datasetDiscrepancies": []
+}

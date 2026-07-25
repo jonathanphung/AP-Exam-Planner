@@ -1,0 +1,16 @@
+{
+ "id": "2-d-art-and-design",
+ "name": "AP 2-D Art and Design",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-2-d-art-and-design/portfolio",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-2-d-art-and-design/assessment",
+ "fallbackUsed": "apstudents",
+ "noSitDownExam": true,
+ "totalMinutesStated": "n/a",
+ "sectionsSumToTotal": "n/a",
+ "changedFor2027": null,
+ "notes": "AP 2-D Art and Design is a portfolio submission, not a timed written exam. The primary apcentral URL 404'd; used the apstudents assessment page. The assessment has two portfolio sections: Sustained Investigation (15 digital images + written evidence, 60% of score) and Selected Works (5 digital images of 5 artworks, 40% of score). Verbatim: 'The three Art and Design Portfolio Exams (2-D, 3-D, Drawing) consist of two sections: Sustained Investigation (60% of total score) and Selected Works (40% of total score).' No MCQ or FRQ sit-down exam exists. Dataset values mcqCount=0, frqCount=0, totalMinutes=0, mcqMinutes='pending', frqMinutes='pending' are consistent with a portfolio-only course, though 'pending' would more accurately be 'n/a' since no timed sections exist.",
+ "sections": [],
+ "datasetDiscrepancies": []
+}

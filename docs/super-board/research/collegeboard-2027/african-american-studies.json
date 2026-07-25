@@ -1,0 +1,60 @@
+{
+ "id": "african-american-studies",
+ "name": "AP African American Studies",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-african-american-studies/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-african-american-studies/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": false,
+ "totalMinutesStated": 165,
+ "totalMinutesVerbatim": "2hrs 45mins",
+ "totalMinutesApproximate": false,
+ "sectionsSumToTotal": false,
+ "changedFor2027": null,
+ "sections": [
+  {
+   "name": "Section I: Multiple Choice",
+   "questionCount": "60",
+   "minutes": 70,
+   "weightPercent": 60,
+   "quote": "Section I: Multiple Choice — 60 Questions | 70 Minutes | 60% of Exam Score"
+  },
+  {
+   "name": "Section IB: Individual Student Project—Exam Day Validation Question",
+   "questionCount": "1",
+   "minutes": 10,
+   "weightPercent": 1.5,
+   "quote": "Section IB: Individual Student Project—Exam Day Validation Question — 1 Question | 10 Minutes | 1.5% of Exam Score"
+  },
+  {
+   "name": "Section II: Short-Answer Questions",
+   "questionCount": "3",
+   "minutes": 40,
+   "weightPercent": 18,
+   "quote": "Section II: Short-Answer Questions — 3 Questions | 40 Minutes | 18% of Exam Score"
+  },
+  {
+   "name": "Section II: Document-Based Question",
+   "questionCount": "1",
+   "minutes": 45,
+   "weightPercent": 12,
+   "quote": "Section II: Document-Based Question — 1 Question | 45 Minutes | 12% of Exam Score"
+  },
+  {
+   "name": "Individual Student Project",
+   "questionCount": "n/a",
+   "minutes": "pending",
+   "weightPercent": 8.5,
+   "quote": "Individual Student Project — 8.5% of Exam Score (three-week independent research project with oral defense, scored by teacher rubric; no exam-day time allocation)"
+  }
+ ],
+ "datasetDiscrepancies": [
+  {
+   "field": "frqMinutes",
+   "dataset": "pending",
+   "page": "40 (Short-Answer) + 45 (Document-Based) + 10 (Validation Question) as separate published sections; no combined FRQ total printed",
+   "quote": "Section II: Short-Answer Questions — 3 Questions | 40 Minutes; Section II: Document-Based Question — 1 Question | 45 Minutes"
+  }
+ ]
+}

@@ -262,7 +262,7 @@ export function migrateLegacyState(
 
 /**
  * Maximum schedule-name length (issue #62). 60 comfortably fits any
- * human-meaningful plan label ("Ambitious retake plan — spring 2026") while
+ * human-meaningful plan label ("Ambitious retake plan — spring 2027") while
  * capping the pathological growth the #39 sweep flagged (a 300-char emoji name
  * was accepted into `apx.schedules.v1`).
  *

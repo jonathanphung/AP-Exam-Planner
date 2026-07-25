@@ -1,0 +1,55 @@
+{
+ "id": "european-history",
+ "name": "AP European History",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-european-history/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-european-history/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": false,
+ "totalMinutesStated": 195,
+ "totalMinutesVerbatim": "3hrs 15mins",
+ "totalMinutesApproximate": false,
+ "sectionsSumToTotal": "pending",
+ "changedFor2027": null,
+ "sections": [
+  {
+   "name": "Section I, Part A: Multiple Choice",
+   "questionCount": "55",
+   "minutes": 55,
+   "weightPercent": 40,
+   "quote": "Section I, Part A: Multiple Choice — 55 Questions | 55 minutes | 40% of Exam Score"
+  },
+  {
+   "name": "Section I, Part B: Short Answer",
+   "questionCount": "3",
+   "minutes": 40,
+   "weightPercent": 20,
+   "quote": "Section I, Part B: Short Answer — 3 Questions | 40 Minutes | 20% of Exam Score"
+  },
+  {
+   "name": "Section II: Document-Based Question and Long Essay",
+   "questionCount": "2",
+   "minutes": 100,
+   "weightPercent": 40,
+   "quote": "Section II: Document-Based Question and Long Essay — 2 questions | 1 Hour, 40 minutes | 40% of Exam Score",
+   "parts": [
+    {
+     "name": "Document-Based Question (DBQ)",
+     "questionCount": "1",
+     "minutes": 60,
+     "toolNote": "includes 15-minute reading period",
+     "quote": "Document-Based Question (DBQ): 1 Hour (includes 15-minute reading period) | 25% of Exam Score"
+    },
+    {
+     "name": "Long Essay",
+     "questionCount": "1",
+     "minutes": 40,
+     "toolNote": "student chooses from 3 options",
+     "quote": "Long Essay: 40 minutes | 15% of Exam Score"
+    }
+   ]
+  }
+ ],
+ "datasetDiscrepancies": []
+}

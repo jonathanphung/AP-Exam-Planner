@@ -1,7 +1,7 @@
 {
   "format": "apx-schedule",
   "version": 1,
-  "exportedAt": "2026-07-11T17:47:23.943Z",
+  "exportedAt": "2026-07-25T01:56:56.336Z",
   "schedule": {
     "name": "Schedule 1",
     "subjects": [
@@ -10,12 +10,12 @@
         "name": "AP Biology",
         "category": "STEM",
         "exam": {
-          "date": "2026-05-04",
-          "session": "AM"
+          "date": "2027-05-03",
+          "session": "PM"
         },
         "lateTesting": {
-          "date": "2026-05-20",
-          "session": "PM"
+          "date": "2027-05-19",
+          "session": "AM"
         },
         "format": {
           "sections": [
@@ -45,11 +45,11 @@
         "name": "AP Seminar",
         "category": "Humanities",
         "exam": {
-          "date": "2026-05-11",
+          "date": "2027-05-10",
           "session": "PM"
         },
         "lateTesting": {
-          "date": "2026-05-20",
+          "date": "2027-05-18",
           "session": "AM"
         },
         "format": {
@@ -73,7 +73,7 @@
         },
         "passRate": 88,
         "portfolio": {
-          "deadline": "2026-04-30",
+          "deadline": "2027-04-30",
           "weightPct": 55,
           "note": "Two performance tasks submitted as final in the AP Digital Portfolio by 11:59 p.m. ET: Team Project and Presentation (20%) and Individual Research-Based Essay and Presentation (35%). The end-of-course exam is the remaining 45%."
         }

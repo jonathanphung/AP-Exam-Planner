@@ -1,0 +1,50 @@
+{
+ "id": "business-with-personal-finance",
+ "name": "AP Business with Personal Finance",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-business-personal-finance/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-business-personal-finance/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": false,
+ "totalMinutesStated": 160,
+ "sectionsSumToTotal": true,
+ "changedFor2027": null,
+ "sections": [
+  {
+   "name": "Section I: Multiple Choice",
+   "questionCount": "60",
+   "minutes": 70,
+   "weightPercent": 60,
+   "quote": "Section I: Multiple Choice — 60 Questions | 1hr 10mins | 60% of Score. Questions usually appear in sets of 3 or 4 with stimulus materials; 20-25% cover personal finance topics."
+  },
+  {
+   "name": "Section II, Part A: Free-Response Question 1 (Business Canvas Project Exam-Day Validation)",
+   "questionCount": "1",
+   "minutes": 25,
+   "weightPercent": 15,
+   "quote": "Section II, Part A: Free-Response Question 1 — Business Canvas Project Exam-Day Validation — 1 Question | 25mins | 15% of Score."
+  },
+  {
+   "name": "Section II, Part B: Free-Response Questions 2-4",
+   "questionCount": "3",
+   "minutes": 65,
+   "weightPercent": 25,
+   "quote": "Section II, Part B: Free-Response Questions 2-4 — 3 Questions | 1hr 05mins | 25% of Score."
+  }
+ ],
+ "datasetDiscrepancies": [
+  {
+   "field": "mcqMinutes",
+   "dataset": "pending",
+   "page": "70",
+   "quote": "Section I: Multiple Choice ... 1hr 10mins"
+  },
+  {
+   "field": "frqMinutes",
+   "dataset": "pending",
+   "page": "25 (Part A) + 65 (Part B); no single Section II total printed",
+   "quote": "Section II, Part A ... 25mins; Section II, Part B ... 1hr 05mins"
+  }
+ ]
+}

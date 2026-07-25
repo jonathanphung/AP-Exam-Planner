@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useMemo, useRef, useState } from "react";
-import apData from "@/data/ap-2026.json";
+import apData from "@/data/ap-2027.json";
 import {
   CATEGORIES,
   type ApDataset,
@@ -49,7 +49,7 @@ import { useModalDialog } from "@/lib/modal";
  * Week-paged calendar grid view of the selected exams (issue #19).
  *
  * A UT-Registration-Plus-style time grid, except the columns are REAL May
- * 2026 dates (the published testing windows from the dataset schema). The
+ * cycle dates (the published testing windows from the dataset schema). The
  * view shows EXACTLY ONE testing week at a time — matching the single-week
  * look of the reference — and pages through the cycle's weeks with visible
  * Previous/Next buttons instead of vertical month scrolling (issue-19 design

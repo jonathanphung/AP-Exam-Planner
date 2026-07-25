@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
-import apData from "../src/data/ap-2026.json";
+import apData from "../src/data/ap-2027.json";
 import { pressViewChip } from "./support/view-chip";
 
 /**
@@ -14,12 +14,12 @@ import { pressViewChip } from "./support/view-chip";
  *
  * Subject fixtures are read straight from the shipped dataset so the assertions
  * track the same source of truth the component renders from:
- *   - AP Biology            2026-05-04 AM  (exam)
- *   - AP European History   2026-05-04 PM  (exam, same day as Biology → PM after AM)
- *   - AP Chemistry          2026-05-05 AM  (exam, next day → later group)
- *   - AP Seminar            2026-05-11 PM  (exam)  + portfolio deadline 2026-04-30
- *   - AP Drawing            portfolio-only, deadline 2026-05-08
- *   - AP Cybersecurity      no May 2026 exam, no portfolio (Career Kickstart)
+ *   - AP Biology            2027-05-03 AM  (exam)
+ *   - AP European History   2027-05-03 PM  (exam, same day as Biology → PM after AM)
+ *   - AP Chemistry          2027-05-04 AM  (exam, next day → later group)
+ *   - AP Seminar            2027-05-10 PM  (exam)  + portfolio deadline 2027-04-30
+ *   - AP Drawing            portfolio-only, deadline 2027-05-07
+ *   - AP Cybersecurity      no May 2027 exam, no portfolio (Career Kickstart)
  */
 
 const EVIDENCE_DIR = "docs/super-board/runs/issue-4-qa-v1";
@@ -74,32 +74,32 @@ test.describe("issue #4 — my schedule", () => {
       page.getByRole("heading", { level: 2, name: "My Schedule", exact: true }),
     ).toBeVisible();
 
-    // Two exams on 2026-05-04 (Biology AM, European History PM) + one on
-    // 2026-05-05 (Chemistry AM) exercises date-ascending grouping AND the
+    // Two exams on 2027-05-03 (Human Geography AM, Biology PM) + one on
+    // 2027-05-06 (Chemistry PM) exercises date-ascending grouping AND the
     // AM-before-PM ordering within a shared day.
     await select(page, "AP Chemistry"); // select later date first on purpose
-    await select(page, "AP European History"); // PM before AM, out of order
-    await select(page, "AP Biology"); // AM, same day as European History
+    await select(page, "AP Biology"); // PM before AM, out of order
+    await select(page, "AP Human Geography"); // AM, same day as Biology
 
     // Grouped under exactly two date headings, chronological.
     await expect(dateHeadings(page)).toHaveCount(2);
-    await expect(dateHeadings(page).nth(0)).toContainText("May 4");
-    await expect(dateHeadings(page).nth(1)).toContainText("May 5");
+    await expect(dateHeadings(page).nth(0)).toContainText("May 3");
+    await expect(dateHeadings(page).nth(1)).toContainText("May 6");
 
     // Three entry rows, in fully-sorted DOM order regardless of click order.
     await expect(rows(page)).toHaveCount(3);
 
-    // Row 0: Biology — May 4 AM (subject name + session badge both shown).
+    // Row 0: Human Geography — May 3 AM (name + session badge both shown).
     // The session is its own badge span, so assert it as an exact-text element
-    // rather than a substring (the row's textContent is "AP BiologyAM").
-    await expect(rows(page).nth(0)).toContainText("AP Biology");
+    // rather than a substring (the row's textContent is "AP Human GeographyAM").
+    await expect(rows(page).nth(0)).toContainText("AP Human Geography");
     await expect(rows(page).nth(0).getByText("AM", { exact: true })).toBeVisible();
-    // Row 1: European History — May 4 PM (AM sorted before PM on the same day).
-    await expect(rows(page).nth(1)).toContainText("AP European History");
+    // Row 1: Biology — May 3 PM (AM sorted before PM on the same day).
+    await expect(rows(page).nth(1)).toContainText("AP Biology");
     await expect(rows(page).nth(1).getByText("PM", { exact: true })).toBeVisible();
-    // Row 2: Chemistry — May 5 AM (later date sorts after May 4).
+    // Row 2: Chemistry — May 6 PM (later date sorts after May 3).
     await expect(rows(page).nth(2)).toContainText("AP Chemistry");
-    await expect(rows(page).nth(2).getByText("AM", { exact: true })).toBeVisible();
+    await expect(rows(page).nth(2).getByText("PM", { exact: true })).toBeVisible();
   });
 
   test("AC2 — a subject with a portfolio renders a distinct 'Portfolio due' entry + internal-deadline note", async ({
@@ -108,14 +108,14 @@ test.describe("issue #4 — my schedule", () => {
     await page.goto("/");
     await openList(page);
 
-    // AP Seminar has BOTH a sit-down exam (2026-05-11 PM) and a portfolio
-    // deadline (2026-04-30) → two entries.
+    // AP Seminar has BOTH a sit-down exam (2027-05-10 PM) and a portfolio
+    // deadline (2027-04-30) → two entries.
     await select(page, "AP Seminar");
 
     await expect(rows(page)).toHaveCount(2);
-    // Deadline 2026-04-30 sorts before the 2026-05-11 exam.
+    // Deadline 2027-04-30 sorts before the 2027-05-10 exam.
     await expect(dateHeadings(page).nth(0)).toContainText("April 30");
-    await expect(dateHeadings(page).nth(1)).toContainText("May 11");
+    await expect(dateHeadings(page).nth(1)).toContainText("May 10");
 
     // Row 0 — the portfolio deadline entry.
     const portfolioRow = rows(page).nth(0);
@@ -156,7 +156,7 @@ test.describe("issue #4 — my schedule", () => {
     await expect(only.getByText("Portfolio due")).toBeVisible();
     // No AM/PM session badge — it is not a sit-down exam.
     await expect(only.getByText(/^(AM|PM)$/)).toHaveCount(0);
-    await expect(dateHeadings(page).nth(0)).toContainText("May 8");
+    await expect(dateHeadings(page).nth(0)).toContainText("May 7");
   });
 
   test("AC4 — a banner states the cycle, read from dataset metadata (not hardcoded)", async ({
@@ -167,7 +167,7 @@ test.describe("issue #4 — my schedule", () => {
     // The banner text is built from the dataset's `cycle` field. Asserting the
     // exact dataset value (rather than a literal) proves it is data-driven: a
     // dataset swap re-labels the banner without a code change.
-    const cycle = apData.cycle; // e.g. "May 2026"
+    const cycle = apData.cycle; // e.g. "May 2027"
     expect(cycle).toMatch(/^May \d{4}$/);
     // The banner lives in the shared "My Schedule" header (issue #19 second
     // bounce) so it is visible regardless of the active view.
@@ -195,21 +195,29 @@ test.describe("issue #4 — my schedule", () => {
     ).toBeVisible();
   });
 
-  test("extra — a Career Kickstart subject with no May 2026 exam surfaces under a no-date note, not as an exam", async ({
+  test("extra — every May 2027 course is dated, so the no-date note never renders", async ({
     page,
   }) => {
     await page.goto("/");
     await openList(page);
 
-    // AP Cybersecurity has no May 2026 exam and no portfolio → it must not be
-    // silently dropped; it appears under the "No May 2026 exam date" note.
+    // Through May 2026 the two launched Career Kickstart courses had no exam
+    // and no portfolio, and this test pinned that they surfaced under the
+    // "No <cycle> exam date" note instead of being silently dropped. For May
+    // 2027 College Board schedules all three, so the note has no reachable
+    // fixture: AP Cybersecurity must now render as a normal dated exam row.
+    // (The undated branch itself stays covered in `week-cards.test.ts` /
+    // `calendar-cards.test.ts` with a synthetic subject.)
     await select(page, "AP Cybersecurity");
 
-    await expect(rows(page)).toHaveCount(0); // never a dated exam/portfolio row
-    await expect(schedule(page).getByText(/No May 2026 exam date/i)).toBeVisible();
+    await expect(rows(page)).toHaveCount(1);
+    await expect(rows(page).nth(0)).toContainText("AP Cybersecurity");
     await expect(
-      schedule(page).getByRole("listitem").filter({ hasText: "AP Cybersecurity" }),
-    ).toHaveCount(1);
+      rows(page).nth(0).getByText("AM", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      schedule(page).getByText(/No May 2027 exam date/i),
+    ).toHaveCount(0);
   });
 
   // One isolated test per viewport (each gets a fresh browser context, so the
@@ -223,7 +231,7 @@ test.describe("issue #4 — my schedule", () => {
       await page.goto("/");
       await openList(page);
 
-      // Populate a rich schedule (exam rows, portfolio row, undated note).
+      // Populate a rich schedule (exam rows, portfolio row, two-entry subject).
       await select(page, "AP Biology");
       await select(page, "AP Seminar");
       await select(page, "AP Drawing");
@@ -259,12 +267,12 @@ for (const vp of viewports) {
 
     // A selection that exercises every entry kind at once: two same-day exams,
     // a subject with both an exam and a portfolio, a portfolio-only subject,
-    // and a Career Kickstart subject with no May 2026 date.
-    await select(page, "AP Biology"); // 05-04 AM
-    await select(page, "AP European History"); // 05-04 PM
-    await select(page, "AP Seminar"); // portfolio 04-30 + exam 05-11 PM
-    await select(page, "AP Drawing"); // portfolio-only 05-08
-    await select(page, "AP Cybersecurity"); // undated
+    // and a Career Kickstart course sitting its first exam.
+    await select(page, "AP Human Geography"); // 05-03 AM
+    await select(page, "AP Biology"); // 05-03 PM
+    await select(page, "AP Seminar"); // portfolio 04-30 + exam 05-10 PM
+    await select(page, "AP Drawing"); // portfolio-only 05-07
+    await select(page, "AP Cybersecurity"); // Career Kickstart, 05-05 AM
 
     await expect(schedule(page).getByText("Portfolio due").first()).toBeVisible();
 
