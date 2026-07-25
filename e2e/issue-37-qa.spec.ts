@@ -21,7 +21,14 @@ import { pressViewChip } from "./support/view-chip";
  * which is the property AC6 is actually about.
  */
 
-const EVIDENCE_DIR = "docs/super-board/runs/issue-37-qa-v1";
+/**
+ * Where the visual-evidence tests write. Overridable so a later QA pass on the
+ * same card writes its own folder instead of overwriting the pass that the
+ * issue/PR comments already link to:
+ *   QA_EVIDENCE_DIR=docs/super-board/runs/issue-37-qa-v2 pnpm exec playwright test e2e/issue-37-qa.spec.ts
+ */
+const EVIDENCE_DIR =
+  process.env.QA_EVIDENCE_DIR ?? "docs/super-board/runs/issue-37-qa-v1";
 
 type Slot = { date: string; session: "AM" | "PM" } | null;
 type Subject = {
@@ -425,6 +432,19 @@ test.describe("issue #37 — visual evidence", () => {
     await expect(page.getByText(noted!.examNote!)).toBeVisible();
     await page.screenshot({
       path: `${EVIDENCE_DIR}/exam-note-desktop.png`,
+      fullPage: true,
+    });
+
+    // Tier 2 — the "Full exam details" dialog prints its own exam-date header,
+    // so it needs the qualifier as much as the chip does. Captured separately
+    // because it is a different surface, not a different state of the same one.
+    await page
+      .getByRole("button", { name: `View exam details for ${noted!.name}` })
+      .click();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toContainText(noted!.examNote!);
+    await page.screenshot({
+      path: `${EVIDENCE_DIR}/exam-note-details-dialog-desktop.png`,
       fullPage: true,
     });
   });

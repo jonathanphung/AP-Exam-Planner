@@ -1,0 +1,80 @@
+  ✓  444 [chromium] › e2e/issue-9-qa.spec.ts:112:7 › AC4 — footer renders with no overflow/overlap/layout-shift (desktop 1920x1080) (2.5s)
+  ✓  448 [chromium] › e2e/qa-evidence.spec.ts:22:7 › AC2 — / renders header + populated main with no console errors (desktop 1920x1080) (807ms)
+  ✓  446 [chromium] › e2e/issue-9-qa.spec.ts:112:7 › AC4 — footer renders with no overflow/overlap/layout-shift (tablet 1024x768) (2.4s)
+  ✓  447 [chromium] › e2e/issue-9-qa.spec.ts:112:7 › AC4 — footer renders with no overflow/overlap/layout-shift (mobile 375x667) (2.3s)
+  ✓  449 [chromium] › e2e/qa-evidence.spec.ts:22:7 › AC2 — / renders header + populated main with no console errors (tablet 1024x768) (1.1s)
+  ✓  451 [chromium] › e2e/smoke.spec.ts:3:5 › home page renders the AP Exam Planner header and title (855ms)
+  ✓  450 [chromium] › e2e/qa-evidence.spec.ts:22:7 › AC2 — / renders header + populated main with no console errors (mobile 375x667) (1.1s)
+  ✓  452 [chromium] › e2e/issue-49-qa.spec.ts:216:5 › AC4 — with NO injected CSS, the app's own scrollbar styling occupies layout width yet dialogs open with zero shift (the macOS trap is defused) (1.6s)
+  ✓  453 [chromium] › e2e/issue-49-qa.spec.ts:150:5 › AC3 — thumb/track contrast measured from live CSS is ≥ 3:1 in light AND dark, and the palette is theme-aware (1.7s)
+  ✓  454 [chromium] › e2e/issue-49-qa.spec.ts:262:5 › AC6 — a dialog body overflows and scrolls with the same custom scrollbar (evidence screenshot) (1.8s)
+  ✓  455 [chromium] › e2e/issue-49-qa.spec.ts:294:5 › AC8 — standard super-board viewport screenshots (light, catalog with styled scrollbar) (1.4s)
+  ✓  457 [chromium] › e2e/issue-49-qa.spec.ts:329:5 › AC8 — dark desktop: styled scrollbar on the catalog + dialog open with no shift (1.4s)
+  ✓  456 [chromium] › e2e/issue-49-qa.spec.ts:309:5 › AC8 — light desktop: styled scrollbar on the catalog + dialog open with no shift (1.7s)
+  ✘  459 [chromium] › e2e/support/scroll-shift.ts:198:7 › feedback dialog (FeedbackDialog) opens with zero horizontal shift under classic scrollbars (3ms)
+  ✘  460 [chromium] › e2e/support/scroll-shift.ts:211:7 › exam details popup (InfoPanel) opens with zero horizontal shift under classic scrollbars (9ms)
+  ✓  458 [chromium] › e2e/issue-49-qa.spec.ts:350:5 › AC8 — mobile 375: catalog (light) + dialog open (dark), no horizontal overflow either way (1.4s)
+  ✘  461 [chromium] › e2e/support/scroll-shift.ts:219:7 › conflict dialog (ConflictDialog) opens with zero horizontal shift under classic scrollbars (1ms)
+  ✘  462 [chromium] › e2e/support/scroll-shift.ts:235:7 › moved-to-late action dialog (CalendarView) opens with zero horizontal shift under classic scrollbars (1ms)
+  ✘  463 [chromium] › e2e/support/scroll-shift.ts:261:7 › delete-schedule confirm (MySchedules) opens with zero horizontal shift under classic scrollbars (1ms)
+  ✘  464 [chromium] › e2e/issue-49-real-chrome.spec.ts:34:5 › real Chrome: logged measurement table — shell rect.left steady closed → open → close (2ms)
+  ✓  438 [chromium] › e2e/issue-8-qa.spec.ts:238:7 › issue #8 QA evidence › AC2 evidence — axe summary across states written to JSON (16.7s)
+  ✓  465 [chromium] › e2e/support/scroll-shift.ts:198:7 › feedback dialog (FeedbackDialog) opens with zero horizontal shift under classic scrollbars (1.1s)
+  ✓  466 [chromium] › e2e/support/scroll-shift.ts:211:7 › exam details popup (InfoPanel) opens with zero horizontal shift under classic scrollbars (1.2s)
+  ✓  467 [chromium] › e2e/support/scroll-shift.ts:219:7 › conflict dialog (ConflictDialog) opens with zero horizontal shift under classic scrollbars (1.5s)
+  ✓  468 [chromium] › e2e/support/scroll-shift.ts:261:7 › delete-schedule confirm (MySchedules) opens with zero horizontal shift under classic scrollbars (1.3s)
+  ✓  470 [chromium] › e2e/support/scroll-shift.ts:283:7 › no horizontal overflow at 320 / 375 / 1024 / 1920 with the custom classic scrollbar active (1.1s)
+  ✓  469 [chromium] › e2e/support/scroll-shift.ts:235:7 › moved-to-late action dialog (CalendarView) opens with zero horizontal shift under classic scrollbars (1.3s)
+
+
+  1) [chromium] › e2e/support/scroll-shift.ts:198:7 › feedback dialog (FeedbackDialog) opens with zero horizontal shift under classic scrollbars 
+
+    Error: browserType.launch: Chromium distribution 'chrome' is not found at /Applications/Google Chrome.app/Contents/MacOS/Google Chrome
+    Run "pnpm exec playwright install chrome"
+
+    Error Context: test-results/issue-49-real-chrome-feedb-76dc4-ft-under-classic-scrollbars-chromium/error-context.md
+
+  2) [chromium] › e2e/support/scroll-shift.ts:211:7 › exam details popup (InfoPanel) opens with zero horizontal shift under classic scrollbars 
+
+    Error: browserType.launch: Chromium distribution 'chrome' is not found at /Applications/Google Chrome.app/Contents/MacOS/Google Chrome
+    Run "pnpm exec playwright install chrome"
+
+    Error Context: test-results/issue-49-real-chrome-exam--cadfa-ft-under-classic-scrollbars-chromium/error-context.md
+
+  3) [chromium] › e2e/support/scroll-shift.ts:219:7 › conflict dialog (ConflictDialog) opens with zero horizontal shift under classic scrollbars 
+
+    Error: browserType.launch: Chromium distribution 'chrome' is not found at /Applications/Google Chrome.app/Contents/MacOS/Google Chrome
+    Run "pnpm exec playwright install chrome"
+
+    Error Context: test-results/issue-49-real-chrome-confl-91b73-ft-under-classic-scrollbars-chromium/error-context.md
+
+  4) [chromium] › e2e/support/scroll-shift.ts:235:7 › moved-to-late action dialog (CalendarView) opens with zero horizontal shift under classic scrollbars 
+
+    Error: browserType.launch: Chromium distribution 'chrome' is not found at /Applications/Google Chrome.app/Contents/MacOS/Google Chrome
+    Run "pnpm exec playwright install chrome"
+
+    Error Context: test-results/issue-49-real-chrome-moved-77e97-ft-under-classic-scrollbars-chromium/error-context.md
+
+  5) [chromium] › e2e/support/scroll-shift.ts:261:7 › delete-schedule confirm (MySchedules) opens with zero horizontal shift under classic scrollbars 
+
+    Error: browserType.launch: Chromium distribution 'chrome' is not found at /Applications/Google Chrome.app/Contents/MacOS/Google Chrome
+    Run "pnpm exec playwright install chrome"
+
+    Error Context: test-results/issue-49-real-chrome-delet-d9598-ft-under-classic-scrollbars-chromium/error-context.md
+
+  6) [chromium] › e2e/issue-49-real-chrome.spec.ts:34:5 › real Chrome: logged measurement table — shell rect.left steady closed → open → close 
+
+    Error: browserType.launch: Chromium distribution 'chrome' is not found at /Applications/Google Chrome.app/Contents/MacOS/Google Chrome
+    Run "pnpm exec playwright install chrome"
+
+    Error Context: test-results/issue-49-real-chrome-real--bf84f-teady-closed-→-open-→-close-chromium/error-context.md
+
+  6 failed
+    [chromium] › e2e/support/scroll-shift.ts:198:7 › feedback dialog (FeedbackDialog) opens with zero horizontal shift under classic scrollbars 
+    [chromium] › e2e/support/scroll-shift.ts:211:7 › exam details popup (InfoPanel) opens with zero horizontal shift under classic scrollbars 
+    [chromium] › e2e/support/scroll-shift.ts:219:7 › conflict dialog (ConflictDialog) opens with zero horizontal shift under classic scrollbars 
+    [chromium] › e2e/support/scroll-shift.ts:235:7 › moved-to-late action dialog (CalendarView) opens with zero horizontal shift under classic scrollbars 
+    [chromium] › e2e/support/scroll-shift.ts:261:7 › delete-schedule confirm (MySchedules) opens with zero horizontal shift under classic scrollbars 
+    [chromium] › e2e/issue-49-real-chrome.spec.ts:34:5 › real Chrome: logged measurement table — shell rect.left steady closed → open → close 
+  464 passed (3.5m)
+ ELIFECYCLE  Command failed with exit code 1.

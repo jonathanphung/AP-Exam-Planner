@@ -1,0 +1,19 @@
+
+Running 14 tests using 4 workers
+
+  ✓   3 [chromium] › e2e/issue-37-qa.spec.ts:106:7 › issue #37 — annual dataset swap to the May 2027 cycle › AC6 — every cycle-derived label reads the new cycle: banner, footer, resources, page description (1.4s)
+  ✓   4 [chromium] › e2e/issue-37-qa.spec.ts:185:7 › issue #37 — annual dataset swap to the May 2027 cycle › AC3/AC6 — the calendar pager derives its weeks from the published 2027 windows (1.8s)
+  ✓   1 [chromium] › e2e/issue-37-qa.spec.ts:225:7 › issue #37 — annual dataset swap to the May 2027 cycle › AC1/AC2 — the catalog renders the full published 2027 roster, and a schedule-only exam carries its published qualifier (1.8s)
+  ✓   6 [chromium] › e2e/issue-37-qa.spec.ts:289:7 › issue #37 — annual dataset swap to the May 2027 cycle › AC6 — the ICS export is named for the new cycle and its dates land in the published 2027 windows (1.3s)
+  ✓   7 [chromium] › e2e/issue-37-qa.spec.ts:319:7 › issue #37 — annual dataset swap to the May 2027 cycle › AC8 — a saved plan carrying a subject id that no longer exists renders without crashing (1.3s)
+  ✓   5 [chromium] › e2e/issue-37-qa.spec.ts:257:7 › issue #37 — annual dataset swap to the May 2027 cycle › AC1/AC4 — an unpublished value renders as a visible pending badge, never a fabricated one (1.8s)
+  ✓   2 [chromium] › e2e/issue-37-qa.spec.ts:140:7 › issue #37 — annual dataset swap to the May 2027 cycle › AC6 — no "2026" survives in any rendered surface (catalog, list, calendar, details, resources) (3.8s)
+  ✓   8 [chromium] › e2e/issue-37-qa.spec.ts:381:7 › issue #37 — annual dataset swap to the May 2027 cycle › AC5 — the shipped dataset declares the cycle and fetch date the sources file documents (1.1s)
+  ✓   9 [chromium] › e2e/issue-37-qa.spec.ts:402:9 › issue #37 — visual evidence › evidence — planner with a 2027 plan (desktop 1920x1080) (1.4s)
+  ✓  10 [chromium] › e2e/issue-37-qa.spec.ts:402:9 › issue #37 — visual evidence › evidence — planner with a 2027 plan (tablet 1024x768) (1.5s)
+  ✓  11 [chromium] › e2e/issue-37-qa.spec.ts:402:9 › issue #37 — visual evidence › evidence — planner with a 2027 plan (mobile 375x667) (1.3s)
+  ✓  14 [chromium] › e2e/issue-37-qa.spec.ts:481:7 › issue #37 — visual evidence › evidence — a stale saved subject id degrades gracefully (desktop) (1.0s)
+  ✓  13 [chromium] › e2e/issue-37-qa.spec.ts:452:7 › issue #37 — visual evidence › evidence — calendar week pager across the published 2027 windows (desktop) (1.4s)
+  ✓  12 [chromium] › e2e/issue-37-qa.spec.ts:424:7 › issue #37 — visual evidence › evidence — the schedule-only exam's published qualifier (desktop) (1.7s)
+
+  14 passed (9.9s)
