@@ -353,12 +353,14 @@ describe("buildIcsCalendar — issue #38 sections[] edge handling", () => {
               name: "Part A",
               questionCount: 30,
               minutes: 60,
+              weightPercent: 35,
               note: "calculator not permitted",
             },
             {
               name: "Part B",
               questionCount: 15,
               minutes: "40–45",
+              weightPercent: 15,
               note: "graphing calculator required",
             },
           ],
@@ -405,11 +407,111 @@ describe("buildIcsCalendar — issue #38 sections[] edge handling", () => {
 
   it("nests published Part A/B rows under their section with the calculator note (verbatim range kept)", () => {
     expect(unfolded).toContain(
-      "- Part A: 30 Questions | 60 Minutes (calculator not permitted)",
+      "- Part A: 30 Questions | 60 Minutes | 35% of Score (calculator not permitted)",
     );
     // The published range renders verbatim, never averaged.
     expect(unfolded).toContain(
-      "- Part B: 15 Questions | 40–45 Minutes (graphing calculator required)",
+      "- Part B: 15 Questions | 40–45 Minutes | 15% of Score (graphing calculator required)",
+    );
+  });
+});
+
+/**
+ * Issue #73 — the part row's weight segment, one printed denominator per case.
+ *
+ * `partRow()` used to emit `questions | minutes` and stop, while the section
+ * row above it emitted `N% of Score`. It now carries the part's published
+ * weight in the same third slot — and the printed denominator decides the
+ * shape, because a .ics DESCRIPTION is flat text with no room for a footnote.
+ */
+describe("buildIcsCalendar — per-part weights keep their printed denominator (issue #73)", () => {
+  const weightsExam = {
+    ...subject(
+      "weights",
+      "AP Weights",
+      { date: "2027-05-13", session: "AM" },
+      { date: "2027-05-20", session: "AM" },
+    ),
+    format: {
+      sections: [
+        {
+          name: "Section I: Exam-denominated",
+          questionCount: 42,
+          minutes: 100,
+          weightPercent: 50,
+          parts: [
+            { name: "Part A", questionCount: 29, minutes: 62, weightPercent: 35 },
+            // A fractional published share stays exact (Precalculus 43.75%).
+            { name: "Part B", questionCount: 13, minutes: 38, weightPercent: 43.75 },
+          ],
+        },
+        {
+          name: "Section II: Other denominators",
+          questionCount: 3,
+          minutes: 60,
+          weightPercent: 33,
+          parts: [
+            {
+              name: "Long free-response question",
+              questionCount: 1,
+              weightPrinted: "50% of section score",
+            },
+            {
+              name: "Individual research report (1,200 words)",
+              weightPrinted: "50% of 20%",
+            },
+          ],
+        },
+        {
+          name: "Section III: No published part weights",
+          questionCount: 6,
+          minutes: 120,
+          weightPercent: 17,
+          parts: [
+            { name: "Question 1: Long Essay–Comparison", questionCount: 1 },
+            { name: "Question 2: Short Essay–Attribution", questionCount: 1, weightPercent: "pending" },
+          ],
+        },
+      ],
+      totalMinutes: 280,
+      calculator: false,
+      delivery: "digital",
+    },
+  } as ApSubject;
+
+  const unfolded = buildIcsCalendar(
+    [weightsExam],
+    ["weights"],
+    [],
+    SESSION_START,
+    FIXED_NOW,
+  ).replace(/\r\n /g, "");
+
+  it("renders an exam-denominated part weight with the section row's own 'N% of Score' wording", () => {
+    expect(unfolded).toContain("- Part A: 29 Questions | 62 Minutes | 35% of Score");
+    expect(unfolded).toContain("- Part B: 13 Questions | 38 Minutes | 43.75% of Score");
+  });
+
+  it("renders a section-denominated weight VERBATIM — never converted to an exam share", () => {
+    expect(unfolded).toContain(
+      "- Long free-response question: 1 Question | 50% of section score",
+    );
+    // 50% of a 33% section is ~16.5% of the exam. That number must not appear.
+    expect(unfolded).not.toContain("16.5");
+  });
+
+  it("renders a nested weight verbatim and drops the length segment College Board prints nothing for", () => {
+    // RFC 5545 escapes the comma in "1,200", so match around it.
+    expect(unfolded).toContain("- Individual research report (1\\,200 words): 50% of 20%");
+    expect(unfolded).not.toContain("undefined");
+    expect(unfolded).not.toContain("| 10% of Score");
+  });
+
+  it("drops the weight segment entirely where no per-part weight is published, and keeps 'pending' distinct", () => {
+    expect(unfolded).toContain("- Question 1: Long Essay–Comparison: 1 Question");
+    expect(unfolded).not.toMatch(/Question 1: Long Essay–Comparison: 1 Question \|/);
+    expect(unfolded).toContain(
+      "- Question 2: Short Essay–Attribution: 1 Question | Weight pending",
     );
   });
 });

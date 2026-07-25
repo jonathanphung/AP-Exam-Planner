@@ -23,16 +23,20 @@ import { evidenceDir } from "./support/evidence";
  *                        Section II: Multiple-Choice 55q/65min/50%.
  *                        totalMinutes 120 is the published figure — sections
  *                        deliberately do not sum to it.
- *   - AP Seminar       — NO multiple-choice section exists: exactly two
- *                        published End-of-Course rows, zero "pending".
+ *   - AP Seminar       — NO multiple-choice section exists: the three
+ *                        components College Board's Assessment Format prints,
+ *                        with printed NESTED weights on their part rows
+ *                        (issue #73), zero "pending".
  *   - AP Drawing       — portfolio-only: no sections, no table at all.
- *   - AP African American Studies — 5 published sections; the Individual
- *                        Student Project row distinguishes omission (no
- *                        question count printed) from pending (minutes exist
- *                        but unpublished).
+ *   - AP African American Studies — the four components College Board prints
+ *                        (issue #73 collapsed two invented sibling "Section
+ *                        II:" rows into the single printed one); the
+ *                        Individual Student Project row distinguishes
+ *                        omission (no question count printed) from pending
+ *                        (minutes exist but unpublished).
  *
  * Layout branch (Jon's PR #48 design bounce, pass 2): exams whose sections
- * have NO published parts (Seminar, AAS, Biology) render spacious two-line
+ * have NO published parts (Biology, Music Theory) render spacious two-line
  * blocks — no table, no column header: a medium-weight name line above a
  * muted left-aligned stats line that wraps only between `·`-separated stat
  * phrases (never inside one); exams WITH parts (Calculus AB, the languages)
@@ -102,39 +106,51 @@ const noHorizontalScroll = (page: Page) =>
   );
 
 test.describe("issue #44 — per-section exam details", () => {
-  test("AC3/AC11 — AP Seminar has NO multiple-choice row: only its two published End-of-Course sections render (as spacious partless rows), with College Board's names, and omission is never shown as 'pending'", async ({
+  test("AC3/AC11 — AP Seminar has NO multiple-choice row: its three published components render with College Board's names and printed nested weights, and omission is never shown as 'pending'", async ({
     page,
   }) => {
     await page.goto("/");
     await openInfo(page, "AP Seminar");
 
-    // PR #48 bounce: no parts → no table, no column header.
-    await expect(sectionsTable(page)).toHaveCount(0);
-    await expect(dialog(page).getByRole("columnheader")).toHaveCount(0);
+    // Issue #73: the components carry printed part rows, so the 4-column
+    // table is the correct layout (PR #48 bounce rule is parts-based).
+    await expect(sectionsTable(page)).toHaveCount(1);
 
-    // Exactly the two published sections — nothing invented, nothing zeroed.
+    // Exactly the three components College Board's Assessment Format prints.
     await expect(
-      summaryRow(page, "End-of-Course Exam – Short-Answer Section"),
+      row(page, /^Performance Task 1: Team Project and Presentation$/),
     ).toHaveCount(1);
     await expect(
-      summaryRow(page, "End-of-Course Exam – Essay Section"),
+      row(
+        page,
+        /^Performance Task 2: Individual Research-Based Essay and Presentation$/,
+      ),
     ).toHaveCount(1);
+    await expect(row(page, /^End-of-Course Exam$/)).toHaveCount(1);
 
-    // The nonexistent MC section is omitted entirely…
+    // The nonexistent MC section is omitted entirely.
     await expect(dialog(page).getByText(/multiple.?choice/i)).toHaveCount(0);
-    // …and never conflated with "not yet published".
-    await expect(
-      dialog(page).getByText("pending", { exact: true }),
-    ).toHaveCount(0);
 
-    // Published values render in the "<count> questions · <length> ·
-    // <weight>% of score" shape — singular "1 question" for the essay.
+    // Nested weights render VERBATIM — never multiplied into an exam share.
     await expect(
-      summaryRow(page, /Short-Answer Section/).locator("dd"),
-    ).toHaveText("3 questions · 30 min · 13.5% of score");
-    await expect(summaryRow(page, /Essay Section/).locator("dd")).toHaveText(
-      "1 question · 1 h 30 min · 31.5% of score",
+      row(page, /Individual research report \(1,200 words\)/),
+    ).toContainText("50% of 20%");
+    await expect(row(page, /Oral defense/)).toContainText("10% of 35%");
+    await expect(
+      row(page, /Understanding and analyzing an argument/),
+    ).toContainText("30% of 45%");
+    await expect(row(page, /Evidence-Based argument essay/)).toContainText(
+      "70% of 45%",
     );
+    // The multiplied-out figures the dataset used to carry must be gone.
+    await expect(dialog(page).getByText("13.5%")).toHaveCount(0);
+    await expect(dialog(page).getByText("31.5%")).toHaveCount(0);
+
+    // The three components' own weights are the printed exam-denominated ones.
+    await expect(
+      row(page, /^Performance Task 1: Team Project and Presentation$/),
+    ).toContainText("20%");
+    await expect(row(page, /^End-of-Course Exam$/)).toContainText("45%");
   });
 
   test("AC2 — a portfolio-only subject (AP Drawing) renders NO section table and no exam-format rows; its portfolio block carries the story", async ({
@@ -169,7 +185,7 @@ test.describe("issue #44 — per-section exam details", () => {
     await openInfo(page, "AP Calculus AB");
 
     // Section row: name | questions | length | weight.
-    const mc = row(page, /^Multiple Choice$/);
+    const mc = row(page, /^Section I: Multiple Choice$/);
     await expect(mc).toContainText("42");
     await expect(mc).toContainText("1 h 40 min");
     await expect(mc).toContainText("50%");
@@ -180,10 +196,13 @@ test.describe("issue #44 — per-section exam details", () => {
     await expect(mcPartA).toContainText("29");
     await expect(mcPartA).toContainText("1 h 2 min");
     await expect(mcPartA).toContainText("calculator not permitted");
+    // Issue #73: the weight cell is the published share, not a dash.
+    await expect(mcPartA).toContainText("35%");
     const mcPartB = row(page, /Multiple Choice\s*—\s*Part B/);
     await expect(mcPartB).toContainText("13");
     await expect(mcPartB).toContainText("38 min");
     await expect(mcPartB).toContainText("graphing calculator required");
+    await expect(mcPartB).toContainText("15%");
 
     // The Free Response section has its own, distinct A/B split.
     const frPartA = row(page, /Free Response\s*—\s*Part A/);
@@ -263,34 +282,42 @@ test.describe("issue #44 — per-section exam details", () => {
     await page.goto("/");
     await openInfo(page, "AP African American Studies");
 
-    // PR #48 bounce: 5 sections but NO parts → the spacious partless rows,
-    // not the table (the branch rule is parts-based, never count-based).
-    await expect(sectionsTable(page)).toHaveCount(0);
-    await expect(dialog(page).getByRole("columnheader")).toHaveCount(0);
+    // Issue #73: the two invented sibling "Section II:" rows collapsed into
+    // the single "Section II: Free Response" College Board prints, with the
+    // Short-Answer Questions (18%) and Document-Based Question (12%) as its
+    // published parts — so AAS renders the 4-column table (the PR #48 branch
+    // rule is parts-based) rather than the spacious partless blocks.
+    await expect(sectionsTable(page)).toHaveCount(1);
 
-    // All five published sections render (the branch rule's real test).
+    // The four published components, in College Board's printed order.
     for (const name of [
-      "Section I: Multiple Choice",
-      "Section IB: Individual Student Project—Exam Day Validation Question",
-      "Section II: Short-Answer Questions",
-      "Section II: Document-Based Question",
-    ]) {
-      await expect(summaryRow(page, name)).toHaveCount(1);
+      /^Section I: Multiple Choice$/,
+      /^Section IB: Individual Student Project—Exam Day Validation Question$/,
+      /^Section II: Free Response$/,
+      /^Individual Student Project$/,
+    ] as const) {
+      await expect(row(page, name)).toHaveCount(1);
     }
-    const isp = summaryRow(page, /^Individual Student Project/);
-    await expect(isp).toHaveCount(1);
+    // Section II's printed 4 questions / 1 h 25 min / 30%, with its parts
+    // nested and carrying their own published weights.
+    const frq = row(page, /^Section II: Free Response$/);
+    await expect(frq).toContainText("4");
+    await expect(frq).toContainText("1 h 25 min");
+    await expect(frq).toContainText("30%");
+    await expect(row(page, /Free Response\s*—\s*Short-Answer Questions/)).toContainText("18%");
+    await expect(row(page, /Free Response\s*—\s*Document-Based Question/)).toContainText("12%");
 
+    const isp = row(page, /^Individual Student Project$/);
+    const cells = isp.getByRole("cell");
     // Questions: the page prints NO count (it's a project, not a question
-    // set) → the questions segment is omitted entirely — omission, not a
-    // fabricated count and not a pending badge.
-    await expect(isp.locator("dd")).not.toContainText("question");
-    // Minutes: a duration exists but is unpublished → the pending badge
-    // inline in its slot of the value string.
+    // set) → the not-published dash, not a fabricated count and not "pending".
+    await expect(cells.nth(0)).toContainText("—");
+    // Minutes: a duration exists but is unpublished → the pending badge.
     await expect(
-      isp.locator("dd").getByText("pending", { exact: true }),
+      cells.nth(1).getByText("pending", { exact: true }),
     ).toBeVisible();
     // Weight: published 8.5% renders.
-    await expect(isp.locator("dd")).toContainText("8.5% of score");
+    await expect(cells.nth(2)).toHaveText("8.5%");
   });
 
   test("PR #48 bounce pass 2 + '9px matched' follow-up — a partless exam (AP Biology) renders two-line section blocks: name line above a muted left-aligned stats line, 9px block padding with hairlines, and an 11px matched gap before the metadata divider", async ({

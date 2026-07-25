@@ -12,21 +12,21 @@
  "changedFor2027": null,
  "sections": [
   {
-   "name": "Section IA: Multiple Choice",
+   "name": "Section I, Part A: Multiple Choice",
    "questionCount": "55",
    "minutes": 55,
    "weightPercent": 40,
    "quote": "Section IA: Multiple Choice — 55 questions 55mins 40% of Score"
   },
   {
-   "name": "Section IB: Short Answer",
+   "name": "Section I, Part B: Short Answer",
    "questionCount": "3",
    "minutes": 40,
    "weightPercent": 20,
    "quote": "Section IB: Short Answer — 3 questions 40mins 20% of Score"
   },
   {
-   "name": "Section II: Free Response",
+   "name": "Section II: Document-Based Question and Long Essay",
    "questionCount": "2",
    "minutes": 100,
    "weightPercent": 40,
@@ -36,15 +36,17 @@
      "name": "Document-Based Question",
      "questionCount": "1",
      "minutes": 60,
+     "weightPercent": 25,
      "toolNote": "Recommended Time: 60 Minutes (includes 15-minute reading period)",
-     "quote": "Document-Based Question | Recommended Time: 60 Minutes (includes 15-minute reading period) | 25% of Score"
+     "quote": "Document-Based Question | Recommended time: 1 Hour (includes 15-minute reading period) | 25% of Score"
     },
     {
      "name": "Long Essay Question",
      "questionCount": "1",
      "minutes": 40,
+     "weightPercent": 15,
      "toolNote": "none",
-     "quote": "Long Essay Question | 40 Minutes | 15% of Score"
+     "quote": "Long Essay Question | Recommended time: 40 Minutes | 15% of Score"
     }
    ]
   }

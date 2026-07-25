@@ -34,8 +34,13 @@ const byId = new Map(dataset.subjects.map((s) => [s.id, s]));
 interface ProvenancePart {
   name: string;
   questionCount?: string;
-  minutes: number | string;
-  toolNote?: string;
+  /** Absent when College Board prints no length for the part (issue #73). */
+  minutes?: number | string | null;
+  /** Exam-denominated published weight (issue #73). */
+  weightPercent?: number | string;
+  /** Verbatim published weight on any other denominator (issue #73). */
+  weightPrinted?: string;
+  toolNote?: string | null;
   quote?: string;
 }
 interface ProvenanceSection {
@@ -88,33 +93,40 @@ function normalizeNote(raw: string | undefined): string | undefined {
 }
 
 /**
- * Spot-check finding (sources.md): four language-exam MC part records carry
- * fetcher commentary as toolNote while their own verbatim quotes print
- * "…; 25% of Score" — the printed weight share is used instead.
+ * Issue #73 — the per-part weight College Board prints, carried through with
+ * its denominator intact. `weightPercent` is exam-denominated and stays a
+ * number; `weightPrinted` is verbatim for the section-relative and nested
+ * forms. The two are mutually exclusive (the schema refuses both) and neither
+ * is ever derived from the other: converting "50% of section score" into an
+ * exam-denominated 16.5 is the back-computation this suite exists to catch.
+ *
+ * Before #73 four language-exam MC part records smuggled "…; 25% of Score"
+ * through `toolNote` and this normalizer had to scrape it back out of the
+ * quote. The weight now has a field, so that hack is gone.
  */
-const COMMENTARY_TOOLNOTES = new Set([
-  "listening/audio, no calculator (world language exam)",
-  "reading, no calculator (world language exam)",
-  "digital exam via Bluebook",
-]);
+function normalizePartWeight(p: ProvenancePart) {
+  if (p.weightPercent !== undefined) {
+    return {
+      weightPercent:
+        p.weightPercent === "pending" ? "pending" : Number(p.weightPercent),
+    };
+  }
+  if (p.weightPrinted !== undefined) return { weightPrinted: p.weightPrinted };
+  return {};
+}
 
 function normalizePart(p: ProvenancePart) {
   const qc = normalizeQuestionCount(p.questionCount);
-  let rawTool: string | undefined = p.toolNote;
-  if (rawTool !== undefined && COMMENTARY_TOOLNOTES.has(rawTool)) {
-    const printedShare =
-      typeof p.quote === "string"
-        ? p.quote.match(/\d+(?:\.\d+)?% of Score/)
-        : null;
-    rawTool = printedShare ? printedShare[0] : undefined;
-  }
-  const tool = normalizeNote(rawTool);
+  const tool = normalizeNote(p.toolNote ?? undefined);
   const note =
     qc.extraNote && tool ? `${qc.extraNote}; ${tool}` : (qc.extraNote ?? tool);
   return {
     name: p.name,
     ...(qc.value !== undefined ? { questionCount: qc.value } : {}),
-    minutes: normalizeMinutes(p.minutes),
+    ...(p.minutes === undefined || p.minutes === null
+      ? {}
+      : { minutes: normalizeMinutes(p.minutes) }),
+    ...normalizePartWeight(p),
     ...(note !== undefined ? { note } : {}),
   };
 }
@@ -162,7 +174,6 @@ function orderSections<T extends { name: string }>(sections: T[]): T[] {
  * sums (music-theory's "9", AAS's "5") and must NOT reappear.
  */
 const CARRIED_FR_NOTES: Record<string, string> = {
-  "art-history": "6 essay questions (2 long, 4 short)",
   biology: "6 free-response questions (2 long, 4 short)",
   chemistry: "7 free-response questions (3 long, 4 short)",
   "comparative-government-and-politics":
@@ -178,8 +189,6 @@ const CARRIED_FR_NOTES: Record<string, string> = {
   "environmental-science": "3 free-response questions",
   "human-geography": "3 free-response questions",
   latin: "translation, short-answer, and short-essay questions (5 questions)",
-  macroeconomics: "3 free-response questions (1 long, 2 short)",
-  microeconomics: "3 free-response questions (1 long, 2 short)",
   "physics-1": "4 free-response questions",
   "physics-2": "4 free-response questions",
   "physics-c-electricity-and-magnetism": "4 free-response questions",
@@ -266,17 +275,32 @@ describe("ap-2027.json sections[] (issue #44)", () => {
   });
 
   it("AP Seminar lacks a multiple-choice section entirely — omitted, never 'pending'", () => {
+    // Issue #73: the two back-computed "End-of-Course Exam – …Section" rows
+    // (13.5% / 31.5% — 30%/70% of 45%, multiplied out) were replaced with the
+    // three components College Board's Assessment Format actually prints, each
+    // carrying its printed nested weight verbatim. Still no multiple choice.
     const sections = byId.get("seminar")?.format.sections ?? [];
-    expect(sections.length).toBe(2);
+    expect(sections.map((s) => [s.name, s.weightPercent])).toEqual([
+      ["Performance Task 1: Team Project and Presentation", 20],
+      ["Performance Task 2: Individual Research-Based Essay and Presentation", 35],
+      ["End-of-Course Exam", 45],
+    ]);
     expect(
       sections.some((s) => /multiple.?choice/i.test(s.name)),
       "seminar must not grow a multiple-choice section",
     ).toBe(false);
+    // The multiplied-out figures must never come back.
+    expect(sections.map((s) => s.weightPercent)).not.toContain(13.5);
+    expect(sections.map((s) => s.weightPercent)).not.toContain(31.5);
   });
 
-  it("pins the seven 3+-section subjects the flat model could not express", () => {
+  it("pins the eight 3+-section subjects the flat model could not express", () => {
     const EXPECTED_SECTION_COUNTS: Record<string, number> = {
-      "african-american-studies": 5,
+      // Issue #73 collapsed AAS's two invented sibling "Section II:" rows into
+      // the single "Section II: Free Response" College Board prints, with the
+      // SAQ and DBQ as its parts — 5 sections → 4.
+      "african-american-studies": 4,
+      seminar: 3,
       "world-history-modern": 3,
       "united-states-history": 3,
       "spanish-literature-and-culture": 3,
@@ -300,7 +324,15 @@ describe("ap-2027.json sections[] (issue #44)", () => {
     ).toBe(false);
     // Same class of error for AP African American Studies' "5".
     const aas = byId.get("african-american-studies")?.format.sections ?? [];
-    expect(aas.map((s) => s.questionCount)).toEqual([60, 1, 3, 1, undefined]);
+    expect(aas.map((s) => s.questionCount)).toEqual([60, 1, 4, undefined]);
+    // Section II's published 4 is College Board's own printed total for the
+    // section ("4 Questions | 1hr 25mins | 30% of Score"), not 3 + 1 summed
+    // from its part rows — the parts print their own 3 and 1 beneath it.
+    const aasFr = aas.find((s) => s.name === "Section II: Free Response");
+    expect(aasFr?.parts?.map((p) => [p.name, p.questionCount, p.weightPercent])).toEqual([
+      ["Short-Answer Questions", 3, 18],
+      ["Document-Based Question", 1, 12],
+    ]);
   });
 
   it("nests Calculus AB's published no-calculator vs. calculator halves as parts (re-sourced for 2027)", () => {
@@ -410,6 +442,111 @@ describe("ap-2027.json sections[] (issue #44)", () => {
     }
   });
 
+  it("traces EVERY populated part weight back to a printed value in the committed capture (issue #73)", () => {
+    // The strongest available anti-fabrication check: the provenance JSON is
+    // hand-maintained and could in principle be edited to match a wrong
+    // dataset, but pages/<id>.txt is the raw extracted page text. Every
+    // per-part weight that ships must appear IN THAT TEXT, in the printed
+    // form the schema says it is:
+    //   - weightPercent  → "<n>% of score" / "<n>% of exam score" (the exam
+    //                      denominator; anything else belongs in weightPrinted)
+    //   - weightPrinted  → the exact string, character for character
+    // A weight that cannot be found in the capture fails here, whatever the
+    // provenance record claims.
+    const escape = (v: string) => v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    let checkedPercent = 0;
+    let checkedPrinted = 0;
+    for (const subject of dataset.subjects) {
+      const parts = subject.format.sections.flatMap((s) => s.parts ?? []);
+      if (parts.length === 0) continue;
+      const page = readFileSync(
+        join(PROVENANCE_DIR, "pages", `${subject.id}.txt`),
+        "utf-8",
+      );
+      for (const part of parts) {
+        if (typeof part.weightPercent === "number") {
+          // "of score" / "of exam score" only — a bare "35%" elsewhere on the
+          // page (a content-mix percentage) must not satisfy this.
+          const printed = new RegExp(
+            `(?<![\\d.])${escape(String(part.weightPercent))}%\\s*of\\s+(exam\\s+)?score`,
+            "i",
+          );
+          expect(
+            printed.test(page),
+            `${subject.id} "${part.name}": ${part.weightPercent}% is not printed as an exam-denominated weight in pages/${subject.id}.txt`,
+          ).toBe(true);
+          checkedPercent++;
+        }
+        if (part.weightPrinted !== undefined) {
+          expect(
+            page.includes(part.weightPrinted),
+            `${subject.id} "${part.name}": "${part.weightPrinted}" does not appear verbatim in pages/${subject.id}.txt`,
+          ).toBe(true);
+          // A verbatim weight is used precisely BECAUSE its denominator is not
+          // the exam score — it must never be a bare exam-denominated share.
+          expect(
+            part.weightPrinted,
+            `${subject.id} "${part.name}": exam-denominated weights belong in weightPercent`,
+          ).not.toMatch(/^\d+(\.\d+)?%\s*(of\s+(exam\s+)?score)?$/i);
+          checkedPrinted++;
+        }
+      }
+    }
+    // Guards against the check silently covering nothing if the fields are
+    // dropped: 17 subjects publish per-part weights (see issue #73's audit).
+    expect(checkedPercent).toBeGreaterThanOrEqual(40);
+    expect(checkedPrinted).toBeGreaterThanOrEqual(11);
+  });
+
+  it("keeps a part's minutes OMITTED where the page prints no length, distinct from 'pending' (issue #73)", () => {
+    const artHistoryFr = byId
+      .get("art-history")
+      ?.format.sections.find((s) => s.name === "Section II: Free Response");
+    // Six printed question rows, no printed per-question length or weight —
+    // Section II's 50% is never divided by six.
+    expect(artHistoryFr?.parts).toHaveLength(6);
+    for (const part of artHistoryFr?.parts ?? []) {
+      expect(part.minutes, `${part.name} minutes`).toBeUndefined();
+      expect(part.weightPercent, `${part.name} weightPercent`).toBeUndefined();
+      expect(part.weightPrinted, `${part.name} weightPrinted`).toBeUndefined();
+    }
+    // AP Psychology's AAQ/EBQ halves are the other state: a length exists
+    // (the section prints 70 minutes) but no per-part figure is published.
+    const psychFr = byId
+      .get("psychology")
+      ?.format.sections.find((s) => /free.?response/i.test(s.name));
+    expect(psychFr?.parts?.map((p) => p.minutes)).toEqual([
+      "pending",
+      "pending",
+    ]);
+  });
+
+  it("carries College Board's printed 'Section <roman>:' prefix on every sit-down subject's sections (issue #73, D2)", () => {
+    // Every section name must be one College Board prints. The check that
+    // scales across 38 subjects: no section may be a bare "Multiple Choice" /
+    // "Free Response" / "Written Response" — the un-prefixed forms 24 subjects
+    // shipped before #73 — and the Arabic "Section 1:" form the AP Students
+    // block uses is never adopted.
+    const bare = new Set(["Multiple Choice", "Free Response", "Written Response"]);
+    const offenders: Array<[string, string]> = [];
+    for (const subject of dataset.subjects) {
+      for (const section of subject.format.sections) {
+        if (bare.has(section.name) || /^Section \d/.test(section.name)) {
+          offenders.push([subject.id, section.name]);
+        }
+      }
+    }
+    expect(offenders).toEqual([]);
+    // Spot-check the headline pair from the ticket: structurally identical
+    // exams now title their sections identically.
+    for (const id of ["art-history", "calculus-bc"]) {
+      expect(byId.get(id)?.format.sections.map((s) => s.name), id).toEqual([
+        "Section I: Multiple Choice",
+        "Section II: Free Response",
+      ]);
+    }
+  });
+
   it("sections omit a question count only where the page prints none (never the string 'n/a')", () => {
     const omitted: Array<[string, string]> = [];
     for (const subject of dataset.subjects) {
@@ -420,10 +557,16 @@ describe("ap-2027.json sections[] (issue #44)", () => {
         }
       }
     }
-    // Exactly one section in the 2026 cycle prints no question count: the
-    // AAS Individual Student Project (a project, not a question set).
+    // Three sections print no question count, all of them projects rather
+    // than question sets: the AAS Individual Student Project and AP Seminar's
+    // two through-course performance tasks (issue #73).
     expect(omitted).toEqual([
       ["african-american-studies", "Individual Student Project"],
+      ["seminar", "Performance Task 1: Team Project and Presentation"],
+      [
+        "seminar",
+        "Performance Task 2: Individual Research-Based Essay and Presentation",
+      ],
     ]);
   });
 });

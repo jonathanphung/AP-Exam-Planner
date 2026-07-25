@@ -14,18 +14,32 @@
  "changedFor2027": null,
  "sections": [
   {
-   "name": "Multiple Choice",
+   "name": "Section I: Multiple Choice",
    "questionCount": "60",
    "minutes": 70,
    "weightPercent": 66,
    "quote": "60 Questions | 1 Hour 10 Minutes | 66% of Exam Score"
   },
   {
-   "name": "Free Response",
+   "name": "Section II: Free Response",
    "questionCount": "3",
    "minutes": 60,
    "weightPercent": 33,
-   "quote": "3 Questions | 1 Hour (includes a 10-minute reading period) | 33% of Exam Score"
+   "quote": "3 Questions | 1 Hour (includes a 10-minute reading period) | 33% of Exam Score",
+   "parts": [
+    {
+     "name": "Long free-response question",
+     "questionCount": "1",
+     "weightPrinted": "50% of section score",
+     "quote": "1 long free-response question (50% of section score)."
+    },
+    {
+     "name": "Short free-response questions",
+     "questionCount": "2",
+     "weightPrinted": "each worth 25% of section score",
+     "quote": "2 short free-response questions (each worth 25% of section score)."
+    }
+   ]
   }
  ],
  "datasetDiscrepancies": [

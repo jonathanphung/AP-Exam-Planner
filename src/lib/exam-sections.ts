@@ -1,4 +1,4 @@
-import type { ExamSection } from "@/data/schema";
+import type { ExamSection, ExamSectionPart } from "@/data/schema";
 
 /**
  * Presentation rules for the exam-details section breakdown (issue #44,
@@ -39,4 +39,41 @@ export function sectionsHavePartRows(
  */
 export function questionCountLabel(count: number | string): string {
   return count === 1 ? "1 question" : `${count} questions`;
+}
+
+/**
+ * What a part row's weight cell should say (issue #73).
+ *
+ * College Board prints per-part weights against three different denominators
+ * and this app never converts between them (see `sectionPartSchema`). Both
+ * surfaces that render parts — the info-panel table and the .ics DESCRIPTION —
+ * resolve the cell through this one function so they can never disagree about
+ * which denominator won:
+ *
+ *   - `percent`     the printed denominator is the EXAM score; `value` is the
+ *                   published number, ready to be suffixed with `%`.
+ *   - `printed`     the printed denominator is anything else ("50% of section
+ *                   score", "50% of 20%"); `text` is verbatim and must be
+ *                   rendered as-is — never parsed, never multiplied out.
+ *   - `pending`     College Board publishes a weight this capture does not
+ *                   have; the caller shows its pending affordance.
+ *   - `unpublished` College Board publishes no per-part weight at all (AP Art
+ *                   History's six free-response questions); the caller shows
+ *                   its not-published affordance. NOT the same as `pending`.
+ */
+export type PartWeight =
+  | { kind: "percent"; value: number }
+  | { kind: "printed"; text: string }
+  | { kind: "pending" }
+  | { kind: "unpublished" };
+
+export function partWeight(part: ExamSectionPart): PartWeight {
+  if (part.weightPercent === "pending") return { kind: "pending" };
+  if (typeof part.weightPercent === "number") {
+    return { kind: "percent", value: part.weightPercent };
+  }
+  if (part.weightPrinted !== undefined) {
+    return { kind: "printed", text: part.weightPrinted };
+  }
+  return { kind: "unpublished" };
 }

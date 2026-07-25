@@ -1,10 +1,15 @@
 "use client";
 
 import { Fragment, type ReactNode, useId, useRef } from "react";
-import type { ApSubject, ExamSection } from "@/data/schema";
+import type {
+  ApSubject,
+  ExamSection,
+  ExamSectionPart,
+} from "@/data/schema";
 import { CYCLE } from "@/data/cycle";
 import { useModalDialog } from "@/lib/modal";
 import {
+  partWeight,
   questionCountLabel,
   sectionsHavePartRows,
 } from "@/lib/exam-sections";
@@ -127,6 +132,37 @@ function NotPublishedDash() {
   );
 }
 
+/**
+ * A part row's share of the score (issue #73).
+ *
+ * Before #73 this cell was an unconditional dash for every part of every
+ * exam — not because College Board publishes nothing, but because the schema
+ * had nowhere to put it. It now renders what the page actually prints, and
+ * the printed denominator decides the shape:
+ *
+ *   - exam-denominated → `35%` (matches the section row's `50%`);
+ *   - any other denominator → the printed string verbatim, wrapped so a long
+ *     phrase like "each worth 25% of section score" can break — never
+ *     converted into an exam-denominated number, which would tell a student
+ *     one AP Macroeconomics question is half their grade;
+ *   - unpublished → the dash, which now means what it says.
+ */
+function PartWeightValue({ part }: { part: ExamSectionPart }) {
+  const weight = partWeight(part);
+  switch (weight.kind) {
+    case "percent":
+      return <>{weight.value}%</>;
+    case "printed":
+      return (
+        <span className="inline-block text-xs leading-snug">{weight.text}</span>
+      );
+    case "pending":
+      return <PendingBadge />;
+    case "unpublished":
+      return <NotPublishedDash />;
+  }
+}
+
 const sectionsTableHeaderCell =
   "py-2 text-left text-xs font-medium text-slate-500 dark:text-slate-400";
 const sectionsTableNumCell = "py-2.5 pl-2 text-right align-baseline";
@@ -221,10 +257,14 @@ function SectionsTable({ sections }: { sections: readonly ExamSection[] }) {
                   )}
                 </td>
                 <td className={`${sectionsTableNumCell} text-sm whitespace-nowrap text-slate-600 dark:text-slate-300`}>
-                  <MinutesValue value={part.minutes} />
+                  {part.minutes === undefined ? (
+                    <NotPublishedDash />
+                  ) : (
+                    <MinutesValue value={part.minutes} />
+                  )}
                 </td>
                 <td className={`${sectionsTableNumCell} text-sm text-slate-600 dark:text-slate-300`}>
-                  <NotPublishedDash />
+                  <PartWeightValue part={part} />
                 </td>
               </tr>
             ))}

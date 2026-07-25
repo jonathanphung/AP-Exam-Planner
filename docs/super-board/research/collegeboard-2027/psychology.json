@@ -14,28 +14,28 @@
  "changedFor2027": null,
  "sections": [
   {
-   "name": "Multiple Choice",
+   "name": "Section I: Multiple Choice",
    "questionCount": "75",
    "minutes": 90,
    "weightPercent": 66.7,
    "quote": "75 Questions | 90 Minutes | 66.7% of Exam Score"
   },
   {
-   "name": "Free Response",
+   "name": "Section II: Free Response",
    "questionCount": "2",
    "minutes": 70,
    "weightPercent": 33.3,
    "quote": "2 Questions | 70 Minutes | 33.3% of Exam Score",
    "parts": [
     {
-     "name": "Part A - Article Analysis Question (AAQ)",
+     "name": "Free-Response Question 1: Article Analysis Question (AAQ)",
      "questionCount": "1",
      "minutes": "pending",
      "toolNote": "n/a",
      "quote": "Article Analysis Question (AAQ)"
     },
     {
-     "name": "Part B - Evidence-Based Question (EBQ)",
+     "name": "Free-Response Question 2: Evidence-Based Question (EBQ)",
      "questionCount": "1",
      "minutes": "pending",
      "toolNote": "n/a",

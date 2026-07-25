@@ -12,18 +12,77 @@
  "changedFor2027": null,
  "sections": [
   {
-   "name": "End-of-Course Exam – Short-Answer Section",
-   "questionCount": "3",
-   "minutes": 30,
-   "weightPercent": 13.5,
-   "quote": "Short-Answer Section: 3 short-answer questions analyzing arguments, suggested 30 minutes, College Board scored (30% of 45%). End-of-Course Exam (45% of Score, 2 Hours Total)."
+   "name": "Performance Task 1: Team Project and Presentation",
+   "questionCount": "n/a",
+   "minutes": "pending",
+   "weightPercent": 20,
+   "quote": "Performance Task 1: Team Project and Presentation—20% of AP Seminar Score",
+   "parts": [
+    {
+     "name": "Individual research report (1,200 words)",
+     "weightPrinted": "50% of 20%",
+     "toolNote": "College Board scored",
+     "quote": "Individual research report (1,200 words) | College Board scored | 50% of 20%"
+    },
+    {
+     "name": "Team multimedia presentation and defense (8–10 minutes, plus defense questions)",
+     "weightPrinted": "50% of 20%",
+     "toolNote": "Teacher scored (group score)",
+     "quote": "Team multimedia presentation and defense (8–10 minutes, plus defense questions) | Teacher scored (group score) | 50% of 20%"
+    }
+   ]
   },
   {
-   "name": "End-of-Course Exam – Essay Section",
-   "questionCount": "1",
-   "minutes": 90,
-   "weightPercent": 31.5,
-   "quote": "Essay Section: 1 long essay presenting evidence-based argument, suggested 90 minutes, College Board scored (70% of 45%). End-of-Course Exam (45% of Score, 2 Hours Total)."
+   "name": "Performance Task 2: Individual Research-Based Essay and Presentation",
+   "questionCount": "n/a",
+   "minutes": "pending",
+   "weightPercent": 35,
+   "quote": "Performance Task 2: Individual Research-Based Essay and Presentation—35% of AP Seminar Score",
+   "parts": [
+    {
+     "name": "Individual written argument (2,000 words)",
+     "weightPrinted": "70% of 35%",
+     "toolNote": "College Board scored",
+     "quote": "Individual written argument (2,000 words) | College Board scored | 70% of 35%"
+    },
+    {
+     "name": "Individual multimedia presentation (6–8 minutes)",
+     "weightPrinted": "20% of 35%",
+     "toolNote": "Teacher scored",
+     "quote": "Individual multimedia presentation (6–8 minutes) | Teacher scored | 20% of 35%"
+    },
+    {
+     "name": "Oral defense (2 questions from the teacher)",
+     "weightPrinted": "10% of 35%",
+     "toolNote": "Teacher scored",
+     "quote": "Oral defense (2 questions from the teacher) | Teacher scored | 10% of 35%"
+    }
+   ]
+  },
+  {
+   "name": "End-of-Course Exam",
+   "questionCount": "4",
+   "minutes": 120,
+   "weightPercent": 45,
+   "quote": "End-of-Course Exam (2 Hours)—45% of AP Seminar Score — 4 questions | 45% of Score",
+   "parts": [
+    {
+     "name": "Understanding and analyzing an argument (3 short-answer questions)",
+     "questionCount": "3",
+     "minutes": 30,
+     "weightPrinted": "30% of 45%",
+     "toolNote": "suggested time; College Board scored",
+     "quote": "Understanding and analyzing an argument (3 short-answer questions); suggested time: 30 minutes | College Board scored | 30% of 45%"
+    },
+    {
+     "name": "Evidence-Based argument essay (1 long essay)",
+     "questionCount": "1",
+     "minutes": 90,
+     "weightPrinted": "70% of 45%",
+     "toolNote": "suggested time; College Board scored",
+     "quote": "Evidence-Based argument essay (1 long essay); suggested time: 90 minutes | College Board scored | 70% of 45%"
+    }
+   ]
   }
  ],
  "datasetDiscrepancies": [

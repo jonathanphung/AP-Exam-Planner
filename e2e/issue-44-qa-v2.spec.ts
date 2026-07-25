@@ -107,7 +107,8 @@ test.describe("issue #44 QA v2 — partless layout (PR #48 bounce), independent 
 
     // Bounce pass 2: line 1 = name (dt), line 2 = stats, line 3 = note.
     const fr = summaryRow(page, "Free Response");
-    await expect(fr.locator("dt")).toHaveText("Free Response");
+    // Issue #73: the printed title carries College Board's "Section II:" prefix.
+    await expect(fr.locator("dt")).toHaveText("Section II: Free Response");
     await expect(fr.locator("dd")).toContainText(
       "6 questions · 1 h 30 min · 50% of score",
     );
@@ -122,32 +123,40 @@ test.describe("issue #44 QA v2 — partless layout (PR #48 bounce), independent 
     expect(noteBox.y).toBeGreaterThanOrEqual(phraseBox.y + phraseBox.height - 1);
   });
 
-  test("singular '1 question' inside the 5-section partless exam (AAS Section IB), and all five blocks are two-line: name above left-aligned stats, no stat phrase ever wrapping — even for AAS's longest section name", async ({
+  // Issue #73 note: AP African American Studies was this suite's multi-section
+  // PARTLESS stress case. #73 collapsed its two invented sibling "Section II:"
+  // rows into the single "Section II: Free Response" College Board prints, with
+  // the SAQ and DBQ as parts — so AAS now renders the 4-column table, not the
+  // spacious blocks. The partless-layout contracts below are unchanged; they now
+  // exercise AP Music Theory, the remaining 3-section exam with no parts
+  // (including the dataset's longest partless section name, "Section IIB: Free
+  // Response: Sight Singing").
+
+  test("singular '1 question' inside a multi-section partless exam (Music Theory), and all three blocks are two-line: name above left-aligned stats, no stat phrase ever wrapping — even for the dataset's longest partless section name", async ({
     page,
   }) => {
     await page.goto("/");
-    await openInfo(page, "AP African American Studies");
+    await openInfo(page, "AP Music Theory");
 
     await expect(sectionsTable(page)).toHaveCount(0);
     await expect(
-      summaryRow(page, /Section IB: Individual Student Project/).locator("dd"),
-    ).toHaveText("1 question · 10 min · 1.5% of score");
+      summaryRow(page, "Section IIB: Free Response: Sight Singing").locator("dd"),
+    ).toHaveText("2 questions · 10 min · 10% of score");
     await expect(
-      summaryRow(page, "Section II: Document-Based Question").locator("dd"),
-    ).toHaveText("1 question · 45 min · 12% of score");
+      summaryRow(page, "Section IIA: Free Response: Written").locator("dd"),
+    ).toHaveText("7 questions · 1 h 10 min · 45% of score");
 
     // Bounce pass 2: every section is a two-line block — the name line (dt,
     // medium weight) sits fully above the stats line (dd), both left-aligned
     // to the same edge, and no `·`-separated stat phrase ever line-breaks.
-    // AAS is the stress test: 5 blocks, including the longest section name in
-    // the dataset ("Section IB: …—Exam Day Validation Question"), which may
-    // wrap freely on its own line without squeezing the stats.
+    // Music Theory is the stress case: 3 blocks, including the longest
+    // partless section name in the dataset ("Section IIB: Free Response:
+    // Sight Singing"), which may wrap freely on its own line without
+    // squeezing the stats.
     for (const name of [
       "Section I: Multiple Choice",
-      /Section IB: Individual Student Project/,
-      "Section II: Short-Answer Questions",
-      "Section II: Document-Based Question",
-      /^Individual Student Project/,
+      "Section IIA: Free Response: Written",
+      "Section IIB: Free Response: Sight Singing",
     ] as const) {
       const block = summaryRow(page, name).first();
       const nameBox = (await block.locator("dt").boundingBox())!;
@@ -235,10 +244,10 @@ const evidenceCases = [
     ready: (page: Page) => summaryRow(page, "Multiple Choice").locator("dd"),
   },
   {
-    file: "aas-5-sections-partless",
-    subject: "AP African American Studies",
+    file: "music-theory-3-sections-partless",
+    subject: "AP Music Theory",
     ready: (page: Page) =>
-      summaryRow(page, "Section II: Document-Based Question").locator("dd"),
+      summaryRow(page, "Section IIB: Free Response: Sight Singing").locator("dd"),
   },
   {
     file: "calculus-ab-table-unchanged",

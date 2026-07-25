@@ -38,15 +38,17 @@
      "name": "Document-Based Question (DBQ)",
      "questionCount": "1",
      "minutes": 60,
+     "weightPercent": 25,
      "toolNote": "includes 15-minute reading period",
-     "quote": "Document-Based Question (DBQ): 1 Hour (includes 15-minute reading period) | 25% of Exam Score"
+     "quote": "Document-Based Question (DBQ): Recommended time: 1 Hour (includes 15-minute reading period) | 25% of Exam Score"
     },
     {
      "name": "Long Essay",
      "questionCount": "1",
      "minutes": 40,
+     "weightPercent": 15,
      "toolNote": "student chooses from 3 options",
-     "quote": "Long Essay: 40 minutes | 15% of Exam Score"
+     "quote": "Long Essay: Recommended time: 40 minutes | 15% of Exam Score"
     }
    ]
   }

@@ -82,26 +82,82 @@ const minutesValue = z.union([
  *
  * `questionCount` is OMITTED (not "pending") when College Board prints no
  * count for the part — omission means the concept does not apply; "pending"
- * means a count exists but is not yet published. `note` carries the page's
- * calculator/tool rule or other printed descriptor, verbatim.
+ * means a count exists but is not yet published. `minutes` follows the same
+ * three-state rule (issue #73): omitted where the page prints no length for
+ * the part at all (AP Art History's six free-response questions, AP Seminar's
+ * research report), "pending" where a length exists but the capture does not
+ * print it (AP Psychology's AAQ/EBQ halves of a 70-minute section). `note`
+ * carries the page's calculator/tool rule or other printed descriptor,
+ * verbatim.
+ *
+ * PER-PART WEIGHTS (issue #73) — the printed denominator is part of the datum.
+ * College Board prints per-part weights against THREE different denominators
+ * and the app must never convert between them:
+ *
+ *   1. % of the EXAM score   "Part A: … (35% of score)"          calculus-bc
+ *   2. % of the SECTION      "1 long free-response question       macroeconomics
+ *                             (50% of section score)."
+ *   3. % of another %        "50% of 20%"                         seminar
+ *
+ * AP Macroeconomics' long free-response question is 50% *of Section II*, and
+ * Section II is 33% of the exam. Writing `50` into an exam-denominated field
+ * would tell a student one question is half their grade. Multiplying to
+ * "16.5% of exam score" is the back-computation this file forbids below.
+ * Therefore:
+ *
+ *   - `weightPercent` — a number ONLY when the printed denominator is the exam
+ *     score (form 1). Rendered as `N%`.
+ *   - `weightPrinted` — the printed weight VERBATIM for every other form
+ *     ("50% of section score", "each worth 25% of section score",
+ *     "50% of 20%"). Rendered as-is, never parsed into arithmetic.
+ *   - Both omitted — College Board publishes no weight for this part; the
+ *     surfaces render the not-published dash. This is the honest state for
+ *     21 of the 38 sit-down subjects (AP Art History prints no per-question
+ *     weight anywhere, and its Section II 50% is NEVER divided by six).
+ *
+ * The two fields are mutually exclusive: a part carries at most one, so no
+ * caller ever has to decide which denominator won.
  */
-export const sectionPartSchema = z.strictObject({
-  name: z.string().min(1),
-  questionCount: questionCount.optional(),
-  minutes: minutesValue,
-  note: z.string().min(1).optional(),
-});
+export const sectionPartSchema = z
+  .strictObject({
+    name: z.string().min(1),
+    questionCount: questionCount.optional(),
+    minutes: minutesValue.optional(),
+    weightPercent: z.union([z.number().min(0).max(100), pending]).optional(),
+    weightPrinted: z.string().min(1).optional(),
+    note: z.string().min(1).optional(),
+  })
+  .superRefine((part, ctx) => {
+    if (part.weightPercent !== undefined && part.weightPrinted !== undefined) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["weightPrinted"],
+        message:
+          "a part carries at most one weight field: weightPercent (exam-denominated) OR weightPrinted (verbatim, any other denominator)",
+      });
+    }
+  });
 
 /**
  * One published exam section (issue #44): the single source of truth for the
  * per-section questions | length | weight breakdown. Section names are the
  * ones College Board actually titles ("Section IIB: Free Response: Sight
- * Singing"), never forced into an MCQ/FRQ mold. `parts` is present only when
- * the page publishes a Part A/Part B-style split. Values are populated from
+ * Singing"), never forced into an MCQ/FRQ mold — and they carry College
+ * Board's printed `Section <roman>:` prefix verbatim (issue #73, decision D2:
+ * AP Central's Roman numbering wins over the AP Students block's Arabic
+ * "Section 1:", because AP Central is this repo's structure source; see
+ * sources.md). `parts` is present only when the page publishes a Part A/Part
+ * B-style split or a printed per-question breakdown. Values are populated from
  * the adversarially verified provenance for the SHIPPED cycle —
  * docs/super-board/research/collegeboard-2027/ — never estimated, never
- * back-computed, never summed into aggregates the page does not print. (The
- * sibling collegeboard-2026/ folder is the superseded prior cycle, kept only
+ * back-computed, never summed into aggregates the page does not print, and
+ * (issue #73) never converted from one printed weight denominator to another —
+ * see {@link sectionPartSchema}. Where the dataset would otherwise have had to
+ * sum two published questions into one merged row, the questions are kept as
+ * the separate rows College Board prints instead (AP Japanese Questions 3 and
+ * 4 are 7.5% each; the joint "30 minutes to complete both writing tasks" lives
+ * in each row's note, and neither the weights nor the minutes are combined).
+ * (The sibling collegeboard-2026/ folder is the superseded prior cycle, kept only
  * as the audit trail for how May 2026 values were sourced; seven subjects'
  * sections changed in the 2027 swap, so a 2027 value must be verified against
  * the 2027 folder.)

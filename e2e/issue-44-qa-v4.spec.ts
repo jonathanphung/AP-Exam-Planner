@@ -204,22 +204,31 @@ test.describe("issue #44 v4 — '9px matched' spacing follow-up", () => {
     await assertNinePxMatched(page, 2);
   });
 
-  test("AC2 — AP African American Studies (5 partless blocks, incl. pending badge + note rows): the SAME 9px/11px contract holds on every block of a 5-section exam (desktop, light)", async ({
+  // Issue #73 note: AP African American Studies was this suite's multi-section
+  // PARTLESS stress case. #73 collapsed its two invented sibling "Section II:"
+  // rows into the single "Section II: Free Response" College Board prints, with
+  // the SAQ and DBQ as parts — so AAS now renders the 4-column table, not the
+  // spacious blocks. The partless-layout contracts below are unchanged; they now
+  // exercise AP Music Theory, the remaining 3-section exam with no parts
+  // (including the dataset's longest partless section name, "Section IIB: Free
+  // Response: Sight Singing").
+
+  test("AC2 — AP Music Theory (3 partless blocks): the SAME 9px/11px contract holds on every block of a multi-section exam (desktop, light)", async ({
     page,
   }) => {
     await page.goto("/");
-    await openInfo(page, "AP African American Studies");
-    await assertNinePxMatched(page, 5);
+    await openInfo(page, "AP Music Theory");
+    await assertNinePxMatched(page, 3);
   });
 
-  test("AC1 — dark theme: the 9px/11px contract holds, inter-block hairlines share the metadata rows' hairline token, and the zone divider stays a distinct stronger token (AAS, desktop, dark)", async ({
+  test("AC1 — dark theme: the 9px/11px contract holds, inter-block hairlines share the metadata rows' hairline token, and the zone divider stays a distinct stronger token (Music Theory, desktop, dark)", async ({
     page,
   }) => {
     await seedDarkTheme(page);
     await page.goto("/");
     await expect(page.locator("html")).toHaveClass(/dark/);
-    await openInfo(page, "AP African American Studies");
-    const { blocks, meta } = await assertNinePxMatched(page, 5);
+    await openInfo(page, "AP Music Theory");
+    const { blocks, meta } = await assertNinePxMatched(page, 3);
 
     // "Separated by hairlines" means ONE rhythm across both zones: the
     // inter-block hairline color must equal the metadata rows' hairline
@@ -297,11 +306,11 @@ const evidenceCases = [
     ready: (page: Page) => summaryRow(page, "Multiple Choice").locator("dd"),
   },
   {
-    file: "aas-5-sections-partless",
-    subject: "AP African American Studies",
+    file: "music-theory-3-sections-partless",
+    subject: "AP Music Theory",
     devices: ["desktop", "mobile"],
     ready: (page: Page) =>
-      summaryRow(page, "Section II: Document-Based Question").locator("dd"),
+      summaryRow(page, "Section IIB: Free Response: Sight Singing").locator("dd"),
   },
   {
     file: "calculus-ab-table-unchanged",

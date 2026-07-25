@@ -19,18 +19,35 @@
    "quote": "Section I: Multiple Choice — 60 Questions | 1hr 10mins | 60% of Score. Questions usually appear in sets of 3 or 4 with stimulus materials; 20-25% cover personal finance topics."
   },
   {
-   "name": "Section II, Part A: Free-Response Question 1 (Business Canvas Project Exam-Day Validation)",
+   "name": "Section II, Part A: Free-Response Question 1: Business Canvas Project Exam-Day Validation",
    "questionCount": "1",
    "minutes": 25,
    "weightPercent": 15,
    "quote": "Section II, Part A: Free-Response Question 1 — Business Canvas Project Exam-Day Validation — 1 Question | 25mins | 15% of Score."
   },
   {
-   "name": "Section II, Part B: Free-Response Questions 2-4",
+   "name": "Section II, Part B: Free-Response Questions 2–4",
    "questionCount": "3",
    "minutes": 65,
    "weightPercent": 25,
-   "quote": "Section II, Part B: Free-Response Questions 2-4 — 3 Questions | 1hr 05mins | 25% of Score."
+   "quote": "Section II, Part B: Free-Response Questions 2-4 — 3 Questions | 1hr 05mins | 25% of Score.",
+   "parts": [
+    {
+     "name": "Free-Response Question 2: Personal Finance",
+     "questionCount": "1",
+     "quote": "Free-Response Question 2: Personal Finance"
+    },
+    {
+     "name": "Free-Response Question 3: Business Concept Application",
+     "questionCount": "1",
+     "quote": "Free-Response Question 3: Business Concept Application"
+    },
+    {
+     "name": "Free-Response Question 4: Business Decision",
+     "questionCount": "1",
+     "quote": "Free-Response Question 4: Business Decision"
+    }
+   ]
   }
  ],
  "datasetDiscrepancies": [

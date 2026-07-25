@@ -12,14 +12,14 @@
  "changedFor2027": null,
  "sections": [
   {
-   "name": "Multiple Choice",
+   "name": "Section I: End-of-Course Multiple-Choice Exam",
    "questionCount": "70",
    "minutes": 120,
    "weightPercent": 70,
    "quote": "Multiple Choice Section (Section I): 70 multiple-choice questions | 120 minutes | 70% of score"
   },
   {
-   "name": "Written Response",
+   "name": "Section II: Create Performance Task and Written Response",
    "questionCount": "2",
    "minutes": 60,
    "weightPercent": 30,

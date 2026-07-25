@@ -117,7 +117,12 @@ async function expectNoMidPhraseWrap(page: Page, label: string) {
 }
 
 test.describe("issue #44 QA v3 — bounce pass 2 (two-line left-aligned blocks), independent checks", () => {
-  test("detector self-test, then no stat phrase ever wraps mid-phrase at 1920 / 375 / 320 for Biology AND AAS, with no horizontal page scroll", async ({
+  // Issue #73 note: AAS gained published part rows (SAQ 18% / DBQ 12% under
+  // the single printed "Section II: Free Response"), so it renders the
+  // 4-column table now and has no stat phrases to wrap. AP Music Theory is
+  // the remaining multi-section partless exam and carries the dataset's
+  // longest partless section name, so it inherits the stress case.
+  test("detector self-test, then no stat phrase ever wraps mid-phrase at 1920 / 375 / 320 for Biology AND Music Theory, with no horizontal page scroll", async ({
     page,
   }) => {
     await page.goto("/");
@@ -148,7 +153,7 @@ test.describe("issue #44 QA v3 — bounce pass 2 (two-line left-aligned blocks),
 
     for (const width of [1920, 375, 320] as const) {
       await page.setViewportSize({ width, height: width >= 1024 ? 1080 : 667 });
-      for (const subject of ["AP Biology", "AP African American Studies"] as const) {
+      for (const subject of ["AP Biology", "AP Music Theory"] as const) {
         await page.goto("/");
         await openInfo(page, subject);
         await expectNoMidPhraseWrap(page, `${subject} @ ${width}px`);
@@ -170,10 +175,12 @@ test.describe("issue #44 QA v3 — bounce pass 2 (two-line left-aligned blocks),
     await page.goto("/");
     await openInfo(page, "AP African American Studies");
 
-    const name = summaryRow(
-      page,
-      /Section IB: Individual Student Project/,
-    ).locator("dt");
+    // Issue #73: AAS renders the table now (its Section II has published SAQ /
+    // DBQ part rows), so the longest name is a table row header rather than a
+    // block's dt. The wrapping contract is identical.
+    const name = sectionsTable(page)
+      .locator("tbody th[scope='row']")
+      .filter({ hasText: /Section IB: Individual Student Project/ });
     // Full College Board title, verbatim — not shortened, not elided.
     await expect(name).toHaveText(
       "Section IB: Individual Student Project—Exam Day Validation Question",
@@ -186,30 +193,38 @@ test.describe("issue #44 QA v3 — bounce pass 2 (two-line left-aligned blocks),
     expect(clip.vertical, "dt clips vertically").toBeLessThanOrEqual(1);
   });
 
-  test("pending badge renders INLINE in its stat slot (AAS Individual Student Project), and its omitted question count stays omitted — 2 phrases, no 'questions' text", async ({
+  test("pending badge and omitted question count stay DISTINCT states in AAS's table (issue #73: AAS renders the table now)", async ({
     page,
   }) => {
     await page.goto("/");
     await openInfo(page, "AP African American Studies");
 
-    const stats = summaryRow(page, /^Individual Student Project/)
-      .first()
-      .locator("dd");
-    const phrases = stats.getByTestId("stat-phrase");
-    // minutes (pending) + weight — question count is OMITTED by College
-    // Board (a project, not a question set): omission ≠ pending.
-    await expect(phrases).toHaveCount(2);
-    await expect(stats).not.toContainText("question");
-    await expect(stats).toContainText("8.5% of score");
-    // The badge lives INSIDE the first stat phrase, on the same line as the
-    // weight phrase that follows it — inline in its slot, not a block.
-    const badge = phrases.first().getByText("pending", { exact: true });
-    await expect(badge).toBeVisible();
-    const badgeBox = (await badge.boundingBox())!;
-    const weightBox = (await phrases.nth(1).boundingBox())!;
-    const badgeMidY = badgeBox.y + badgeBox.height / 2;
-    expect(badgeMidY).toBeGreaterThanOrEqual(weightBox.y);
-    expect(badgeMidY).toBeLessThanOrEqual(weightBox.y + weightBox.height);
+    // Issue #73: AAS's printed "Section II: Free Response" carries published
+    // SAQ / DBQ part rows, so the whole subject renders the 4-column table.
+    // The two honest-degradation states this test exists for are unchanged,
+    // they are just cells now instead of stat phrases.
+    const isp = sectionsTable(page)
+      .getByRole("row")
+      .filter({
+        has: page.getByRole("rowheader", {
+          name: /^Individual Student Project$/,
+        }),
+      });
+    await expect(isp).toHaveCount(1);
+    const cells = isp.getByRole("cell");
+    await expect(cells).toHaveCount(3);
+    // Questions: College Board prints NO count (a project, not a question
+    // set) → the not-published dash, never a pending badge.
+    await expect(cells.nth(0)).toContainText("—");
+    await expect(cells.nth(0).getByText("pending", { exact: true })).toHaveCount(
+      0,
+    );
+    // Length: a duration exists but is unpublished → the pending badge.
+    await expect(
+      cells.nth(1).getByText("pending", { exact: true }),
+    ).toBeVisible();
+    // Weight: the published 8.5% renders as a number.
+    await expect(cells.nth(2)).toHaveText("8.5%");
   });
 
   test("zone divider: present above the metadata group in the partless case (Biology), ABSENT in the table case (Calc AB) — the divider must not leak into the byte-untouched table layout", async ({
@@ -350,11 +365,11 @@ const evidenceCases = [
     ready: (page: Page) => summaryRow(page, "Multiple Choice").locator("dd"),
   },
   {
-    file: "aas-5-sections-partless",
-    subject: "AP African American Studies",
+    file: "music-theory-3-sections-partless",
+    subject: "AP Music Theory",
     devices: ["desktop", "mobile"],
     ready: (page: Page) =>
-      summaryRow(page, "Section II: Document-Based Question").locator("dd"),
+      summaryRow(page, "Section IIB: Free Response: Sight Singing").locator("dd"),
   },
   {
     file: "calculus-ab-table-unchanged",

@@ -12,18 +12,32 @@
  "changedFor2027": null,
  "sections": [
   {
-   "name": "Multiple Choice",
+   "name": "Section I: Multiple Choice",
    "questionCount": "60",
    "minutes": 70,
    "weightPercent": 66,
    "quote": "Section I: Multiple Choice — 60 Questions | 1 Hour 10 Minutes | 66% of Exam Score. Questions require the use of economics content knowledge and reasoning across the range of course topics and skills in skill categories 1, 2, and 3."
   },
   {
-   "name": "Free Response",
+   "name": "Section II: Free Response",
    "questionCount": "3",
    "minutes": 60,
    "weightPercent": 33,
-   "quote": "Section II: Free Response — 3 Questions | 1 Hour (includes 10-minute reading period) | 33% of Exam Score. 1 long question (50% of section score) and 2 short questions (25% each of section score)."
+   "quote": "Section II: Free Response — 3 Questions | 1 Hour (includes 10-minute reading period) | 33% of Exam Score. 1 long question (50% of section score) and 2 short questions (25% each of section score).",
+   "parts": [
+    {
+     "name": "Long free-response question",
+     "questionCount": "1",
+     "weightPrinted": "50% of section score",
+     "quote": "1 long free-response question (50% of section score)."
+    },
+    {
+     "name": "Short free-response questions",
+     "questionCount": "2",
+     "weightPrinted": "each worth 25% of section score",
+     "quote": "2 short free-response questions (each worth 25% of section score)."
+    }
+   ]
   }
  ],
  "datasetDiscrepancies": []
