@@ -1,0 +1,1234 @@
+
+Running 557 tests using 6 workers
+
+  ok   6 [chromium] › e2e\a11y.spec.ts:295:7 › AC1 — keyboard operability › tab order: search → quick-jump chip → chip toggle → its disclosure → view switcher → export; visible focus indicators throughout (1.9s)
+  ok   7 [chromium] › e2e\a11y.spec.ts:379:7 › AC1 — keyboard operability › conflict dialog: modal, focus-trapped, Escape closes (prompt stays available inline) (1.6s)
+  ok   1 [chromium] › e2e\a11y.spec.ts:168:7 › AC2 — axe-core scans report zero serious/critical violations › empty state (nothing selected) (3.7s)
+  ok   3 [chromium] › e2e\a11y.spec.ts:192:7 › AC2 — axe-core scans report zero serious/critical violations › conflict dialog open (4.4s)
+  ok   5 [chromium] › e2e\a11y.spec.ts:201:7 › AC2 — axe-core scans report zero serious/critical violations › info panel open (4.7s)
+  ok   8 [chromium] › e2e\a11y.spec.ts:433:7 › AC1 — keyboard operability › conflict dialog: choosing a keeper inside the modal resolves and closes it (1.2s)
+  ok   9 [chromium] › e2e\a11y.spec.ts:452:7 › AC1 — keyboard operability › info panel: focus-trapped and closes on Escape (regression, shared modal helper) (1.3s)
+  ok  12 [chromium] › e2e\a11y.spec.ts:676:7 › AC4 — 375×667 layout › no horizontal scroll: populated schedule, conflict dialog, info panel (2.7s)
+  ok  10 [chromium] › e2e\a11y.spec.ts:540:9 › AC3 — conflict + moved-to-late styles measure ≥ 4.5:1 › measured ratios (light mode) (3.3s)
+  ok  11 [chromium] › e2e\a11y.spec.ts:540:9 › AC3 — conflict + moved-to-late styles measure ≥ 4.5:1 › measured ratios (dark mode) (2.9s)
+  ok  13 [chromium] › e2e\a11y.spec.ts:712:7 › AC4 — 375×667 layout › primary tap targets are ≥ 44×44 px (2.7s)
+  ok   4 [chromium] › e2e\a11y.spec.ts:210:7 › AC2 — axe-core scans report zero serious/critical violations › resolved schedule (moved-to-late + late-late warning), light and dark (8.1s)
+  ok   2 [chromium] › e2e\a11y.spec.ts:174:7 › AC2 — axe-core scans report zero serious/critical violations › with selections (schedule populated), light and dark (8.2s)
+  ok  14 [chromium] › e2e\a11y.spec.ts:779:7 › AC5 — landmarks and labels › exactly one h1; search input is labelled; icon-only buttons have accessible names (1.8s)
+  ok  16 [chromium] › e2e\issue-19-calendar-view.spec.ts:327:5 › AC1 — calendar is the default; List/Calendar chips toggle by keyboard under a shared header (1.7s)
+  ok  15 [chromium] › e2e\a11y.spec.ts:805:7 › AC5 — landmarks and labels › selected and moved states are distinguishable by more than color (2.0s)
+  ok  19 [chromium] › e2e\issue-19-calendar-view.spec.ts:589:5 › AC4 — blocks are category-colored with a legend, showing subject name and start time (1.6s)
+  ok  17 [chromium] › e2e\issue-19-calendar-view.spec.ts:398:5 › AC2 — pager walks every published week one grid at a time with dated headers and an hourly axis (2.5s)
+  ok  18 [chromium] › e2e\issue-19-calendar-view.spec.ts:481:5 › AC3 — resolved conflict places the moved exam at its late-testing slot in both views (2.5s)
+  ok  20 [chromium] › e2e\issue-19-calendar-view.spec.ts:716:5 › AC6 — empty selection renders a hint instead of a blank grid (1.5s)
+  ok  22 [chromium] › e2e\issue-19-calendar-view.spec.ts:742:5 › AC7 — banner names the dataset cycle on both views (1.4s)
+  ok  21 [chromium] › e2e\issue-19-calendar-view.spec.ts:659:5 › AC5 — portfolio deadlines and undated subjects land in the off-grid list, never on the grid (1.7s)
+  ok  23 [chromium] › e2e\issue-19-calendar-view.spec.ts:771:7 › AC8 — calendar usable at desktop 1920x1080: no body h-scroll, grid scrolls internally, no errors (1.5s)
+  ok  24 [chromium] › e2e\issue-19-calendar-view.spec.ts:771:7 › AC8 — calendar usable at tablet 1024x768: no body h-scroll, grid scrolls internally, no errors (1.3s)
+  ok  25 [chromium] › e2e\issue-19-calendar-view.spec.ts:771:7 › AC8 — calendar usable at mobile 375x667: no body h-scroll, grid scrolls internally, no errors (1.2s)
+  ok  26 [chromium] › e2e\issue-19-calendar-view.spec.ts:858:5 › AC8 — switcher chips paint a focus-visible ring under keyboard focus (1.8s)
+  ok  29 [chromium] › e2e\issue-19-calendar-view.spec.ts:1008:5 › Bounce A — blocks span published exam lengths plus a distinct setup buffer, and the axis fits the longest (1.9s)
+  ok  30 [chromium] › e2e\issue-19-calendar-view.spec.ts:1080:5 › Bounce C7 — activating a block opens the shared exam-details popup; Escape closes and restores focus (1.6s)
+  ok  28 [chromium] › e2e\issue-19-calendar-view.spec.ts:941:5 › Pager a11y — keyboard-operable buttons with accessible names and an aria-live week announcement (2.1s)
+  ok  27 [chromium] › e2e\issue-19-calendar-view.spec.ts:891:5 › Bounce 5 — default page follows the live selection until the student pages manually (2.4s)
+  ok  31 [chromium] › e2e\issue-19-calendar-view.spec.ts:1117:5 › Bounce C8 — activating a conflicted block opens the conflict dialog; resolving from the calendar moves the loser (2.0s)
+  ok  35 [chromium] › e2e\issue-20-subject-emoji.spec.ts:111:7 › issue #20 — decorative subject emoji everywhere the name shows › AC3 — the emoji is aria-hidden: accessible name is the subject name WITHOUT the glyph (1.3s)
+  ok  32 [chromium] › e2e\issue-19-calendar-view.spec.ts:1184:5 › Bounce C9 — swap: keep the moved exam at the regular time and move the other exam instead (2.0s)
+  ok  37 [chromium] › e2e\issue-20-subject-emoji.spec.ts:167:7 › issue #20 — decorative subject emoji everywhere the name shows › AC2 — emoji shows in the info-panel title (and stays aria-hidden there) (1.2s)
+  ok  34 [chromium] › e2e\issue-20-subject-emoji.spec.ts:82:7 › issue #20 — decorative subject emoji everywhere the name shows › AC1 — every catalog card renders a non-blank leading emoji (complete coverage, whole roster) (2.0s)
+  ok  36 [chromium] › e2e\issue-20-subject-emoji.spec.ts:142:7 › issue #20 — decorative subject emoji everywhere the name shows › AC2 — emoji shows on schedule rows and the conflict prompt's subject list (1.8s)
+  ok  33 [chromium] › e2e\issue-19-calendar-view.spec.ts:1233:5 › Bounce C9 — switch back re-opens the conflict prompt so the collision is re-resolved (2.6s)
+  ok  39 [chromium] › e2e\issue-20-subject-emoji.spec.ts:200:9 › issue #20 — decorative subject emoji everywhere the name shows › evidence — catalog + schedule with emoji at tablet 1024x768 (1.6s)
+  ok  41 [chromium] › e2e\issue-20-subject-emoji.spec.ts:218:7 › issue #20 — decorative subject emoji everywhere the name shows › evidence — info panel title with emoji (desktop) (1.3s)
+  ok  38 [chromium] › e2e\issue-20-subject-emoji.spec.ts:200:9 › issue #20 — decorative subject emoji everywhere the name shows › evidence — catalog + schedule with emoji at desktop 1920x1080 (1.9s)
+  ok  43 [chromium] › e2e\issue-22-qa.spec.ts:114:7 › issue #22 — mobile category-grouped chips + progressive disclosure › AC2 — chip: emoji + name, unmistakable selected state, ≥44px tap targets (1.0s)
+  ok  42 [chromium] › e2e\issue-22-qa.spec.ts:80:7 › issue #22 — mobile category-grouped chips + progressive disclosure › AC1 — mobile catalog is grouped under category headings, not a flat list (3.3s)
+  ok  45 [chromium] › e2e\issue-22-qa.spec.ts:169:7 › issue #22 — mobile category-grouped chips + progressive disclosure › AC4 — search filters the sectioned view; empty categories hide; no-matches state (2.3s)
+  ok  46 [chromium] › e2e\issue-22-qa.spec.ts:205:7 › issue #22 — mobile category-grouped chips + progressive disclosure › AC5 — chip tap toggles the shared selection store; schedule reflects immediately (2.4s)
+  ok  47 [chromium] › e2e\issue-22-qa.spec.ts:228:7 › issue #22 — mobile category-grouped chips + progressive disclosure › AC6 — expand and select are separate controls; neither triggers the other (2.2s)
+  ok  40 [chromium] › e2e\issue-20-subject-emoji.spec.ts:200:9 › issue #20 — decorative subject emoji everywhere the name shows › evidence — catalog + schedule with emoji at mobile 375x667 (4.1s)
+  ok  44 [chromium] › e2e\issue-22-qa.spec.ts:148:7 › issue #22 — mobile category-grouped chips + progressive disclosure › AC3 — sticky quick-jump nav reaches a lower category without scrolling the catalog (3.2s)
+  ok  48 [chromium] › e2e\issue-22-qa.spec.ts:256:7 › issue #22 — mobile category-grouped chips + progressive disclosure › AC7 (Tier 1) — expand reveals exam date, session start time, late testing; portfolio deadline; sourced no-exam reason (1.3s)
+  ok  53 [chromium] › e2e\issue-22-qa.spec.ts:450:7 › issue #22 — mobile category-grouped chips + progressive disclosure › AC14 — desktop shares the grouped IA (issue #24); no horizontal scroll at 375/768/1024/1920 (2.0s)
+  ok  52 [chromium] › e2e\issue-22-qa.spec.ts:419:7 › issue #22 — mobile category-grouped chips + progressive disclosure › AC13 — real landmarks/headings, chips are buttons with aria-pressed, reduced-motion honored (2.5s)
+  ok  49 [chromium] › e2e\issue-22-qa.spec.ts:305:7 › issue #22 — mobile category-grouped chips + progressive disclosure › AC8 (Tier 2) — 'Full exam details' opens the shared InfoPanel with the #6 dataset content (3.1s)
+  ok  51 [chromium] › e2e\issue-22-qa.spec.ts:378:7 › issue #22 — mobile category-grouped chips + progressive disclosure › AC12 — disclosure is keyboard/SR-accessible: aria-controls wiring, dialog focus trap + restore (2.9s)
+  ok  54 [chromium] › e2e\issue-22-qa.spec.ts:491:7 › evidence — catalog with a selection (desktop 1920x1080) (2.3s)
+  ok  50 [chromium] › e2e\issue-22-qa.spec.ts:327:7 › issue #22 — mobile category-grouped chips + progressive disclosure › AC9/AC10 (Tier 3) — verified official College Board link: new tab, noopener noreferrer, arrow icon, exceptions honored (3.4s)
+  ok  58 [chromium] › e2e\issue-23-resources.spec.ts:85:5 › AC2 — every resource link is a real https collegeboard.org URL, no placeholders (1.1s)
+  ok  57 [chromium] › e2e\issue-23-resources.spec.ts:55:5 › AC1 — grouped headings with real, descriptively-labeled anchors (1.2s)
+  ok  60 [chromium] › e2e\issue-23-resources.spec.ts:144:5 › AC4 (desktop) — persistent sidebar renders beside the intact single-page planner (818ms)
+  ok  59 [chromium] › e2e\issue-23-resources.spec.ts:110:5 › AC3 — links open in a new tab with rel=noopener noreferrer and an accessible arrow icon (1.3s)
+  ok  55 [chromium] › e2e\issue-22-qa.spec.ts:491:7 › evidence — catalog with a selection (tablet 1024x768) (2.0s)
+  ok  56 [chromium] › e2e\issue-22-qa.spec.ts:491:7 › evidence — catalog with a selection (mobile 375x667) (2.0s)
+  ok  62 [chromium] › e2e\issue-23-resources.spec.ts:201:5 › AC5 — the non-affiliation footer notice is present on the home page (1.3s)
+  ok  63 [chromium] › e2e\issue-23-resources.spec.ts:214:5 › AC6 — cycle-labeled links read the cycle from the dataset metadata (1.3s)
+  ok  61 [chromium] › e2e\issue-23-resources.spec.ts:169:5 › AC4 (mobile) — resources collapse into an accessible disclosure near the top (1.8s)
+  ok  67 [chromium] › e2e\issue-23-resources.spec.ts:272:5 › Home page with the resources sidebar renders without console or page errors (823ms)
+  ok  64 [chromium] › e2e\issue-23-resources.spec.ts:233:7 › AC7 — no horizontal overflow and keyboard-focusable links (desktop 1920x1080) (1.9s)
+  ok  65 [chromium] › e2e\issue-23-resources.spec.ts:233:7 › AC7 — no horizontal overflow and keyboard-focusable links (tablet 1024x768) (1.8s)
+  ok  68 [chromium] › e2e\issue-24-qa.spec.ts:96:7 › issue #24 — desktop catalog grouped by category by default › AC1 — desktop renders labeled category sections by default, not a flat grid (940ms)
+  ok  66 [chromium] › e2e\issue-23-resources.spec.ts:233:7 › AC7 — no horizontal overflow and keyboard-focusable links (mobile 375x667) (1.9s)
+  ok  69 [chromium] › e2e\issue-24-qa.spec.ts:123:7 › issue #24 — desktop catalog grouped by category by default › AC2 — sections are multi-column on desktop (more columns than mobile), same chip components (769ms)
+  ok  73 [chromium] › e2e\issue-24-qa.spec.ts:255:7 › issue #24 — desktop catalog grouped by category by default › AC6 — category order comes from the CATEGORIES constant, identical on desktop and mobile (1.3s)
+  ok  74 [chromium] › e2e\issue-24-qa.spec.ts:287:7 › issue #24 — desktop catalog grouped by category by default › AC7 — a11y + responsive: real landmarks, buttons with aria-pressed, logical keyboard order, no h-scroll (1.6s)
+  ok  70 [chromium] › e2e\issue-24-qa.spec.ts:147:7 › issue #24 — desktop catalog grouped by category by default › AC3 — search filters within/across groups; retired filter is now the quick-jump nav (2.0s)
+  ok  71 [chromium] › e2e\issue-24-qa.spec.ts:190:7 › issue #24 — desktop catalog grouped by category by default › AC4 — chip click toggles the shared useSelection store; grouping changes no semantics (2.0s)
+  ok  75 [chromium] › e2e\issue-24-qa.spec.ts:362:7 › AC8 — expansion is vertical-only with a stable arrow at 1920×1080 (1.8s)
+  ok  72 [chromium] › e2e\issue-24-qa.spec.ts:219:7 › issue #24 — desktop catalog grouped by category by default › AC5 — desktop reuses #22's disclosure: Tier-1 timing → Tier-2 InfoPanel → Tier-3 CB link (2.1s)
+  ok  76 [chromium] › e2e\issue-24-qa.spec.ts:362:7 › AC8 — expansion is vertical-only with a stable arrow at 1024×768 (1.1s)
+  ok  82 [chromium] › e2e\issue-29-qa-v2.spec.ts:83:5 › R1 — sidebar pins at top-10 (40px) mid-scroll and tracks the viewport (1.2s)
+  ok  78 [chromium] › e2e\issue-24-qa.spec.ts:362:7 › AC8 — expansion is vertical-only with a stable arrow at 375×667 (2.0s)
+  ok  77 [chromium] › e2e\issue-24-qa.spec.ts:362:7 › AC8 — expansion is vertical-only with a stable arrow at 768×900 (2.2s)
+  ok  80 [chromium] › e2e\issue-24-qa.spec.ts:487:7 › evidence — grouped catalog, one selected + one expanded (tablet 1024x768) (1.9s)
+  ok  81 [chromium] › e2e\issue-24-qa.spec.ts:487:7 › evidence — grouped catalog, one selected + one expanded (mobile 375x667) (1.9s)
+  ok  79 [chromium] › e2e\issue-24-qa.spec.ts:487:7 › evidence — grouped catalog, one selected + one expanded (desktop 1920x1080) (2.0s)
+  ok  85 [chromium] › e2e\issue-29-qa-v2.spec.ts:220:5 › R3 — footer controls expose complete accessible names (new-tab disclosure where applicable) (2.3s)
+  ok  86 [chromium] › e2e\issue-29-qa-v2.spec.ts:238:5 › R4 — lg boundary (1024px): desktop column presentation with the footer row, no horizontal scroll (2.5s)
+  ok  83 [chromium] › e2e\issue-29-qa-v2.spec.ts:143:5 › R1 — panel taller than the viewport: sections scroll internally, footer stays pinned in view (2.9s)
+  ok  87 [chromium] › e2e\issue-29-qa-v2.spec.ts:258:5 › R4 — mobile: support row visible in the SITE FOOTER while BOTH disclosures stay closed (default state) (2.6s)
+  ok  90 [chromium] › e2e\issue-29-qa.spec.ts:332:7 › AC3 — all 8 resource labels render on one line, untruncated, at 1024px (1.6s)
+  ok  91 [chromium] › e2e\issue-29-qa.spec.ts:332:7 › AC3 — all 8 resource labels render on one line, untruncated, at 1440px (1.5s)
+  ok  92 [chromium] › e2e\issue-29-qa.spec.ts:332:7 › AC3 — all 8 resource labels render on one line, untruncated, at 1920px (1.5s)
+  ok  89 [chromium] › e2e\issue-29-qa.spec.ts:271:5 › AC2 — mobile: no persistent left column; My Schedules and Resources are disclosures and schedule switching works inside them (2.1s)
+  ok  88 [chromium] › e2e\issue-29-qa.spec.ts:182:5 › AC1 — desktop sidebar: branding → MY SCHEDULES → divider → RESOURCES; collapse toggle widens main, is announced, and is remembered (4.3s)
+  ok  84 [chromium] › e2e\issue-29-qa-v2.spec.ts:185:5 › R2 — collapsed state + outline glyph survive a reload; expanded restores the filled column (4.8s)
+  ok  94 [chromium] › e2e\issue-29-qa.spec.ts:385:5 › AC4 — no resource link label contains parentheses (1.5s)
+  ok  93 [chromium] › e2e\issue-29-qa.spec.ts:358:5 › AC3 — resource labels also fit on one line inside the 375px mobile disclosure (1.9s)
+  ok  98 [chromium] › e2e\issue-29-qa.spec.ts:517:5 › AC7 — + creates 'Schedule N'; inline rename; delete needs confirmation; the last schedule cannot be deleted (1.7s)
+  ok  95 [chromium] › e2e\issue-29-qa.spec.ts:403:7 › AC5 — hovering a resource link underlines the label but never the ↗ (desktop) (2.3s)
+  ok  96 [chromium] › e2e\issue-29-qa.spec.ts:403:7 › AC5 — hovering a resource link underlines the label but never the ↗ (mobile disclosure) (2.2s)
+  ok  97 [chromium] › e2e\issue-29-qa.spec.ts:455:5 › AC6 — switching schedules swaps chips, list, calendar, and ICS export immediately (2.4s)
+  ok  99 [chromium] › e2e\issue-29-qa.spec.ts:589:5 › AC8 — two schedules hold OPPOSITE resolutions of the same collision without leaking; legacy mirror follows the active schedule (2.1s)
+[WebServer] [browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+[WebServer] 
+[WebServer] - A server/client branch `if (typeof window !== 'undefined')`.
+[WebServer] - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+[WebServer] - Date formatting in a user's locale which doesn't match the server.
+[WebServer] - External changing data without sending a snapshot of it along with the HTML.
+[WebServer] - Invalid HTML tag nesting.
+[WebServer] 
+[WebServer] It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+[WebServer] 
+[WebServer] https://react.dev/link/hydration-mismatch
+[WebServer] 
+[WebServer]   ...
+[WebServer]     <LoadingBoundary name="/" loading={null}>
+[WebServer]       <HTTPAccessFallbackBoundary notFound={{...}} forbidden={undefined} unauthorized={undefined}>
+[WebServer]         <HTTPAccessFallbackErrorBoundary pathname="/" notFound={{...}} forbidden={undefined} unauthorized={undefined} ...>
+[WebServer]           <RedirectBoundary>
+[WebServer]             <RedirectErrorBoundary router={{...}}>
+[WebServer]               <InnerLayoutRouter url="/" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+[WebServer]                 <SegmentViewNode type="page" pagePath="page.tsx">
+[WebServer]                   <SegmentTrieNode>
+[WebServer]                   <Home>
+[WebServer]                     <div data-scroll-lock-anchor={true} className="mx-auto fl...">
+[WebServer]                       <Sidebar>
+[WebServer]                       <main className="flex min-w..." aria-label="Exam planner">
+[WebServer]                         <CatalogGrid>
+[WebServer]                           <section aria-label="Subject ca..." className="flex flex-...">
+[WebServer]                             <div className="flex flex-...">
+[WebServer]                               <div className="flex flex-...">
+[WebServer]                                 <label>
+[WebServer]                                 <input
+[WebServer]                                   id="subject-search"
+[WebServer]                                   type="search"
+[WebServer]                                   value=""
+[WebServer]                                   onChange={function onChange}
+[WebServer]                                   placeholder="e.g. bio"
+[WebServer]                                   autoComplete="off"
+[WebServer]                                   className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 tex..."
+[WebServer] -                                 style={{caret-color:"transparent"}}
+[WebServer]                                 >
+[WebServer]                               ...
+[WebServer]                             ...
+[WebServer]                         ...
+[WebServer]                 ...
+[WebServer]               ...
+[WebServer]  
+  ok 104 [chromium] › e2e\issue-29-qa.spec.ts:886:7 › AC13 — no horizontal scroll at 1920px (desktop); evidence screenshot (1.1s)
+  ok 101 [chromium] › e2e\issue-29-qa.spec.ts:719:5 › AC10 — legacy apx.selection.v1 + apx.resolutions.v1 are adopted as 'Schedule 1' with nothing lost (1.5s)
+  ok 103 [chromium] › e2e\issue-29-qa.spec.ts:811:5 › AC12 — radiogroup roving tabindex + arrow keys; rename and delete manage focus; collapse toggle is keyboard-operable (1.6s)
+  ok 100 [chromium] › e2e\issue-29-qa.spec.ts:675:5 › AC9 — schedules persist across reload in versioned localStorage with zero cookies (3.0s)
+  ok 102 [chromium] › e2e\issue-29-qa.spec.ts:779:5 › AC11 — creating and switching schedules in one tab is reflected in another tab (2.7s)
+  ok 106 [chromium] › e2e\issue-29-qa.spec.ts:886:7 › AC13 — no horizontal scroll at 375px (mobile); evidence screenshot (1.3s)
+[WebServer] [browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+[WebServer] 
+[WebServer] - A server/client branch `if (typeof window !== 'undefined')`.
+[WebServer] - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+[WebServer] - Date formatting in a user's locale which doesn't match the server.
+[WebServer] - External changing data without sending a snapshot of it along with the HTML.
+[WebServer] - Invalid HTML tag nesting.
+[WebServer] 
+[WebServer] It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+[WebServer] 
+[WebServer] https://react.dev/link/hydration-mismatch
+[WebServer] 
+[WebServer]   ...
+[WebServer]     <LoadingBoundary name="/" loading={null}>
+[WebServer]       <HTTPAccessFallbackBoundary notFound={{...}} forbidden={undefined} unauthorized={undefined}>
+[WebServer]         <HTTPAccessFallbackErrorBoundary pathname="/" notFound={{...}} forbidden={undefined} unauthorized={undefined} ...>
+[WebServer]           <RedirectBoundary>
+[WebServer]             <RedirectErrorBoundary router={{...}}>
+[WebServer]               <InnerLayoutRouter url="/" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+[WebServer]                 <SegmentViewNode type="page" pagePath="page.tsx">
+[WebServer]                   <SegmentTrieNode>
+[WebServer]                   <Home>
+[WebServer]                     <div data-scroll-lock-anchor={true} className="mx-auto fl...">
+[WebServer]                       <Sidebar>
+[WebServer]                       <main className="flex min-w..." aria-label="Exam planner">
+[WebServer]                         <CatalogGrid>
+[WebServer]                           <section aria-label="Subject ca..." className="flex flex-...">
+[WebServer]                             <div className="flex flex-...">
+[WebServer]                               <div className="flex flex-...">
+[WebServer]                                 <label>
+[WebServer]                                 <input
+[WebServer]                                   id="subject-search"
+[WebServer]                                   type="search"
+[WebServer]                                   value=""
+[WebServer]                                   onChange={function onChange}
+[WebServer]                                   placeholder="e.g. bio"
+[WebServer]                                   autoComplete="off"
+[WebServer]                                   className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 tex..."
+[WebServer] -                                 style={{caret-color:"transparent"}}
+[WebServer]                                 >
+[WebServer]                               ...
+[WebServer]                             ...
+[WebServer]                         ...
+[WebServer]                 ...
+[WebServer]               ...
+[WebServer]  
+  ok 107 [chromium] › e2e\issue-29-qa.spec.ts:886:7 › AC13 — no horizontal scroll at 1440px (laptop); evidence screenshot (1.3s)
+  ok 105 [chromium] › e2e\issue-29-qa.spec.ts:886:7 › AC13 — no horizontal scroll at 1024px (tablet); evidence screenshot (1.7s)
+  ok 108 [chromium] › e2e\issue-29-revision.spec.ts:64:5 › desktop sidebar is sticky: pinned and usable while the main content scrolls (1.2s)
+  ok 114 [chromium] › e2e\issue-29-revision.spec.ts:292:5 › #60 — desktop with a tall viewport: the support row pins to the bottom edge, far below the last RESOURCES link (1.1s)
+  ok 111 [chromium] › e2e\issue-29-revision.spec.ts:198:5 › footer hover: feedback text underlines, the GitHub icon does not (1.5s)
+  ok 112 [chromium] › e2e\issue-29-revision.spec.ts:220:5 › mobile support row: lives in the SITE FOOTER (not the sidebar card) with ≥44px touch targets (1.4s)
+  ok 109 [chromium] › e2e\issue-29-revision.spec.ts:122:5 › collapse toggle uses the panel glyph (rect + column divider), not a chevron, in both states (1.8s)
+  ok 110 [chromium] › e2e\issue-29-revision.spec.ts:146:5 › desktop footer row: Send us Feedback left, GitHub icon right, same row, correct targets (1.6s)
+  ok 113 [chromium] › e2e\issue-29-revision.spec.ts:273:5 › #60 — exactly one Send-us-Feedback button and one GitHub link are exposed to assistive tech at every viewport (2.4s)
+  ok 115 [chromium] › e2e\issue-29-revision.spec.ts:333:5 › R6: the delete-schedule dialog is portaled to <body> and its backdrop dims the sticky catalog filter bar (1.7s)
+  ok 116 [chromium] › e2e\issue-3-catalog-grid.spec.ts:48:7 › issue #3 — subject catalog › AC1 — renders every subject with name, category, and date/deadline meta (1.6s)
+  ok 117 [chromium] › e2e\issue-3-catalog-grid.spec.ts:76:7 › issue #3 — subject catalog › AC2 — labeled search filters by name, case-insensitively, live as you type (1.6s)
+  ok 118 [chromium] › e2e\issue-3-catalog-grid.spec.ts:101:7 › issue #3 — subject catalog › AC3 — category chips are a quick-jump to their section, and track search (1.7s)
+  ok 119 [chromium] › e2e\issue-3-catalog-grid.spec.ts:144:7 › issue #3 — subject catalog › AC4 — tapping a card toggles My Exams and updates the running count (1.6s)
+  ok 120 [chromium] › e2e\issue-3-catalog-grid.spec.ts:162:7 › issue #3 — subject catalog › AC5 — selection persists in localStorage apx.selection.v1 across reload (1.8s)
+  ok 122 [chromium] › e2e\issue-3-catalog-grid.spec.ts:225:7 › issue #3 — subject catalog › AC7 — responsive: category-sectioned chips at 375px with no h-scroll, grouped multi-column sections at 1920px (1.4s)
+  ok 121 [chromium] › e2e\issue-3-catalog-grid.spec.ts:191:7 › issue #3 — subject catalog › AC6 — cards are keyboard focusable in DOM order and toggle on Enter/Space (1.9s)
+  ok 125 [chromium] › e2e\issue-3-catalog-grid.spec.ts:289:7 › evidence — catalog with a selection (mobile 375x667) (1.7s)
+  ok 124 [chromium] › e2e\issue-3-catalog-grid.spec.ts:289:7 › evidence — catalog with a selection (tablet 1024x768) (1.8s)
+  ok 123 [chromium] › e2e\issue-3-catalog-grid.spec.ts:289:7 › evidence — catalog with a selection (desktop 1920x1080) (1.9s)
+  ok 126 [chromium] › e2e\issue-30-calendar-palette.spec.ts:269:5 › AC1/AC2 — unresolved conflict paints both blocks orange with a caution marker and worded label (1.4s)
+  ok 127 [chromium] › e2e\issue-30-calendar-palette.spec.ts:314:5 › AC3 — resolved conflict drops the orange: keeper returns to its pastel category, mover shows late (no marker) (1.3s)
+issue-30 contrast (dark): STEM (blue)=9.46:1  Humanities (yellow)=7.83:1  Languages (green)=8.16:1  Conflict (orange)=8.27:1  Arts (pink)=8.72:1
+  ok 130 [chromium] › e2e\issue-30-calendar-palette.spec.ts:420:7 › AC5 — block text clears WCAG AA on every fill in dark mode (1.5s)
+issue-30 contrast (light): STEM (blue)=7.71:1  Humanities (yellow)=6.60:1  Languages (green)=6.32:1  Conflict (orange)=5.56:1  Arts (pink)=5.09:1
+  ok 129 [chromium] › e2e\issue-30-calendar-palette.spec.ts:420:7 › AC5 — block text clears WCAG AA on every fill in light mode (1.6s)
+  ok 128 [chromium] › e2e\issue-30-calendar-palette.spec.ts:363:5 › AC4 — the four block-bearing categories render distinct pastel fills, none equal to the orange conflict tone (1.7s)
+  ok 131 [chromium] › e2e\issue-30-qa.spec.ts:208:7 › AC1/AC2 evidence — conflict week renders orange ⚠️ blocks with no errors (desktop 1920×1080) (1.7s)
+  ok 132 [chromium] › e2e\issue-30-qa.spec.ts:208:7 › AC1/AC2 evidence — conflict week renders orange ⚠️ blocks with no errors (tablet 1024×768) (1.4s)
+  ok 133 [chromium] › e2e\issue-30-qa.spec.ts:208:7 › AC1/AC2 evidence — conflict week renders orange ⚠️ blocks with no errors (mobile 375×667) (1.3s)
+  ok 138 [chromium] › e2e\issue-31-qa.spec.ts:261:5 › AC2 — 375px: segmented switcher endcaps + filled Export visually distinct from outline chips (1.2s)
+  ok 139 [chromium] › e2e\issue-31-qa.spec.ts:318:7 › AC3 — 375px: slim 32px pills with ≥44px effective tap targets, ≥8px switcher↔Export gap (1.2s)
+  ok 137 [chromium] › e2e\issue-31-qa.spec.ts:238:5 › AC1 — 375px: Export, List, Calendar sit on ONE row below the My Schedule header; cycle banner keeps its own line (1.7s)
+  ok 136 [chromium] › e2e\issue-30-qa.spec.ts:370:5 › AC8 — legend and off-grid markers use the pastel accent scheme (incl. Career Kickstart) (2.0s)
+  ok 134 [chromium] › e2e\issue-30-qa.spec.ts:238:5 › AC3 evidence — resolved conflict: keeper pastel, mover keeps the 'Moved to late testing' affordance (2.3s)
+  ok 140 [chromium] › e2e\issue-31-qa.spec.ts:318:7 › AC3 — 320px: slim 32px pills with ≥44px effective tap targets, ≥8px switcher↔Export gap (1.7s)
+  ok 141 [chromium] › e2e\issue-31-qa.spec.ts:351:5 › AC4 — 375px & 360px: 'Export' label (issue #51), one row, no page h-scroll (1.6s)
+  ok 143 [chromium] › e2e\issue-31-qa.spec.ts:389:5 › AC5 — switcher keeps aria-pressed semantics; hover state distinguishable (1.5s)
+  ok 142 [chromium] › e2e\issue-31-qa.spec.ts:366:5 › AC4 — 320px: 'Export' label (never stacks), one row, no page h-scroll (1.7s)
+  ok 135 [chromium] › e2e\issue-30-qa.spec.ts:291:5 › AC4/AC6 — dark mode: category fills distinct from each other and from orange; conflict + resolved screenshots (3.8s)
+  ok 144 [chromium] › e2e\issue-31-qa.spec.ts:417:5 › AC5 — keyboard focus reaches List → Calendar → Export in visual order, each with a visible focus indicator (1.5s)
+  ok 150 [chromium] › e2e\issue-37-qa.spec.ts:106:7 › issue #37 — annual dataset swap to the May 2027 cycle › AC6 — every cycle-derived label reads the new cycle: banner, footer, resources, page description (1.1s)
+  ok 145 [chromium] › e2e\issue-31-qa.spec.ts:491:7 › AC6 — 768px: one-row toolbar at slim 32px control height, no h-scroll (1.7s)
+  ok 149 [chromium] › e2e\issue-31-qa.spec.ts:512:7 › AC7 — 1920px: toolbar geometry identical between Calendar and List views (1.5s)
+  ok 146 [chromium] › e2e\issue-31-qa.spec.ts:491:7 › AC6 — 1024px: one-row toolbar at slim 32px control height, no h-scroll (1.9s)
+  ok 147 [chromium] › e2e\issue-31-qa.spec.ts:491:7 › AC6 — 1920px: one-row toolbar at slim 32px control height, no h-scroll (1.8s)
+  ok 148 [chromium] › e2e\issue-31-qa.spec.ts:512:7 › AC7 — 375px: toolbar geometry identical between Calendar and List views (1.8s)
+  ok 156 [chromium] › e2e\issue-37-qa.spec.ts:319:7 › issue #37 — annual dataset swap to the May 2027 cycle › AC8 — a saved plan carrying a subject id that no longer exists renders without crashing (1.4s)
+  ok 152 [chromium] › e2e\issue-37-qa.spec.ts:185:7 › issue #37 — annual dataset swap to the May 2027 cycle › AC3/AC6 — the calendar pager derives its weeks from the published 2027 windows (1.7s)
+  ok 153 [chromium] › e2e\issue-37-qa.spec.ts:225:7 › issue #37 — annual dataset swap to the May 2027 cycle › AC1/AC2 — the catalog renders the full published 2027 roster, and a schedule-only exam carries its published qualifier (1.7s)
+  ok 155 [chromium] › e2e\issue-37-qa.spec.ts:289:7 › issue #37 — annual dataset swap to the May 2027 cycle › AC6 — the ICS export is named for the new cycle and its dates land in the published 2027 windows (1.6s)
+  ok 154 [chromium] › e2e\issue-37-qa.spec.ts:257:7 › issue #37 — annual dataset swap to the May 2027 cycle › AC1/AC4 — an unpublished value renders as a visible pending badge, never a fabricated one (1.7s)
+  ok 151 [chromium] › e2e\issue-37-qa.spec.ts:140:7 › issue #37 — annual dataset swap to the May 2027 cycle › AC6 — no "2026" survives in any rendered surface (catalog, list, calendar, details, resources) (2.9s)
+  ok 157 [chromium] › e2e\issue-37-qa.spec.ts:381:7 › issue #37 — annual dataset swap to the May 2027 cycle › AC5 — the shipped dataset declares the cycle and fetch date the sources file documents (1.4s)
+  ok 160 [chromium] › e2e\issue-37-qa.spec.ts:402:9 › issue #37 — visual evidence › evidence — planner with a 2027 plan (mobile 375x667) (1.5s)
+[WebServer] [browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+[WebServer] 
+[WebServer] - A server/client branch `if (typeof window !== 'undefined')`.
+[WebServer] - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+[WebServer] - Date formatting in a user's locale which doesn't match the server.
+[WebServer] - External changing data without sending a snapshot of it along with the HTML.
+[WebServer] - Invalid HTML tag nesting.
+[WebServer] 
+[WebServer] It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+[WebServer] 
+[WebServer] https://react.dev/link/hydration-mismatch
+[WebServer] 
+[WebServer]   ...
+[WebServer]     <LoadingBoundary name="/" loading={null}>
+[WebServer]       <HTTPAccessFallbackBoundary notFound={{...}} forbidden={undefined} unauthorized={undefined}>
+[WebServer]         <HTTPAccessFallbackErrorBoundary pathname="/" notFound={{...}} forbidden={undefined} unauthorized={undefined} ...>
+[WebServer]           <RedirectBoundary>
+[WebServer]             <RedirectErrorBoundary router={{...}}>
+[WebServer]               <InnerLayoutRouter url="/" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+[WebServer]                 <SegmentViewNode type="page" pagePath="page.tsx">
+[WebServer]                   <SegmentTrieNode>
+[WebServer]                   <Home>
+[WebServer]                     <div data-scroll-lock-anchor={true} className="mx-auto fl...">
+[WebServer]                       <Sidebar>
+[WebServer]                       <main className="flex min-w..." aria-label="Exam planner">
+[WebServer]                         <CatalogGrid>
+[WebServer]                           <section aria-label="Subject ca..." className="flex flex-...">
+[WebServer]                             <div className="flex flex-...">
+[WebServer]                               <div className="flex flex-...">
+[WebServer]                                 <label>
+[WebServer]                                 <input
+[WebServer]                                   id="subject-search"
+[WebServer]                                   type="search"
+[WebServer]                                   value=""
+[WebServer]                                   onChange={function onChange}
+[WebServer]                                   placeholder="e.g. bio"
+[WebServer]                                   autoComplete="off"
+[WebServer]                                   className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 tex..."
+[WebServer] -                                 style={{caret-color:"transparent"}}
+[WebServer]                                 >
+[WebServer]                               ...
+[WebServer]                             ...
+[WebServer]                         ...
+[WebServer]                 ...
+[WebServer]               ...
+[WebServer]  
+[WebServer] [browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+[WebServer] 
+[WebServer] - A server/client branch `if (typeof window !== 'undefined')`.
+[WebServer] - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+[WebServer] - Date formatting in a user's locale which doesn't match the server.
+[WebServer] - External changing data without sending a snapshot of it along with the HTML.
+[WebServer] - Invalid HTML tag nesting.
+[WebServer] 
+[WebServer] It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+[WebServer] 
+[WebServer] https://react.dev/link/hydration-mismatch
+[WebServer] 
+[WebServer]   ...
+[WebServer]     <LoadingBoundary name="/" loading={null}>
+[WebServer]       <HTTPAccessFallbackBoundary notFound={{...}} forbidden={undefined} unauthorized={undefined}>
+[WebServer]         <HTTPAccessFallbackErrorBoundary pathname="/" notFound={{...}} forbidden={undefined} unauthorized={undefined} ...>
+[WebServer]           <RedirectBoundary>
+[WebServer]             <RedirectErrorBoundary router={{...}}>
+[WebServer]               <InnerLayoutRouter url="/" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+[WebServer]                 <SegmentViewNode type="page" pagePath="page.tsx">
+[WebServer]                   <SegmentTrieNode>
+[WebServer]                   <Home>
+[WebServer]                     <div data-scroll-lock-anchor={true} className="mx-auto fl...">
+[WebServer]                       <Sidebar>
+[WebServer]                       <main className="flex min-w..." aria-label="Exam planner">
+[WebServer]                         <CatalogGrid>
+[WebServer]                           <section aria-label="Subject ca..." className="flex flex-...">
+[WebServer]                             <div className="flex flex-...">
+[WebServer]                               <div className="flex flex-...">
+[WebServer]                                 <label>
+[WebServer]                                 <input
+[WebServer]                                   id="subject-search"
+[WebServer]                                   type="search"
+[WebServer]                                   value=""
+[WebServer]                                   onChange={function onChange}
+[WebServer]                                   placeholder="e.g. bio"
+[WebServer]                                   autoComplete="off"
+[WebServer]                                   className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 tex..."
+[WebServer] -                                 style={{caret-color:"transparent"}}
+[WebServer]                                 >
+[WebServer]                               ...
+[WebServer]                             ...
+[WebServer]                         ...
+[WebServer]                 ...
+[WebServer]               ...
+[WebServer]  
+  ok 159 [chromium] › e2e\issue-37-qa.spec.ts:402:9 › issue #37 — visual evidence › evidence — planner with a 2027 plan (tablet 1024x768) (1.6s)
+  ok 158 [chromium] › e2e\issue-37-qa.spec.ts:402:9 › issue #37 — visual evidence › evidence — planner with a 2027 plan (desktop 1920x1080) (1.7s)
+  ok 161 [chromium] › e2e\issue-37-qa.spec.ts:424:7 › issue #37 — visual evidence › evidence — the schedule-only exam's published qualifier (desktop) (2.2s)
+  ok 162 [chromium] › e2e\issue-37-qa.spec.ts:452:7 › issue #37 — visual evidence › evidence — calendar week pager across the published 2027 windows (desktop) (1.6s)
+  ok 163 [chromium] › e2e\issue-37-qa.spec.ts:481:7 › issue #37 — visual evidence › evidence — a stale saved subject id degrades gracefully (desktop) (1.4s)
+  ok 166 [chromium] › e2e\issue-4-schedule-view.spec.ts:144:7 › issue #4 — my schedule › AC3 — a portfolio-only subject appears only as a deadline entry, never as an exam (1.3s)
+  ok 165 [chromium] › e2e\issue-4-schedule-view.spec.ts:106:7 › issue #4 — my schedule › AC2 — a subject with a portfolio renders a distinct 'Portfolio due' entry + internal-deadline note (1.4s)
+  ok 164 [chromium] › e2e\issue-4-schedule-view.spec.ts:64:7 › issue #4 — my schedule › AC1 — entries render grouped by date ascending, AM before PM, with subject name + session (1.6s)
+  ok 167 [chromium] › e2e\issue-4-schedule-view.spec.ts:163:7 › issue #4 — my schedule › AC4 — a banner states the cycle, read from dataset metadata (not hardcoded) (1.7s)
+  ok 168 [chromium] › e2e\issue-4-schedule-view.spec.ts:184:7 › issue #4 — my schedule › AC5 — zero selections shows an empty-state hint, not an empty list (1.6s)
+  ok 169 [chromium] › e2e\issue-4-schedule-view.spec.ts:199:7 › issue #4 — my schedule › extra — every May 2027 course is dated, so the no-date note never renders (1.5s)
+  ok 170 [chromium] › e2e\issue-4-schedule-view.spec.ts:228:9 › issue #4 — my schedule › AC6 — readable at 375px with no horizontal scroll (1.7s)
+  ok 171 [chromium] › e2e\issue-4-schedule-view.spec.ts:228:9 › issue #4 — my schedule › AC6 — readable at 1024px with no horizontal scroll (1.8s)
+  ok 172 [chromium] › e2e\issue-4-schedule-view.spec.ts:228:9 › issue #4 — my schedule › AC6 — readable at 1920px with no horizontal scroll (1.6s)
+  ok 176 [chromium] › e2e\issue-41-theme-toggle.spec.ts:129:5 › AC: glyph reflects the resolved theme on first load — light OS → sun (947ms)
+  ok 177 [chromium] › e2e\issue-41-theme-toggle.spec.ts:140:5 › AC: glyph reflects the resolved theme on first load — dark OS → moon (1.1s)
+  ok 173 [chromium] › e2e\issue-4-schedule-view.spec.ts:262:7 › evidence — populated schedule (desktop 1920x1080) (2.2s)
+  ok 175 [chromium] › e2e\issue-4-schedule-view.spec.ts:262:7 › evidence — populated schedule (mobile 375x667) (2.0s)
+  ok 174 [chromium] › e2e\issue-4-schedule-view.spec.ts:262:7 › evidence — populated schedule (tablet 1024x768) (2.2s)
+  ok 178 [chromium] › e2e\issue-41-theme-toggle.spec.ts:151:5 › AC: the monitor glyph is absent in every state (deleted) (1.7s)
+  ok 180 [chromium] › e2e\issue-41-theme-toggle.spec.ts:188:5 › AC: first click out of system picks the opposite of the resolved theme — OS light (1.1s)
+  ok 179 [chromium] › e2e\issue-41-theme-toggle.spec.ts:168:5 › AC: first click out of system picks the opposite of the resolved theme — OS dark (1.4s)
+  ok 183 [chromium] › e2e\issue-41-theme-toggle.spec.ts:233:5 › AC: System mode follows a live OS change (before any click) (1.6s)
+  ok 182 [chromium] › e2e\issue-41-theme-toggle.spec.ts:217:5 › AC: an explicit choice stops following the OS (1.8s)
+  ok 181 [chromium] › e2e\issue-41-theme-toggle.spec.ts:203:5 › AC: after the first click it is a plain two-state light ↔ dark toggle (1.9s)
+  ok 186 [chromium] › e2e\issue-41-theme-toggle.spec.ts:288:5 › AC: a malformed stored value degrades to system (no crash) (1.1s)
+  ok 185 [chromium] › e2e\issue-41-theme-toggle.spec.ts:273:5 › AC: a stored 'system' still resolves correctly on load (1.3s)
+  ok 184 [chromium] › e2e\issue-41-theme-toggle.spec.ts:252:5 › AC: choice persists across reload/session under apx.theme.v1 (1.9s)
+  ok 187 [chromium] › e2e\issue-41-theme-toggle.spec.ts:304:5 › AC: no flash of the wrong theme (pre-paint apply) — Dark stored on a light OS (1.0s)
+  ok 191 [chromium] › e2e\issue-41-theme-toggle.spec.ts:372:5 › AC: lives in the branding row, immediately left of the collapse control, same size (1.3s)
+  ok 193 [chromium] › e2e\issue-41-theme-toggle.spec.ts:427:5 › AC: renders in the mobile presentation with a 44px touch target (689ms)
+  ok 189 [chromium] › e2e\issue-41-theme-toggle.spec.ts:332:5 › AC: class strategy — .dark on <html> flips existing dark: utilities (1.6s)
+  ok 188 [chromium] › e2e\issue-41-theme-toggle.spec.ts:319:5 › AC: color-scheme is set to match the active theme (native UI) (1.8s)
+  ok 192 [chromium] › e2e\issue-41-theme-toggle.spec.ts:403:5 › AC: h1 stays uncrowded / untruncated after the move (1024 and 1920) (2.5s)
+  ok 196 [chromium] › e2e\issue-41-theme-toggle.spec.ts:461:7 › AC: no horizontal page scroll at 375px (expanded) (1.1s)
+  ok 195 [chromium] › e2e\issue-41-theme-toggle.spec.ts:461:7 › AC: no horizontal page scroll at 320px (expanded) (1.2s)
+  ok 197 [chromium] › e2e\issue-41-theme-toggle.spec.ts:461:7 › AC: no horizontal page scroll at 1024px (expanded) (1.0s)
+  ok 190 [chromium] › e2e\issue-41-theme-toggle.spec.ts:348:5 › AC: SSR-safe store — no hydration mismatch warning with a stored preference (2.8s)
+  ok 194 [chromium] › e2e\issue-41-theme-toggle.spec.ts:439:5 › AC: reachable & operable when the desktop sidebar is collapsed (rail) (1.6s)
+  ok 198 [chromium] › e2e\issue-41-theme-toggle.spec.ts:461:7 › AC: no horizontal page scroll at 1920px (expanded) (1.2s)
+  ok 203 [chromium] › e2e\issue-41-theme-toggle.spec.ts:540:5 › AC: icon is decorative (aria-hidden); button carries the name (927ms)
+  ok 200 [chromium] › e2e\issue-41-theme-toggle.spec.ts:492:5 › AC: real button semantics; name conveys state + action (1.3s)
+  ok 199 [chromium] › e2e\issue-41-theme-toggle.spec.ts:475:5 › AC: no horizontal scroll with the collapsed rail (desktop) (1.5s)
+  ok 202 [chromium] › e2e\issue-41-theme-toggle.spec.ts:521:5 › AC: keyboard operable (Enter / Space activate from focus) (1.5s)
+  ok 201 [chromium] › e2e\issue-41-theme-toggle.spec.ts:506:5 › AC: new state announced on activation (polite live region) (1.7s)
+[WebServer] [browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+[WebServer] 
+[WebServer] - A server/client branch `if (typeof window !== 'undefined')`.
+[WebServer] - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+[WebServer] - Date formatting in a user's locale which doesn't match the server.
+[WebServer] - External changing data without sending a snapshot of it along with the HTML.
+[WebServer] - Invalid HTML tag nesting.
+[WebServer] 
+[WebServer] It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+[WebServer] 
+[WebServer] https://react.dev/link/hydration-mismatch
+[WebServer] 
+[WebServer]   ...
+[WebServer]     <LoadingBoundary name="/" loading={null}>
+[WebServer]       <HTTPAccessFallbackBoundary notFound={{...}} forbidden={undefined} unauthorized={undefined}>
+[WebServer]         <HTTPAccessFallbackErrorBoundary pathname="/" notFound={{...}} forbidden={undefined} unauthorized={undefined} ...>
+[WebServer]           <RedirectBoundary>
+[WebServer]             <RedirectErrorBoundary router={{...}}>
+[WebServer]               <InnerLayoutRouter url="/" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+[WebServer]                 <SegmentViewNode type="page" pagePath="page.tsx">
+[WebServer]                   <SegmentTrieNode>
+[WebServer]                   <Home>
+[WebServer]                     <div data-scroll-lock-anchor={true} className="mx-auto fl...">
+[WebServer]                       <Sidebar>
+[WebServer]                       <main className="flex min-w..." aria-label="Exam planner">
+[WebServer]                         <CatalogGrid>
+[WebServer]                           <section aria-label="Subject ca..." className="flex flex-...">
+[WebServer]                             <div className="flex flex-...">
+[WebServer]                               <div className="flex flex-...">
+[WebServer]                                 <label>
+[WebServer]                                 <input
+[WebServer]                                   id="subject-search"
+[WebServer]                                   type="search"
+[WebServer]                                   value=""
+[WebServer]                                   onChange={function onChange}
+[WebServer]                                   placeholder="e.g. bio"
+[WebServer]                                   autoComplete="off"
+[WebServer]                                   className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 tex..."
+[WebServer] -                                 style={{caret-color:"transparent"}}
+[WebServer]                                 >
+[WebServer]                               ...
+[WebServer]                             ...
+[WebServer]                         ...
+[WebServer]                 ...
+[WebServer]               ...
+[WebServer]  
+  ok 208 [chromium] › e2e\issue-42-feedback-dialog.spec.ts:135:5 › AC1 — opens from the mobile presentation too (375px) (1.2s)
+  ok 204 [chromium] › e2e\issue-41-theme-toggle.spec.ts:553:5 › AC: respects prefers-reduced-motion (no theme-transition animation) (1.7s)
+  ok 207 [chromium] › e2e\issue-42-feedback-dialog.spec.ts:112:5 › AC1 — footer 'Send us Feedback' is a real <button> that opens the dialog without navigating; the GitHub icon still links to the repo (1.4s)
+  ok 209 [chromium] › e2e\issue-42-feedback-dialog.spec.ts:143:5 › AC2 — dialog contents match the card: heading, blurb, labeled optional email, labeled textarea w/ placeholder, Cancel + Send Feedback + ✕ (1.4s)
+  ok 210 [chromium] › e2e\issue-42-feedback-dialog.spec.ts:186:5 › AC3 — invalid email blocks submission with an inline, aria-tied error; no transport is touched (1.6s)
+  ok 205 [chromium] › e2e\issue-41-theme-toggle.spec.ts:572:5 › AC: branding control cluster is axe-clean in both themes (AA contrast) (3.2s)
+  ok 213 [chromium] › e2e\issue-42-feedback-dialog.spec.ts:280:5 › AC4 — 2000-char cap is enforced (maxLength) and the live counter appears near the cap, turning emphatic at it (1.3s)
+  ok 211 [chromium] › e2e\issue-42-feedback-dialog.spec.ts:212:5 › AC3 — empty email submits fine (email is optional); any-domain email is accepted and rides along (1.7s)
+[WebServer] [browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+[WebServer] 
+[WebServer] - A server/client branch `if (typeof window !== 'undefined')`.
+[WebServer] - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+[WebServer] - Date formatting in a user's locale which doesn't match the server.
+[WebServer] - External changing data without sending a snapshot of it along with the HTML.
+[WebServer] - Invalid HTML tag nesting.
+[WebServer] 
+[WebServer] It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+[WebServer] 
+[WebServer] https://react.dev/link/hydration-mismatch
+[WebServer] 
+[WebServer]   ...
+[WebServer]     <LoadingBoundary name="/" loading={null}>
+[WebServer]       <HTTPAccessFallbackBoundary notFound={{...}} forbidden={undefined} unauthorized={undefined}>
+[WebServer]         <HTTPAccessFallbackErrorBoundary pathname="/" notFound={{...}} forbidden={undefined} unauthorized={undefined} ...>
+[WebServer]           <RedirectBoundary>
+[WebServer]             <RedirectErrorBoundary router={{...}}>
+[WebServer]               <InnerLayoutRouter url="/" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+[WebServer]                 <SegmentViewNode type="page" pagePath="page.tsx">
+[WebServer]                   <SegmentTrieNode>
+[WebServer]                   <Home>
+[WebServer]                     <div data-scroll-lock-anchor={true} className="mx-auto fl...">
+[WebServer]                       <Sidebar>
+[WebServer]                       <main className="flex min-w..." aria-label="Exam planner">
+[WebServer]                         <CatalogGrid>
+[WebServer]                           <section aria-label="Subject ca..." className="flex flex-...">
+[WebServer]                             <div className="flex flex-...">
+[WebServer]                               <div className="flex flex-...">
+[WebServer]                                 <label>
+[WebServer]                                 <input
+[WebServer]                                   id="subject-search"
+[WebServer]                                   type="search"
+[WebServer]                                   value=""
+[WebServer]                                   onChange={function onChange}
+[WebServer]                                   placeholder="e.g. bio"
+[WebServer]                                   autoComplete="off"
+[WebServer]                                   className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 tex..."
+[WebServer] -                                 style={{caret-color:"transparent"}}
+[WebServer]                                 >
+[WebServer]                               ...
+[WebServer]                             ...
+[WebServer]                         ...
+[WebServer]                 ...
+[WebServer]               ...
+[WebServer]  
+  ok 212 [chromium] › e2e\issue-42-feedback-dialog.spec.ts:243:5 › AC4 — empty and whitespace-only messages are rejected inline (role=alert, aria-describedby, focus moves to the field); no transport (1.9s)
+  ok 206 [chromium] › e2e\issue-41-theme-toggle.spec.ts:611:5 › evidence — branding-row toggle: light & dark, expanded & collapsed, desktop & mobile (4.8s)
+  ok 218 [chromium] › e2e\issue-42-feedback-dialog.spec.ts:441:5 › AC6 — it's a real form: Enter from the email field submits (1.3s)
+  ok 216 [chromium] › e2e\issue-42-feedback-dialog.spec.ts:377:5 › AC5 — failure (blocked pop-up): error surfaces, the user's text is preserved, and retry succeeds — the UI never claims success on failure (1.8s)
+  ok 214 [chromium] › e2e\issue-42-feedback-dialog.spec.ts:313:5 › AC5 — pending: submit disabled w/ busy indicator, dialog not dismissable mid-flight (Cancel, ✕, Escape, backdrop all inert) (2.0s)
+  ok 215 [chromium] › e2e\issue-42-feedback-dialog.spec.ts:348:5 › AC5 — success: thank-you view uses the adapter's own notice and never claims delivery the interim path can't guarantee (2.1s)
+  ok 217 [chromium] › e2e\issue-42-feedback-dialog.spec.ts:406:5 › AC6 — focus management: initial focus in the dialog, Tab is trapped, and Cancel / Escape / ✕ each restore focus to the trigger (2.0s)
+  ok 222 [chromium] › e2e\issue-42-feedback-dialog.spec.ts:504:7 › AC7 — dialog works at 320×568 with no horizontal page scroll (1.3s)
+  ok 219 [chromium] › e2e\issue-42-feedback-dialog.spec.ts:453:5 › AC6 — ≥44×44px touch targets on mobile (trigger, ✕, Cancel, Send) (1.7s)
+  ok 223 [chromium] › e2e\issue-42-feedback-dialog.spec.ts:504:7 › AC7 — dialog works at 375×667 with no horizontal page scroll (1.3s)
+  ok 224 [chromium] › e2e\issue-42-feedback-dialog.spec.ts:504:7 › AC7 — dialog works at 1024×768 with no horizontal page scroll (1.3s)
+  ok 220 [chromium] › e2e\issue-42-feedback-dialog.spec.ts:475:7 › AC6 — axe: the open dialog has no WCAG violations (light) (2.1s)
+  ok 221 [chromium] › e2e\issue-42-feedback-dialog.spec.ts:475:7 › AC6 — axe: the open dialog has no WCAG violations (dark) (2.1s)
+  ok 225 [chromium] › e2e\issue-42-feedback-dialog.spec.ts:504:7 › AC7 — dialog works at 1920×1080 with no horizontal page scroll (1.8s)
+  ok 229 [chromium] › e2e\issue-42-feedback-dialog.spec.ts:590:9 › AC7 — evidence: dark theme dialog at 375×667 (1.4s)
+  ok 227 [chromium] › e2e\issue-42-feedback-dialog.spec.ts:569:5 › AC7 — the dialog itself scrolls on short viewports (footer actions stay reachable) (1.9s)
+  ok 230 [chromium] › e2e\issue-44-qa-v2.spec.ts:80:7 › issue #44 QA v2 — partless layout (PR #48 bounce), independent checks › calendar event popup (third surface) renders the partless spacious layout — no table, no column header, exact value string (1.4s)
+  ok 228 [chromium] › e2e\issue-42-feedback-dialog.spec.ts:590:9 › AC7 — evidence: dark theme dialog at 1920×1080 (1.9s)
+  ok 226 [chromium] › e2e\issue-42-feedback-dialog.spec.ts:521:5 › AC7 — desktop presentation: the modal overlay covers the sticky catalog filter bar (QA v1 FAIL — issue-29 R6 regression class) (2.0s)
+  ok 233 [chromium] › e2e\issue-44-qa-v2.spec.ts:188:7 › issue #44 QA v2 — partless layout (PR #48 bounce), independent checks › table case pixel-untouched: Calculus AB keeps the 4-column table, part rows, AND the mt-2 gap above the metadata list (1.8s)
+  ok 231 [chromium] › e2e\issue-44-qa-v2.spec.ts:102:7 › issue #44 QA v2 — partless layout (PR #48 bounce), independent checks › a section note survives the layout switch: Biology's FR composition note renders as the block's third muted line, below the exact stats line (1.9s)
+  ok 236 [chromium] › e2e\issue-44-qa-v2.spec.ts:220:7 › evidence — partless Biology (mobile 375x667, light) (1.7s)
+  ok 234 [chromium] › e2e\issue-44-qa-v2.spec.ts:220:7 › evidence — partless Biology (desktop 1920x1080, light) (1.9s)
+  ok 235 [chromium] › e2e\issue-44-qa-v2.spec.ts:220:7 › evidence — partless Biology (tablet 1024x768, light) (1.8s)
+  ok 232 [chromium] › e2e\issue-44-qa-v2.spec.ts:125:7 › issue #44 QA v2 — partless layout (PR #48 bounce), independent checks › singular '1 question' inside the 5-section partless exam (AAS Section IB), and all five blocks are two-line: name above left-aligned stats, no stat phrase ever wrapping — even for AAS's longest section name (2.1s)
+  ok 237 [chromium] › e2e\issue-44-qa-v2.spec.ts:252:9 › evidence — biology-partless (desktop, light) (2.3s)
+  ok 242 [chromium] › e2e\issue-44-qa-v2.spec.ts:252:9 › evidence — calculus-ab-table-unchanged (desktop, dark) (2.1s)
+  ok 238 [chromium] › e2e\issue-44-qa-v2.spec.ts:252:9 › evidence — biology-partless (desktop, dark) (2.4s)
+  ok 241 [chromium] › e2e\issue-44-qa-v2.spec.ts:252:9 › evidence — calculus-ab-table-unchanged (desktop, light) (2.3s)
+  ok 239 [chromium] › e2e\issue-44-qa-v2.spec.ts:252:9 › evidence — aas-5-sections-partless (desktop, light) (2.4s)
+  ok 240 [chromium] › e2e\issue-44-qa-v2.spec.ts:252:9 › evidence — aas-5-sections-partless (desktop, dark) (2.4s)
+  ok 244 [chromium] › e2e\issue-44-qa-v3.spec.ts:167:7 › issue #44 QA v3 — bounce pass 2 (two-line left-aligned blocks), independent checks › the longest section name in the dataset (AAS Section IB) is wrapped, never truncated — full text rendered, nothing clipped (1.8s)
+  ok 245 [chromium] › e2e\issue-44-qa-v3.spec.ts:189:7 › issue #44 QA v3 — bounce pass 2 (two-line left-aligned blocks), independent checks › pending badge renders INLINE in its stat slot (AAS Individual Student Project), and its omitted question count stays omitted — 2 phrases, no 'questions' text (1.8s)
+  ok 246 [chromium] › e2e\issue-44-qa-v3.spec.ts:215:7 › issue #44 QA v3 — bounce pass 2 (two-line left-aligned blocks), independent checks › zone divider: present above the metadata group in the partless case (Biology), ABSENT in the table case (Calc AB) — the divider must not leak into the byte-untouched table layout (2.0s)
+  ok 247 [chromium] › e2e\issue-44-qa-v3.spec.ts:239:7 › issue #44 QA v3 — bounce pass 2 (two-line left-aligned blocks), independent checks › stats line is left-aligned by computed style and the muted-vs-name hierarchy holds — light AND dark (Biology) (3.2s)
+  ok 250 [chromium] › e2e\issue-44-qa-v3.spec.ts:301:7 › issue #44 QA v3 — bounce pass 2 (two-line left-aligned blocks), independent checks › calendar event popup (third surface) renders the two-line blocks — name line above left-aligned stats, no table (1.7s)
+  ok 251 [chromium] › e2e\issue-44-qa-v3.spec.ts:334:7 › evidence — partless Biology (desktop 1920x1080, light) (1.7s)
+  ok 248 [chromium] › e2e\issue-44-qa-v3.spec.ts:269:7 › issue #44 QA v3 — bounce pass 2 (two-line left-aligned blocks), independent checks › axe: no serious/critical violations with the partless dialog open — Biology (light) (3.7s)
+  ok 253 [chromium] › e2e\issue-44-qa-v3.spec.ts:334:7 › evidence — partless Biology (mobile 375x667, light) (1.5s)
+  ok 252 [chromium] › e2e\issue-44-qa-v3.spec.ts:334:7 › evidence — partless Biology (tablet 1024x768, light) (1.8s)
+  ok 255 [chromium] › e2e\issue-44-qa-v3.spec.ts:370:11 › evidence — biology-partless (desktop, dark) (1.6s)
+  ok 254 [chromium] › e2e\issue-44-qa-v3.spec.ts:370:11 › evidence — biology-partless (desktop, light) (1.8s)
+  ok 249 [chromium] › e2e\issue-44-qa-v3.spec.ts:284:7 › issue #44 QA v3 — bounce pass 2 (two-line left-aligned blocks), independent checks › axe: no serious/critical violations with the 5-section partless dialog open — AAS (dark) (3.9s)
+  ok 256 [chromium] › e2e\issue-44-qa-v3.spec.ts:370:11 › evidence — biology-partless (mobile, light) (1.9s)
+  ok 257 [chromium] › e2e\issue-44-qa-v3.spec.ts:370:11 › evidence — biology-partless (mobile, dark) (1.8s)
+  ok 260 [chromium] › e2e\issue-44-qa-v3.spec.ts:370:11 › evidence — aas-5-sections-partless (mobile, light) (1.4s)
+  ok 259 [chromium] › e2e\issue-44-qa-v3.spec.ts:370:11 › evidence — aas-5-sections-partless (desktop, dark) (1.7s)
+  ok 258 [chromium] › e2e\issue-44-qa-v3.spec.ts:370:11 › evidence — aas-5-sections-partless (desktop, light) (1.8s)
+  ok 243 [chromium] › e2e\issue-44-qa-v3.spec.ts:120:7 › issue #44 QA v3 — bounce pass 2 (two-line left-aligned blocks), independent checks › detector self-test, then no stat phrase ever wraps mid-phrase at 1920 / 375 / 320 for Biology AND AAS, with no horizontal page scroll (7.5s)
+  ok 261 [chromium] › e2e\issue-44-qa-v3.spec.ts:370:11 › evidence — aas-5-sections-partless (mobile, dark) (1.8s)
+  ok 264 [chromium] › e2e\issue-44-qa-v4.spec.ts:199:7 › issue #44 v4 — '9px matched' spacing follow-up › AC1/AC2 — AP Biology (2 partless blocks): 9px block rhythm with centered hairlines, 11px rendered gap to the zone divider, 10px metadata rhythm below it (desktop, light) (1.6s)
+  ok 266 [chromium] › e2e\issue-44-qa-v4.spec.ts:215:7 › issue #44 v4 — '9px matched' spacing follow-up › AC1 — dark theme: the 9px/11px contract holds, inter-block hairlines share the metadata rows' hairline token, and the zone divider stays a distinct stronger token (AAS, desktop, dark) (1.5s)
+  ok 265 [chromium] › e2e\issue-44-qa-v4.spec.ts:207:7 › issue #44 v4 — '9px matched' spacing follow-up › AC2 — AP African American Studies (5 partless blocks, incl. pending badge + note rows): the SAME 9px/11px contract holds on every block of a 5-section exam (desktop, light) (1.6s)
+  ok 263 [chromium] › e2e\issue-44-qa-v3.spec.ts:370:11 › evidence — calculus-ab-table-unchanged (desktop, dark) (2.1s)
+  ok 262 [chromium] › e2e\issue-44-qa-v3.spec.ts:370:11 › evidence — calculus-ab-table-unchanged (desktop, light) (2.2s)
+  ok 267 [chromium] › e2e\issue-44-qa-v4.spec.ts:232:7 › issue #44 v4 — '9px matched' spacing follow-up › AC1 — light theme hairline tokens: inter-block hairline = metadata hairline, zone divider distinct (Biology, desktop, light) (1.8s)
+  ok 269 [chromium] › e2e\issue-44-qa-v4.spec.ts:251:7 › issue #44 v4 — '9px matched' spacing follow-up › AC2 — table branch runtime guard: Calc AB keeps the table, and its metadata group keeps the shipped mt-2 with NO leaked zone divider or partless hairlines (1.8s)
+  ok 268 [chromium] › e2e\issue-44-qa-v4.spec.ts:242:7 › issue #44 v4 — '9px matched' spacing follow-up › AC1/AC4 — mobile 375: the rendered 9px/11px distances are viewport-independent (Biology, light) (1.8s)
+  ok 272 [chromium] › e2e\issue-44-qa-v4.spec.ts:279:7 › evidence — partless Biology, 9px matched (mobile 375x667, light) (1.6s)
+  ok 270 [chromium] › e2e\issue-44-qa-v4.spec.ts:279:7 › evidence — partless Biology, 9px matched (desktop 1920x1080, light) (1.9s)
+  ok 271 [chromium] › e2e\issue-44-qa-v4.spec.ts:279:7 › evidence — partless Biology, 9px matched (tablet 1024x768, light) (1.7s)
+  ok 275 [chromium] › e2e\issue-44-qa-v4.spec.ts:317:11 › evidence — biology-partless (mobile, light) (3.5s)
+  ok 276 [chromium] › e2e\issue-44-qa-v4.spec.ts:317:11 › evidence — biology-partless (mobile, dark) (3.5s)
+  ok 274 [chromium] › e2e\issue-44-qa-v4.spec.ts:317:11 › evidence — biology-partless (desktop, dark) (3.6s)
+  ok 277 [chromium] › e2e\issue-44-qa-v4.spec.ts:317:11 › evidence — aas-5-sections-partless (desktop, light) (3.6s)
+  ok 278 [chromium] › e2e\issue-44-qa-v4.spec.ts:317:11 › evidence — aas-5-sections-partless (desktop, dark) (3.6s)
+  ok 273 [chromium] › e2e\issue-44-qa-v4.spec.ts:317:11 › evidence — biology-partless (desktop, light) (3.9s)
+  ok 284 [chromium] › e2e\issue-44-qa.spec.ts:140:7 › issue #44 — per-section exam details › AC2 — a portfolio-only subject (AP Drawing) renders NO section table and no exam-format rows; its portfolio block carries the story (2.3s)
+  ok 283 [chromium] › e2e\issue-44-qa.spec.ts:105:7 › issue #44 — per-section exam details › AC3/AC11 — AP Seminar has NO multiple-choice row: only its two published End-of-Course sections render (as spacious partless rows), with College Board's names, and omission is never shown as 'pending' (2.4s)
+  ok 279 [chromium] › e2e\issue-44-qa-v4.spec.ts:317:11 › evidence — aas-5-sections-partless (mobile, light) (2.7s)
+  ok 280 [chromium] › e2e\issue-44-qa-v4.spec.ts:317:11 › evidence — aas-5-sections-partless (mobile, dark) (2.7s)
+  ok 281 [chromium] › e2e\issue-44-qa-v4.spec.ts:317:11 › evidence — calculus-ab-table-unchanged (desktop, light) (2.8s)
+  ok 282 [chromium] › e2e\issue-44-qa-v4.spec.ts:317:11 › evidence — calculus-ab-table-unchanged (desktop, dark) (2.8s)
+  ok 287 [chromium] › e2e\issue-44-qa.spec.ts:242:7 › issue #44 — per-section exam details › AC13 — genuinely unpublished values degrade to a visible 'pending' badge; the row keeps its name, count, and published note (1.8s)
+  ok 288 [chromium] › e2e\issue-44-qa.spec.ts:260:7 › issue #44 — per-section exam details › AC3/AC13 — omission and 'pending' are distinct states in one row (AAS Individual Student Project: no printed question count vs unpublished minutes) (1.8s)
+  ok 285 [chromium] › e2e\issue-44-qa.spec.ts:165:7 › issue #44 — per-section exam details › AC12/AC7 — Calculus AB nests its published Part A/B rows beneath each section, visually subordinate and programmatically associated with the parent (1.9s)
+  ok 286 [chromium] › e2e\issue-44-qa.spec.ts:208:7 › issue #44 — per-section exam details › AC4/AC14 — AP Chinese renders its published ranges verbatim, in the page's printed section order, and 'Exam length' stays the published total (never a section sum) (1.9s)
+  ok 289 [chromium] › e2e\issue-44-qa.spec.ts:296:7 › issue #44 — per-section exam details › PR #48 bounce pass 2 + '9px matched' follow-up — a partless exam (AP Biology) renders two-line section blocks: name line above a muted left-aligned stats line, 9px block padding with hairlines, and an 11px matched gap before the metadata divider (1.8s)
+  ok 290 [chromium] › e2e\issue-44-qa.spec.ts:409:7 › issue #44 — per-section exam details › PR #48 bounce — mobile Tier-2 (375×667 and 320px): the partless layout keeps every row visible, no horizontal scroll, and no stat phrase ever wraps mid-phrase (1.7s)
+  ok 292 [chromium] › e2e\issue-44-qa.spec.ts:473:7 › issue #44 — per-section exam details › AC15/AC16 — mobile Tier-2 details (375×667) render the table with no horizontal scroll, including at 320px (1.8s)
+  ok 296 [chromium] › e2e\issue-44-qa.spec.ts:531:7 › evidence — multi-part Calculus AB (mobile 375x667, light) (1.6s)
+  ok 291 [chromium] › e2e\issue-44-qa.spec.ts:453:7 › issue #44 — per-section exam details › AC15 — the calendar event popup shares the same sections table (1.9s)
+  ok 295 [chromium] › e2e\issue-44-qa.spec.ts:531:7 › evidence — multi-part Calculus AB (tablet 1024x768, light) (1.7s)
+  ok 294 [chromium] › e2e\issue-44-qa.spec.ts:531:7 › evidence — multi-part Calculus AB (desktop 1920x1080, light) (1.9s)
+  ok 297 [chromium] › e2e\issue-44-qa.spec.ts:563:9 › evidence — chinese-range (desktop, light) (1.9s)
+  ok 298 [chromium] › e2e\issue-44-qa.spec.ts:563:9 › evidence — chinese-range (desktop, dark) (1.9s)
+  ok 300 [chromium] › e2e\issue-44-qa.spec.ts:563:9 › evidence — portfolio-drawing (desktop, dark) (1.8s)
+  ok 299 [chromium] › e2e\issue-44-qa.spec.ts:563:9 › evidence — portfolio-drawing (desktop, light) (2.0s)
+  ok 301 [chromium] › e2e\issue-44-qa.spec.ts:563:9 › evidence — seminar-no-mc (desktop, light) (1.9s)
+  ok 293 [chromium] › e2e\issue-44-qa.spec.ts:490:7 › issue #44 — per-section exam details › AC16 — real table semantics (caption + scoped headers) and zero serious/critical axe violations with the dialog open (3.8s)
+  ok 305 [chromium] › e2e\issue-45-qa-v3.spec.ts:217:7 › issue #45 — corrected counts + durations + statistics frqType render in InfoPanel › AC5 — AP Statistics' free-response section note shows the sourced Section-II composition (no investigative task, no pending) (1.7s)
+  ok 307 [chromium] › e2e\issue-45-qa-v3.spec.ts:257:9 › issue #45 — corrected counts + durations + statistics frqType render in InfoPanel › AC5 evidence — AP French exam-details popup (desktop 1920x1080) (1.8s)
+  ok 302 [chromium] › e2e\issue-44-qa.spec.ts:563:9 › evidence — seminar-no-mc (desktop, dark) (2.1s)
+  ok 306 [chromium] › e2e\issue-45-qa-v3.spec.ts:238:9 › issue #45 — corrected counts + durations + statistics frqType render in InfoPanel › AC5 evidence — AP Statistics exam-details popup (desktop 1920x1080) (1.9s)
+  ok 303 [chromium] › e2e\issue-44-qa.spec.ts:579:5 › evidence — multi-part Calculus AB (desktop, dark) (2.3s)
+  ok 310 [chromium] › e2e\issue-45-qa-v3.spec.ts:238:9 › issue #45 — corrected counts + durations + statistics frqType render in InfoPanel › AC5 evidence — AP Statistics exam-details popup (mobile 375x667) (1.7s)
+  ok 309 [chromium] › e2e\issue-45-qa-v3.spec.ts:257:9 › issue #45 — corrected counts + durations + statistics frqType render in InfoPanel › AC5 evidence — AP French exam-details popup (tablet 1024x768) (1.8s)
+  ok 311 [chromium] › e2e\issue-45-qa-v3.spec.ts:257:9 › issue #45 — corrected counts + durations + statistics frqType render in InfoPanel › AC5 evidence — AP French exam-details popup (mobile 375x667) (1.7s)
+  ok 308 [chromium] › e2e\issue-45-qa-v3.spec.ts:238:9 › issue #45 — corrected counts + durations + statistics frqType render in InfoPanel › AC5 evidence — AP Statistics exam-details popup (tablet 1024x768) (2.0s)
+  ok 312 [chromium] › e2e\issue-45-qa-v3.spec.ts:278:7 › issue #45 — corrected counts + durations + statistics frqType render in InfoPanel › AC5 evidence — AP French calendar event popup renders the corrected 2 h 30 min (1.7s)
+  ok 304 [chromium] › e2e\issue-45-qa-v3.spec.ts:150:7 › issue #45 — corrected counts + durations + statistics frqType render in InfoPanel › AC5 — all seven subjects' catalog exam-details popup shows the corrected counts, frqType, and length; none pending (4.1s)
+  ok 318 [chromium] › e2e\issue-5-conflict-resolution.spec.ts:419:7 › issue #5 — same-slot conflicts resolve to official late-testing slots › AC7 — portfolio deadlines sharing a date never trigger the conflict flow (898ms)
+  ok 314 [chromium] › e2e\issue-5-conflict-resolution.spec.ts:270:7 › issue #5 — same-slot conflicts resolve to official late-testing slots › AC2 — choosing the keeper moves each non-keeper to ITS OWN late-testing slot, shown under the late date with a 'Moved to late testing' tag (2.9s)
+  ok 317 [chromium] › e2e\issue-5-conflict-resolution.spec.ts:404:7 › issue #5 — same-slot conflicts resolve to official late-testing slots › AC6 — both the prompt and the moved-exam tag carry the AP-coordinator planning-choice wording (2.8s)
+  ok 316 [chromium] › e2e\issue-5-conflict-resolution.spec.ts:360:7 › issue #5 — same-slot conflicts resolve to official late-testing slots › AC5 — two moved exams landing on the same late slot show a named warning; both entries render; no forced second resolution (3.1s)
+  ok 315 [chromium] › e2e\issue-5-conflict-resolution.spec.ts:298:7 › issue #5 — same-slot conflicts resolve to official late-testing slots › AC3 — resolution persists in apx.resolutions.v1 across reload; deselecting an involved subject clears it and restores the regular slot; re-creating the collision re-prompts (4.0s)
+  ok 313 [chromium] › e2e\issue-5-conflict-resolution.spec.ts:223:7 › issue #5 — same-slot conflicts resolve to official late-testing slots › AC1 — conflict prompt appears when the collision comes into existence (second selection AND persisted load), naming both subjects + the shared slot (4.1s)
+  ok 319 [chromium] › e2e\issue-5-conflict-resolution.spec.ts:447:7 › issue #5 — same-slot conflicts resolve to official late-testing slots › AC9 — the schedule renders the RESOLVED slot (never the default) and the conflict styling meets WCAG AA contrast in light and dark (3.2s)
+  ok 325 [chromium] › e2e\issue-50-qa.spec.ts:175:5 › AC1 — dark theme: icon stroke tracks the dark-mode link/button color (currentColor, no hardcoded fills) (1.5s)
+  ok 322 [chromium] › e2e\issue-5-conflict-resolution.spec.ts:532:7 › evidence — conflict prompt renders at mobile 375x667 (2.8s)
+  ok 321 [chromium] › e2e\issue-5-conflict-resolution.spec.ts:532:7 › evidence — conflict prompt renders at tablet 1024x768 (3.1s)
+  ok 320 [chromium] › e2e\issue-5-conflict-resolution.spec.ts:532:7 › evidence — conflict prompt renders at desktop 1920x1080 (3.3s)
+  ok 324 [chromium] › e2e\issue-50-qa.spec.ts:142:5 › AC1/AC5 — all 8 resource links + College Board button use the shared aria-hidden currentColor SVG; sr-only new-tab hint intact (light) (2.2s)
+  ok 327 [chromium] › e2e\issue-50-qa.spec.ts:212:5 › AC2 — no U+2197 text node renders: mobile with disclosures open (1.6s)
+  ok 330 [chromium] › e2e\issue-50-qa.spec.ts:312:5 › AC4 — hover underlines the label span only; anchor and SVG never carry the underline (1.4s)
+  ok 329 [chromium] › e2e\issue-50-qa.spec.ts:292:5 › AC3 — collapsed sidebar unchanged: resources (and their icons) fully hide in the w-10 rail, restore on expand (1.4s)
+  ok 326 [chromium] › e2e\issue-50-qa.spec.ts:196:5 › AC2 — no U+2197 text node renders: desktop with dialog open (1.8s)
+  ok 328 [chromium] › e2e\issue-50-qa.spec.ts:230:5 › AC3 — icon box is exactly 1em of each call site's font (16px sidebar, 14px CB button), 4px gap after the label, inside the link's single line box (1.7s)
+  ok 323 [chromium] › e2e\issue-5-conflict-resolution.spec.ts:548:5 › evidence — resolved state (moved tag) and late-late warning at desktop (4.3s)
+[WebServer] [browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+[WebServer] 
+[WebServer] - A server/client branch `if (typeof window !== 'undefined')`.
+[WebServer] - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+[WebServer] - Date formatting in a user's locale which doesn't match the server.
+[WebServer] - External changing data without sending a snapshot of it along with the HTML.
+[WebServer] - Invalid HTML tag nesting.
+[WebServer] 
+[WebServer] It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+[WebServer] 
+[WebServer] https://react.dev/link/hydration-mismatch
+[WebServer] 
+[WebServer]   ...
+[WebServer]     <LoadingBoundary name="/" loading={null}>
+[WebServer]       <HTTPAccessFallbackBoundary notFound={{...}} forbidden={undefined} unauthorized={undefined}>
+[WebServer]         <HTTPAccessFallbackErrorBoundary pathname="/" notFound={{...}} forbidden={undefined} unauthorized={undefined} ...>
+[WebServer]           <RedirectBoundary>
+[WebServer]             <RedirectErrorBoundary router={{...}}>
+[WebServer]               <InnerLayoutRouter url="/" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+[WebServer]                 <SegmentViewNode type="page" pagePath="page.tsx">
+[WebServer]                   <SegmentTrieNode>
+[WebServer]                   <Home>
+[WebServer]                     <div data-scroll-lock-anchor={true} className="mx-auto fl...">
+[WebServer]                       <Sidebar>
+[WebServer]                       <main className="flex min-w..." aria-label="Exam planner">
+[WebServer]                         <CatalogGrid>
+[WebServer]                           <section aria-label="Subject ca..." className="flex flex-...">
+[WebServer]                             <div className="flex flex-...">
+[WebServer]                               <div className="flex flex-...">
+[WebServer]                                 <label>
+[WebServer]                                 <input
+[WebServer]                                   id="subject-search"
+[WebServer]                                   type="search"
+[WebServer]                                   value=""
+[WebServer]                                   onChange={function onChange}
+[WebServer]                                   placeholder="e.g. bio"
+[WebServer]                                   autoComplete="off"
+[WebServer]                                   className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 tex..."
+[WebServer] -                                 style={{caret-color:"transparent"}}
+[WebServer]                                 >
+[WebServer]                               ...
+[WebServer]                             ...
+[WebServer]                         ...
+[WebServer]                 ...
+[WebServer]               ...
+[WebServer]  
+  ok 333 [chromium] › e2e\issue-50-qa.spec.ts:346:7 › AC6 — expanded sidebar is 320px and every resource label fits one line untruncated at 1920px (1.6s)
+  ok 332 [chromium] › e2e\issue-50-qa.spec.ts:346:7 › AC6 — expanded sidebar is 320px and every resource label fits one line untruncated at 1440px (1.6s)
+  ok 331 [chromium] › e2e\issue-50-qa.spec.ts:346:7 › AC6 — expanded sidebar is 320px and every resource label fits one line untruncated at 1024px (1.8s)
+  ok 334 [chromium] › e2e\issue-50-qa.spec.ts:388:5 › AC7 — each external link exposes exactly one visible affordance: one SVG arrow, zero text arrows (1.7s)
+[WebServer] [browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+[WebServer] 
+[WebServer] - A server/client branch `if (typeof window !== 'undefined')`.
+[WebServer] - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+[WebServer] - Date formatting in a user's locale which doesn't match the server.
+[WebServer] - External changing data without sending a snapshot of it along with the HTML.
+[WebServer] - Invalid HTML tag nesting.
+[WebServer] 
+[WebServer] It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+[WebServer] 
+[WebServer] https://react.dev/link/hydration-mismatch
+[WebServer] 
+[WebServer]   ...
+[WebServer]     <LoadingBoundary name="/" loading={null}>
+[WebServer]       <HTTPAccessFallbackBoundary notFound={{...}} forbidden={undefined} unauthorized={undefined}>
+[WebServer]         <HTTPAccessFallbackErrorBoundary pathname="/" notFound={{...}} forbidden={undefined} unauthorized={undefined} ...>
+[WebServer]           <RedirectBoundary>
+[WebServer]             <RedirectErrorBoundary router={{...}}>
+[WebServer]               <InnerLayoutRouter url="/" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+[WebServer]                 <SegmentViewNode type="page" pagePath="page.tsx">
+[WebServer]                   <SegmentTrieNode>
+[WebServer]                   <Home>
+[WebServer]                     <div data-scroll-lock-anchor={true} className="mx-auto fl...">
+[WebServer]                       <Sidebar>
+[WebServer]                       <main className="flex min-w..." aria-label="Exam planner">
+[WebServer]                         <CatalogGrid>
+[WebServer]                           <section aria-label="Subject ca..." className="flex flex-...">
+[WebServer]                             <div className="flex flex-...">
+[WebServer]                               <div className="flex flex-...">
+[WebServer]                                 <label>
+[WebServer]                                 <input
+[WebServer]                                   id="subject-search"
+[WebServer]                                   type="search"
+[WebServer]                                   value=""
+[WebServer]                                   onChange={function onChange}
+[WebServer]                                   placeholder="e.g. bio"
+[WebServer]                                   autoComplete="off"
+[WebServer]                                   className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 tex..."
+[WebServer] -                                 style={{caret-color:"transparent"}}
+[WebServer]                                 >
+[WebServer]                               ...
+[WebServer]                             ...
+[WebServer]                         ...
+[WebServer]                 ...
+[WebServer]               ...
+[WebServer]  
+  ok 338 [chromium] › e2e\issue-51-qa.spec.ts:89:9 › issue #51 — Export trigger button › AC1/AC2 — trigger reads exactly "Export" with menu semantics at 320px (1.6s)
+  ok 340 [chromium] › e2e\issue-51-qa.spec.ts:89:9 › issue #51 — Export trigger button › AC1/AC2 — trigger reads exactly "Export" with menu semantics at 1920px (1.6s)
+  ok 337 [chromium] › e2e\issue-51-qa.spec.ts:89:9 › issue #51 — Export trigger button › AC1/AC2 — trigger reads exactly "Export" with menu semantics at 375px (1.6s)
+  ok 339 [chromium] › e2e\issue-51-qa.spec.ts:89:9 › issue #51 — Export trigger button › AC1/AC2 — trigger reads exactly "Export" with menu semantics at 1024px (1.6s)
+  ok 335 [chromium] › e2e\issue-50-qa.spec.ts:414:7 › evidence — standard viewports, light theme (3.2s)
+  ok 336 [chromium] › e2e\issue-50-qa.spec.ts:414:7 › evidence — standard viewports, dark theme (3.9s)
+  ok 344 [chromium] › e2e\issue-51-qa.spec.ts:216:7 › issue #51 — keyboard menu semantics › AC3 — ArrowUp on the trigger opens+focuses the LAST item (1.7s)
+  ok 341 [chromium] › e2e\issue-51-qa.spec.ts:117:7 › issue #51 — Export trigger button › AC2 — trigger enables on selection and aria-expanded tracks open state (1.8s)
+  ok 345 [chromium] › e2e\issue-51-qa.spec.ts:228:7 › issue #51 — keyboard menu semantics › AC3 — click-outside closes the menu (1.7s)
+  ok 342 [chromium] › e2e\issue-51-qa.spec.ts:149:7 › issue #51 — menu items › AC4 — exactly five menuitems in order: png-list, png-calendar, ics, json, txt (1.8s)
+  ok 343 [chromium] › e2e\issue-51-qa.spec.ts:177:7 › issue #51 — keyboard menu semantics › AC3 — ArrowDown opens+focuses first, roving Down/Up/Home/End, Escape returns focus (1.8s)
+  ok 346 [chromium] › e2e\issue-51-qa.spec.ts:246:7 › issue #51 — no scroll lock (#49 defect class) › AC5 — opening the menu does not lock body scroll or shift the layout (2.3s)
+  ok 347 [chromium] › e2e\issue-51-qa.spec.ts:296:7 › issue #51 — stacking (#42 R6 defect class) › AC6 — menu portals to <body> and every item is the top-most element at its center (2.2s)
+  ok 348 [chromium] › e2e\issue-51-qa.spec.ts:345:7 › issue #51 — real downloads per format › AC13/AC9 — .json downloads the versioned envelope matching the selection (2.3s)
+  ok 349 [chromium] › e2e\issue-51-qa.spec.ts:375:7 › issue #51 — real downloads per format › AC13/AC10 — .txt downloads a CRLF, chronologically-sorted schedule (2.3s)
+  ok 350 [chromium] › e2e\issue-51-qa.spec.ts:407:9 › issue #51 — real downloads per format › AC13/AC8 — list .png downloads one designed card per non-empty testing week (2.9s)
+  ok 351 [chromium] › e2e\issue-51-qa.spec.ts:407:9 › issue #51 — real downloads per format › AC13/AC8 — calendar .png downloads one designed card per non-empty testing week (2.9s)
+  ok 352 [chromium] › e2e\issue-51-qa.spec.ts:444:7 › issue #51 — real downloads per format › AC13/AC7 — .ics downloads the unchanged calendar file (blob, valid VCALENDAR) (1.1s)
+  ok 356 [chromium] › e2e\issue-51-qa.spec.ts:470:9 › issue #51 — no horizontal scroll (issue #8 bar) › AC12 — no horizontal scroll at 1920px with the menu open (2.6s)
+  ok 353 [chromium] › e2e\issue-51-qa.spec.ts:470:9 › issue #51 — no horizontal scroll (issue #8 bar) › AC12 — no horizontal scroll at 320px with the menu open (3.4s)
+  ok 354 [chromium] › e2e\issue-51-qa.spec.ts:470:9 › issue #51 — no horizontal scroll (issue #8 bar) › AC12 — no horizontal scroll at 375px with the menu open (3.3s)
+  ok 355 [chromium] › e2e\issue-51-qa.spec.ts:470:9 › issue #51 — no horizontal scroll (issue #8 bar) › AC12 — no horizontal scroll at 1024px with the menu open (3.3s)
+  ok 358 [chromium] › e2e\issue-51-qa.spec.ts:498:7 › evidence — Export menu open (menu-desktop-dark) (2.8s)
+  ok 357 [chromium] › e2e\issue-51-qa.spec.ts:498:7 › evidence — Export menu open (menu-desktop-light) (2.8s)
+  ok 360 [chromium] › e2e\issue-51-qa.spec.ts:498:7 › evidence — Export menu open (menu-mobile-dark) (3.2s)
+  ok 362 [chromium] › e2e\issue-56-png-cards.spec.ts:79:11 › 1week · list · light — emits exactly 1 designed week card(s) (3.1s)
+  ok 359 [chromium] › e2e\issue-51-qa.spec.ts:498:7 › evidence — Export menu open (menu-mobile-light) (3.2s)
+  ok 363 [chromium] › e2e\issue-56-png-cards.spec.ts:79:11 › 1week · calendar · light — emits exactly 1 designed week card(s) (3.2s)
+  ok 364 [chromium] › e2e\issue-56-png-cards.spec.ts:79:11 › 2week · list · light — emits exactly 2 designed week card(s) (3.3s)
+  ok 366 [chromium] › e2e\issue-56-png-cards.spec.ts:79:11 › 1week · list · dark — emits exactly 1 designed week card(s) (1.8s)
+  ok 361 [chromium] › e2e\issue-51-qa.spec.ts:525:5 › evidence — export a real .png / .json / .txt and commit the artifacts (5.0s)
+  ok 368 [chromium] › e2e\issue-56-png-cards.spec.ts:79:11 › 1week · calendar · dark — emits exactly 1 designed week card(s) (1.8s)
+  ok 369 [chromium] › e2e\issue-56-png-cards.spec.ts:79:11 › 2week · list · dark — emits exactly 2 designed week card(s) (1.8s)
+  ok 367 [chromium] › e2e\issue-56-png-cards.spec.ts:79:11 › 3week · list · light — emits exactly 3 designed week card(s) (2.6s)
+  ok 365 [chromium] › e2e\issue-56-png-cards.spec.ts:79:11 › 2week · calendar · light — emits exactly 2 designed week card(s) (2.8s)
+  ok 371 [chromium] › e2e\issue-56-qa.spec.ts:85:11 › 1week · list · light — emits exactly 1 designed week card(s) (1.6s)
+  ok 372 [chromium] › e2e\issue-56-qa.spec.ts:85:11 › 1week · calendar · dark — emits exactly 1 designed week card(s) (1.6s)
+  ok 373 [chromium] › e2e\issue-56-qa.spec.ts:85:11 › 2week · calendar · light — emits exactly 2 designed week card(s) (2.3s)
+  ok 376 [chromium] › e2e\issue-56-qa.spec.ts:85:11 › 1week · list · dark — emits exactly 1 designed week card(s) (1.2s)
+  ok 374 [chromium] › e2e\issue-56-png-cards.spec.ts:79:11 › 3week · list · dark — emits exactly 3 designed week card(s) (2.1s)
+  ok 370 [chromium] › e2e\issue-56-png-cards.spec.ts:79:11 › 3week · calendar · light — emits exactly 3 designed week card(s) (3.6s)
+  ok 377 [chromium] › e2e\issue-56-qa.spec.ts:85:11 › 2week · list · light — emits exactly 2 designed week card(s) (1.8s)
+  ok 375 [chromium] › e2e\issue-56-png-cards.spec.ts:79:11 › 2week · calendar · dark — emits exactly 2 designed week card(s) (3.0s)
+  ok 378 [chromium] › e2e\issue-56-qa.spec.ts:85:11 › 2week · calendar · dark — emits exactly 2 designed week card(s) (1.7s)
+  ok 383 [chromium] › e2e\issue-56-qa.spec.ts:153:5 › other export menu items still download single files (AC10) (1.6s)
+  ok 379 [chromium] › e2e\issue-56-qa.spec.ts:85:11 › 1week · calendar · light — emits exactly 1 designed week card(s) (2.9s)
+  ok 382 [chromium] › e2e\issue-56-qa.spec.ts:85:11 › 2week · list · dark — emits exactly 2 designed week card(s) (2.1s)
+  ok 380 [chromium] › e2e\issue-56-qa.spec.ts:85:11 › 3week · list · dark — emits exactly 3 designed week card(s) (3.3s)
+  ok 384 [chromium] › e2e\issue-56-qa.spec.ts:85:11 › 3week · list · light — emits exactly 3 designed week card(s) (2.1s)
+  ok 381 [chromium] › e2e\issue-56-png-cards.spec.ts:79:11 › 3week · calendar · dark — emits exactly 3 designed week card(s) (3.8s)
+  ok 387 [chromium] › e2e\issue-57-qa.spec.ts:160:7 › issue #57 — collapsed subject-pill height is normalized › AC1 — @375 (1-col mobile): every collapsed pill is normalized to the reserved height (2.4s)
+  ok 386 [chromium] › e2e\issue-57-qa.spec.ts:142:7 › issue #57 — collapsed subject-pill height is normalized › AC1 — @1024 (2-col): CS A (1-line) + CS Principles (2-line) share a row, even height (2.5s)
+  ok 385 [chromium] › e2e\issue-57-qa.spec.ts:96:7 › issue #57 — collapsed subject-pill height is normalized › AC1 — @1920 (3-col): the Chemistry / CS A / CS Principles row is even in height (2.6s)
+  ok 390 [chromium] › e2e\issue-57-qa.spec.ts:199:7 › issue #57 — collapsed subject-pill height is normalized › AC2 — expanding the two-line chip does not stretch/resize its row neighbors, width unchanged (991ms)
+  ok 392 [chromium] › e2e\issue-57-qa.spec.ts:317:7 › issue #57 — collapsed subject-pill height is normalized › AC6 — min-height is a floor: a genuinely taller name would grow, never clip (1.3s)
+  ok 391 [chromium] › e2e\issue-57-qa.spec.ts:269:7 › issue #57 — collapsed subject-pill height is normalized › AC4 — full name renders (no clamp/ellipsis) and aria semantics are unchanged (1.5s)
+  ok 393 [chromium] › e2e\issue-57-qa.spec.ts:357:7 › issue #57 — collapsed subject-pill height is normalized › AC5 — selecting a chip does not change its collapsed height (both states even) (1.5s)
+  ok 389 [chromium] › e2e\issue-57-qa.spec.ts:178:7 › issue #57 — collapsed subject-pill height is normalized › AC3 — the collapsed body stays ≥44px (issue #8 AC5 touch-target floor) (3.3s)
+  ok 388 [chromium] › e2e\issue-56-qa.spec.ts:85:11 › 3week · calendar · light — emits exactly 3 designed week card(s) (3.9s)
+  ok 395 [chromium] › e2e\issue-57-qa.spec.ts:425:7 › issue #57 — visual evidence › expanded evidence — CS Principles expanded, row neighbors unmoved (1.8s)
+  ok 397 [chromium] › e2e\issue-6-exam-info-panel.spec.ts:58:7 › issue #6 — exam info panel › AC1 — each chip has a details affordance distinct from the select toggle that opens the panel without selecting (1.6s)
+  ok 398 [chromium] › e2e\issue-6-exam-info-panel.spec.ts:91:7 › issue #6 — exam info panel › AC2 — panel shows per-section questions|length|weight rows (issue #44), length as h/min, calculator, delivery, and the pass rate labeled 'scored 3 or higher' (1.6s)
+  ok 400 [chromium] › e2e\issue-6-exam-info-panel.spec.ts:124:7 › issue #6 — exam info panel › AC3 — a 'pending' value renders as a visible muted badge, never blank or fabricated (1.6s)
+  ok 401 [chromium] › e2e\issue-6-exam-info-panel.spec.ts:145:7 › issue #6 — exam info panel › AC4 — portfolio subjects show the portfolio's weight (% of final) and deadline in the panel (1.4s)
+  ok 396 [chromium] › e2e\issue-57-qa.spec.ts:439:7 › issue #57 — visual evidence › standard super-board viewports — full page (3.3s)
+  ok 402 [chromium] › e2e\issue-6-exam-info-panel.spec.ts:162:7 › issue #6 — exam info panel › AC5 — accessible: focus moves in on open, Escape and close button dismiss, focus returns, scroll locked while open (1.7s)
+  ok 399 [chromium] › e2e\issue-56-qa.spec.ts:85:11 › 3week · calendar · dark — emits exactly 3 designed week card(s) (3.0s)
+  ok 394 [chromium] › e2e\issue-57-qa.spec.ts:380:7 › issue #57 — visual evidence › row evidence — the three-pill row, light + dark, 3-col + 2-col + mobile (5.7s)
+  ok 403 [chromium] › e2e\issue-6-exam-info-panel.spec.ts:204:7 › issue #6 — exam info panel › AC6 — at 375px the panel is a full-width sheet with no horizontal scroll (1.8s)
+  ok 407 [chromium] › e2e\issue-60-bounce1-meta-row.spec.ts:69:7 › bounce1 — mobile: the support pair renders as a quiet meta row below the attribution, with no rule and the footer's own muted type (1.4s)
+  ok 406 [chromium] › e2e\issue-6-exam-info-panel.spec.ts:240:7 › evidence — info panel open (mobile 375x667) (1.6s)
+  ok 405 [chromium] › e2e\issue-6-exam-info-panel.spec.ts:240:7 › evidence — info panel open (tablet 1024x768) (1.7s)
+  ok 404 [chromium] › e2e\issue-6-exam-info-panel.spec.ts:240:7 › evidence — info panel open (desktop 1920x1080) (2.1s)
+  ok 408 [chromium] › e2e\issue-60-bounce1-meta-row.spec.ts:69:7 › bounce1 — tablet: the support pair renders as a quiet meta row below the attribution, with no rule and the footer's own muted type (976ms)
+  ok 409 [chromium] › e2e\issue-60-bounce1-meta-row.spec.ts:248:5 › bounce1 — desktop: the pinned sidebar row keeps its approved presentation (bordered row, text label left, icon-only mark right) (1.5s)
+  ok 413 [chromium] › e2e\issue-60-qa.spec.ts:108:5 › AC1 — desktop (short content): the support row is flush with the bottom of the sidebar column, at the bottom of the viewport — not under the last RESOURCES link (1.2s)
+  ok 412 [chromium] › e2e\issue-60-bounce1-meta-row.spec.ts:403:5 › bounce1 — dark mode: the meta row still resolves to the footer's own type and colour (1.5s)
+  ok 410 [chromium] › e2e\issue-60-bounce1-meta-row.spec.ts:291:5 › bounce1 — resizing desktop → mobile flips the placement with exactly one control of each kind still in the a11y tree (1.7s)
+  ok 411 [chromium] › e2e\issue-60-bounce1-meta-row.spec.ts:346:5 › bounce1 — mobile: the feedback dialog still opens from the quiet meta row, traps focus, closes on Escape, and restores focus (1.6s)
+  ok 414 [chromium] › e2e\issue-60-qa.spec.ts:151:5 › AC2 — desktop (tall content): the sections region scrolls internally, the support row stays pinned to the bottom, and nothing shifts the page (1.3s)
+  ok 415 [chromium] › e2e\issue-60-qa.spec.ts:258:5 › AC2 — desktop: the column stays pinned at the layout offset through the whole scroll and never overlaps the site footer (1.9s)
+  ok 417 [chromium] › e2e\issue-60-qa.spec.ts:368:7 › AC4 — mobile (375px): the sidebar card ends after RESOURCES; the pair renders inside the site footer with ≥44px touch targets (1.8s)
+  ok 418 [chromium] › e2e\issue-60-qa.spec.ts:368:7 › AC4 — tablet (768px): the sidebar card ends after RESOURCES; the pair renders inside the site footer with ≥44px touch targets (1.8s)
+  ok 420 [chromium] › e2e\issue-60-qa.spec.ts:504:7 › AC6 — mobile: the feedback dialog opens from its new location, traps focus, closes on Escape, and restores focus to the trigger (1.7s)
+  ok 416 [chromium] › e2e\issue-60-qa.spec.ts:316:5 › AC3 — desktop collapsed rail: the GitHub mark stays present, centered and reachable; the 'Send us Feedback' label stays hidden (2.0s)
+[WebServer] [browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+[WebServer] 
+[WebServer] - A server/client branch `if (typeof window !== 'undefined')`.
+[WebServer] - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+[WebServer] - Date formatting in a user's locale which doesn't match the server.
+[WebServer] - External changing data without sending a snapshot of it along with the HTML.
+[WebServer] - Invalid HTML tag nesting.
+[WebServer] 
+[WebServer] It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+[WebServer] 
+[WebServer] https://react.dev/link/hydration-mismatch
+[WebServer] 
+[WebServer]   ...
+[WebServer]     <LoadingBoundary name="/" loading={null}>
+[WebServer]       <HTTPAccessFallbackBoundary notFound={{...}} forbidden={undefined} unauthorized={undefined}>
+[WebServer]         <HTTPAccessFallbackErrorBoundary pathname="/" notFound={{...}} forbidden={undefined} unauthorized={undefined} ...>
+[WebServer]           <RedirectBoundary>
+[WebServer]             <RedirectErrorBoundary router={{...}}>
+[WebServer]               <InnerLayoutRouter url="/" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+[WebServer]                 <SegmentViewNode type="page" pagePath="page.tsx">
+[WebServer]                   <SegmentTrieNode>
+[WebServer]                   <Home>
+[WebServer]                     <div data-scroll-lock-anchor={true} className="mx-auto fl...">
+[WebServer]                       <Sidebar>
+[WebServer]                       <main className="flex min-w..." aria-label="Exam planner">
+[WebServer]                         <CatalogGrid>
+[WebServer]                           <section aria-label="Subject ca..." className="flex flex-...">
+[WebServer]                             <div className="flex flex-...">
+[WebServer]                               <div className="flex flex-...">
+[WebServer]                                 <label>
+[WebServer]                                 <input
+[WebServer]                                   id="subject-search"
+[WebServer]                                   type="search"
+[WebServer]                                   value=""
+[WebServer]                                   onChange={function onChange}
+[WebServer]                                   placeholder="e.g. bio"
+[WebServer]                                   autoComplete="off"
+[WebServer]                                   className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 tex..."
+[WebServer] -                                 style={{caret-color:"transparent"}}
+[WebServer]                                 >
+[WebServer]                               ...
+[WebServer]                             ...
+[WebServer]                         ...
+[WebServer]                 ...
+[WebServer]               ...
+[WebServer]  
+  ok 421 [chromium] › e2e\issue-60-qa.spec.ts:504:7 › AC6 — desktop: the feedback dialog opens from its new location, traps focus, closes on Escape, and restores focus to the trigger (1.8s)
+  ok 425 [chromium] › e2e\issue-62-qa.spec.ts:154:5 › AC3 — always-present aria-describedby hint; a rejected commit sets aria-invalid + role=alert wired via aria-describedby (2.5s)
+  ok 423 [chromium] › e2e\issue-62-qa.spec.ts:82:5 › AC1 — renaming Schedule 2 to the existing 'Schedule 1' is rejected inline; no duplicate radio; fixing the name commits (2.7s)
+  ok 424 [chromium] › e2e\issue-62-qa.spec.ts:123:5 › AC2 — the rename input caps length at 60 characters (2.7s)
+  ok 419 [chromium] › e2e\issue-60-qa.spec.ts:454:5 › AC5 — exactly ONE 'Send us Feedback' button and ONE GitHub link are exposed to assistive tech at every viewport (5.4s)
+  ok 422 [chromium] › e2e\issue-60-qa.spec.ts:561:5 › AC8 — evidence: standard super-board viewports (3.7s)
+  ok 426 [chromium] › e2e\issue-62-qa.spec.ts:190:5 › AC5 — blank rename rejected (no-op), trim applied on a valid rename, last-remaining delete disabled (2.1s)
+  ok 427 [chromium] › e2e\issue-62-qa.spec.ts:235:7 › evidence — duplicate-name rejection alert at desktop 1920x1080 (2.5s)
+  ok 428 [chromium] › e2e\issue-62-qa.spec.ts:235:7 › evidence — duplicate-name rejection alert at tablet 1024x768 (2.5s)
+  ok 429 [chromium] › e2e\issue-62-qa.spec.ts:235:7 › evidence — duplicate-name rejection alert at mobile 375x667 (2.4s)
+  ok 430 [chromium] › e2e\issue-7-export-ics.spec.ts:71:7 › issue #7 — export to calendar › AC1 — the Export button lives in the My Schedule header and is disabled until ≥1 subject is selected (1.8s)
+  ok 431 [chromium] › e2e\issue-7-export-ics.spec.ts:105:7 › issue #7 — export to calendar › AC1 — clicking downloads ap-exams-2027.ics generated client-side (blob, zero network) with the selected exam + portfolio events (2.0s)
+  ok 432 [chromium] › e2e\issue-7-export-ics.spec.ts:196:7 › evidence — enabled Export button over a populated schedule (desktop 1920x1080) (1.8s)
+  ok 436 [chromium] › e2e\issue-71-exam-note.spec.ts:79:7 › issue #71 AC6 — published exam qualifier on the schedule surfaces › List view leaves an unqualified exam row alone (no empty note element) (1.3s)
+  ok 438 [chromium] › e2e\issue-71-exam-note.spec.ts:120:7 › issue #71 AC6 — published exam qualifier on the schedule surfaces › Activating the calendar block opens the details dialog with the verbatim qualifier (1.3s)
+  ok 435 [chromium] › e2e\issue-71-exam-note.spec.ts:59:7 › issue #71 AC6 — published exam qualifier on the schedule surfaces › List view prints the verbatim qualifier on the exam row (1.9s)
+  ok 437 [chromium] › e2e\issue-71-exam-note.spec.ts:92:7 › issue #71 AC6 — published exam qualifier on the schedule surfaces › Calendar block carries the marker on its face and the verbatim text in its accessible name (1.5s)
+  ok 434 [chromium] › e2e\issue-7-export-ics.spec.ts:196:7 › evidence — enabled Export button over a populated schedule (mobile 375x667) (2.0s)
+  ok 433 [chromium] › e2e\issue-7-export-ics.spec.ts:196:7 › evidence — enabled Export button over a populated schedule (tablet 1024x768) (2.1s)
+  ok 442 [chromium] › e2e\issue-71-exam-note.spec.ts:176:9 › issue #71 AC6 — published exam qualifier on the schedule surfaces › evidence — List and Calendar qualifier at mobile 375x667 with no horizontal overflow (1.8s)
+  ok 443 [chromium] › e2e\issue-71-qa-v2.spec.ts:179:9 › issue #71 QA v2 — the rebuild's block face, in the states it changed › QA-V2-1 — the qualifier row paints in full in the unresolved-conflict state at desktop 1920x1080 (1.7s)
+  ok 444 [chromium] › e2e\issue-71-qa-v2.spec.ts:179:9 › issue #71 QA v2 — the rebuild's block face, in the states it changed › QA-V2-1 — the qualifier row paints in full in the unresolved-conflict state at tablet 1024x768 (1.7s)
+  ok 440 [chromium] › e2e\issue-71-exam-note.spec.ts:176:9 › issue #71 AC6 — published exam qualifier on the schedule surfaces › evidence — List and Calendar qualifier at desktop 1920x1080 with no horizontal overflow (2.0s)
+  ok 441 [chromium] › e2e\issue-71-exam-note.spec.ts:176:9 › issue #71 AC6 — published exam qualifier on the schedule surfaces › evidence — List and Calendar qualifier at tablet 1024x768 with no horizontal overflow (1.9s)
+  ok 439 [chromium] › e2e\issue-71-exam-note.spec.ts:134:7 › issue #71 AC6 — published exam qualifier on the schedule surfaces › .ics DESCRIPTION and .txt line both carry the verbatim qualifier (2.2s)
+  ok 446 [chromium] › e2e\issue-71-qa-v2.spec.ts:225:9 › issue #71 QA v2 — the rebuild's block face, in the states it changed › QA-V2-2 — the qualifier row is never the last row of the face at desktop 1920x1080 (1.6s)
+  ok 447 [chromium] › e2e\issue-71-qa-v2.spec.ts:225:9 › issue #71 QA v2 — the rebuild's block face, in the states it changed › QA-V2-2 — the qualifier row is never the last row of the face at tablet 1024x768 (1.6s)
+  ok 448 [chromium] › e2e\issue-71-qa-v2.spec.ts:225:9 › issue #71 QA v2 — the rebuild's block face, in the states it changed › QA-V2-2 — the qualifier row is never the last row of the face at mobile 375x667 (1.5s)
+  ok 452 [chromium] › e2e\issue-71-qa.spec.ts:187:7 › issue #71 QA — published qualifier on every schedule surface › fixture guard — the dataset still supplies a qualified exam and a same-slot partner (2ms)
+  ok 449 [chromium] › e2e\issue-71-qa-v2.spec.ts:266:7 › issue #71 QA v2 — the rebuild's block face, in the states it changed › QA-V2-3 — an approximate block keeps three carriers of the pending-length signal without the clock suffix (1.6s)
+  ok 445 [chromium] › e2e\issue-71-qa-v2.spec.ts:179:9 › issue #71 QA v2 — the rebuild's block face, in the states it changed › QA-V2-1 — the qualifier row paints in full in the unresolved-conflict state at mobile 375x667 (1.9s)
+  ok 450 [chromium] › e2e\issue-71-qa-v2.spec.ts:328:7 › issue #71 QA v2 — the rebuild's block face, in the states it changed › QA-V2-4 — the exported calendar PNG orders the qualifier above the secondary markers, like the site (2.5s)
+  ok 456 [chromium] › e2e\issue-71-qa.spec.ts:318:7 › issue #71 QA — published qualifier on every schedule surface › AC6-QA4 — the qualifier is disclosed in dark theme too (1.5s)
+  ok 453 [chromium] › e2e\issue-71-qa.spec.ts:199:7 › issue #71 QA — published qualifier on every schedule surface › AC6-QA1 — the rasterized list-view .png prints the verbatim qualifier (not just the card model) (1.9s)
+  ok 455 [chromium] › e2e\issue-71-qa.spec.ts:259:7 › issue #71 QA — published qualifier on every schedule surface › AC6-QA3 — the qualifier follows the exam when conflict resolution moves it to late testing (2.1s)
+  ok 454 [chromium] › e2e\issue-71-qa.spec.ts:231:7 › issue #71 QA — published qualifier on every schedule surface › AC6-QA2 — the rasterized calendar-view .png prints the qualifier in a notes strip (2.2s)
+  ok 451 [chromium] › e2e\issue-71-qa-v2.spec.ts:393:7 › issue #71 QA v2 — the rebuild's block face, in the states it changed › QA-V2-5 — survey: subject-name clamping vs unused face height (3.0s)
+  ok 458 [chromium] › e2e\issue-71-qa.spec.ts:367:7 › issue #71 QA — published qualifier on every schedule surface › AC6-QA6 — #37's two catalog surfaces still disclose it (this issue adds surfaces, it must not move any) (1.5s)
+  ok 459 [chromium] › e2e\issue-71-qa.spec.ts:418:11 › issue #71 QA — published qualifier on every schedule surface › AC6-QA7 — the block-face marker actually renders at desktop 1920x1080 (1.8s)
+  ok 461 [chromium] › e2e\issue-71-qa.spec.ts:418:11 › issue #71 QA — published qualifier on every schedule surface › AC6-QA7 — the block-face marker actually renders at tablet 1024x768 (1.5s)
+  ok 460 [chromium] › e2e\issue-71-qa.spec.ts:418:11 › issue #71 QA — published qualifier on every schedule surface › AC6-QA7 — the block-face marker actually renders at desktop 1920x1080 (moved to late testing) (1.7s)
+  ok 463 [chromium] › e2e\issue-71-qa.spec.ts:418:11 › issue #71 QA — published qualifier on every schedule surface › AC6-QA7 — the block-face marker actually renders at mobile 375x667 (1.2s)
+  ok 462 [chromium] › e2e\issue-71-qa.spec.ts:418:11 › issue #71 QA — published qualifier on every schedule surface › AC6-QA7 — the block-face marker actually renders at tablet 1024x768 (moved to late testing) (1.6s)
+  ok 464 [chromium] › e2e\issue-71-qa.spec.ts:418:11 › issue #71 QA — published qualifier on every schedule surface › AC6-QA7 — the block-face marker actually renders at mobile 375x667 (moved to late testing) (1.6s)
+  ok 465 [chromium] › e2e\issue-71-qa.spec.ts:471:9 › issue #71 QA — published qualifier on every schedule surface › evidence — qualifier on List + Calendar at desktop 1920x1080 (1.7s)
+  ok 466 [chromium] › e2e\issue-71-qa.spec.ts:471:9 › issue #71 QA — published qualifier on every schedule surface › evidence — qualifier on List + Calendar at tablet 1024x768 (1.6s)
+  ok 468 [chromium] › e2e\issue-74-face-budget.spec.ts:206:7 › issue #74 — the block face budgets its height › BUDGET-1 — the face's rendered geometry matches the constants the budget reserves (1.1s)
+  ok 457 [chromium] › e2e\issue-71-qa.spec.ts:339:7 › issue #71 QA — published qualifier on every schedule surface › AC6-QA5 — no new serious/critical axe violation with the qualifier on screen (4.8s)
+  ok 467 [chromium] › e2e\issue-71-qa.spec.ts:471:9 › issue #71 QA — published qualifier on every schedule surface › evidence — qualifier on List + Calendar at mobile 375x667 (1.5s)
+  ok 469 [chromium] › e2e\issue-74-face-budget.spec.ts:278:9 › issue #74 — the block face budgets its height › BUDGET-2 — the longest subject name is ellipsised only when the face has no spare height at desktop 1920x1080 (1.8s)
+  ok 471 [chromium] › e2e\issue-74-face-budget.spec.ts:278:9 › issue #74 — the block face budgets its height › BUDGET-2 — the longest subject name is ellipsised only when the face has no spare height at mobile 375x667 (1.7s)
+  ok 470 [chromium] › e2e\issue-74-face-budget.spec.ts:278:9 › issue #74 — the block face budgets its height › BUDGET-2 — the longest subject name is ellipsised only when the face has no spare height at tablet 1024x768 (1.7s)
+  ok 474 [chromium] › e2e\issue-74-face-budget.spec.ts:332:11 › issue #74 — the block face budgets its height › BUDGET-3 — every reserved row still paints in full, regular state at mobile 375x667 (1.4s)
+  ok 472 [chromium] › e2e\issue-74-face-budget.spec.ts:332:11 › issue #74 — the block face budgets its height › BUDGET-3 — every reserved row still paints in full, regular state at desktop 1920x1080 (1.7s)
+  ok 473 [chromium] › e2e\issue-74-face-budget.spec.ts:332:11 › issue #74 — the block face budgets its height › BUDGET-3 — every reserved row still paints in full, regular state at tablet 1024x768 (1.6s)
+  ok 475 [chromium] › e2e\issue-74-face-budget.spec.ts:332:11 › issue #74 — the block face budgets its height › BUDGET-3 — every reserved row still paints in full, conflict state at desktop 1920x1080 (1.9s)
+  ok 477 [chromium] › e2e\issue-74-face-budget.spec.ts:332:11 › issue #74 — the block face budgets its height › BUDGET-3 — every reserved row still paints in full, conflict state at mobile 375x667 (1.9s)
+  ok 476 [chromium] › e2e\issue-74-face-budget.spec.ts:332:11 › issue #74 — the block face budgets its height › BUDGET-3 — every reserved row still paints in full, conflict state at tablet 1024x768 (2.0s)
+  ok 480 [chromium] › e2e\issue-74-face-budget.spec.ts:332:11 › issue #74 — the block face budgets its height › BUDGET-3 — every reserved row still paints in full, late state at mobile 375x667 (1.8s)
+  ok 478 [chromium] › e2e\issue-74-face-budget.spec.ts:332:11 › issue #74 — the block face budgets its height › BUDGET-3 — every reserved row still paints in full, late state at desktop 1920x1080 (1.9s)
+  ok 479 [chromium] › e2e\issue-74-face-budget.spec.ts:332:11 › issue #74 — the block face budgets its height › BUDGET-3 — every reserved row still paints in full, late state at tablet 1024x768 (1.9s)
+  ok 482 [chromium] › e2e\issue-74-face-budget.spec.ts:502:7 › issue #74 — the block face budgets its height › BUDGET-5 — the exported calendar PNG still rasterizes with the budgeted face (2.9s)
+  ok 483 [chromium] › e2e\issue-74-qa.spec.ts:259:7 › issue #74 QA — the block face's height budget › QA74-1 — the name's line allowance scales with the block's height, and the rows below it are reserved (4.4s)
+  ok 481 [chromium] › e2e\issue-74-face-budget.spec.ts:406:7 › issue #74 — the block face budgets its height › BUDGET-4 — the budget ellipsises fewer names than the pre-#74 two-line cap (4.5s)
+  ok 487 [chromium] › e2e\issue-74-qa.spec.ts:423:11 › issue #74 QA — the block face's height budget › QA74-3 — reserved rows paint in full and stay top-packed, regular state at desktop 1920x1080 (3.3s)
+  ok 485 [chromium] › e2e\issue-74-qa.spec.ts:331:9 › issue #74 QA — the block face's height budget › QA74-2 — no subject name is ellipsised while a whole line of its face is unspent at tablet 1024x768 (6.1s)
+  ok 486 [chromium] › e2e\issue-74-qa.spec.ts:331:9 › issue #74 QA — the block face's height budget › QA74-2 — no subject name is ellipsised while a whole line of its face is unspent at mobile 375x667 (6.2s)
+  ok 484 [chromium] › e2e\issue-74-qa.spec.ts:331:9 › issue #74 QA — the block face's height budget › QA74-2 — no subject name is ellipsised while a whole line of its face is unspent at desktop 1920x1080 (6.2s)
+  ok 488 [chromium] › e2e\issue-74-qa.spec.ts:423:11 › issue #74 QA — the block face's height budget › QA74-3 — reserved rows paint in full and stay top-packed, regular state at tablet 1024x768 (3.4s)
+  ok 489 [chromium] › e2e\issue-74-qa.spec.ts:423:11 › issue #74 QA — the block face's height budget › QA74-3 — reserved rows paint in full and stay top-packed, regular state at mobile 375x667 (3.4s)
+  ok 490 [chromium] › e2e\issue-74-qa.spec.ts:423:11 › issue #74 QA — the block face's height budget › QA74-3 — reserved rows paint in full and stay top-packed, conflict state at desktop 1920x1080 (3.2s)
+  ok 491 [chromium] › e2e\issue-74-qa.spec.ts:423:11 › issue #74 QA — the block face's height budget › QA74-3 — reserved rows paint in full and stay top-packed, conflict state at tablet 1024x768 (3.1s)
+  ok 492 [chromium] › e2e\issue-74-qa.spec.ts:423:11 › issue #74 QA — the block face's height budget › QA74-3 — reserved rows paint in full and stay top-packed, conflict state at mobile 375x667 (3.1s)
+  ok 498 [chromium] › e2e\issue-74-qa.spec.ts:685:7 › issue #74 QA — the block face's height budget › QA74-6 — the ORDERING CONTRACT comment describes the budget and names its gates (11ms)
+  ok 493 [chromium] › e2e\issue-74-qa.spec.ts:423:11 › issue #74 QA — the block face's height budget › QA74-3 — reserved rows paint in full and stay top-packed, late state at desktop 1920x1080 (3.2s)
+  ok 495 [chromium] › e2e\issue-74-qa.spec.ts:423:11 › issue #74 QA — the block face's height budget › QA74-3 — reserved rows paint in full and stay top-packed, late state at mobile 375x667 (3.0s)
+  ok 494 [chromium] › e2e\issue-74-qa.spec.ts:423:11 › issue #74 QA — the block face's height budget › QA74-3 — reserved rows paint in full and stay top-packed, late state at tablet 1024x768 (3.0s)
+  ok 497 [chromium] › e2e\issue-74-qa.spec.ts:635:7 › issue #74 QA — the block face's height budget › QA74-5 — a name the cramped lane ellipsises is still recoverable in full (3.0s)
+  ok 499 [chromium] › e2e\issue-74-qa.spec.ts:716:9 › issue #74 QA — the block face's height budget › QA74-7 — evidence: calendar grid at desktop 1920x1080 (3.0s)
+  ok 500 [chromium] › e2e\issue-74-qa.spec.ts:716:9 › issue #74 QA — the block face's height budget › QA74-7 — evidence: calendar grid at tablet 1024x768 (3.0s)
+  ok 496 [chromium] › e2e\issue-74-qa.spec.ts:498:7 › issue #74 QA — the block face's height budget › QA74-4 — the exported calendar card's faces budget their height too (4.0s)
+  ok 502 [chromium] › e2e\issue-75-qa.spec.ts:83:9 › AC7 evidence — desktop 1920×1080 light: both dialogs open while scrolled (2.5s)
+  ok 501 [chromium] › e2e\issue-74-qa.spec.ts:716:9 › issue #74 QA — the block face's height budget › QA74-7 — evidence: calendar grid at mobile 375x667 (2.8s)
+  ok 505 [chromium] › e2e\issue-75-qa.spec.ts:83:9 › AC7 evidence — tablet 1024×768 dark: both dialogs open while scrolled (2.1s)
+  ok 504 [chromium] › e2e\issue-75-qa.spec.ts:83:9 › AC7 evidence — tablet 1024×768 light: both dialogs open while scrolled (2.1s)
+  ok 503 [chromium] › e2e\issue-75-qa.spec.ts:83:9 › AC7 evidence — desktop 1920×1080 dark: both dialogs open while scrolled (2.4s)
+  ok 508 [chromium] › e2e\issue-75-scroll-lock-sticky.spec.ts:245:7 › AC1/AC3 — delete-schedule confirm (MySchedules): opening it while scrolled leaves the sidebar and the scroll position untouched (1.3s)
+  ok 506 [chromium] › e2e\issue-75-qa.spec.ts:83:9 › AC7 evidence — mobile 375×667 light: both dialogs open while scrolled (2.1s)
+  ok 507 [chromium] › e2e\issue-75-qa.spec.ts:83:9 › AC7 evidence — mobile 375×667 dark: both dialogs open while scrolled (2.0s)
+  ok 510 [chromium] › e2e\issue-75-scroll-lock-sticky.spec.ts:245:7 › AC1/AC3 — feedback dialog (FeedbackDialog): opening it while scrolled leaves the sidebar and the scroll position untouched (1.9s)
+  ok 509 [chromium] › e2e\issue-75-scroll-lock-sticky.spec.ts:245:7 › AC1/AC3 — exam details popup (InfoPanel): opening it while scrolled leaves the sidebar and the scroll position untouched (2.0s)
+  ok 511 [chromium] › e2e\issue-75-scroll-lock-sticky.spec.ts:245:7 › AC1/AC3 — conflict resolution (ConflictDialog): opening it while scrolled leaves the sidebar and the scroll position untouched (2.0s)
+  ok 512 [chromium] › e2e\issue-75-scroll-lock-sticky.spec.ts:245:7 › AC1/AC3 — moved-to-late block details (CalendarView): opening it while scrolled leaves the sidebar and the scroll position untouched (1.8s)
+  ok 514 [chromium] › e2e\issue-75-scroll-lock-sticky.spec.ts:314:7 › AC1 — sidebar is pixel-identical through an open/close cycle at 1440px @ 400px (1.4s)
+  ok 513 [chromium] › e2e\issue-75-scroll-lock-sticky.spec.ts:314:7 › AC1 — sidebar is pixel-identical through an open/close cycle at 1024px @ 1200px (1.5s)
+  ok 515 [chromium] › e2e\issue-75-scroll-lock-sticky.spec.ts:314:7 › AC1 — sidebar is pixel-identical through an open/close cycle at 1440px @ 1200px (1.9s)
+  ok 516 [chromium] › e2e\issue-75-scroll-lock-sticky.spec.ts:314:7 › AC1 — sidebar is pixel-identical through an open/close cycle at 1440px @ page bottom (1.8s)
+  ok 517 [chromium] › e2e\issue-75-scroll-lock-sticky.spec.ts:314:7 › AC1 — sidebar is pixel-identical through an open/close cycle at 1920px @ 1200px (1.7s)
+  ok 519 [chromium] › e2e\issue-75-scroll-lock-sticky.spec.ts:469:5 › AC3 — the dialog's initial focus does not scroll the document (preventScroll) (1.8s)
+  ok 522 [chromium] › e2e\issue-8-qa.spec.ts:206:7 › issue #8 QA evidence › AC1 evidence — visible focus indicator + focus-trapped conflict modal (1.6s)
+  ok 518 [chromium] › e2e\issue-75-scroll-lock-sticky.spec.ts:357:7 › AC2 — the lock still blocks every input path › AC2 — background scroll is locked while a dialog is open (wheel, keyboard, touch), and released after (3.4s)
+  ok 523 [chromium] › e2e\issue-8-qa.spec.ts:221:7 › issue #8 QA evidence › AC1 evidence — conflict modal open with focus inside (1.8s)
+  ok 527 [chromium] › e2e\issue-8-qa.spec.ts:478:7 › issue #8 QA evidence › AC5 evidence — info panel with textual 'pending' badge (1.7s)
+  ok 528 [chromium] › e2e\issue-9-qa.spec.ts:31:5 › AC1 — README has what/why, feature list, stack, pnpm quickstart, and the data/swap note (11ms)
+  ok 529 [chromium] › e2e\issue-9-qa.spec.ts:63:5 › AC2 — README embeds committed screenshots under docs/screenshots/ via relative paths (15ms)
+  ok 530 [chromium] › e2e\issue-9-qa.spec.ts:88:5 › AC3 — footer shows both attribution lines and does not duplicate the coordinator note (994ms)
+  ok 526 [chromium] › e2e\issue-8-qa.spec.ts:391:7 › issue #8 QA evidence › AC4 evidence — mobile conflict dialog + measured tap targets (3.3s)
+  ok 520 [chromium] › e2e\issue-75-scroll-lock-sticky.spec.ts:515:5 › evidence — sidebar present with a dialog open while scrolled (light + dark, desktop + tablet) (6.8s)
+  ok 521 [chromium] › e2e\issue-8-qa.spec.ts:178:7 › issue #8 QA evidence › standard viewports — resolved schedule with moved badge + late warning (5.4s)
+  ok 534 [chromium] › e2e\qa-evidence.spec.ts:23:7 › AC2 — / renders header + populated main with no console errors (desktop 1920x1080) (989ms)
+  ok 531 [chromium] › e2e\issue-9-qa.spec.ts:113:7 › AC4 — footer renders with no overflow/overlap/layout-shift (desktop 1920x1080) (2.3s)
+[WebServer] [browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+[WebServer] 
+[WebServer] - A server/client branch `if (typeof window !== 'undefined')`.
+[WebServer] - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+[WebServer] - Date formatting in a user's locale which doesn't match the server.
+[WebServer] - External changing data without sending a snapshot of it along with the HTML.
+[WebServer] - Invalid HTML tag nesting.
+[WebServer] 
+[WebServer] It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+[WebServer] 
+[WebServer] https://react.dev/link/hydration-mismatch
+[WebServer] 
+[WebServer]   ...
+[WebServer]     <LoadingBoundary name="/" loading={null}>
+[WebServer]       <HTTPAccessFallbackBoundary notFound={{...}} forbidden={undefined} unauthorized={undefined}>
+[WebServer]         <HTTPAccessFallbackErrorBoundary pathname="/" notFound={{...}} forbidden={undefined} unauthorized={undefined} ...>
+[WebServer]           <RedirectBoundary>
+[WebServer]             <RedirectErrorBoundary router={{...}}>
+[WebServer]               <InnerLayoutRouter url="/" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+[WebServer]                 <SegmentViewNode type="page" pagePath="page.tsx">
+[WebServer]                   <SegmentTrieNode>
+[WebServer]                   <Home>
+[WebServer]                     <div data-scroll-lock-anchor={true} className="mx-auto fl...">
+[WebServer]                       <Sidebar>
+[WebServer]                       <main className="flex min-w..." aria-label="Exam planner">
+[WebServer]                         <CatalogGrid>
+[WebServer]                           <section aria-label="Subject ca..." className="flex flex-...">
+[WebServer]                             <div className="flex flex-...">
+[WebServer]                               <div className="flex flex-...">
+[WebServer]                                 <label>
+[WebServer]                                 <input
+[WebServer]                                   id="subject-search"
+[WebServer]                                   type="search"
+[WebServer]                                   value=""
+[WebServer]                                   onChange={function onChange}
+[WebServer]                                   placeholder="e.g. bio"
+[WebServer]                                   autoComplete="off"
+[WebServer]                                   className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 tex..."
+[WebServer] -                                 style={{caret-color:"transparent"}}
+[WebServer]                                 >
+[WebServer]                               ...
+[WebServer]                             ...
+[WebServer]                         ...
+[WebServer]                 ...
+[WebServer]               ...
+[WebServer]  
+  ok 525 [chromium] › e2e\issue-8-qa.spec.ts:321:7 › issue #8 QA evidence › AC3 evidence — measured contrast ratios written to contrast-ratios.txt (5.9s)
+  x  535 [chromium] › e2e\qa-evidence.spec.ts:23:7 › AC2 — / renders header + populated main with no console errors (tablet 1024x768) (996ms)
+  ok 533 [chromium] › e2e\issue-9-qa.spec.ts:113:7 › AC4 — footer renders with no overflow/overlap/layout-shift (mobile 375x667) (2.4s)
+  ok 532 [chromium] › e2e\issue-9-qa.spec.ts:113:7 › AC4 — footer renders with no overflow/overlap/layout-shift (tablet 1024x768) (2.6s)
+  ok 536 [chromium] › e2e\qa-evidence.spec.ts:23:7 › AC2 — / renders header + populated main with no console errors (mobile 375x667) (1.1s)
+  ok 537 [chromium] › e2e\smoke.spec.ts:3:5 › home page renders the AP Exam Planner header and title (592ms)
+[WebServer] [browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+[WebServer] 
+[WebServer] - A server/client branch `if (typeof window !== 'undefined')`.
+[WebServer] - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+[WebServer] - Date formatting in a user's locale which doesn't match the server.
+[WebServer] - External changing data without sending a snapshot of it along with the HTML.
+[WebServer] - Invalid HTML tag nesting.
+[WebServer] 
+[WebServer] It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+[WebServer] 
+[WebServer] https://react.dev/link/hydration-mismatch
+[WebServer] 
+[WebServer]   ...
+[WebServer]     <LoadingBoundary name="/" loading={null}>
+[WebServer]       <HTTPAccessFallbackBoundary notFound={{...}} forbidden={undefined} unauthorized={undefined}>
+[WebServer]         <HTTPAccessFallbackErrorBoundary pathname="/" notFound={{...}} forbidden={undefined} unauthorized={undefined} ...>
+[WebServer]           <RedirectBoundary>
+[WebServer]             <RedirectErrorBoundary router={{...}}>
+[WebServer]               <InnerLayoutRouter url="/" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+[WebServer]                 <SegmentViewNode type="page" pagePath="page.tsx">
+[WebServer]                   <SegmentTrieNode>
+[WebServer]                   <Home>
+[WebServer]                     <div data-scroll-lock-anchor={true} className="mx-auto fl...">
+[WebServer]                       <Sidebar>
+[WebServer]                       <main className="flex min-w..." aria-label="Exam planner">
+[WebServer]                         <CatalogGrid>
+[WebServer]                           <section aria-label="Subject ca..." className="flex flex-...">
+[WebServer]                             <div className="flex flex-...">
+[WebServer]                               <div className="flex flex-...">
+[WebServer]                                 <label>
+[WebServer]                                 <input
+[WebServer]                                   id="subject-search"
+[WebServer]                                   type="search"
+[WebServer]                                   value=""
+[WebServer]                                   onChange={function onChange}
+[WebServer]                                   placeholder="e.g. bio"
+[WebServer]                                   autoComplete="off"
+[WebServer]                                   className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 tex..."
+[WebServer] -                                 style={{caret-color:"transparent"}}
+[WebServer]                                 >
+[WebServer]                               ...
+[WebServer]                             ...
+[WebServer]                         ...
+[WebServer]                 ...
+[WebServer]               ...
+[WebServer]  
+  ok 538 [chromium] › e2e\issue-49-qa.spec.ts:150:5 › AC3 — thumb/track contrast measured from live CSS is ≥ 3:1 in light AND dark, and the palette is theme-aware (1.8s)
+  ok 541 [chromium] › e2e\issue-49-qa.spec.ts:294:5 › AC8 — standard super-board viewport screenshots (light, catalog with styled scrollbar) (1.3s)
+  ok 539 [chromium] › e2e\issue-49-qa.spec.ts:216:5 › AC4 — with NO injected CSS, the app's own scrollbar styling occupies layout width yet dialogs open with zero shift (the macOS trap is defused) (1.8s)
+  ok 540 [chromium] › e2e\issue-49-qa.spec.ts:262:5 › AC6 — a dialog body overflows and scrolls with the same custom scrollbar (evidence screenshot) (1.9s)
+  ok 542 [chromium] › e2e\issue-49-qa.spec.ts:309:5 › AC8 — light desktop: styled scrollbar on the catalog + dialog open with no shift (1.7s)
+[WebServer] [browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+[WebServer] 
+[WebServer] - A server/client branch `if (typeof window !== 'undefined')`.
+[WebServer] - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+[WebServer] - Date formatting in a user's locale which doesn't match the server.
+[WebServer] - External changing data without sending a snapshot of it along with the HTML.
+[WebServer] - Invalid HTML tag nesting.
+[WebServer] 
+[WebServer] It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+[WebServer] 
+[WebServer] https://react.dev/link/hydration-mismatch
+[WebServer] 
+[WebServer]   ...
+[WebServer]     <LoadingBoundary name="/" loading={null}>
+[WebServer]       <HTTPAccessFallbackBoundary notFound={{...}} forbidden={undefined} unauthorized={undefined}>
+[WebServer]         <HTTPAccessFallbackErrorBoundary pathname="/" notFound={{...}} forbidden={undefined} unauthorized={undefined} ...>
+[WebServer]           <RedirectBoundary>
+[WebServer]             <RedirectErrorBoundary router={{...}}>
+[WebServer]               <InnerLayoutRouter url="/" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+[WebServer]                 <SegmentViewNode type="page" pagePath="page.tsx">
+[WebServer]                   <SegmentTrieNode>
+[WebServer]                   <Home>
+[WebServer]                     <div data-scroll-lock-anchor={true} className="mx-auto fl...">
+[WebServer]                       <Sidebar>
+[WebServer]                       <main className="flex min-w..." aria-label="Exam planner">
+[WebServer]                         <CatalogGrid>
+[WebServer]                           <section aria-label="Subject ca..." className="flex flex-...">
+[WebServer]                             <div className="flex flex-...">
+[WebServer]                               <div className="flex flex-...">
+[WebServer]                                 <label>
+[WebServer]                                 <input
+[WebServer]                                   id="subject-search"
+[WebServer]                                   type="search"
+[WebServer]                                   value=""
+[WebServer]                                   onChange={function onChange}
+[WebServer]                                   placeholder="e.g. bio"
+[WebServer]                                   autoComplete="off"
+[WebServer]                                   className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 tex..."
+[WebServer] -                                 style={{caret-color:"transparent"}}
+[WebServer]                                 >
+[WebServer]                               ...
+[WebServer]                             ...
+[WebServer]                         ...
+[WebServer]                 ...
+[WebServer]               ...
+[WebServer]  
+  ok 543 [chromium] › e2e\issue-49-qa.spec.ts:329:5 › AC8 — dark desktop: styled scrollbar on the catalog + dialog open with no shift (1.6s)
+  ok 544 [chromium] › e2e\issue-49-qa.spec.ts:350:5 › AC8 — mobile 375: catalog (light) + dialog open (dark), no horizontal overflow either way (2.1s)
+  ok 545 [chromium] › e2e\support\scroll-shift.ts:198:7 › feedback dialog (FeedbackDialog) opens with zero horizontal shift under classic scrollbars (2.5s)
+  ok 547 [chromium] › e2e\support\scroll-shift.ts:219:7 › conflict dialog (ConflictDialog) opens with zero horizontal shift under classic scrollbars (2.6s)
+  ok 546 [chromium] › e2e\support\scroll-shift.ts:211:7 › exam details popup (InfoPanel) opens with zero horizontal shift under classic scrollbars (2.9s)
+  ok 548 [chromium] › e2e\support\scroll-shift.ts:261:7 › delete-schedule confirm (MySchedules) opens with zero horizontal shift under classic scrollbars (2.1s)
+  ok 551 [chromium] › e2e\issue-75-real-chrome.spec.ts:64:5 › real Chrome + classic scrollbars: a dialog opened while scrolled moves neither the sticky sidebar nor the centered shell (1.7s)
+  ok 550 [chromium] › e2e\issue-49-real-chrome.spec.ts:35:5 › real Chrome: logged measurement table — shell rect.left steady closed → open → close (2.1s)
+  ok 549 [chromium] › e2e\support\scroll-shift.ts:235:7 › moved-to-late action dialog (CalendarView) opens with zero horizontal shift under classic scrollbars (2.4s)
+  ok 552 [chromium] › e2e\support\scroll-shift.ts:198:7 › feedback dialog (FeedbackDialog) opens with zero horizontal shift under classic scrollbars (1.1s)
+  ok 524 [chromium] › e2e\issue-8-qa.spec.ts:238:7 › issue #8 QA evidence › AC2 evidence — axe summary across states written to JSON (18.7s)
+  ok 554 [chromium] › e2e\support\scroll-shift.ts:283:7 › no horizontal overflow at 320 / 375 / 1024 / 1920 with the custom classic scrollbar active (1.4s)
+  ok 557 [chromium] › e2e\support\scroll-shift.ts:261:7 › delete-schedule confirm (MySchedules) opens with zero horizontal shift under classic scrollbars (1.2s)
+  ok 556 [chromium] › e2e\support\scroll-shift.ts:219:7 › conflict dialog (ConflictDialog) opens with zero horizontal shift under classic scrollbars (1.7s)
+  ok 553 [chromium] › e2e\support\scroll-shift.ts:211:7 › exam details popup (InfoPanel) opens with zero horizontal shift under classic scrollbars (2.0s)
+  ok 555 [chromium] › e2e\support\scroll-shift.ts:235:7 › moved-to-late action dialog (CalendarView) opens with zero horizontal shift under classic scrollbars (1.8s)
+
+
+  1) [chromium] › e2e\qa-evidence.spec.ts:23:7 › AC2 — / renders header + populated main with no console errors (tablet 1024x768) 
+
+    Error: Unexpected console errors: A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+    - A server/client branch `if (typeof window !== 'undefined')`.
+    - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+    - Date formatting in a user's locale which doesn't match the server.
+    - External changing data without sending a snapshot of it along with the HTML.
+    - Invalid HTML tag nesting.
+
+    It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+    %s%s https://react.dev/link/hydration-mismatch 
+
+      ...
+        <LoadingBoundary name="/" loading={null}>
+          <HTTPAccessFallbackBoundary notFound={{...}} forbidden={undefined} unauthorized={undefined}>
+            <HTTPAccessFallbackErrorBoundary pathname="/" notFound={{...}} forbidden={undefined} unauthorized={undefined} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <InnerLayoutRouter url="/" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+                    <SegmentViewNode type="page" pagePath="page.tsx">
+                      <SegmentTrieNode>
+                      <Home>
+                        <div data-scroll-lock-anchor={true} className="mx-auto fl...">
+                          <Sidebar>
+                          <main className="flex min-w..." aria-label="Exam planner">
+                            <CatalogGrid>
+                              <section aria-label="Subject ca..." className="flex flex-...">
+                                <div className="flex flex-...">
+                                  <div className="flex flex-...">
+                                    <label>
+                                    <input
+                                      id="subject-search"
+                                      type="search"
+                                      value=""
+                                      onChange={function onChange}
+                                      placeholder="e.g. bio"
+                                      autoComplete="off"
+                                      className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 tex..."
+    -                                 style={{caret-color:"transparent"}}
+                                    >
+                                  ...
+                                ...
+                            ...
+                    ...
+                  ...
+
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  -  1
+    + Received  + 48
+
+    - Array []
+    + Array [
+    +   "A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+    +
+    + - A server/client branch `if (typeof window !== 'undefined')`.
+    + - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+    + - Date formatting in a user's locale which doesn't match the server.
+    + - External changing data without sending a snapshot of it along with the HTML.
+    + - Invalid HTML tag nesting.
+    +
+    + It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+    +
+    + %s%s https://react.dev/link/hydration-mismatch 
+    +
+    +   ...
+    +     <LoadingBoundary name=\"/\" loading={null}>
+    +       <HTTPAccessFallbackBoundary notFound={{...}} forbidden={undefined} unauthorized={undefined}>
+    +         <HTTPAccessFallbackErrorBoundary pathname=\"/\" notFound={{...}} forbidden={undefined} unauthorized={undefined} ...>
+    +           <RedirectBoundary>
+    +             <RedirectErrorBoundary router={{...}}>
+    +               <InnerLayoutRouter url=\"/\" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+    +                 <SegmentViewNode type=\"page\" pagePath=\"page.tsx\">
+    +                   <SegmentTrieNode>
+    +                   <Home>
+    +                     <div data-scroll-lock-anchor={true} className=\"mx-auto fl...\">
+    +                       <Sidebar>
+    +                       <main className=\"flex min-w...\" aria-label=\"Exam planner\">
+    +                         <CatalogGrid>
+    +                           <section aria-label=\"Subject ca...\" className=\"flex flex-...\">
+    +                             <div className=\"flex flex-...\">
+    +                               <div className=\"flex flex-...\">
+    +                                 <label>
+    +                                 <input
+    +                                   id=\"subject-search\"
+    +                                   type=\"search\"
+    +                                   value=\"\"
+    +                                   onChange={function onChange}
+    +                                   placeholder=\"e.g. bio\"
+    +                                   autoComplete=\"off\"
+    +                                   className=\"min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 tex...\"
+    + -                                 style={{caret-color:\"transparent\"}}
+    +                                 >
+    +                               ...
+    +                             ...
+    +                         ...
+    +                 ...
+    +               ...
+    + ",
+    + ]
+
+      63 |       meaningfulErrors,
+      64 |       `Unexpected console errors: ${meaningfulErrors.join(", ")}`,
+    > 65 |     ).toEqual([]);
+         |       ^
+      66 |   });
+      67 | }
+      68 |
+        at C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-80-qa\e2e\qa-evidence.spec.ts:65:7
+
+    Error Context: test-results\qa-evidence-AC2-—-renders--85574-ole-errors-tablet-1024x768--chromium\error-context.md
+
+  1 failed
+    [chromium] › e2e\qa-evidence.spec.ts:23:7 › AC2 — / renders header + populated main with no console errors (tablet 1024x768) 
+  556 passed (3.5m)
