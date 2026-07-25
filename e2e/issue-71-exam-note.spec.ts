@@ -194,6 +194,18 @@ test.describe("issue #71 AC6 — published exam qualifier on the schedule surfac
 
       await pressViewChip(page, "Calendar");
       await expect(page.getByTestId("block-exam-note")).toBeVisible();
+      // `toBeVisible()` is NOT enough here and this assertion is why: the block
+      // face is a fixed-height `overflow-hidden` box, and Playwright calls a row
+      // clipped to zero pixels "visible" as long as it still has a box. QA v1
+      // caught exactly that (the marker painted 0 of 30px at 375). Geometry is
+      // the only honest observable — see the ORDERING CONTRACT in
+      // src/components/CalendarView.tsx.
+      const clip = await markerClip(page);
+      expect(clip, "the block-face marker element vanished").not.toBeNull();
+      expect(
+        clip!.visibleHeight,
+        `the block-face marker is clipped by its overflow-hidden face — ${clip!.visibleHeight}px of ${clip!.markerHeight}px painted`,
+      ).toBe(clip!.markerHeight);
       await page.screenshot({
         path: `${EVIDENCE_DIR}/ac6-calendar-${vp.name}.png`,
         fullPage: true,
@@ -209,6 +221,34 @@ function horizontalOverflow(page: Page): Promise<number> {
       document.documentElement.scrollWidth -
       document.documentElement.clientWidth,
   );
+}
+
+/**
+ * How much of the block-face marker actually paints: the height of the
+ * intersection between the marker's rect and its nearest `overflow: hidden`
+ * ancestor's rect. Equal heights = fully drawn.
+ */
+function markerClip(
+  page: Page,
+): Promise<{ markerHeight: number; visibleHeight: number } | null> {
+  return page.evaluate(() => {
+    const marker = document.querySelector(
+      '[data-testid="block-exam-note"]',
+    ) as HTMLElement | null;
+    if (!marker) return null;
+    let clip: HTMLElement | null = marker.parentElement;
+    while (clip && getComputedStyle(clip).overflow !== "hidden")
+      clip = clip.parentElement;
+    if (!clip) return { markerHeight: 0, visibleHeight: 0 };
+    const m = marker.getBoundingClientRect();
+    const c = clip.getBoundingClientRect();
+    return {
+      markerHeight: Math.round(m.height),
+      visibleHeight: Math.round(
+        Math.max(0, Math.min(m.bottom, c.bottom) - Math.max(m.top, c.top)),
+      ),
+    };
+  });
 }
 
 function escapeRegExp(value: string): string {

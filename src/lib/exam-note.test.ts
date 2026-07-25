@@ -33,7 +33,9 @@ import { buildWeekCards } from "./week-cards";
  * | `.png` calendar card block  | block on the emitted card carries the note |
  *
  * The React render sites (`ScheduleView` row, `CalendarView` block face +
- * accessible name) are covered in the browser by `e2e/issue-71-qa.spec.ts`.
+ * accessible name) are covered in the browser by `e2e/issue-71-exam-note.spec.ts`
+ * (render sites + downloads) and `e2e/issue-71-qa.spec.ts` (the PNG renderers,
+ * the moved-to-late path, and the block face's paint geometry).
  *
  * Every assertion is derived from the dataset — the subject id, the note text,
  * and the date are never hardcoded — so the next annual swap re-points them

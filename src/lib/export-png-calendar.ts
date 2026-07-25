@@ -127,6 +127,11 @@ function renderBlock(
     overflow: "hidden",
     padding: "4px 6px",
   });
+  // Row order mirrors the site's block face exactly (see the ORDERING CONTRACT
+  // in src/components/CalendarView.tsx): the segment is a fixed height with
+  // `overflow: hidden`, so the qualifier marker goes ABOVE the markers that a
+  // non-text cue already carries, and the secondary markers share one line so
+  // the stack cannot grow with their count.
   examSeg.append(
     el(
       "div",
@@ -138,25 +143,13 @@ function renderBlock(
     el(
       "div",
       { marginTop: "2px" },
+      // Clock only — "length pending" is carried by the marker row below and by
+      // the block's dashed border, never twice on one face.
       block.approximate
-        ? `${block.startClock} · length pending`
+        ? block.startClock
         : `${block.startClock} – ${block.endClock}`,
     ),
   );
-  if (block.approximate) {
-    examSeg.append(
-      el("div", { marginTop: "1px", fontStyle: "italic" }, "Length pending"),
-    );
-  }
-  if (block.movedToLate) {
-    examSeg.append(
-      el(
-        "div",
-        { marginTop: "1px", fontStyle: "italic", fontWeight: "500" },
-        "Moved to late testing",
-      ),
-    );
-  }
   // Published-qualifier marker (issue #71) — the verbatim text is printed in the
   // card's notes strip below the grid, which is the only place on a fixed-size
   // block grid that can hold a paragraph without truncating it.
@@ -164,8 +157,37 @@ function renderBlock(
     examSeg.append(
       el(
         "div",
-        { marginTop: "1px", fontStyle: "italic", fontWeight: "500" },
+        {
+          marginTop: "1px",
+          fontStyle: "italic",
+          fontWeight: "500",
+          fontSize: "10px",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        },
         EXAM_NOTE_LABEL,
+      ),
+    );
+  }
+  const secondaryMarkers = [
+    block.movedToLate ? "Moved to late testing" : null,
+    block.approximate ? "Length pending" : null,
+  ].filter((marker): marker is string => marker !== null);
+  if (secondaryMarkers.length > 0) {
+    examSeg.append(
+      el(
+        "div",
+        {
+          marginTop: "1px",
+          fontStyle: "italic",
+          fontWeight: "500",
+          fontSize: "10px",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        },
+        secondaryMarkers.join(" · "),
       ),
     );
   }
