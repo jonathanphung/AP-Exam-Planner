@@ -1,0 +1,401 @@
+{
+  "viewport": {
+    "name": "desktop",
+    "width": 1920,
+    "height": 1080
+  },
+  "measured": 39,
+  "rosterSize": 39,
+  "blocks": [
+    {
+      "subjectId": "human-geography",
+      "laneWidth": 159,
+      "faceHeight": 99,
+      "nameClamp": 3,
+      "nameLines": 1,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 59
+    },
+    {
+      "subjectId": "biology",
+      "laneWidth": 159,
+      "faceHeight": 132,
+      "nameClamp": 6,
+      "nameLines": 1,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 92
+    },
+    {
+      "subjectId": "business-with-personal-finance",
+      "laneWidth": 159,
+      "faceHeight": 117,
+      "nameClamp": 5,
+      "nameLines": 2,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 62
+    },
+    {
+      "subjectId": "european-history",
+      "laneWidth": 159,
+      "faceHeight": 143,
+      "nameClamp": 6,
+      "nameLines": 1,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 103
+    },
+    {
+      "subjectId": "cybersecurity",
+      "laneWidth": 159,
+      "faceHeight": 95,
+      "nameClamp": 3,
+      "nameLines": 1,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 55
+    },
+    {
+      "subjectId": "physics-1",
+      "laneWidth": 159,
+      "faceHeight": 132,
+      "nameClamp": 6,
+      "nameLines": 2,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 77
+    },
+    {
+      "subjectId": "french-language-and-culture",
+      "laneWidth": 159,
+      "faceHeight": 110,
+      "nameClamp": 4,
+      "nameLines": 2,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 55
+    },
+    {
+      "subjectId": "african-american-studies",
+      "laneWidth": 159,
+      "faceHeight": 121,
+      "nameClamp": 5,
+      "nameLines": 2,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 66
+    },
+    {
+      "subjectId": "german-language-and-culture",
+      "laneWidth": 159,
+      "faceHeight": 110,
+      "nameClamp": 4,
+      "nameLines": 2,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 55
+    },
+    {
+      "subjectId": "macroeconomics",
+      "laneWidth": 159,
+      "faceHeight": 95,
+      "nameClamp": 3,
+      "nameLines": 1,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 55
+    },
+    {
+      "subjectId": "calculus-ab",
+      "laneWidth": 159,
+      "faceHeight": 139,
+      "nameClamp": 6,
+      "nameLines": 1,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 99
+    },
+    {
+      "subjectId": "music-theory",
+      "laneWidth": 159,
+      "faceHeight": 117,
+      "nameClamp": 5,
+      "nameLines": 1,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 77
+    },
+    {
+      "subjectId": "japanese-language-and-culture",
+      "laneWidth": 159,
+      "faceHeight": 88,
+      "nameClamp": 3,
+      "nameLines": 2,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 33
+    },
+    {
+      "subjectId": "statistics",
+      "laneWidth": 159,
+      "faceHeight": 132,
+      "nameClamp": 6,
+      "nameLines": 1,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 92
+    },
+    {
+      "subjectId": "english-language-and-composition",
+      "laneWidth": 159,
+      "faceHeight": 143,
+      "nameClamp": 6,
+      "nameLines": 2,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 88
+    },
+    {
+      "subjectId": "art-history",
+      "laneWidth": 159,
+      "faceHeight": 132,
+      "nameClamp": 6,
+      "nameLines": 1,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 92
+    },
+    {
+      "subjectId": "spanish-language-and-culture",
+      "laneWidth": 159,
+      "faceHeight": 110,
+      "nameClamp": 4,
+      "nameLines": 2,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 55
+    },
+    {
+      "subjectId": "chinese-language-and-culture",
+      "laneWidth": 159,
+      "faceHeight": 88,
+      "nameClamp": 3,
+      "nameLines": 2,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 33
+    },
+    {
+      "subjectId": "comparative-government-and-politics",
+      "laneWidth": 159,
+      "faceHeight": 110,
+      "nameClamp": 4,
+      "nameLines": 3,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 40
+    },
+    {
+      "subjectId": "latin",
+      "laneWidth": 159,
+      "faceHeight": 132,
+      "nameClamp": 6,
+      "nameLines": 1,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 92
+    },
+    {
+      "subjectId": "physics-c-mechanics",
+      "laneWidth": 159,
+      "faceHeight": 132,
+      "nameClamp": 6,
+      "nameLines": 2,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 77
+    },
+    {
+      "subjectId": "italian-language-and-culture",
+      "laneWidth": 159,
+      "faceHeight": 110,
+      "nameClamp": 4,
+      "nameLines": 2,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 55
+    },
+    {
+      "subjectId": "united-states-government-and-politics",
+      "laneWidth": 159,
+      "faceHeight": 132,
+      "nameClamp": 6,
+      "nameLines": 3,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 62
+    },
+    {
+      "subjectId": "microeconomics",
+      "laneWidth": 159,
+      "faceHeight": 95,
+      "nameClamp": 3,
+      "nameLines": 1,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 55
+    },
+    {
+      "subjectId": "english-literature-and-composition",
+      "laneWidth": 159,
+      "faceHeight": 132,
+      "nameClamp": 6,
+      "nameLines": 2,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 77
+    },
+    {
+      "subjectId": "physics-c-electricity-and-magnetism",
+      "laneWidth": 159,
+      "faceHeight": 132,
+      "nameClamp": 6,
+      "nameLines": 3,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 62
+    },
+    {
+      "subjectId": "physics-2",
+      "laneWidth": 159,
+      "faceHeight": 132,
+      "nameClamp": 6,
+      "nameLines": 2,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 77
+    },
+    {
+      "subjectId": "chemistry",
+      "laneWidth": 159,
+      "faceHeight": 143,
+      "nameClamp": 6,
+      "nameLines": 1,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 103
+    },
+    {
+      "subjectId": "united-states-history",
+      "laneWidth": 159,
+      "faceHeight": 143,
+      "nameClamp": 6,
+      "nameLines": 2,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 88
+    },
+    {
+      "subjectId": "networking",
+      "laneWidth": 159,
+      "faceHeight": 88,
+      "nameClamp": 2,
+      "nameLines": 1,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 19
+    },
+    {
+      "subjectId": "calculus-bc",
+      "laneWidth": 159,
+      "faceHeight": 139,
+      "nameClamp": 6,
+      "nameLines": 1,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 99
+    },
+    {
+      "subjectId": "seminar",
+      "laneWidth": 159,
+      "faceHeight": 88,
+      "nameClamp": 3,
+      "nameLines": 1,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 48
+    },
+    {
+      "subjectId": "precalculus",
+      "laneWidth": 159,
+      "faceHeight": 128,
+      "nameClamp": 5,
+      "nameLines": 1,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 88
+    },
+    {
+      "subjectId": "computer-science-a",
+      "laneWidth": 159,
+      "faceHeight": 132,
+      "nameClamp": 6,
+      "nameLines": 1,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 92
+    },
+    {
+      "subjectId": "environmental-science",
+      "laneWidth": 159,
+      "faceHeight": 117,
+      "nameClamp": 5,
+      "nameLines": 2,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 62
+    },
+    {
+      "subjectId": "computer-science-principles",
+      "laneWidth": 159,
+      "faceHeight": 132,
+      "nameClamp": 6,
+      "nameLines": 2,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 77
+    },
+    {
+      "subjectId": "psychology",
+      "laneWidth": 159,
+      "faceHeight": 117,
+      "nameClamp": 5,
+      "nameLines": 1,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 77
+    },
+    {
+      "subjectId": "world-history-modern",
+      "laneWidth": 159,
+      "faceHeight": 143,
+      "nameClamp": 6,
+      "nameLines": 2,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 88
+    },
+    {
+      "subjectId": "spanish-literature-and-culture",
+      "laneWidth": 159,
+      "faceHeight": 132,
+      "nameClamp": 6,
+      "nameLines": 2,
+      "nameHidden": 0,
+      "clockLines": 1,
+      "spare": 77
+    }
+  ]
+}
