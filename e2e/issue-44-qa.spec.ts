@@ -579,9 +579,16 @@ const evidenceCases = [
       dialog(page).getByRole("heading", { name: "Portfolio component" }),
   },
   {
+    // Issue #73 replaced AP Seminar's two invented `End-of-Course Exam –
+    // Short-Answer/Essay Section` rows (whose 13.5% / 31.5% were `30% of 45%`
+    // and `70% of 45%` multiplied out) with the three components College Board
+    // prints. Seminar therefore has parts now, so it renders the 4-column
+    // TABLE rather than the partless `dl` this case used to wait on — the
+    // readiness locator has to be a table row, not a summary row, or the
+    // screenshot is taken against an element that no longer exists.
     file: "seminar-no-mc",
     subject: "AP Seminar",
-    ready: (page: Page) => summaryRow(page, /Short-Answer Section/),
+    ready: (page: Page) => row(page, /^End-of-Course Exam$/),
   },
 ] as const;
 
