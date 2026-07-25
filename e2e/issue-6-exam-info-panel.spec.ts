@@ -47,11 +47,19 @@ const dialog = (page: Page) => page.getByRole("dialog");
 const selectedCount = (page: Page) => page.getByText(/^\d+ selected$/);
 
 // The <dd> value for a labelled row inside the panel's description lists.
-// Issue #44 (PR #48 bounce): partless exams (like AP Biology) render their
-// sections as spacious label/value rows in the same list, so this locator
-// also reaches section values ("Multiple Choice", "Free Response").
+// Issue #73 bounce: this reaches the METADATA rows only ("Exam length",
+// "Calculator", "Pass rate", the portfolio block). It used to reach section
+// values too, because Jon's PR #48 bounce rendered a partless exam's sections
+// as spacious label/value rows in the same list; every exam renders the
+// sections TABLE now, so section values are read with `sectionRow` below.
 const rowValue = (page: Page, label: string | RegExp): Locator =>
   dialog(page).locator("dl > div").filter({ hasText: label }).locator("dd");
+
+/** A section (or part) row of the sections table, by its row header. */
+const sectionRow = (page: Page, name: string | RegExp): Locator =>
+  dialog(page)
+    .getByRole("row")
+    .filter({ has: page.getByRole("rowheader", { name }) });
 
 test.describe("issue #6 — exam info panel", () => {
   test("AC1 — each chip has a details affordance distinct from the select toggle that opens the panel without selecting", async ({
@@ -94,21 +102,21 @@ test.describe("issue #6 — exam info panel", () => {
     await openInfo(page, "AP Biology");
     await expect(dialog(page)).toBeVisible();
 
-    // Issue #44 (PR #48 bounce): Biology has no published part splits, so its
-    // sections render as spacious label/value rows — no table, no header row.
-    await expect(dialog(page).locator("table")).toHaveCount(0);
-    const mc = rowValue(page, "Multiple Choice");
-    await expect(mc).toContainText("60 questions");
-    await expect(mc).toContainText("1 h 30 min");
-    await expect(mc).toContainText("50% of score");
-    const fr = rowValue(page, "Free Response");
-    await expect(fr).toContainText("6 questions");
-    await expect(fr).toContainText("1 h 30 min");
-    await expect(fr).toContainText("50% of score");
+    // Issue #73 bounce: Biology has no published part splits and still renders
+    // the same sections table as AP Calculus BC — one row per section, no
+    // nested part rows, no second presentation.
+    await expect(dialog(page).locator("table")).toHaveCount(1);
+    await expect(dialog(page).locator("tbody tr")).toHaveCount(2);
+    const mc = sectionRow(page, /^Section I: Multiple Choice$/);
+    await expect(mc.getByRole("cell").nth(0)).toHaveText("60");
+    await expect(mc.getByRole("cell").nth(1)).toHaveText("1 h 30 min");
+    await expect(mc.getByRole("cell").nth(2)).toHaveText("50%");
+    const fr = sectionRow(page, /Section II: Free Response/);
+    await expect(fr.getByRole("cell").nth(0)).toHaveText("6");
+    await expect(fr.getByRole("cell").nth(1)).toHaveText("1 h 30 min");
+    await expect(fr.getByRole("cell").nth(2)).toHaveText("50%");
     // The published FRQ-composition note still renders with its section row.
-    await expect(
-      dialog(page).locator("dl > div").filter({ hasText: "Free Response" }),
-    ).toContainText("2 long, 4 short");
+    await expect(fr).toContainText("2 long, 4 short");
 
     // 180 minutes formatted as hours/minutes → "3 h".
     await expect(rowValue(page, "Exam length")).toHaveText("3 h");

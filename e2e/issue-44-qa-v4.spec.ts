@@ -3,41 +3,44 @@ import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA v4 (issue #44, Jon's post-merge "9px matched" spacing
- * follow-up, PR #53) — independent verification of the approved variant
- * "Reduced 9px + matched meta gap".
+ * follow-up, PR #53) — retargeted by Jon's #73 bounce.
  *
- * Spec under test (Jon's follow-up comment on #44, 2026-07-10):
- *   1. Partless section block vertical padding → 9px above and below the
- *      block's content; the hairline between blocks stays.
- *   2. Sections→metadata gap matched to the metadata rhythm: the last
- *      block's content sits exactly 11px above the divider over
- *      "Exam length" (builder's documented call: 9px block padding + 2px
- *      group margin — the RENDERED distance is what's specified).
- *   Everything else stays as shipped: stats-line offset under the name,
- *   first block's 4px header offset (builder's documented call — the
- *   header gap was not one of the two changes), type sizes, pending chip,
- *   and the multi-part table byte-untouched.
+ * ## What this suite used to verify, and why it changed
  *
- * This suite deliberately does NOT re-assert the builder's computed-style
- * pins (e2e/issue-44-qa.spec.ts). It measures the RENDERED distances with
- * getBoundingClientRect geometry — the mechanism the spec's own
- * parenthetical names as authoritative — and it covers what the builder's
- * revision left unverified:
- *   1. EVERY block of a 5-section partless exam (AAS), not just Biology's
- *      two: 9px rhythm, hairline on each non-last block, none on the last;
- *   2. the 11px sections→divider distance and the 10px divider→first-row
- *      distance as geometry, cross-checked against the metadata rows' own
- *      10px rhythm (the "matched" claim), at desktop AND mobile 375;
- *   3. the hairline-token consistency claim: inter-block hairlines use the
- *      same color as the metadata rows' hairlines, and the zone divider
- *      stays a distinct, stronger token — in light AND dark;
- *   4. the table branch's runtime guard: Calc AB's metadata group keeps
- *      its shipped mt-2 (8px) with NO leaked zone divider or hairlines.
+ * Jon's follow-up (2026-07-10) tuned the PARTLESS layout's spacing: 9px above
+ * and below each prose block's content, a hairline between blocks, and a
+ * sections→metadata gap "matched to the metadata rhythm" — the last block's
+ * content sitting exactly 11px above the divider over "Exam length". Jon's
+ * #73 bounce deletes the prose blocks entirely (one presentation for every
+ * exam), so every distance this suite measured now has no element to measure.
  *
- * Evidence (Jon's mandated set: Biology + AAS, light+dark, desktop+mobile,
- * plus Calc AB unchanged and the three standard viewports) is captured to the
- * `issue-44-qa-v4` evidence folder resolved by `evidenceDir()` — see
- * e2e/support/evidence.ts for how a lane points it at
+ * The CLAIM behind those numbers survives, and is what this suite now pins:
+ * the sections group and the metadata group read as ONE vertical rhythm
+ * rather than two competing ones. In the table that is a stronger, simpler
+ * statement, because both are built from the same tokens:
+ *   1. every SECTION row carries the metadata rows' own 10px padding (py-2.5)
+ *      top and bottom — one rhythm, not a denser table crammed above airier
+ *      rows, which was the original complaint that produced PR #48;
+ *   2. hairlines between section rows use the SAME token as the hairlines
+ *      between metadata rows, in light AND dark — the "separated by
+ *      hairlines" half of the follow-up;
+ *   3. the last row of each group carries no hairline, so nothing doubles up
+ *      at a group boundary — the reason the old spec put no border on the
+ *      last block;
+ *   4. the prose block's zone DIVIDER is gone: the metadata group keeps the
+ *      shipped `mt-2` (8px) and no border, which is what the table branch
+ *      always had and what every subject has now;
+ *   5. PART rows stay visually subordinate — tighter padding (8px) and a
+ *      deeper indent than their section row. This is new: the prose layout
+ *      had no parts to subordinate, and it is the geometry most at risk in a
+ *      port that merges two layouts into one.
+ *
+ * As before, this suite measures RENDERED distances with
+ * getBoundingClientRect geometry rather than re-asserting the builder's
+ * computed-style pins, and covers desktop AND mobile 375, light AND dark.
+ *
+ * Evidence is captured to the `issue-44-qa-v4` evidence folder resolved by
+ * `evidenceDir()` — see e2e/support/evidence.ts for how a lane points it at
  * docs/super-board/runs/ when it wants committed evidence.
  */
 
@@ -58,21 +61,17 @@ async function openInfo(page: Page, name: string) {
   await expect(dialog(page)).toBeVisible();
 }
 
-/** The partless sections <dl> — the only dl that carries stat phrases. */
-const sectionsDl = (page: Page): Locator =>
-  dialog(page)
-    .locator("dl")
-    .filter({ has: page.getByTestId("stat-phrase") });
+const sectionsTable = (page: Page) => dialog(page).locator("table");
 
 /** The metadata <dl> (Exam length / Calculator / Delivery rows). */
 const metaDl = (page: Page): Locator =>
   dialog(page).locator("dl").filter({ hasText: "Exam length" });
 
-/** A section/summary row by its dt/label text. */
-const summaryRow = (page: Page, name: string | RegExp): Locator =>
-  dialog(page).locator("dl > div").filter({ hasText: name });
-
-const sectionsTable = (page: Page) => dialog(page).locator("table");
+/** A section (or part) row of the sections table, by its row header. */
+const row = (page: Page, name: string | RegExp): Locator =>
+  dialog(page)
+    .getByRole("row")
+    .filter({ has: page.getByRole("rowheader", { name }) });
 
 async function seedDarkTheme(page: Page) {
   await page.addInitScript(
@@ -81,202 +80,201 @@ async function seedDarkTheme(page: Page) {
   );
 }
 
-type BlockBox = {
-  rectTop: number;
-  rectBottom: number;
-  paddingTop: number;
-  paddingBottom: number;
-  borderTopWidth: number;
+type RowBox = {
+  isPart: boolean;
+  headerPaddingLeft: number;
+  headerPaddingTop: number;
+  cellPaddingTop: number;
+  cellPaddingBottom: number;
   borderBottomWidth: number;
   borderBottomColor: string;
 };
 
-/** Geometry + box model of every child block of the partless sections dl. */
-const measureBlocks = (dl: Locator): Promise<BlockBox[]> =>
-  dl.evaluate((el) =>
-    [...el.children].map((child) => {
-      const rect = child.getBoundingClientRect();
-      const cs = getComputedStyle(child);
-      return {
-        rectTop: rect.top,
-        rectBottom: rect.bottom,
-        paddingTop: parseFloat(cs.paddingTop),
-        paddingBottom: parseFloat(cs.paddingBottom),
-        borderTopWidth: parseFloat(cs.borderTopWidth),
-        borderBottomWidth: parseFloat(cs.borderBottomWidth),
-        borderBottomColor: cs.borderBottomColor,
-      };
-    }),
-  );
+/**
+ * Box model of every body row of the sections table. A part row is identified
+ * the way a screen reader identifies it: its row header carries the sr-only
+ * "<section> — " prefix that programmatically ties it to its parent.
+ */
+const measureRows = (page: Page): Promise<RowBox[]> =>
+  sectionsTable(page)
+    .locator("tbody tr")
+    .evaluateAll((rows) =>
+      rows.map((tr) => {
+        const header = tr.querySelector("th")!;
+        const cell = tr.querySelector("td")!;
+        const headerCs = getComputedStyle(header);
+        const cellCs = getComputedStyle(cell);
+        const trCs = getComputedStyle(tr);
+        return {
+          isPart: !!header.querySelector(".sr-only"),
+          headerPaddingLeft: parseFloat(headerCs.paddingLeft),
+          headerPaddingTop: parseFloat(headerCs.paddingTop),
+          cellPaddingTop: parseFloat(cellCs.paddingTop),
+          cellPaddingBottom: parseFloat(cellCs.paddingBottom),
+          borderBottomWidth: parseFloat(trCs.borderBottomWidth),
+          borderBottomColor: trCs.borderBottomColor,
+        };
+      }),
+    );
 
 const measureMeta = (dl: Locator) =>
   dl.evaluate((el) => {
-    const rect = el.getBoundingClientRect();
     const cs = getComputedStyle(el);
     const firstRow = el.children[0]!;
     const firstRowCs = getComputedStyle(firstRow);
-    const firstRowRect = firstRow.getBoundingClientRect();
+    const lastRow = el.children[el.children.length - 1]!;
     return {
-      rectTop: rect.top,
       marginTop: parseFloat(cs.marginTop),
       paddingTop: parseFloat(cs.paddingTop),
       borderTopWidth: parseFloat(cs.borderTopWidth),
-      borderTopColor: cs.borderTopColor,
-      firstRowRectTop: firstRowRect.top,
       firstRowPaddingTop: parseFloat(firstRowCs.paddingTop),
       firstRowPaddingBottom: parseFloat(firstRowCs.paddingBottom),
+      firstRowBorderBottomWidth: parseFloat(firstRowCs.borderBottomWidth),
       firstRowBorderBottomColor: firstRowCs.borderBottomColor,
+      lastRowBorderBottomWidth: parseFloat(
+        getComputedStyle(lastRow).borderBottomWidth,
+      ),
     };
   });
 
 /**
- * The core "9px matched" geometry contract, asserted for one open partless
- * dialog: 9px block rhythm, hairlines between blocks only, 11px rendered
- * distance from the last block's content to the zone divider, and the
- * metadata rows' own 10px rhythm immediately below it.
+ * The ported "one rhythm" contract, asserted for one open dialog: section
+ * rows on the metadata rows' own 10px rhythm, one shared hairline token, no
+ * hairline at either group's last row, and no leftover zone divider.
  */
-async function assertNinePxMatched(page: Page, expectedBlocks: number) {
-  const blocks = await measureBlocks(sectionsDl(page));
-  expect(blocks).toHaveLength(expectedBlocks);
+async function assertOneRhythm(page: Page, expectedSectionRows: number) {
+  const rows = await measureRows(page);
+  const sections = rows.filter((r) => !r.isPart);
+  expect(sections).toHaveLength(expectedSectionRows);
 
-  blocks.forEach((b, i) => {
-    const isFirst = i === 0;
-    const isLast = i === blocks.length - 1;
-    // 9px above and below each block's content — except the first block's
-    // shipped 4px header offset (documented builder call, unchanged spec).
-    expect(b.paddingTop, `block ${i} padding-top`).toBeCloseTo(
-      isFirst ? 4 : 9,
-      1,
-    );
-    expect(b.paddingBottom, `block ${i} padding-bottom`).toBeCloseTo(9, 1);
-    // Hairline between blocks: bottom edge of every non-last block, never
-    // the last (nothing may double up against the zone divider).
-    expect(b.borderTopWidth, `block ${i} border-top`).toBe(0);
-    expect(b.borderBottomWidth, `block ${i} border-bottom`).toBeCloseTo(
+  const meta = await measureMeta(metaDl(page));
+
+  rows.forEach((r, i) => {
+    const isLast = i === rows.length - 1;
+    if (!r.isPart) {
+      // (1) Section rows share the metadata rows' 10px rhythm exactly.
+      expect(r.cellPaddingTop, `section row ${i} padding-top`).toBeCloseTo(
+        meta.firstRowPaddingTop,
+        1,
+      );
+      expect(r.cellPaddingBottom, `section row ${i} padding-bottom`).toBeCloseTo(
+        meta.firstRowPaddingBottom,
+        1,
+      );
+      expect(r.cellPaddingTop, `section row ${i} is on the 10px rhythm`).toBeCloseTo(
+        10,
+        1,
+      );
+      expect(
+        r.headerPaddingTop,
+        `section row ${i} header is on the 10px rhythm`,
+      ).toBeCloseTo(10, 1);
+    } else {
+      // (5) Part rows are subordinate: the ROW HEADER is tighter than a
+      // section row's (8px vs 10px). Note the value cells are deliberately
+      // NOT re-measured here — they carry the shared `sectionsTableNumCell`
+      // 10px padding on section and part rows alike, which is why the visible
+      // subordination comes from the header's padding plus its indent.
+      expect(r.headerPaddingTop, `part row ${i} header padding-top`).toBeCloseTo(
+        8,
+        1,
+      );
+    }
+    // (3) Hairline on every row but the last of the group.
+    expect(r.borderBottomWidth, `body row ${i} border-bottom`).toBeCloseTo(
       isLast ? 0 : 1,
       1,
     );
+    if (!isLast) {
+      // (2) One hairline token across both groups.
+      expect(
+        r.borderBottomColor,
+        `body row ${i} hairline token`,
+      ).toBe(meta.firstRowBorderBottomColor);
+    }
   });
 
-  // Rendered inter-block rhythm: content bottom of block N to content top of
-  // block N+1 = 9px + 1px hairline + 9px = 19px, hairline centered.
-  for (let i = 0; i + 1 < blocks.length; i++) {
-    const contentBottom =
-      blocks[i].rectBottom -
-      blocks[i].paddingBottom -
-      blocks[i].borderBottomWidth;
-    const contentTop = blocks[i + 1].rectTop + blocks[i + 1].paddingTop;
-    expect(contentTop - contentBottom, `gap between blocks ${i}/${i + 1}`)
-      .toBeCloseTo(19, 1);
-  }
+  // (3) again, for the metadata group's own last row.
+  expect(meta.firstRowBorderBottomWidth).toBeCloseTo(1, 1);
+  expect(meta.lastRowBorderBottomWidth).toBeCloseTo(0, 1);
 
-  const meta = await measureMeta(metaDl(page));
-  const last = blocks[blocks.length - 1];
-
-  // THE specified rendered distance: last block's content sits exactly 11px
-  // above the zone divider (metaDl's top border edge).
-  expect(meta.rectTop - (last.rectBottom - last.paddingBottom)).toBeCloseTo(
-    11,
-    1,
-  );
-  expect(meta.borderTopWidth).toBeCloseTo(1, 1);
-
-  // …and the first metadata row keeps its usual 10px below the divider —
-  // the metadata rhythm the gap is matched to (10px on both sides of every
-  // metadata hairline).
+  // (4) The prose block's zone divider is gone; the shipped mt-2 remains.
+  expect(meta.borderTopWidth).toBe(0);
+  expect(meta.marginTop).toBeCloseTo(8, 1);
   expect(meta.paddingTop).toBe(0);
-  expect(
-    meta.firstRowRectTop + meta.firstRowPaddingTop -
-      (meta.rectTop + meta.borderTopWidth),
-  ).toBeCloseTo(10, 1);
-  expect(meta.firstRowPaddingTop).toBeCloseTo(10, 1);
-  expect(meta.firstRowPaddingBottom).toBeCloseTo(10, 1);
 
-  return { blocks, meta };
+  return { rows, meta };
 }
 
-test.describe("issue #44 v4 — '9px matched' spacing follow-up", () => {
-  test("AC1/AC2 — AP Biology (2 partless blocks): 9px block rhythm with centered hairlines, 11px rendered gap to the zone divider, 10px metadata rhythm below it (desktop, light)", async ({
+test.describe("issue #44 v4 — one vertical rhythm after the #73 one-presentation port", () => {
+  test("AC1/AC2 — AP Biology (2 sections, no parts): section rows sit on the metadata rows' own 10px rhythm under one hairline token, with no leftover zone divider (desktop, light)", async ({
     page,
   }) => {
     await page.goto("/");
     await openInfo(page, "AP Biology");
-    await assertNinePxMatched(page, 2);
+    const { rows } = await assertOneRhythm(page, 2);
+    // A section with no parts is one row and nothing else.
+    expect(rows.filter((r) => r.isPart)).toHaveLength(0);
+    expect(rows).toHaveLength(2);
   });
 
-  // Issue #73 note: AP African American Studies was this suite's multi-section
-  // PARTLESS stress case. #73 collapsed its two invented sibling "Section II:"
-  // rows into the single "Section II: Free Response" College Board prints, with
-  // the SAQ and DBQ as parts — so AAS now renders the 4-column table, not the
-  // spacious blocks. The partless-layout contracts below are unchanged; they now
-  // exercise AP Music Theory, the remaining 3-section exam with no parts
-  // (including the dataset's longest partless section name, "Section IIB: Free
-  // Response: Sight Singing").
-
-  test("AC2 — AP Music Theory (3 partless blocks): the SAME 9px/11px contract holds on every block of a multi-section exam (desktop, light)", async ({
+  // AP African American Studies was this suite's multi-section PARTLESS stress
+  // case. Issue #73 gave it published part rows (SAQ / DBQ under the single
+  // printed "Section II: Free Response"), so AP Music Theory inherits the
+  // case — and it is the subject Jon's #73 bounce named as proof the fix must
+  // not be `sections.length === 2`.
+  test("AC2 — AP Music Theory (3 sections, no parts): the SAME rhythm contract holds on every row of a multi-section exam (desktop, light)", async ({
     page,
   }) => {
     await page.goto("/");
     await openInfo(page, "AP Music Theory");
-    await assertNinePxMatched(page, 3);
+    const { rows } = await assertOneRhythm(page, 3);
+    expect(rows.filter((r) => r.isPart)).toHaveLength(0);
   });
 
-  test("AC1 — dark theme: the 9px/11px contract holds, inter-block hairlines share the metadata rows' hairline token, and the zone divider stays a distinct stronger token (Music Theory, desktop, dark)", async ({
+  test("AC1 — dark theme: the rhythm contract holds and section-row hairlines still share the metadata rows' token (Music Theory, desktop, dark)", async ({
     page,
   }) => {
     await seedDarkTheme(page);
     await page.goto("/");
     await expect(page.locator("html")).toHaveClass(/dark/);
     await openInfo(page, "AP Music Theory");
-    const { blocks, meta } = await assertNinePxMatched(page, 3);
-
-    // "Separated by hairlines" means ONE rhythm across both zones: the
-    // inter-block hairline color must equal the metadata rows' hairline
-    // color, and the zone divider must differ from both (it marks the zone
-    // boundary, not a row boundary).
-    expect(blocks[0].borderBottomColor).toBe(meta.firstRowBorderBottomColor);
-    expect(meta.borderTopColor).not.toBe(blocks[0].borderBottomColor);
+    const { rows, meta } = await assertOneRhythm(page, 3);
+    expect(rows[0].borderBottomColor).toBe(meta.firstRowBorderBottomColor);
   });
 
-  test("AC1 — light theme hairline tokens: inter-block hairline = metadata hairline, zone divider distinct (Biology, desktop, light)", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    await openInfo(page, "AP Biology");
-    const { blocks, meta } = await assertNinePxMatched(page, 2);
-    expect(blocks[0].borderBottomColor).toBe(meta.firstRowBorderBottomColor);
-    expect(meta.borderTopColor).not.toBe(blocks[0].borderBottomColor);
-  });
-
-  test("AC1/AC4 — mobile 375: the rendered 9px/11px distances are viewport-independent (Biology, light)", async ({
+  test("AC1/AC4 — mobile 375: the rendered distances are viewport-independent (Biology, light)", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/");
     await openInfo(page, "AP Biology");
-    await assertNinePxMatched(page, 2);
+    await assertOneRhythm(page, 2);
   });
 
-  test("AC2 — table branch runtime guard: Calc AB keeps the table, and its metadata group keeps the shipped mt-2 with NO leaked zone divider or partless hairlines", async ({
+  test("AC2/AC5 — a part-carrying exam (Calc AB) keeps the same section rhythm, and its part rows stay subordinate: tighter padding AND a deeper indent than their section row", async ({
     page,
   }) => {
     await page.goto("/");
     await openInfo(page, "AP Calculus AB");
+    const { rows } = await assertOneRhythm(page, 2);
 
-    await expect(sectionsTable(page)).toBeVisible();
-    // The partless sections dl must not exist here at all.
-    await expect(sectionsDl(page)).toHaveCount(0);
+    const parts = rows.filter((r) => r.isPart);
+    expect(parts.length).toBeGreaterThan(0);
+    const section = rows.find((r) => !r.isPart)!;
+    for (const part of parts) {
+      expect(part.headerPaddingLeft).toBeGreaterThan(section.headerPaddingLeft);
+      expect(part.headerPaddingTop).toBeLessThan(section.headerPaddingTop);
+    }
 
-    const meta = await measureMeta(metaDl(page));
-    expect(meta.marginTop).toBeCloseTo(8, 1); // shipped mt-2, untouched
-    expect(meta.borderTopWidth).toBe(0); // the partless-only divider must not leak
-    expect(meta.paddingTop).toBe(0);
-    expect(meta.firstRowPaddingTop).toBeCloseTo(10, 1); // metadata rhythm untouched
+    // The section row's own numbers match a partless exam's exactly — the two
+    // cases are one case now.
+    expect(section.cellPaddingTop).toBeCloseTo(10, 1);
   });
 });
 
-// --- Evidence capture (Jon's mandated set: Biology + AAS, light+dark, --------
-// --- desktop+mobile; Calc AB unchanged; standard viewports) ------------------
+// --- Evidence capture (Biology + Music Theory, light+dark, desktop+mobile; ---
+// --- Calc AB as the part-carrying control; the standard viewports) -----------
 
 const viewports = [
   { name: "desktop", width: 1920, height: 1080 },
@@ -285,15 +283,13 @@ const viewports = [
 ] as const;
 
 for (const vp of viewports) {
-  test(`evidence — partless Biology, 9px matched (${vp.name} ${vp.width}x${vp.height}, light)`, async ({
+  test(`evidence — partless Biology, one rhythm (${vp.name} ${vp.width}x${vp.height}, light)`, async ({
     page,
   }) => {
     await page.setViewportSize({ width: vp.width, height: vp.height });
     await page.goto("/");
     await openInfo(page, "AP Biology");
-    await expect(
-      summaryRow(page, "Multiple Choice").locator("dd"),
-    ).toBeVisible();
+    await expect(row(page, /^Section I: Multiple Choice$/)).toBeVisible();
     await page.screenshot({ path: `${EVIDENCE_DIR}/${vp.name}.png` });
   });
 }
@@ -303,14 +299,14 @@ const evidenceCases = [
     file: "biology-partless",
     subject: "AP Biology",
     devices: ["desktop", "mobile"],
-    ready: (page: Page) => summaryRow(page, "Multiple Choice").locator("dd"),
+    ready: (page: Page) => row(page, /^Section I: Multiple Choice$/),
   },
   {
     file: "music-theory-3-sections-partless",
     subject: "AP Music Theory",
     devices: ["desktop", "mobile"],
     ready: (page: Page) =>
-      summaryRow(page, "Section IIB: Free Response: Sight Singing").locator("dd"),
+      row(page, /^Section IIB: Free Response: Sight Singing$/),
   },
   {
     file: "calculus-ab-table-unchanged",

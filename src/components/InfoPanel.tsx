@@ -8,11 +8,7 @@ import type {
 } from "@/data/schema";
 import { CYCLE } from "@/data/cycle";
 import { useModalDialog } from "@/lib/modal";
-import {
-  partWeight,
-  questionCountLabel,
-  sectionsHavePartRows,
-} from "@/lib/exam-sections";
+import { partWeight } from "@/lib/exam-sections";
 import { officialCollegeBoardUrl } from "@/lib/college-board-links";
 import { SubjectName } from "@/components/SubjectName";
 import { ArrowUpRightIcon } from "@/components/ArrowUpRightIcon";
@@ -33,14 +29,19 @@ import { ArrowUpRightIcon } from "@/components/ArrowUpRightIcon";
  * published" are different states: only genuinely unpublished values show
  * the "pending" badge.
  *
- * Layout branch (Jon's PR #48 design bounce): the 4-column table renders
- * ONLY when a section has published part rows (Calculus AB, the language
- * exams). An exam with no parts — however many sections it has — renders one
- * spacious two-line block per section instead (bounce pass 2: name line +
- * muted left-aligned stats line, wrapping only between `·`-separated stat
- * phrases), in its own group visually distinct from the metadata rows below
- * ("Exam length", "Calculator", …). See {@link sectionsHavePartRows} and
- * {@link SectionBlock}.
+ * ONE presentation for every exam (Jon's #73 bounce, 2026-07-25). Every
+ * subject with at least one published section renders {@link SectionsTable};
+ * part rows nest under their section where parts exist and are simply absent
+ * where they don't. This **supersedes Jon's PR #48 design bounce**, which had
+ * given partless exams a spacious two-line block per section instead of the
+ * table (pass 2: "no table, no column header"), tuned again in his "9px
+ * matched" spacing follow-up (2026-07-10). Both were deliberate calls; the
+ * cost was that AP Human Geography and AP English Language presented nothing
+ * like AP Calculus BC even though every number the table needs is published
+ * for them — the exact inconsistency issue #73 exists to remove. The prose
+ * block and its parts-based branch rule (`sectionsHavePartRows`) are gone;
+ * see the presentation history in src/lib/exam-sections.ts before adding a
+ * second layout back.
  *
  * A single instance is rendered by {@link CatalogGrid} for the currently open
  * subject (not one per card). The dialog:
@@ -168,14 +169,32 @@ const sectionsTableHeaderCell =
 const sectionsTableNumCell = "py-2.5 pl-2 text-right align-baseline";
 
 /**
- * The per-section questions | length | weight table (issue #44).
+ * The per-section questions | length | weight table (issue #44) — since Jon's
+ * #73 bounce, the ONLY presentation any exam gets.
  *
  * A real `<table>` so screen readers convey each value's column relationship;
- * every section and part row is a `<th scope="row">`. Part rows are visually
- * subordinate (indented, lighter weight) and programmatically associated with
- * their section via an sr-only "<section> — " prefix in the row header.
- * Design decision (issue #44): parts render as indented sub-rows of the same
- * table rather than a nested sub-table — one header set, simpler AT output.
+ * every section and part row is a `<th scope="row">`, under the sr-only
+ * caption. Part rows are visually subordinate (indented, lighter weight) and
+ * programmatically associated with their section via an sr-only
+ * "<section> — " prefix in the row header. Design decision (issue #44): parts
+ * render as indented sub-rows of the same table rather than a nested
+ * sub-table — one header set, simpler AT output.
+ *
+ * A section with no published parts is exactly one row and nothing else — no
+ * empty part row, no placeholder. `section.parts?.map` covers both the
+ * omitted and the empty array; the 18 subjects that render no part rows at
+ * all (AP Human Geography, AP Music Theory, …) reach this table with the
+ * same markup the 20 part-carrying subjects already used.
+ *
+ * Honest degradation (PRD §7.5) is per CELL, and the three states stay
+ * distinct in every column:
+ *   - `"pending"` → the {@link PendingBadge} inline in its own cell. Never a
+ *     blank cell, never a dropped row.
+ *   - a published range ("55–75", "65–70") → verbatim, never averaged.
+ *   - a value College Board does not print at all → {@link NotPublishedDash}.
+ *     Omission ≠ pending: `undefined` means the concept does not apply (the
+ *     AAS Individual Student Project is a project, not a question set),
+ *     `"pending"` means CB publishes a number this capture does not have.
  */
 function SectionsTable({ sections }: { sections: readonly ExamSection[] }) {
   return (
@@ -275,91 +294,6 @@ function SectionsTable({ sections }: { sections: readonly ExamSection[] }) {
   );
 }
 
-/**
- * Spacious two-line section block for exams with NO published part splits
- * (Jon's PR #48 design bounce, pass 2): no table, no column header — each
- * section renders as a left-aligned block:
- *
- *   Multiple Choice
- *   60 questions · 1 h 30 min · 50% of score
- *
- * Line 1 is the section name — medium weight, never truncated; long College
- * Board names wrap harmlessly because nothing shares the line. Line 2 is the
- * muted stats line: each `·`-separated stat phrase is atomic
- * (whitespace-nowrap, separator kept with the preceding phrase), so the line
- * can only wrap BETWEEN phrases — "50% of / score" mid-phrase breaks are
- * impossible by construction. A published note (FRQ composition etc.) stays
- * as a third muted line. Blocks are separated by hairlines, and the whole
- * sections group sits above a divider so it reads as a distinct zone from
- * the metadata rows below.
- *
- * Value shape: `<count> questions · <length> · <weight>% of score`. Honest
- * degradation is unchanged in meaning:
- *   - a "pending" value renders the pending badge inline in its stat slot —
- *     never a blanked segment, never a dropped row;
- *   - a published range ("55–75") renders verbatim;
- *   - a question count College Board does not print at all (omission — e.g.
- *     the AAS Individual Student Project, which is a project, not a question
- *     set) omits the questions phrase entirely: omission ≠ pending.
- *
- * The dt/dd pairing keeps the section-name → questions/length/weight
- * association programmatic for screen readers.
- *
- * Spacing (Jon's post-merge "9px matched" follow-up, 2026-07-10): each block
- * keeps 9px above and below its content with a hairline between blocks, and
- * the sections→metadata gap is matched to the metadata rhythm — the last
- * block's content sits exactly 11px above the divider (9px block padding +
- * 2px metadata-group margin), while the first metadata row keeps its usual
- * 10px (py-2.5) below it, the same distance every metadata row keeps from
- * its hairlines. The first block keeps its shipped 4px top padding — the
- * header offset was already tighter than the mock and was not part of the
- * two specified changes.
- */
-function SectionBlock({ section }: { section: ExamSection }) {
-  const phrases: ReactNode[] = [];
-  if (section.questionCount !== undefined) {
-    phrases.push(
-      section.questionCount === "pending" ? (
-        <PendingBadge />
-      ) : (
-        questionCountLabel(section.questionCount)
-      ),
-    );
-  }
-  phrases.push(<MinutesValue value={section.minutes} />);
-  phrases.push(
-    section.weightPercent === "pending" ? (
-      <PendingBadge />
-    ) : (
-      `${section.weightPercent}% of score`
-    ),
-  );
-
-  return (
-    <div className="py-[9px] first:pt-1">
-      <dt className="text-sm font-medium break-words text-slate-900 dark:text-slate-100">
-        {section.name}
-      </dt>
-      <dd className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-        {phrases.map((phrase, index) => (
-          <Fragment key={index}>
-            {index > 0 && " "}
-            <span data-testid="stat-phrase" className="whitespace-nowrap">
-              {phrase}
-              {index < phrases.length - 1 && " ·"}
-            </span>
-          </Fragment>
-        ))}
-        {section.note && (
-          <span className="mt-0.5 block text-xs leading-snug text-slate-500 dark:text-slate-400">
-            {section.note}
-          </span>
-        )}
-      </dd>
-    </div>
-  );
-}
-
 const DELIVERY_LABELS: Record<"digital" | "paper" | "hybrid", string> = {
   digital: "Digital",
   paper: "Paper",
@@ -382,11 +316,6 @@ export function InfoPanel({ subject, onClose }: InfoPanelProps) {
   // portfolio-only subjects) — the exam-format rows are omitted entirely,
   // never rendered as zeroed or "pending" placeholders.
   const hasSections = format.sections.length > 0;
-
-  // Jon's PR #48 design bounce: the 4-column table earns its keep only when
-  // a section has published part rows. The branch is parts-based, never
-  // count-based — a 5-section exam with no parts gets 5 spacious rows.
-  const showSectionsTable = hasSections && sectionsHavePartRows(format.sections);
 
   // Tier 3 (issue #22): verified official College Board page — `null` (link
   // omitted) for any subject without an individually verified URL.
@@ -461,38 +390,15 @@ export function InfoPanel({ subject, onClose }: InfoPanelProps) {
         </div>
 
         <div className="p-5 sm:p-6">
-          {/* Issue #44: one row per published section. The table (with parts
-              nested beneath their section) renders only when the exam HAS
-              published parts; a partless exam renders its sections as
-              spacious two-line blocks in their own group instead (PR #48
-              bounce, pass 2), separated from the metadata rows below by a
-              divider at the metadata rows' own rhythm ("9px matched"
-              follow-up) so the two zones read as distinct but share one
-              vertical rhythm.
+          {/* One row per published section, parts nested beneath their own
+              section — the single presentation every exam now gets (Jon's #73
+              bounce, superseding the PR #48 partless prose blocks; see the
+              module doc above).
               A portfolio-only subject has no sections — no table, no zeroed
               rows; its portfolio block below tells the real story. */}
-          {showSectionsTable && <SectionsTable sections={format.sections} />}
+          {hasSections && <SectionsTable sections={format.sections} />}
 
-          {hasSections && !showSectionsTable && (
-            <dl className="divide-y divide-slate-100 dark:divide-slate-800">
-              {format.sections.map((section, index) => (
-                <SectionBlock
-                  key={`${index}-${section.name}`}
-                  section={section}
-                />
-              ))}
-            </dl>
-          )}
-
-          <dl
-            className={
-              showSectionsTable
-                ? "mt-2"
-                : hasSections
-                  ? "mt-0.5 border-t border-slate-200 dark:border-slate-700"
-                  : undefined
-            }
-          >
+          <dl className={hasSections ? "mt-2" : undefined}>
             {hasSections && (
               <>
                 <Row label="Exam length">

@@ -1,86 +1,25 @@
 import { describe, expect, it } from "vitest";
-import type { ExamSection, ExamSectionPart } from "@/data/schema";
-import {
-  partWeight,
-  questionCountLabel,
-  sectionsHavePartRows,
-} from "./exam-sections";
+import type { ExamSectionPart } from "@/data/schema";
+import { partWeight } from "./exam-sections";
 
 /**
- * Issue #44 (Jon's PR #48 design bounce) — the hasParts branch rule.
+ * Two describe blocks that used to live here left with the layout they
+ * described (Jon's #73 bounce — one presentation for every exam):
  *
- * The InfoPanel renders the 4-column sections table ONLY when a section has
- * published part rows; otherwise every section becomes a spacious
- * metadata-style row. The rule is parts-based, never count-based: a
- * 5-section exam with no parts (AP African American Studies) must NOT get
- * the table.
+ *   - "sectionsHavePartRows — the table-vs-rows branch rule" asserted that a
+ *     partless exam must NOT get the table (issue #44 / Jon's PR #48 design
+ *     bounce). Every exam gets the table now, so the rule it pinned no longer
+ *     exists — keeping the block would have kept a helper alive purely to be
+ *     tested. The runtime replacement is an e2e contract, not a unit one:
+ *     `e2e/issue-73-one-presentation.spec.ts` walks all 38 sit-down subjects
+ *     and fails if any renders something other than the table.
+ *   - "questionCountLabel — singular/plural and verbatim ranges" pinned the
+ *     prose block's "1 question" / "55–75 questions" phrasing; the table's
+ *     Questions column is a bare number under its own column header.
+ *
+ * Both are in `git show 741a900:src/lib/exam-sections.test.ts` if a future
+ * layout brings the helpers back.
  */
-
-const section = (overrides: Partial<ExamSection> = {}): ExamSection => ({
-  name: "Multiple Choice",
-  questionCount: 60,
-  minutes: 90,
-  weightPercent: 50,
-  ...overrides,
-});
-
-const parts: ExamSection["parts"] = [
-  { name: "Part A", questionCount: 30, minutes: 60, note: "No calculator" },
-  { name: "Part B", questionCount: 15, minutes: 45 },
-];
-
-describe("sectionsHavePartRows — the table-vs-rows branch rule", () => {
-  it("is false for a portfolio-only subject (no sections at all)", () => {
-    expect(sectionsHavePartRows([])).toBe(false);
-  });
-
-  it("is false for a plain two-section exam with no parts (AP Biology shape)", () => {
-    expect(
-      sectionsHavePartRows([section(), section({ name: "Free Response" })]),
-    ).toBe(false);
-  });
-
-  it("is false for a MULTI-section exam with no parts — the rule is parts-based, not count-based (AAS shape, 5 sections)", () => {
-    expect(
-      sectionsHavePartRows([
-        section({ name: "Section I: Multiple Choice" }),
-        section({ name: "Section IB: Validation Question" }),
-        section({ name: "Section II: Short-Answer Questions" }),
-        section({ name: "Section II: Document-Based Question" }),
-        section({ name: "Individual Student Project", minutes: "pending" }),
-      ]),
-    ).toBe(false);
-  });
-
-  it("is true when any section has a published part split (Calculus AB shape)", () => {
-    expect(sectionsHavePartRows([section({ parts })])).toBe(true);
-  });
-
-  it("is true when only a later section has parts (World History: Modern shape)", () => {
-    expect(
-      sectionsHavePartRows([
-        section({ name: "Section IA: Multiple Choice" }),
-        section({ name: "Section IB: Short Answer" }),
-        section({ name: "Section II: Free Response", parts }),
-      ]),
-    ).toBe(true);
-  });
-});
-
-describe("questionCountLabel — singular/plural and verbatim ranges", () => {
-  it("uses the singular for exactly one question", () => {
-    expect(questionCountLabel(1)).toBe("1 question");
-  });
-
-  it("uses the plural for other counts", () => {
-    expect(questionCountLabel(3)).toBe("3 questions");
-    expect(questionCountLabel(60)).toBe("60 questions");
-  });
-
-  it("renders a published range verbatim, plural", () => {
-    expect(questionCountLabel("55–75")).toBe("55–75 questions");
-  });
-});
 
 /**
  * Issue #73 — the part weight cell, one denominator at a time.
