@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ExamSectionPart } from "@/data/schema";
-import { partWeight } from "./exam-sections";
+import { minuteGroups, partWeight } from "./exam-sections";
 
 /**
  * Two describe blocks that used to live here left with the layout they
@@ -107,5 +107,45 @@ describe("partWeight — three printed denominators, zero conversions", () => {
         part({ weightPercent: 25, weightPrinted: "50% of section score" }),
       ),
     ).toEqual({ kind: "percent", value: 25 });
+  });
+});
+
+/**
+ * Jon's second #73 bounce — the Length column is budgeted now, so a duration
+ * can wrap. These cases pin the two halves of that: the groups are the only
+ * places it may break, and joining them reproduces the exact string this app
+ * has printed since issue #6 (nothing here may quietly re-format a duration
+ * while making it wrappable).
+ */
+describe("minuteGroups — a duration breaks between its units, never inside one", () => {
+  it("splits hours from minutes (90 -> '1 h' + '30 min')", () => {
+    expect(minuteGroups(90)).toEqual(["1 h", "30 min"]);
+  });
+
+  it("keeps a whole-hour duration in one group — nothing to break (180)", () => {
+    expect(minuteGroups(180)).toEqual(["3 h"]);
+  });
+
+  it("keeps a sub-hour duration in one group (50)", () => {
+    expect(minuteGroups(50)).toEqual(["50 min"]);
+  });
+
+  it("never splits a unit from its number", () => {
+    for (const total of [45, 50, 60, 62, 90, 105, 165, 195]) {
+      for (const group of minuteGroups(total)) {
+        expect(group, `"${group}" must carry its own unit`).toMatch(
+          /^\d+ (h|min)$/,
+        );
+      }
+    }
+  });
+
+  it("joins back to the string the panel has always printed", () => {
+    const printed = (total: number) => minuteGroups(total).join(" ");
+    expect(printed(90)).toBe("1 h 30 min");
+    expect(printed(165)).toBe("2 h 45 min");
+    expect(printed(180)).toBe("3 h");
+    expect(printed(50)).toBe("50 min");
+    expect(printed(60)).toBe("1 h");
   });
 });

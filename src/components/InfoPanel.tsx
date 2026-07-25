@@ -8,7 +8,7 @@ import type {
 } from "@/data/schema";
 import { CYCLE } from "@/data/cycle";
 import { useModalDialog } from "@/lib/modal";
-import { partWeight } from "@/lib/exam-sections";
+import { minuteGroups, partWeight } from "@/lib/exam-sections";
 import { officialCollegeBoardUrl } from "@/lib/college-board-links";
 import { SubjectName } from "@/components/SubjectName";
 import { ArrowUpRightIcon } from "@/components/ArrowUpRightIcon";
@@ -84,11 +84,34 @@ function Row({ label, children }: { label: ReactNode; children: ReactNode }) {
 
 /** Format a whole-minute duration as e.g. "2 h 45 min" / "3 h" / "50 min". */
 function formatMinutes(total: number): string {
-  const hours = Math.floor(total / 60);
-  const minutes = total % 60;
-  if (hours === 0) return `${minutes} min`;
-  if (minutes === 0) return `${hours} h`;
-  return `${hours} h ${minutes} min`;
+  return minuteGroups(total).join(" ");
+}
+
+/**
+ * A value rendered so it can only ever break BETWEEN its groups.
+ *
+ * The Length column has a width budget now (see {@link SectionsTable}), so at
+ * the narrowest widths "1 h 30 min" no longer has a whole line to itself.
+ * Left to ordinary wrapping it would break wherever it happened to run out of
+ * room — "1 h 30" / "min", or "65–70" split from its "min". Each group is
+ * `whitespace-nowrap` and the only breakable space is the one between them,
+ * so the narrow-width fallback is the readable "1 h" / "30 min".
+ *
+ * The rendered text is identical to the single-line form — plain spaces
+ * between groups, no `&nbsp;` — so `textContent` still reads "1 h 30 min" for
+ * assistive tech and for the specs that assert it.
+ */
+function NoBreakGroups({ groups }: { groups: readonly string[] }) {
+  return (
+    <>
+      {groups.map((group, i) => (
+        <Fragment key={i}>
+          {i > 0 ? " " : null}
+          <span className="whitespace-nowrap">{group}</span>
+        </Fragment>
+      ))}
+    </>
+  );
 }
 
 /**
@@ -114,9 +137,12 @@ function CountValue({ value }: { value: number | string }) {
 /** A duration in whole minutes, a published range (verbatim), or "pending". */
 function MinutesValue({ value }: { value: number | string }) {
   if (value === "pending") return <PendingBadge />;
-  if (typeof value === "number") return <>{formatMinutes(value)}</>;
-  // Published range, e.g. "65–70" — rendered verbatim, never averaged.
-  return <>{value} min</>;
+  if (typeof value === "number")
+    return <NoBreakGroups groups={minuteGroups(value)} />;
+  // Published range, e.g. "65–70" — rendered verbatim, never averaged. The
+  // range itself must never break across lines (a "65–" / "70 min" would read
+  // as a different value), so it is its own group.
+  return <NoBreakGroups groups={[value, "min"]} />;
 }
 
 /**
@@ -154,8 +180,14 @@ function PartWeightValue({ part }: { part: ExamSectionPart }) {
     case "percent":
       return <>{weight.value}%</>;
     case "printed":
+      // `inline-block` + `break-words`: the phrase wraps INSIDE the Weight
+      // column's budget instead of asking for a wider column — the same rule
+      // the section note follows in the Section column (Jon's second #73
+      // bounce). Right-aligned like every other value in the column.
       return (
-        <span className="inline-block text-xs leading-snug">{weight.text}</span>
+        <span className="inline-block text-xs leading-snug break-words">
+          {weight.text}
+        </span>
       );
     case "pending":
       return <PendingBadge />;
@@ -166,7 +198,14 @@ function PartWeightValue({ part }: { part: ExamSectionPart }) {
 
 const sectionsTableHeaderCell =
   "py-2 text-left text-xs font-medium text-slate-500 dark:text-slate-400";
-const sectionsTableNumCell = "py-2.5 pl-2 text-right align-baseline";
+/**
+ * The gutter between the numeric columns: 12px, dropping to 8px below 400px
+ * where those 4px are the difference between the "Questions" header fitting
+ * its budgeted column and overflowing it. Same step on the Section column's
+ * `pr`, so the four gutters always match.
+ */
+const sectionsTableGutter = "pl-2 min-[400px]:pl-3";
+const sectionsTableNumCell = `py-2.5 ${sectionsTableGutter} text-right align-baseline`;
 
 /**
  * The per-section questions | length | weight table (issue #44) — since Jon's
@@ -195,25 +234,92 @@ const sectionsTableNumCell = "py-2.5 pl-2 text-right align-baseline";
  *     Omission ≠ pending: `undefined` means the concept does not apply (the
  *     AAS Individual Student Project is a project, not a question set),
  *     `"pending"` means CB publishes a number this capture does not have.
+ *
+ * ## Column budget (Jon's second #73 bounce, 2026-07-25)
+ *
+ * The columns are budgeted by `<colgroup>` under `table-fixed`, NOT sized
+ * from their content. Under the default auto layout a column's width is
+ * negotiated from what is in it, and the Section cell holds `section.note` —
+ * free prose up to 108 characters ("4 free-response questions (concept
+ * application, quantitative analysis, comparative analysis, argument
+ * essay)"). A long note won that negotiation and squeezed Questions / Length
+ * / Weight into a cramped strip at the right edge: AP Comparative Government
+ * collapsed to `4 · 1 h 30 min · 50%` jammed together. `break-words` did not
+ * help — it governs how a cell wraps once the column is narrow, not how wide
+ * the column asks to be.
+ *
+ * So the three numeric columns take a guaranteed share and Section takes the
+ * remainder. The share is a percentage below 400px and a fixed rem at and
+ * above it. Two steps because the two ends want opposite things: below 400px
+ * every pixel is contested and the numeric columns must scale down with the
+ * dialog to leave the section names anything at all; from 400px up they stop
+ * growing, because a wider dialog does not make "1 h 30 min" any longer — the
+ * slack belongs to the section names, the only cells whose content grows.
+ * Above `sm` the dialog itself stops growing (`max-w-lg`), so every desktop
+ * gets the same 464px table: Section 224px, then 72 / 88 / 80.
+ *
+ * The obvious single expression, `width: min(5.5rem, 27%)`, does NOT work:
+ * Chrome ignores a math function containing a percentage on a table column
+ * (and on a header cell) and silently falls back to equal division — measured,
+ * all four columns came out 115.5px. Plain lengths and plain percentages are
+ * honored, hence the breakpoint.
+ *
+ * The floors are measured, not guessed: "Questions" is the widest thing its
+ * own column ever holds (54px at `text-xs`), the pending pill is 61px and
+ * cannot wrap, and "43.75%" is 45px.
+ *
+ * This is a property of the shared table, so it holds for every subject that
+ * has sections — no per-subject width, no special case for the observed one.
+ * Two column contents can still exceed their budget, and both wrap inside it
+ * rather than widening it: a published length ({@link NoBreakGroups}) and a
+ * part's printed weight ({@link PartWeightValue}, "each worth 25% of section
+ * score"). The Length column is the widest share because it is the only one
+ * that can hold a {@link PendingBadge} (AAS's Individual Student Project),
+ * which is a fixed ~61px pill that cannot wrap.
  */
 function SectionsTable({ sections }: { sections: readonly ExamSection[] }) {
   return (
-    <table className="w-full border-collapse">
+    <table className="w-full table-fixed border-collapse">
       <caption className="sr-only">
         Exam sections: questions, length, and share of score
       </caption>
+      <colgroup>
+        {/* Section: whatever the three budgeted columns leave — 28% of a
+            320px dialog, 224px of the 464px every desktop gets. */}
+        <col />
+        {/* A count, a published range ("55–75"), or a dash. Its widest
+            content is the "Questions" column header itself (54px). */}
+        <col className="w-[24%] min-[400px]:w-[4.5rem]" />
+        {/* "1 h 30 min", "65–70 min", or the pending badge (61px, unwrappable
+            — the widest single thing in any numeric column). */}
+        <col className="w-[27%] min-[400px]:w-[5.5rem]" />
+        {/* "43.75%", a dash, or a printed phrase that wraps. */}
+        <col className="w-[21%] min-[400px]:w-[5rem]" />
+      </colgroup>
       <thead>
         <tr className="border-b border-slate-200 dark:border-slate-700">
-          <th scope="col" className={`${sectionsTableHeaderCell} pr-2`}>
+          <th
+            scope="col"
+            className={`${sectionsTableHeaderCell} pr-2 min-[400px]:pr-3`}
+          >
             Section
           </th>
-          <th scope="col" className={`${sectionsTableHeaderCell} pl-2 text-right`}>
+          <th
+            scope="col"
+            className={`${sectionsTableHeaderCell} ${sectionsTableGutter} text-right`}
+          >
             Questions
           </th>
-          <th scope="col" className={`${sectionsTableHeaderCell} pl-2 text-right`}>
+          <th
+            scope="col"
+            className={`${sectionsTableHeaderCell} ${sectionsTableGutter} text-right`}
+          >
             Length
           </th>
-          <th scope="col" className={`${sectionsTableHeaderCell} pl-2 text-right`}>
+          <th
+            scope="col"
+            className={`${sectionsTableHeaderCell} ${sectionsTableGutter} text-right`}
+          >
             Weight
           </th>
         </tr>
@@ -224,7 +330,7 @@ function SectionsTable({ sections }: { sections: readonly ExamSection[] }) {
             <tr className="border-b border-slate-100 last:border-b-0 dark:border-slate-800">
               <th
                 scope="row"
-                className="py-2.5 pr-2 text-left align-baseline text-sm font-medium break-words text-slate-900 dark:text-slate-100"
+                className="py-2.5 pr-2 text-left align-baseline text-sm font-medium break-words text-slate-900 min-[400px]:pr-3 dark:text-slate-100"
               >
                 {section.name}
                 {section.note && (
@@ -240,7 +346,7 @@ function SectionsTable({ sections }: { sections: readonly ExamSection[] }) {
                   <CountValue value={section.questionCount} />
                 )}
               </td>
-              <td className={`${sectionsTableNumCell} text-sm whitespace-nowrap text-slate-900 dark:text-slate-100`}>
+              <td className={`${sectionsTableNumCell} text-sm text-slate-900 dark:text-slate-100`}>
                 <MinutesValue value={section.minutes} />
               </td>
               <td className={`${sectionsTableNumCell} text-sm whitespace-nowrap text-slate-900 dark:text-slate-100`}>
@@ -258,7 +364,7 @@ function SectionsTable({ sections }: { sections: readonly ExamSection[] }) {
               >
                 <th
                   scope="row"
-                  className="py-2 pr-2 pl-4 text-left align-baseline text-sm font-normal break-words text-slate-600 dark:text-slate-300"
+                  className="py-2 pr-2 pl-4 text-left align-baseline text-sm font-normal break-words text-slate-600 min-[400px]:pr-3 dark:text-slate-300"
                 >
                   <span className="sr-only">{section.name} — </span>
                   {part.name}
@@ -275,7 +381,7 @@ function SectionsTable({ sections }: { sections: readonly ExamSection[] }) {
                     <CountValue value={part.questionCount} />
                   )}
                 </td>
-                <td className={`${sectionsTableNumCell} text-sm whitespace-nowrap text-slate-600 dark:text-slate-300`}>
+                <td className={`${sectionsTableNumCell} text-sm text-slate-600 dark:text-slate-300`}>
                   {part.minutes === undefined ? (
                     <NotPublishedDash />
                   ) : (
