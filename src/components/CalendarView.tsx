@@ -118,6 +118,66 @@ const HOUR_PX = 44;
 /** Vertical breathing gap between stacked blocks, absorbed by the buffer segment. */
 const BLOCK_GAP_PX = 4;
 
+/*
+ * ── Block-face height budget (issue #74) ──────────────────────────────────
+ * The exam segment is a FIXED-height, `overflow-hidden` box (its height is the
+ * exam's published duration), so the rows on it are an allocation problem, not
+ * a styling one. These constants are the rendered geometry of those rows — they
+ * mirror the Tailwind classes on the face and are asserted against the live DOM
+ * by `BUDGET-1` in e2e/issue-74-face-budget.spec.ts, so a class change that
+ * moves them cannot drift silently.
+ */
+
+/** One line of the name / clock rows: `text-xs` 12px × `leading-tight` 1.25. */
+const FACE_LINE_PX = 15;
+/** One marker row: `text-[10px]` 10px × `leading-tight` 1.25. */
+const FACE_MARKER_PX = 12.5;
+/** `mt-0.5` between face rows. */
+const FACE_ROW_GAP_PX = 2;
+/** `py-1` on the exam segment (top + bottom). */
+const FACE_PAD_Y_PX = 8;
+/** The clock keeps its own two-line cap, so the budget reserves both lines. */
+const CLOCK_MAX_LINES = 2;
+/** Floor for the name budget — never fewer lines than the pre-#74 fixed cap. */
+const NAME_MIN_LINES = 2;
+
+/**
+ * How many lines of subject name the face can afford (issue #74).
+ *
+ * Before #74 the name row was a hard `line-clamp-2` regardless of the block's
+ * height, which ellipsised 3/39 names at 1920, 17/39 at 1024 and 23/39 at 375
+ * while leaving 35–87px of the face unused (survey in
+ * `docs/super-board/runs/issue-71-qa-v2/name-clamp-survey.json`). This turns
+ * that cap into a BUDGET: reserve every row that must stay painted below the
+ * name — the clock at its own two-line cap, plus the one-line qualifier and
+ * secondary-marker rows when they render — and give the name whatever whole
+ * lines are left.
+ *
+ * Because the reservation is exact and floored to whole lines, a long name can
+ * never push the qualifier or marker rows past the clip edge (the issue #71
+ * QA v1 defect) — and the name still ellipsises cleanly on a line boundary
+ * instead of being cut mid-glyph, which is what an `overflow`-only budget does.
+ */
+function nameLineBudget({
+  examHeight,
+  hasQualifier,
+  hasSecondaryMarkers,
+}: {
+  examHeight: number;
+  hasQualifier: boolean;
+  hasSecondaryMarkers: boolean;
+}): number {
+  const reservedBelowName =
+    FACE_ROW_GAP_PX +
+    CLOCK_MAX_LINES * FACE_LINE_PX +
+    (hasQualifier ? FACE_ROW_GAP_PX + FACE_MARKER_PX : 0) +
+    (hasSecondaryMarkers ? FACE_ROW_GAP_PX + FACE_MARKER_PX : 0);
+  return Math.max(
+    NAME_MIN_LINES,
+    Math.floor((examHeight - FACE_PAD_Y_PX - reservedBelowName) / FACE_LINE_PX),
+  );
+}
+
 /**
  * Category → block/legend colors — a soft PASTEL scheme (issue #30): low-
  * saturation fills carry a darker same-hue text + a soft same-hue left accent
@@ -270,6 +330,16 @@ function ExamBlock({
     block.movedToLate ? "Moved to late testing" : null,
     block.approximate ? "Length pending" : null,
   ].filter((marker): marker is string => marker !== null);
+  // Issue #74: the name row's line cap is this block's height budget, not a
+  // constant — the rows below it are reserved first (see the ordering contract
+  // on the face below), and the name spends every whole line that is left.
+  const nameLines = nameLineBudget({
+    examHeight,
+    // `Boolean`, not `!== null`: the JSX below renders the row on truthiness,
+    // and the budget must reserve exactly the rows that render.
+    hasQualifier: Boolean(block.examNote),
+    hasSecondaryMarkers: secondaryMarkers.length > 0,
+  });
   // The conflict is carried in WORDS in the accessible name — never by the
   // orange fill or the ⚠️ glyph alone (both are aria-hidden decoration).
   const accessibleName = [
@@ -308,14 +378,19 @@ function ExamBlock({
         className={`flex h-full w-full flex-col overflow-hidden rounded-md border-l-4 text-left text-xs leading-tight transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:ring-offset-white dark:hover:brightness-110 dark:focus-visible:ring-offset-slate-950 ${style} ${block.approximate ? "border-dashed border-t border-r border-b" : ""}`}
       >
         {/* Exam segment — the labelled, duration-proportional portion.
-            ORDERING CONTRACT (issue #71 QA v1): this box has a FIXED height and
-            `overflow-hidden`, so whatever sits last is what disappears, and
-            `toBeVisible()` still reports true for a row clipped to zero pixels.
-            Rows are therefore ordered by how little the reader can recover from
-            elsewhere, and every row after the subject name is height-capped:
+            ORDERING CONTRACT (issue #71 QA v1, budgeted in issue #74): this box
+            has a FIXED height and `overflow-hidden`, so whatever sits last is
+            what disappears, and `toBeVisible()` still reports true for a row
+            clipped to zero pixels. Rows are therefore ordered by how little the
+            reader can recover from elsewhere, and the height is ALLOCATED —
+            every row below the name is `flex-none`, i.e. reserved, and the name
+            spends what is left ({@link nameLineBudget}):
 
-              1. subject name        — clamped to 2 lines
-              2. clock               — clamped to 2 lines
+              1. subject name        — as many whole lines as the face can
+                                       afford after (2)–(4) are reserved; never
+                                       fewer than 2, and it ellipsises only when
+                                       one more line would eat a reserved row
+              2. clock               — clamped to 2 lines (both reserved)
               3. published qualifier — ONE line; nothing else on the grid
                                        discloses it, so it must never be last
               4. secondary markers   — ONE shared line; each of these is also
@@ -324,9 +399,21 @@ function ExamBlock({
                                        dashed border), so this is the row that
                                        may ellipsise on a narrow column
 
-            Do not append a row after (3) or un-cap (1)/(2): both re-open the
-            clipped-marker defect that `AC6-QA7` in e2e/issue-71-qa.spec.ts
-            measures at 1920/1024/375, in the regular and moved-to-late states.
+            Do not append a row after (3), and do not un-cap (1)/(2) by letting
+            them size themselves: (1) is bounded by the budget, not by a fixed
+            cap, and dropping the budget re-opens the clipped-marker defect that
+            `AC6-QA7` in e2e/issue-71-qa.spec.ts measures at 1920/1024/375 (the
+            regular and moved-to-late states) and that `QA-V2-1` / `QA-V2-2` in
+            e2e/issue-71-qa-v2.spec.ts measure in the unresolved-conflict state
+            (the narrowest lanes the grid can produce). The budget itself is
+            measured by e2e/issue-74-face-budget.spec.ts.
+
+            Why the budget and not `flex-1` on a name+clock group: a growing
+            group absorbs the slack, which pushes rows (3)/(4) 19–77px down to
+            the foot of the face, away from the clock they qualify, and spends
+            the cramped state's deficit on the clock's second line instead of on
+            row (4) — the one row this contract designates as clippable. Rows
+            stay top-packed; the budget is arithmetic, and it is exact.
 
             Known and deliberate: below roughly a 64px-wide lane (two or more
             same-slot blocks sharing a phone-width column) the marker rows
@@ -337,10 +424,20 @@ function ExamBlock({
             characters at any readable size. */}
         <span
           aria-hidden="true"
-          className="block min-h-0 flex-none overflow-hidden px-1.5 py-1"
+          className="flex min-h-0 flex-none flex-col overflow-hidden px-1.5 py-1"
           style={{ height: `${examHeight}px` }}
         >
-          <span className="line-clamp-2 font-semibold break-words">
+          <span
+            className="flex-none overflow-hidden font-semibold break-words"
+            style={{
+              // The budgeted line cap. Spelled out rather than Tailwind's
+              // `line-clamp-N` because N is per-block: it is derived from THIS
+              // block's published duration (see {@link nameLineBudget}).
+              display: "-webkit-box",
+              WebkitBoxOrient: "vertical",
+              WebkitLineClamp: nameLines,
+            }}
+          >
             {conflicted && (
               // Decorative caution glyph — a SHAPE cue, not colour; the words
               // live in the button's accessible name and the caption below.
@@ -350,7 +447,7 @@ function ExamBlock({
             )}
             {block.subjectName}
           </span>
-          <span className="mt-0.5 line-clamp-2">{spanLabel}</span>
+          <span className="mt-0.5 line-clamp-2 flex-none">{spanLabel}</span>
           {/* Published qualifier marker (issue #71). A duration-proportional
               block cannot legibly hold a paragraph, so the face carries the
               label and the verbatim text rides the accessible name / tooltip
@@ -358,13 +455,13 @@ function ExamBlock({
           {block.examNote && (
             <span
               data-testid="block-exam-note"
-              className="mt-0.5 block overflow-hidden text-[10px] font-medium text-ellipsis whitespace-nowrap italic"
+              className="mt-0.5 block flex-none overflow-hidden text-[10px] font-medium text-ellipsis whitespace-nowrap italic"
             >
               {EXAM_NOTE_LABEL}
             </span>
           )}
           {secondaryMarkers.length > 0 && (
-            <span className="mt-0.5 block overflow-hidden text-[10px] font-medium text-ellipsis whitespace-nowrap italic">
+            <span className="mt-0.5 block flex-none overflow-hidden text-[10px] font-medium text-ellipsis whitespace-nowrap italic">
               {secondaryMarkers.map((marker, index) => (
                 <span key={marker}>
                   {index > 0 && <span aria-hidden="true"> · </span>}

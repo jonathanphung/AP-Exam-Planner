@@ -63,6 +63,45 @@ const HOUR_PX = 44;
 /** Vertical breathing gap absorbed by the buffer segment (mirrors the site). */
 const BLOCK_GAP_PX = 4;
 
+/*
+ * ── Block-face height budget (issue #74) ──────────────────────────────────
+ * Mirrors {@link nameLineBudget} in src/components/CalendarView.tsx with THIS
+ * renderer's metrics (11px/1.2 body, 10px markers, 4px padding, 2px/1px row
+ * gaps) — the two faces are deliberately kept in sync, see `QA-V2-4` in
+ * e2e/issue-71-qa-v2.spec.ts.
+ */
+/** One line of the name / clock rows: 11px × the node's 1.2 line-height. */
+const FACE_LINE_PX = 13.2;
+/** One marker row: 10px × 1.2. */
+const FACE_MARKER_PX = 12;
+/** Gap above the clock row. */
+const FACE_ROW_GAP_PX = 2;
+/** Gap above a marker row. */
+const FACE_MARKER_GAP_PX = 1;
+/** The exam segment's vertical padding (top + bottom). */
+const FACE_PAD_Y_PX = 8;
+/** The clock keeps a two-line cap here too, so the budget reserves both. */
+const CLOCK_MAX_LINES = 2;
+/** Floor for the name budget — never fewer lines than the pre-#74 fixed cap. */
+const NAME_MIN_LINES = 2;
+
+/** Whole lines of subject name this block's face can afford (see above). */
+function nameLineBudget(
+  examHeight: number,
+  hasQualifier: boolean,
+  hasSecondaryMarkers: boolean,
+): number {
+  const reservedBelowName =
+    FACE_ROW_GAP_PX +
+    CLOCK_MAX_LINES * FACE_LINE_PX +
+    (hasQualifier ? FACE_MARKER_GAP_PX + FACE_MARKER_PX : 0) +
+    (hasSecondaryMarkers ? FACE_MARKER_GAP_PX + FACE_MARKER_PX : 0);
+  return Math.max(
+    NAME_MIN_LINES,
+    Math.floor((examHeight - FACE_PAD_Y_PX - reservedBelowName) / FACE_LINE_PX),
+  );
+}
+
 /** Time-axis gutter width (the site's 3.5rem). */
 const AXIS_W = 56;
 /** Fixed day-column width (px) — wide enough for a subject name + clock. */
@@ -126,23 +165,58 @@ function renderBlock(
     height: `${examHeight}px`,
     overflow: "hidden",
     padding: "4px 6px",
+    display: "flex",
+    flexDirection: "column",
   });
-  // Row order mirrors the site's block face exactly (see the ORDERING CONTRACT
-  // in src/components/CalendarView.tsx): the segment is a fixed height with
-  // `overflow: hidden`, so the qualifier marker goes ABOVE the markers that a
-  // non-text cue already carries, and the secondary markers share one line so
-  // the stack cannot grow with their count.
+  // Row order AND the height budget mirror the site's block face exactly (see
+  // the ORDERING CONTRACT in src/components/CalendarView.tsx): the segment is a
+  // fixed height with `overflow: hidden`, so the qualifier marker goes ABOVE the
+  // markers that a non-text cue already carries, the secondary markers share one
+  // line so the stack cannot grow with their count, every row below the name is
+  // `flex-shrink: 0` (reserved), and the name spends the whole lines that are
+  // left over instead of a fixed two-line cap.
+  const secondaryMarkers = [
+    block.movedToLate ? "Moved to late testing" : null,
+    block.approximate ? "Length pending" : null,
+  ].filter((marker): marker is string => marker !== null);
+  const nameLines = nameLineBudget(
+    examHeight,
+    Boolean(block.examNote),
+    secondaryMarkers.length > 0,
+  );
   examSeg.append(
     el(
       "div",
-      { fontWeight: "600", wordBreak: "break-word" },
+      {
+        fontWeight: "600",
+        wordBreak: "break-word",
+        flexShrink: "0",
+        // `maxHeight` alongside the clamp: `html-to-image` rasterizes through a
+        // cloned, style-inlined subtree, so the budget must hold even if the
+        // vendor-prefixed clamp does not survive the round trip.
+        maxHeight: `${nameLines * FACE_LINE_PX}px`,
+        overflow: "hidden",
+        display: "-webkit-box",
+        webkitBoxOrient: "vertical",
+        webkitLineClamp: `${nameLines}`,
+      },
       block.subjectName,
     ),
   );
   examSeg.append(
     el(
       "div",
-      { marginTop: "2px" },
+      {
+        marginTop: `${FACE_ROW_GAP_PX}px`,
+        flexShrink: "0",
+        // Same two-line cap the site's clock row carries, ellipsis included, so
+        // a narrow lane truncates identically in both renderers.
+        maxHeight: `${CLOCK_MAX_LINES * FACE_LINE_PX}px`,
+        overflow: "hidden",
+        display: "-webkit-box",
+        webkitBoxOrient: "vertical",
+        webkitLineClamp: `${CLOCK_MAX_LINES}`,
+      },
       // Clock only — "length pending" is carried by the marker row below and by
       // the block's dashed border, never twice on one face.
       block.approximate
@@ -158,7 +232,8 @@ function renderBlock(
       el(
         "div",
         {
-          marginTop: "1px",
+          marginTop: `${FACE_MARKER_GAP_PX}px`,
+          flexShrink: "0",
           fontStyle: "italic",
           fontWeight: "500",
           fontSize: "10px",
@@ -170,16 +245,13 @@ function renderBlock(
       ),
     );
   }
-  const secondaryMarkers = [
-    block.movedToLate ? "Moved to late testing" : null,
-    block.approximate ? "Length pending" : null,
-  ].filter((marker): marker is string => marker !== null);
   if (secondaryMarkers.length > 0) {
     examSeg.append(
       el(
         "div",
         {
-          marginTop: "1px",
+          marginTop: `${FACE_MARKER_GAP_PX}px`,
+          flexShrink: "0",
           fontStyle: "italic",
           fontWeight: "500",
           fontSize: "10px",
