@@ -179,6 +179,10 @@ test("AC: after the first click it is a plain two-state light ↔ dark toggle", 
   await page.emulateMedia({ colorScheme: "light" });
   await page.goto("/");
 
+  // Same pre-hydration settle as the OS-dark cases (issue #78) — this test has
+  // the same click-immediately-after-goto shape and the same latent race.
+  await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("light"));
+
   await toggle(page).click(); // system → dark
   await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("dark"));
   await toggle(page).click(); // dark → light
@@ -190,6 +194,16 @@ test("AC: after the first click it is a plain two-state light ↔ dark toggle", 
 test("AC: an explicit choice stops following the OS", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "dark" });
   await page.goto("/"); // system, resolves dark
+
+  // Wait for `system` to actually RESOLVE to dark before clicking (issue #78).
+  // Without this the click can land pre-hydration, where it is either swallowed
+  // or computed against an unresolved theme, and the first click appears to
+  // pick the same theme rather than the opposite one. The sibling test "first
+  // click out of system picks the opposite of the resolved theme — OS dark"
+  // asserts identical semantics and never flaked precisely because it happens
+  // to await this label first. This was a spec-side observation race, not a
+  // first-click race in the toggle.
+  await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("dark"));
 
   await toggle(page).click(); // → explicit light
   await expect(toggle(page)).toHaveAttribute("aria-label", nameFor("light"));

@@ -144,15 +144,32 @@ test("AC1 — desktop (short content): the support row is flush with the bottom 
 
 // ── AC2 — desktop, tall content: internal scroll, row stays pinned ───────────
 
+/**
+ * Seeded row count for AC2, named so the seed and the hydration gate below
+ * cannot drift apart — a mismatch there would hang on a count that never
+ * arrives and read as a layout regression.
+ */
+const AC2_SCHEDULE_COUNT = 25;
+
 test("AC2 — desktop (tall content): the sections region scrolls internally, the support row stays pinned to the bottom, and nothing shifts the page", async ({
   page,
 }) => {
-  await seedManySchedules(page);
+  await seedManySchedules(page, AC2_SCHEDULE_COUNT);
   await page.setViewportSize({ width: 1440, height: 800 });
   await page.goto("/");
 
   const sections = page.locator(SECTIONS);
   await page.getByRole("button", { name: /^Collapse sidebar$/ }).waitFor();
+
+  // Wait for the SEEDED schedules to actually render before measuring (issue
+  // #78). The collapse toggle exists pre-hydration, so waiting on it does not
+  // gate the store: the schedules list hydrates from localStorage in an effect
+  // after first paint, and until it commits MY SCHEDULES holds the single
+  // default "Schedule 1". Measured there, the region does not overflow
+  // (scrollHeight === clientHeight === 615) and AC2's precondition fails —
+  // which is exactly how this spec went red without any layout regression.
+  // Gate on the seeded row count so the measurement sees the tall content.
+  await expect(page.getByRole("radio")).toHaveCount(AC2_SCHEDULE_COUNT);
 
   // The sections region — not the page, not the aside — is what overflows.
   const overflow = await sections.evaluate((el) => ({

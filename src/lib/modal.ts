@@ -26,6 +26,30 @@ const FOCUSABLE =
   'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
 
 /**
+ * The `overflow` value used to lock background scroll (issue #75).
+ *
+ * `clip` is the correct lock: it blocks user scrolling as completely as
+ * `hidden` but establishes no scroll container, so `position: sticky` inside
+ * the locked element keeps resolving against the viewport (see the long note
+ * in the mount effect below).
+ *
+ * Unlike the `scrollbar-gutter` feature detection in `scrollLockCompensationPx`
+ * — where `CSS.supports` lies because Chromium supports the property but not
+ * the semantics — this detection is honest: it asks only whether the VALUE
+ * parses, which is exactly what determines whether the assignment takes hold.
+ * Falling back to `hidden` matters because a silently-ignored `clip` would
+ * leave the background scrolling freely, which is worse than the sticky bug.
+ *
+ * `clip`: Chromium 90+, Firefox 81+, Safari 16+.
+ */
+export const SCROLL_LOCK_OVERFLOW: "clip" | "hidden" =
+  typeof CSS !== "undefined" &&
+  typeof CSS.supports === "function" &&
+  CSS.supports("overflow", "clip")
+    ? "clip"
+    : "hidden";
+
+/**
  * Scroll-lock width compensation (issue #49) — pure core, unit-tested in
  * `modal.test.ts`.
  *
@@ -111,20 +135,40 @@ export function useModalDialog(
     const previouslyFocused = document.activeElement as HTMLElement | null;
 
     // Move focus into the dialog.
+    //
+    // `preventScroll` is load-bearing (issue #75). Focusing an element inside
+    // the dialog otherwise scrolls it into view, and a programmatic scroll is
+    // NOT blocked by the background lock below — neither `hidden` nor `clip`
+    // stops `scrollIntoView`-style movement, only user input. Opening a dialog
+    // at scrollY 1200 jumped the page to 0 and left it there after close, so
+    // the student lost their place in the catalog entirely.
     const initial =
       initialFocusRef?.current ??
       panelRef.current?.querySelector<HTMLElement>(FOCUSABLE) ??
       null;
-    initial?.focus();
+    initial?.focus({ preventScroll: true });
 
     // Lock background scroll while the dialog is open (issue #49). The lock
     // must land on the ROOT element, not only the body: `scrollbar-gutter:
     // stable` (globals.css) is only honored by the scroll container it is set
     // on, and overflow propagated body → viewport drops the reservation —
     // body-only locking is exactly what caused the Windows layout shift. The
-    // body is locked too so the pre-#49 observable contract
-    // (body.style.overflow === "hidden" while open, asserted by issue-6/a11y
-    // specs) still holds.
+    // body is locked too so the observable contract (asserted by the issue-6
+    // and a11y specs) still holds.
+    //
+    // The lock value is `clip`, not `hidden` (issue #75). `hidden` establishes
+    // a SCROLL CONTAINER, and that is what broke the desktop sidebar: with the
+    // root turned into a non-scrolling box, `position: sticky`
+    // (`Sidebar.tsx:200`) stopped resolving against the viewport and the panel
+    // snapped back to its static position — above the top of the screen once
+    // the page was scrolled, so the whole left column vanished. `clip` blocks
+    // user scrolling exactly as well as `hidden` (wheel, trackpad, touch and
+    // keyboard alike) but establishes NO scroll container, so `sticky` keeps
+    // resolving and the sidebar holds its pixel.
+    //
+    // Reverting to a body-only lock is NOT an alternative — that trades this
+    // bug for the Windows layout shift #49 fixed. Both elements stay locked;
+    // only the value changes.
     const root = document.documentElement;
     const body = document.body;
     const previousRootOverflow = root.style.overflow;
@@ -146,8 +190,8 @@ export function useModalDialog(
       Number.parseFloat(window.getComputedStyle(body).paddingRight) || 0;
 
     const unlockedClientWidth = root.clientWidth;
-    root.style.overflow = "hidden";
-    body.style.overflow = "hidden";
+    root.style.overflow = SCROLL_LOCK_OVERFLOW;
+    body.style.overflow = SCROLL_LOCK_OVERFLOW;
 
     // First guess from the width delta (right in browsers that drop the gutter
     // under the lock; a no-op when it held or scrollbars are overlay).
@@ -211,7 +255,15 @@ export function useModalDialog(
       body.style.paddingRight = previousPaddingRight;
       // Return focus to the element that opened the dialog (no-op if it has
       // since left the document).
-      previouslyFocused?.focus();
+      //
+      // `preventScroll` here for the same reason as the mount-side focus
+      // (issue #75), and it is the half that is easy to miss: by the time a
+      // dialog closes, its opener may be scrolled out of view — the student
+      // scrolled while it was open, or the opener sits in a region the dialog
+      // covered. Restoring focus without this scrolls the page to wherever
+      // that opener happens to be, undoing the reading position the mount-side
+      // fix just protected.
+      previouslyFocused?.focus({ preventScroll: true });
     };
     // Mount-scoped by design — see the doc comment above.
     // eslint-disable-next-line react-hooks/exhaustive-deps

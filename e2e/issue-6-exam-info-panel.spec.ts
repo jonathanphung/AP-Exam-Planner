@@ -173,8 +173,16 @@ test.describe("issue #6 — exam info panel", () => {
     await expect(panel).toBeVisible();
     const closeBtn = panel.getByRole("button", { name: "Close" });
     await expect(closeBtn).toBeFocused();
+    // The lock value changed from `hidden` to `clip` in issue #75: `hidden`
+    // established a scroll container on the root, which stopped
+    // `position: sticky` resolving and made the desktop sidebar disappear
+    // whenever a dialog opened while the page was scrolled. `clip` blocks user
+    // scrolling identically without creating that container. This assertion
+    // encodes the lock MECHANISM, so it is re-pointed deliberately rather than
+    // relaxed — the "is scroll actually locked" behavior is asserted directly
+    // in e2e/issue-75-qa.spec.ts.
     expect(await page.evaluate(() => document.body.style.overflow)).toBe(
-      "hidden",
+      "clip",
     );
 
     // Escape dismisses, focus returns to the invoking info button, scroll freed.
