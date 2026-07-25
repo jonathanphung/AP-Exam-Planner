@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { CYCLE } from "@/data/cycle";
 import { Footer } from "@/components/Footer";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "AP Exam Planner",
-  description:
-    "Plan your May 2026 AP exam schedule: official dates and sessions, portfolio deadlines, conflict detection, and calendar export.",
+  description: `Plan your ${CYCLE} AP exam schedule: official dates and sessions, portfolio deadlines, conflict detection, and calendar export.`,
 };
 
 /*

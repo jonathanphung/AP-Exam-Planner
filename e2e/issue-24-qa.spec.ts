@@ -25,7 +25,7 @@ import { test, expect, type Page, type Locator } from "@playwright/test";
  *     SAME card in both states at each of the four bounce viewports.
  *
  * Category counts pinned by `pnpm test:data`: STEM 13, Humanities 14,
- * Languages 8, Arts 5, Career Kickstart 2 → 42 subjects.
+ * Languages 8, Arts 5, Career Kickstart 3 → 43 subjects.
  */
 
 const EVIDENCE_DIR = "docs/super-board/runs/issue-24-qa-v1";
@@ -43,9 +43,9 @@ const CATEGORY_COUNTS: readonly { name: string; count: number }[] = [
   { name: "Humanities", count: 14 },
   { name: "Languages", count: 8 },
   { name: "Arts", count: 5 },
-  { name: "Career Kickstart", count: 2 },
+  { name: "Career Kickstart", count: 3 },
 ];
-const TOTAL_SUBJECTS = 42;
+const TOTAL_SUBJECTS = 43;
 
 const DESKTOP = { width: 1920, height: 1080 } as const;
 
@@ -227,10 +227,10 @@ test.describe("issue #24 — desktop catalog grouped by category by default", ()
     await expect(expand).toHaveAttribute("aria-expanded", "true");
     const bioLi = catalog(page).locator("li").filter({ has: expand });
     await expect(bioLi.locator("dl")).toContainText(
-      "Mon, May 4 · AM (8 a.m. local time)",
+      "Mon, May 3 · PM (12 p.m. local time)",
     );
     await expect(bioLi.locator("dl")).toContainText(
-      "Wed, May 20 · PM (12 p.m. local time)",
+      "Wed, May 19 · AM (8 a.m. local time)",
     );
 
     // Tier 2: the same shared InfoPanel dialog as #6/#22.

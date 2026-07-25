@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
-import apData from "../src/data/ap-2026.json";
+import apData from "../src/data/ap-2027.json";
 import { pressViewChip } from "./support/view-chip";
 
 /**
@@ -82,18 +82,18 @@ const byId = (id: string): Subject => {
   return s;
 };
 const BIOLOGY = byId("biology");
-const LATIN = byId("latin");
+const ITALIAN = byId("italian-language-and-culture");
 const CHEMISTRY = byId("chemistry");
 
 if (
-  BIOLOGY.exam!.date !== LATIN.exam!.date ||
-  BIOLOGY.exam!.session !== LATIN.exam!.session
+  BIOLOGY.exam!.date !== ITALIAN.exam!.date ||
+  BIOLOGY.exam!.session !== ITALIAN.exam!.session
 )
-  throw new Error("fixture drift: biology/latin no longer share a slot");
+  throw new Error("fixture drift: biology/italian no longer share a slot");
 if (BIOLOGY.exam!.date === CHEMISTRY.exam!.date)
   throw new Error("fixture drift: biology/chemistry now share a day");
 
-/** "Monday, May 4, 2026" — must match src/lib/schedule.ts formatDateLabel. */
+/** "Monday, May 3, 2027" — must match src/lib/schedule.ts formatDateLabel. */
 function dateLabel(iso: string): string {
   const [year, month, day] = iso.split("-").map(Number);
   return new Intl.DateTimeFormat("en-US", {
@@ -589,7 +589,7 @@ test("AC7 — + creates 'Schedule N'; inline rename; delete needs confirmation; 
 test("AC8 — two schedules hold OPPOSITE resolutions of the same collision without leaking; legacy mirror follows the active schedule", async ({
   page,
 }) => {
-  // Seed the multi-schedule store directly: S1 has the biology/latin collision
+  // Seed the multi-schedule store directly: S1 has the biology/italian collision
   // RESOLVED (keep Biology → Latin moves late); S2 has the same selection
   // UNRESOLVED.
   const slot = { date: BIOLOGY.exam!.date, session: BIOLOGY.exam!.session };
@@ -602,19 +602,19 @@ test("AC8 — two schedules hold OPPOSITE resolutions of the same collision with
         {
           id: "sched-1",
           name: "Schedule 1",
-          selection: [BIOLOGY.id, LATIN.id],
+          selection: [BIOLOGY.id, ITALIAN.id],
           resolutions: [
             {
               ...slot,
               keeperId: BIOLOGY.id,
-              memberIds: [BIOLOGY.id, LATIN.id],
+              memberIds: [BIOLOGY.id, ITALIAN.id],
             },
           ],
         },
         {
           id: "sched-2",
           name: "Schedule 2",
-          selection: [BIOLOGY.id, LATIN.id],
+          selection: [BIOLOGY.id, ITALIAN.id],
           resolutions: [],
         },
       ],
@@ -626,8 +626,8 @@ test("AC8 — two schedules hold OPPOSITE resolutions of the same collision with
 
   // S1 (active): resolved — no prompt; Latin sits at its late-testing slot.
   await expect(page.getByTestId("conflict-prompt")).toHaveCount(0);
-  await expect(dateGroup(page, LATIN.lateTesting!.date)).toContainText(
-    LATIN.name,
+  await expect(dateGroup(page, ITALIAN.lateTesting!.date)).toContainText(
+    ITALIAN.name,
   );
   await expect(dateGroup(page, BIOLOGY.exam!.date)).toContainText(
     BIOLOGY.name,
@@ -642,26 +642,26 @@ test("AC8 — two schedules hold OPPOSITE resolutions of the same collision with
   await page
     .getByTestId("conflict-prompt")
     .first()
-    .getByRole("button", { name: `Keep ${LATIN.name} at the regular time` })
+    .getByRole("button", { name: `Keep ${ITALIAN.name} at the regular time` })
     .first()
     .click();
   await expect(page.getByTestId("conflict-prompt")).toHaveCount(0);
   await expect(dateGroup(page, BIOLOGY.lateTesting!.date)).toContainText(
     BIOLOGY.name,
   );
-  await expect(dateGroup(page, LATIN.exam!.date)).toContainText(LATIN.name);
+  await expect(dateGroup(page, ITALIAN.exam!.date)).toContainText(ITALIAN.name);
 
   // Legacy mirror describes the ACTIVE schedule (S2: keeper = Latin).
   const mirrorS2 = JSON.parse((await readKey(page, RESOLUTIONS_KEY))!);
   expect(mirrorS2).toHaveLength(1);
-  expect(mirrorS2[0].keeperId).toBe(LATIN.id);
+  expect(mirrorS2[0].keeperId).toBe(ITALIAN.id);
 
   // Back to S1: its own resolution is intact — S2's opposite choice did not
   // leak. Latin late, Biology regular, still no prompt.
   await switchSchedule(page, "Schedule 1");
   await expect(page.getByTestId("conflict-prompt")).toHaveCount(0);
-  await expect(dateGroup(page, LATIN.lateTesting!.date)).toContainText(
-    LATIN.name,
+  await expect(dateGroup(page, ITALIAN.lateTesting!.date)).toContainText(
+    ITALIAN.name,
   );
   await expect(dateGroup(page, BIOLOGY.exam!.date)).toContainText(
     BIOLOGY.name,
@@ -723,7 +723,7 @@ test("AC10 — legacy apx.selection.v1 + apx.resolutions.v1 are adopted as 'Sche
   await seedKey(
     page,
     SELECTION_KEY,
-    JSON.stringify([BIOLOGY.id, LATIN.id]),
+    JSON.stringify([BIOLOGY.id, ITALIAN.id]),
   );
   await seedKey(
     page,
@@ -733,7 +733,7 @@ test("AC10 — legacy apx.selection.v1 + apx.resolutions.v1 are adopted as 'Sche
         date: BIOLOGY.exam!.date,
         session: BIOLOGY.exam!.session,
         keeperId: BIOLOGY.id,
-        memberIds: [BIOLOGY.id, LATIN.id],
+        memberIds: [BIOLOGY.id, ITALIAN.id],
       },
     ]),
   );
@@ -752,7 +752,7 @@ test("AC10 — legacy apx.selection.v1 + apx.resolutions.v1 are adopted as 'Sche
     "aria-pressed",
     "true",
   );
-  await expect(catalogCard(page, LATIN.name)).toHaveAttribute(
+  await expect(catalogCard(page, ITALIAN.name)).toHaveAttribute(
     "aria-pressed",
     "true",
   );
@@ -760,8 +760,8 @@ test("AC10 — legacy apx.selection.v1 + apx.resolutions.v1 are adopted as 'Sche
   // …and the RESOLUTION migrated too: no re-prompt, Latin at its late slot.
   await pressViewChip(page, "List");
   await expect(page.getByTestId("conflict-prompt")).toHaveCount(0);
-  await expect(dateGroup(page, LATIN.lateTesting!.date)).toContainText(
-    LATIN.name,
+  await expect(dateGroup(page, ITALIAN.lateTesting!.date)).toContainText(
+    ITALIAN.name,
   );
 
   // The store adopted it under the new versioned key.
@@ -769,7 +769,7 @@ test("AC10 — legacy apx.selection.v1 + apx.resolutions.v1 are adopted as 'Sche
   expect(stored.schedules).toHaveLength(1);
   expect(stored.schedules[0].name).toBe("Schedule 1");
   expect(stored.schedules[0].selection).toEqual(
-    expect.arrayContaining([BIOLOGY.id, LATIN.id]),
+    expect.arrayContaining([BIOLOGY.id, ITALIAN.id]),
   );
   expect(stored.schedules[0].resolutions).toHaveLength(1);
 });

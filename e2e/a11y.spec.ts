@@ -1,6 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import apData from "../src/data/ap-2026.json";
+import apData from "../src/data/ap-2027.json";
 import { pressViewChip } from "./support/view-chip";
 
 /**
@@ -21,7 +21,7 @@ import { pressViewChip } from "./support/view-chip";
  * AC6 (build + full e2e suite green) is the run itself.
  *
  * Fixtures (same dataset-derived ids as issue #5's suite):
- *   biology + latin           — same-slot collision (2026-05-04 AM)
+ *   biology + italian           — same-slot collision (2027-05-03 AM)
  *   chemistry + human-geography — second collision whose movers share
  *                                 biology's late slot (late-late warning)
  */
@@ -43,15 +43,15 @@ const byId = (id: string): Subject => {
 };
 
 const BIOLOGY = byId("biology");
-const LATIN = byId("latin");
+const ITALIAN = byId("italian-language-and-culture");
+const AAS = byId("african-american-studies");
 const CHEMISTRY = byId("chemistry");
-const HUMAN_GEO = byId("human-geography");
 
 if (
-  BIOLOGY.exam!.date !== LATIN.exam!.date ||
-  BIOLOGY.exam!.session !== LATIN.exam!.session
+  BIOLOGY.exam!.date !== ITALIAN.exam!.date ||
+  BIOLOGY.exam!.session !== ITALIAN.exam!.session
 )
-  throw new Error("fixture drift: biology/latin no longer share a slot");
+  throw new Error("fixture drift: biology/italian no longer share a slot");
 
 // A selection with NO conflicts (matches issue #4's fixture set).
 const CALM_SELECTION = ["biology", "seminar", "drawing", "cybersecurity"];
@@ -100,19 +100,19 @@ async function seedResolutions(
   );
 }
 
-/** Resolve biology/latin → latin keeps; biology moves to its late slot. */
-const RESOLVED_BIO_LATIN = {
+/** Resolve biology/italian → italian keeps; biology moves to its late slot. */
+const RESOLVED_BIO_ITALIAN = {
   date: BIOLOGY.exam!.date,
   session: BIOLOGY.exam!.session,
-  keeperId: LATIN.id,
-  memberIds: [BIOLOGY.id, LATIN.id],
+  keeperId: ITALIAN.id,
+  memberIds: [BIOLOGY.id, ITALIAN.id],
 };
-/** Resolve chemistry/human-geography → chemistry moves (late-late overlap). */
-const RESOLVED_CHEM_HGEO = {
-  date: CHEMISTRY.exam!.date,
-  session: CHEMISTRY.exam!.session,
-  keeperId: HUMAN_GEO.id,
-  memberIds: [CHEMISTRY.id, HUMAN_GEO.id],
+/** Resolve african-american-studies/chemistry → AAS moves (late-late overlap). */
+const RESOLVED_AAS_CHEM = {
+  date: AAS.exam!.date,
+  session: AAS.exam!.session,
+  keeperId: CHEMISTRY.id,
+  memberIds: [AAS.id, CHEMISTRY.id],
 };
 
 // ---------------------------------------------------------------------------
@@ -190,7 +190,7 @@ test.describe("AC2 — axe-core scans report zero serious/critical violations", 
   });
 
   test("conflict dialog open", async ({ page }) => {
-    await seedSelection(page, [BIOLOGY.id, LATIN.id]);
+    await seedSelection(page, [BIOLOGY.id, ITALIAN.id]);
     await page.goto("/");
     await openList(page);
     await expect(dialog(page)).toBeVisible();
@@ -213,11 +213,11 @@ test.describe("AC2 — axe-core scans report zero serious/critical violations", 
   }) => {
     await seedSelection(page, [
       BIOLOGY.id,
-      LATIN.id,
+      ITALIAN.id,
+      AAS.id,
       CHEMISTRY.id,
-      HUMAN_GEO.id,
     ]);
-    await seedResolutions(page, [RESOLVED_BIO_LATIN, RESOLVED_CHEM_HGEO]);
+    await seedResolutions(page, [RESOLVED_BIO_ITALIAN, RESOLVED_AAS_CHEM]);
     await page.goto("/");
     await openList(page);
     await expect(page.getByTestId("late-collision-warning")).toBeVisible();
@@ -230,11 +230,11 @@ test.describe("AC2 — axe-core scans report zero serious/critical violations", 
     const dark = await darkCtx.newPage();
     await seedSelection(dark, [
       BIOLOGY.id,
-      LATIN.id,
+      ITALIAN.id,
+      AAS.id,
       CHEMISTRY.id,
-      HUMAN_GEO.id,
     ]);
-    await seedResolutions(dark, [RESOLVED_BIO_LATIN, RESOLVED_CHEM_HGEO]);
+    await seedResolutions(dark, [RESOLVED_BIO_ITALIAN, RESOLVED_AAS_CHEM]);
     await dark.goto("/");
     await openList(dark);
     await expect(dark.getByTestId("late-collision-warning")).toBeVisible();
@@ -379,7 +379,7 @@ test.describe("AC1 — keyboard operability", () => {
   test("conflict dialog: modal, focus-trapped, Escape closes (prompt stays available inline)", async ({
     page,
   }) => {
-    await seedSelection(page, [BIOLOGY.id, LATIN.id]);
+    await seedSelection(page, [BIOLOGY.id, ITALIAN.id]);
     await page.goto("/");
     await openList(page);
 
@@ -417,7 +417,7 @@ test.describe("AC1 — keyboard operability", () => {
 
     // Resolving from the inline prompt still works.
     await conflictPrompt(page)
-      .getByRole("button", { name: `Keep ${LATIN.name} at the regular time` })
+      .getByRole("button", { name: `Keep ${ITALIAN.name} at the regular time` })
       .click();
     await expect(conflictPrompt(page)).toHaveCount(0);
   });
@@ -425,14 +425,14 @@ test.describe("AC1 — keyboard operability", () => {
   test("conflict dialog: choosing a keeper inside the modal resolves and closes it", async ({
     page,
   }) => {
-    await seedSelection(page, [BIOLOGY.id, LATIN.id]);
+    await seedSelection(page, [BIOLOGY.id, ITALIAN.id]);
     await page.goto("/");
     await openList(page);
     const modal = dialog(page);
     await expect(modal).toBeVisible();
 
     await modal
-      .getByRole("button", { name: `Keep ${LATIN.name} at the regular time` })
+      .getByRole("button", { name: `Keep ${ITALIAN.name} at the regular time` })
       .click();
     await expect(dialog(page)).toHaveCount(0);
     await expect(conflictPrompt(page)).toHaveCount(0);
@@ -534,7 +534,7 @@ test.describe("AC3 — conflict + moved-to-late styles measure ≥ 4.5:1", () =>
       const page = await ctx.newPage();
 
       // Unresolved conflict → prompt (modal) text.
-      await seedSelection(page, [BIOLOGY.id, LATIN.id]);
+      await seedSelection(page, [BIOLOGY.id, ITALIAN.id]);
       await page.goto("/");
       await openList(page);
       await expect(conflictPrompt(page)).toBeVisible();
@@ -569,13 +569,13 @@ test.describe("AC3 — conflict + moved-to-late styles measure ≥ 4.5:1", () =>
       const resolved = await ctx2.newPage();
       await seedSelection(resolved, [
         BIOLOGY.id,
-        LATIN.id,
+        ITALIAN.id,
+        AAS.id,
         CHEMISTRY.id,
-        HUMAN_GEO.id,
       ]);
       await seedResolutions(resolved, [
-        RESOLVED_BIO_LATIN,
-        RESOLVED_CHEM_HGEO,
+        RESOLVED_BIO_ITALIAN,
+        RESOLVED_AAS_CHEM,
       ]);
       await resolved.goto("/");
       await openList(resolved);
@@ -690,7 +690,7 @@ test.describe("AC4 — 375×667 layout", () => {
       viewport: { width: 375, height: 667 },
     });
     const conflict = await ctx.newPage();
-    await seedSelection(conflict, [BIOLOGY.id, LATIN.id]);
+    await seedSelection(conflict, [BIOLOGY.id, ITALIAN.id]);
     await conflict.goto("/");
     await openList(conflict);
     await expect(dialog(conflict)).toBeVisible();
@@ -745,7 +745,7 @@ test.describe("AC4 — 375×667 layout", () => {
       viewport: { width: 375, height: 667 },
     });
     const conflict = await ctx.newPage();
-    await seedSelection(conflict, [BIOLOGY.id, LATIN.id]);
+    await seedSelection(conflict, [BIOLOGY.id, ITALIAN.id]);
     await conflict.goto("/");
     await openList(conflict);
     await expect(dialog(conflict)).toBeVisible();
@@ -797,8 +797,8 @@ test.describe("AC5 — landmarks and labels", () => {
   test("selected and moved states are distinguishable by more than color", async ({
     page,
   }) => {
-    await seedSelection(page, [BIOLOGY.id, LATIN.id]);
-    await seedResolutions(page, [RESOLVED_BIO_LATIN]);
+    await seedSelection(page, [BIOLOGY.id, ITALIAN.id]);
+    await seedResolutions(page, [RESOLVED_BIO_ITALIAN]);
     await page.goto("/");
     await openList(page); // the moved-to-late text badge renders in the list
 

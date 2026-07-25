@@ -14,7 +14,7 @@ import {
  * AC4: "Three or more subjects sharing one slot use the same
  * choose-one-to-keep flow: all non-keepers move to their late-testing slots."
  *
- * The shipped May-2026 dataset contains only 2-way slot collisions, so the
+ * The shipped May-2027 dataset contains only 2-way slot collisions, so the
  * browser (e2e/issue-5-conflict-resolution.spec.ts) cannot reach a 3-way
  * conflict. This test chains the pure functions in the exact order
  * ScheduleView does — group → prompt set → keeper resolution → resolveSlots →
@@ -51,19 +51,19 @@ function subject(
   } as ApSubject;
 }
 
-const SHARED: ExamSlot = { date: "2026-05-06", session: "AM" };
+const SHARED: ExamSlot = { date: "2027-05-05", session: "AM" };
 
 // Three subjects colliding on one slot, each with its OWN distinct late slot.
 const trio = [
-  subject("one", SHARED, { date: "2026-05-18", session: "AM" }),
-  subject("two", SHARED, { date: "2026-05-19", session: "PM" }),
-  subject("three", SHARED, { date: "2026-05-21", session: "AM" }),
+  subject("one", SHARED, { date: "2027-05-17", session: "AM" }),
+  subject("two", SHARED, { date: "2027-05-18", session: "PM" }),
+  subject("three", SHARED, { date: "2027-05-20", session: "AM" }),
 ];
 // A bystander that must stay untouched throughout.
 const bystander = subject(
   "bystander",
-  { date: "2026-05-13", session: "PM" },
-  { date: "2026-05-22", session: "AM" },
+  { date: "2027-05-12", session: "PM" },
+  { date: "2027-05-21", session: "AM" },
 );
 
 const SUBJECTS = [...trio, bystander];
@@ -102,17 +102,17 @@ describe("issue #5 QA — AC4: 3+ subjects on one slot, full resolution chain", 
       movedToLate: false,
     });
     expect(resolved.get("one")).toMatchObject({
-      date: "2026-05-18",
+      date: "2027-05-17",
       session: "AM",
       movedToLate: true,
     });
     expect(resolved.get("three")).toMatchObject({
-      date: "2026-05-21",
+      date: "2027-05-20",
       session: "AM",
       movedToLate: true,
     });
     expect(resolved.get("bystander")).toMatchObject({
-      date: "2026-05-13",
+      date: "2027-05-12",
       session: "PM",
       movedToLate: false,
     });

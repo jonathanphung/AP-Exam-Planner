@@ -1,0 +1,15 @@
+{
+ "id": "networking",
+ "name": "AP Networking",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-networking/adopt",
+ "totalMinutesSource": null,
+ "noSitDownExam": false,
+ "totalMinutesStated": "pending",
+ "totalMinutesVerbatim": null,
+ "changedFor2027": null,
+ "notes": "No AP Central exam page and no AP Students assessment page exist for AP Networking as of 2026-07-24 (both 404). The course is in its third and final pilot in 2026-27 and launches in fall 2027; the 2027 exam schedule lists it for \"Networking (2026-27 pilot schools only)\". Every format value is therefore \"pending\" — nothing is estimated.",
+ "sections": [],
+ "datasetDiscrepancies": []
+}

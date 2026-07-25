@@ -27,7 +27,7 @@ import { resolve } from "node:path";
 const REPO_ROOT = resolve(__dirname, "..");
 const CYCLE = (
   JSON.parse(
-    readFileSync(resolve(REPO_ROOT, "src/data/ap-2026.json"), "utf8"),
+    readFileSync(resolve(REPO_ROOT, "src/data/ap-2027.json"), "utf8"),
   ) as { cycle: string }
 ).cycle;
 

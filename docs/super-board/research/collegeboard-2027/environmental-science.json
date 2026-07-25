@@ -1,0 +1,32 @@
+{
+ "id": "environmental-science",
+ "name": "AP Environmental Science",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-environmental-science/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-environmental-science/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": false,
+ "totalMinutesStated": 160,
+ "totalMinutesVerbatim": "2hrs 40mins",
+ "totalMinutesApproximate": false,
+ "sectionsSumToTotal": "pending",
+ "changedFor2027": null,
+ "sections": [
+  {
+   "name": "Multiple Choice",
+   "questionCount": "80",
+   "minutes": 90,
+   "weightPercent": 60,
+   "quote": "Section I: Multiple Choice — 80 Questions | 1 Hour 30 Minutes | 60% of Exam Score"
+  },
+  {
+   "name": "Free Response",
+   "questionCount": "3",
+   "minutes": 70,
+   "weightPercent": 40,
+   "quote": "Section II: Free Response — 3 Questions | 1 Hour 10 Minutes | 40% of Exam Score"
+  }
+ ],
+ "datasetDiscrepancies": []
+}

@@ -1,0 +1,16 @@
+{
+ "id": "3-d-art-and-design",
+ "name": "AP 3-D Art and Design",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-3-d-art-and-design/portfolio",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-3-d-art-and-design/assessment",
+ "fallbackUsed": "apstudents",
+ "noSitDownExam": true,
+ "totalMinutesStated": "n/a",
+ "sectionsSumToTotal": "n/a",
+ "changedFor2027": null,
+ "notes": "AP 3-D Art and Design is a portfolio-only assessment with no timed written exam. Primary URL (apcentral .../exam) returned HTTP 404; used apstudents assessment page. Two portfolio sections: Sustained Investigation (60% of score, 15 digital images plus written documentation) and Selected Works (40% of score, images of 5 works, 2 views each = 10 images, plus written descriptions). Submitted via AP Digital Portfolio. No MCQ, no FRQ, no durations published. Dataset values mcqCount=0, frqCount=0, totalMinutes=0, mcqMinutes/frqMinutes=pending are consistent with a portfolio (no timed exam); pending should arguably be n/a for the minutes fields since no such timed sections exist.",
+ "sections": [],
+ "datasetDiscrepancies": []
+}

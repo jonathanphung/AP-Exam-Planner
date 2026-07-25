@@ -1,24 +1,32 @@
 import { z } from "zod";
 
 /**
- * Zod schema for the swappable AP exam dataset (`src/data/ap-2026.json`).
+ * Zod schema for the swappable AP exam dataset (`src/data/ap-2027.json`).
  *
  * The JSON file is the single annual swap point (PRD §8): when College Board
- * publishes the May 2027 calendar, a new JSON file replaces this one and the
- * window constants below are the only schema edits required.
+ * publishes the next May calendar, a new JSON file replaces this one and the
+ * window constants below are the only schema edits normally required.
  *
  * Data rule (PRD §7.5/§8/§11): no value is estimated. Anything College Board
  * has not published is the literal string "pending".
  */
 
-/** Published 2026 testing windows (College Board exam-date pages). */
+/**
+ * Published 2027 testing windows (AP Central "2027 AP Exam Dates":
+ * "The 2027 AP Exams will be administered in schools over two weeks in May:
+ * May 3–7 and May 10–14.").
+ */
 export const REGULAR_WINDOWS: ReadonlyArray<{ start: string; end: string }> = [
-  { start: "2026-05-04", end: "2026-05-08" },
-  { start: "2026-05-11", end: "2026-05-15" },
+  { start: "2027-05-03", end: "2027-05-07" },
+  { start: "2027-05-10", end: "2027-05-14" },
 ];
+/**
+ * Published 2027 late-testing window (AP Central "2027 AP Exam Late-Testing
+ * Dates": Monday, May 17 – Friday, May 21, 2027).
+ */
 export const LATE_TESTING_WINDOW = {
-  start: "2026-05-18",
-  end: "2026-05-22",
+  start: "2027-05-17",
+  end: "2027-05-21",
 } as const;
 
 export const CATEGORIES = [
@@ -136,11 +144,19 @@ export const subjectSchema = z
     passRate: z.union([z.number().min(0).max(100), pending]),
     portfolio: portfolioSchema.nullable(),
     /**
-     * Only present when a listed course has no published May 2026 exam for a
-     * sourced reason other than being portfolio-only (the two Career
-     * Kickstart courses: first exam administration is May 2027).
+     * Only present when a listed course has no published exam in this cycle
+     * for a sourced reason other than being portfolio-only. Empty for May
+     * 2027 — both Career Kickstart courses that were exam-less in 2026 now
+     * sit a May 2027 exam.
      */
     noExamReason: z.string().min(1).optional(),
+    /**
+     * A published qualifier College Board attaches to this subject's exam
+     * that has no other home in the schema — e.g. AP Networking's May 2027
+     * exam, which the published schedule restricts to "2026-27 pilot schools
+     * only". Verbatim-sourced, never editorial.
+     */
+    examNote: z.string().min(1).optional(),
   })
   .superRefine((subject, ctx) => {
     const inWindow = (
@@ -153,7 +169,7 @@ export const subjectSchema = z
         ctx.addIssue({
           code: "custom",
           path: ["exam", "date"],
-          message: `exam date ${subject.exam.date} is outside the published 2026 regular testing windows (May 4–8 and May 11–15)`,
+          message: `exam date ${subject.exam.date} is outside the published 2027 regular testing windows (May 3–7 and May 10–14)`,
         });
       }
       if (subject.lateTesting === null) {
@@ -161,7 +177,7 @@ export const subjectSchema = z
           code: "custom",
           path: ["lateTesting"],
           message:
-            "every subject with a regular 2026 exam has a published late-testing slot",
+            "every subject with a regular 2027 exam has a published late-testing slot",
         });
       }
     }
@@ -173,7 +189,7 @@ export const subjectSchema = z
       ctx.addIssue({
         code: "custom",
         path: ["lateTesting", "date"],
-        message: `late-testing date ${subject.lateTesting.date} is outside the published 2026 late-testing window (May 18–22)`,
+        message: `late-testing date ${subject.lateTesting.date} is outside the published 2027 late-testing window (May 17–21)`,
       });
     }
 
@@ -182,7 +198,7 @@ export const subjectSchema = z
         code: "custom",
         path: ["exam"],
         message:
-          "exam may be null only for portfolio-only subjects, or with a sourced noExamReason (Career Kickstart courses whose first exam is May 2027)",
+          "exam may be null only for portfolio-only subjects, or with a sourced noExamReason",
       });
     }
 
@@ -198,21 +214,34 @@ export const subjectSchema = z
           "portfolio-only subjects (no sit-down exam) must have no sections",
       });
     }
-    // Every subject that sits a 2026 exam has a published section structure
-    // (verified for all 38 in docs/super-board/research/collegeboard-2026/).
-    if (subject.exam !== null && subject.format.sections.length === 0) {
+    // A subject that sits an exam carries its published section structure —
+    // UNLESS College Board publishes no exam format for it at all. That state
+    // is self-describing rather than a new flag: every other format field is
+    // "pending" too (AP Networking's May 2027 pilot administration, whose
+    // course page does not exist yet). A partially-filled format can never
+    // reach the empty-sections branch, so "we have some data but no rows"
+    // stays an error.
+    const noPublishedFormat =
+      subject.format.totalMinutes === "pending" &&
+      subject.format.delivery === "pending" &&
+      subject.format.calculator === "pending";
+    if (
+      subject.exam !== null &&
+      subject.format.sections.length === 0 &&
+      !noPublishedFormat
+    ) {
       ctx.addIssue({
         code: "custom",
         path: ["format", "sections"],
         message:
-          "subjects with a sit-down exam must carry at least one published section",
+          "subjects with a sit-down exam must carry at least one published section, unless College Board publishes no exam format at all (then every format field is \"pending\")",
       });
     }
   });
 
 export const apDatasetSchema = z
   .strictObject({
-    cycle: z.string().regex(/^May \d{4}$/, 'cycle looks like "May 2026"'),
+    cycle: z.string().regex(/^May \d{4}$/, 'cycle looks like "May 2027"'),
     lastVerified: isoDate,
     sessionStartTimes: z.strictObject({
       AM: z.string().min(1),

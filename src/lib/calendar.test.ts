@@ -85,20 +85,20 @@ const SUBJECT_INFO: ReadonlyMap<string, SubjectCalendarInfo> = new Map([
 
 describe("enumerateDates", () => {
   it("returns every date from start to end inclusive", () => {
-    expect(enumerateDates("2026-05-04", "2026-05-08")).toEqual([
-      "2026-05-04",
-      "2026-05-05",
-      "2026-05-06",
-      "2026-05-07",
-      "2026-05-08",
+    expect(enumerateDates("2027-05-03", "2027-05-07")).toEqual([
+      "2027-05-03",
+      "2027-05-04",
+      "2027-05-05",
+      "2027-05-06",
+      "2027-05-07",
     ]);
   });
 
   it("handles a single-day range and month boundaries", () => {
-    expect(enumerateDates("2026-05-04", "2026-05-04")).toEqual(["2026-05-04"]);
-    expect(enumerateDates("2026-04-30", "2026-05-01")).toEqual([
-      "2026-04-30",
-      "2026-05-01",
+    expect(enumerateDates("2027-05-03", "2027-05-03")).toEqual(["2027-05-03"]);
+    expect(enumerateDates("2027-04-30", "2027-05-01")).toEqual([
+      "2027-04-30",
+      "2027-05-01",
     ]);
   });
 });
@@ -152,14 +152,14 @@ describe("buildCalendarLayout", () => {
   it("places exams on their effective date at the parsed session start hour", () => {
     const layout = buildCalendarLayout(
       scheduleOf([
-        examEntry("bio", "2026-05-04", "AM"),
-        examEntry("euro", "2026-05-11", "PM"),
+        examEntry("bio", "2027-05-03", "AM"),
+        examEntry("euro", "2027-05-10", "PM"),
       ]),
       START_TIMES,
       SUBJECT_INFO,
     );
 
-    const may4 = layout.weeks[0].days.find((d) => d.date === "2026-05-04")!;
+    const may4 = layout.weeks[0].days.find((d) => d.date === "2027-05-03")!;
     expect(may4.blocks).toHaveLength(1);
     expect(may4.blocks[0]).toMatchObject({
       subjectId: "bio",
@@ -169,7 +169,7 @@ describe("buildCalendarLayout", () => {
       startLabel: START_TIMES.AM,
     });
 
-    const may11 = layout.weeks[1].days.find((d) => d.date === "2026-05-11")!;
+    const may11 = layout.weeks[1].days.find((d) => d.date === "2027-05-10")!;
     expect(may11.blocks[0]).toMatchObject({
       subjectId: "euro",
       category: "Humanities",
@@ -180,11 +180,11 @@ describe("buildCalendarLayout", () => {
 
   it("spans each block over the subject's published exam length (bounce item A1)", () => {
     const layout = buildCalendarLayout(
-      scheduleOf([examEntry("bio", "2026-05-04", "AM")]),
+      scheduleOf([examEntry("bio", "2027-05-03", "AM")]),
       START_TIMES,
       SUBJECT_INFO,
     );
-    const block = layout.weeks[0].days.find((d) => d.date === "2026-05-04")!
+    const block = layout.weeks[0].days.find((d) => d.date === "2027-05-03")!
       .blocks[0];
     // 195 published minutes from 8:00 AM → 11:15 AM; the labels carry the
     // TRUE exam span only — the setup buffer is a separate visual allowance.
@@ -203,11 +203,11 @@ describe("buildCalendarLayout", () => {
 
   it("falls back to the documented nominal block for 'pending' lengths, marked approximate (A2)", () => {
     const layout = buildCalendarLayout(
-      scheduleOf([examEntry("latin", "2026-05-04", "PM")]),
+      scheduleOf([examEntry("latin", "2027-05-03", "PM")]),
       START_TIMES,
       SUBJECT_INFO,
     );
-    const block = layout.weeks[0].days.find((d) => d.date === "2026-05-04")!
+    const block = layout.weeks[0].days.find((d) => d.date === "2027-05-03")!
       .blocks[0];
     expect(block).toMatchObject({
       examMinutes: null,
@@ -219,11 +219,11 @@ describe("buildCalendarLayout", () => {
 
   it("treats a subject missing from the info map as approximate, never inventing a length", () => {
     const layout = buildCalendarLayout(
-      scheduleOf([examEntry("mystery", "2026-05-04", "AM")]),
+      scheduleOf([examEntry("mystery", "2027-05-03", "AM")]),
       START_TIMES,
       SUBJECT_INFO,
     );
-    const block = layout.weeks[0].days.find((d) => d.date === "2026-05-04")!
+    const block = layout.weeks[0].days.find((d) => d.date === "2027-05-03")!
       .blocks[0];
     expect(block).toMatchObject({
       category: null,
@@ -234,12 +234,12 @@ describe("buildCalendarLayout", () => {
 
   it("renders a moved exam in the late-testing week, not its regular slot", () => {
     const layout = buildCalendarLayout(
-      scheduleOf([examEntry("latin", "2026-05-19", "PM", true)]),
+      scheduleOf([examEntry("latin", "2027-05-18", "PM", true)]),
       START_TIMES,
       SUBJECT_INFO,
     );
     const lateWeek = layout.weeks[layout.weeks.length - 1];
-    const may19 = lateWeek.days.find((d) => d.date === "2026-05-19")!;
+    const may19 = lateWeek.days.find((d) => d.date === "2027-05-18")!;
     expect(may19.blocks[0]).toMatchObject({
       subjectId: "latin",
       movedToLate: true,
@@ -249,14 +249,14 @@ describe("buildCalendarLayout", () => {
   it("splits same-day same-start blocks into side-by-side lanes", () => {
     const layout = buildCalendarLayout(
       scheduleOf([
-        examEntry("euro", "2026-05-04", "AM"),
-        examEntry("bio", "2026-05-04", "AM"),
-        examEntry("latin", "2026-05-04", "PM"),
+        examEntry("euro", "2027-05-03", "AM"),
+        examEntry("bio", "2027-05-03", "AM"),
+        examEntry("latin", "2027-05-03", "PM"),
       ]),
       START_TIMES,
       SUBJECT_INFO,
     );
-    const may4 = layout.weeks[0].days.find((d) => d.date === "2026-05-04")!;
+    const may4 = layout.weeks[0].days.find((d) => d.date === "2027-05-03")!;
     const am = may4.blocks.filter((b) => b.startHour === 8);
     // Sorted by name: AP bio before AP euro.
     expect(am.map((b) => [b.subjectId, b.laneIndex, b.laneCount])).toEqual([
@@ -278,13 +278,13 @@ describe("buildCalendarLayout", () => {
     ] as const);
     const layout = buildCalendarLayout(
       scheduleOf([
-        examEntry("bio", "2026-05-04", "AM"),
-        examEntry("latin", "2026-05-04", "PM"),
+        examEntry("bio", "2027-05-03", "AM"),
+        examEntry("latin", "2027-05-03", "PM"),
       ]),
       START_TIMES,
       longInfo,
     );
-    const may4 = layout.weeks[0].days.find((d) => d.date === "2026-05-04")!;
+    const may4 = layout.weeks[0].days.find((d) => d.date === "2027-05-03")!;
     expect(
       may4.blocks.map((b) => [b.subjectId, b.laneIndex, b.laneCount]),
     ).toEqual([
@@ -295,7 +295,7 @@ describe("buildCalendarLayout", () => {
 
   it("routes portfolio deadlines off-grid instead of guessing a time", () => {
     const layout = buildCalendarLayout(
-      scheduleOf([portfolioEntry("bio", "2026-04-30")]),
+      scheduleOf([portfolioEntry("bio", "2027-04-30")]),
       START_TIMES,
       SUBJECT_INFO,
     );
@@ -307,7 +307,7 @@ describe("buildCalendarLayout", () => {
 
   it("routes exams with unparseable session labels off-grid", () => {
     const layout = buildCalendarLayout(
-      scheduleOf([examEntry("bio", "2026-05-04", "AM")]),
+      scheduleOf([examEntry("bio", "2027-05-03", "AM")]),
       { AM: "pending", PM: START_TIMES.PM },
       SUBJECT_INFO,
     );
@@ -318,7 +318,7 @@ describe("buildCalendarLayout", () => {
 
   it("routes exam dates outside every published window off-grid", () => {
     const layout = buildCalendarLayout(
-      scheduleOf([examEntry("bio", "2026-05-09", "AM")]),
+      scheduleOf([examEntry("bio", "2027-05-08", "AM")]),
       START_TIMES,
       SUBJECT_INFO,
     );
@@ -334,7 +334,7 @@ describe("buildCalendarLayout", () => {
       ["bio", { category: "STEM", totalMinutes: 195 }],
     ] as const);
     const layout = buildCalendarLayout(
-      scheduleOf([examEntry("bio", "2026-05-04", "PM")]),
+      scheduleOf([examEntry("bio", "2027-05-03", "PM")]),
       START_TIMES,
       pmInfo,
     );
@@ -366,9 +366,9 @@ describe("week pager helpers", () => {
   it("counts placed exam blocks per week", () => {
     const layout = buildCalendarLayout(
       scheduleOf([
-        examEntry("bio", "2026-05-04", "AM"),
-        examEntry("euro", "2026-05-05", "PM"),
-        examEntry("latin", "2026-05-19", "PM", true),
+        examEntry("bio", "2027-05-03", "AM"),
+        examEntry("euro", "2027-05-04", "PM"),
+        examEntry("latin", "2027-05-18", "PM", true),
       ]),
       START_TIMES,
       SUBJECT_INFO,
@@ -378,7 +378,7 @@ describe("week pager helpers", () => {
 
   it("defaults the pager to the first week containing an exam", () => {
     const layout = buildCalendarLayout(
-      scheduleOf([examEntry("euro", "2026-05-13", "PM")]),
+      scheduleOf([examEntry("euro", "2027-05-12", "PM")]),
       START_TIMES,
       SUBJECT_INFO,
     );
@@ -387,7 +387,7 @@ describe("week pager helpers", () => {
 
   it("defaults to the late-testing week when it holds the only exam", () => {
     const layout = buildCalendarLayout(
-      scheduleOf([examEntry("bio", "2026-05-20", "PM", true)]),
+      scheduleOf([examEntry("bio", "2027-05-19", "PM", true)]),
       START_TIMES,
       SUBJECT_INFO,
     );
@@ -403,7 +403,7 @@ describe("week pager helpers", () => {
 
     // Off-grid entries (portfolio deadlines) never influence the default.
     const offGridOnly = buildCalendarLayout(
-      scheduleOf([portfolioEntry("bio", "2026-05-08")]),
+      scheduleOf([portfolioEntry("bio", "2027-05-07")]),
       START_TIMES,
       SUBJECT_INFO,
     );
@@ -413,15 +413,15 @@ describe("week pager helpers", () => {
 
 describe("labels", () => {
   it("formats weekday and month-day headers without timezone day-shift", () => {
-    expect(weekdayLabel("2026-05-04")).toBe("MON");
-    expect(monthDayLabel("2026-05-04")).toBe("May 4");
+    expect(weekdayLabel("2027-05-03")).toBe("MON");
+    expect(monthDayLabel("2027-05-03")).toBe("May 3");
   });
 
   it("formats week ranges", () => {
-    expect(weekRangeLabel(["2026-05-04", "2026-05-05", "2026-05-08"])).toBe(
-      "May 4 – May 8",
+    expect(weekRangeLabel(["2027-05-03", "2027-05-04", "2027-05-07"])).toBe(
+      "May 3 – May 7",
     );
-    expect(weekRangeLabel(["2026-05-04"])).toBe("May 4");
+    expect(weekRangeLabel(["2027-05-03"])).toBe("May 3");
     expect(weekRangeLabel([])).toBe("");
   });
 

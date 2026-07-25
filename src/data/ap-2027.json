@@ -1,6 +1,6 @@
 {
-  "cycle": "May 2026",
-  "lastVerified": "2026-07-04",
+  "cycle": "May 2027",
+  "lastVerified": "2026-07-24",
   "sessionStartTimes": {
     "AM": "8 a.m. local time",
     "PM": "12 p.m. local time"
@@ -11,12 +11,12 @@
       "name": "AP African American Studies",
       "category": "Humanities",
       "exam": {
-        "date": "2026-05-07",
+        "date": "2027-05-06",
         "session": "PM"
       },
       "lateTesting": {
-        "date": "2026-05-19",
-        "session": "PM"
+        "date": "2027-05-19",
+        "session": "AM"
       },
       "format": {
         "sections": [
@@ -62,12 +62,12 @@
       "name": "AP Art History",
       "category": "Arts",
       "exam": {
-        "date": "2026-05-14",
-        "session": "AM"
+        "date": "2027-05-12",
+        "session": "PM"
       },
       "lateTesting": {
-        "date": "2026-05-21",
-        "session": "PM"
+        "date": "2027-05-18",
+        "session": "AM"
       },
       "format": {
         "sections": [
@@ -97,12 +97,12 @@
       "name": "AP Biology",
       "category": "STEM",
       "exam": {
-        "date": "2026-05-04",
-        "session": "AM"
+        "date": "2027-05-03",
+        "session": "PM"
       },
       "lateTesting": {
-        "date": "2026-05-20",
-        "session": "PM"
+        "date": "2027-05-19",
+        "session": "AM"
       },
       "format": {
         "sections": [
@@ -131,9 +131,14 @@
       "id": "business-with-personal-finance",
       "name": "AP Business with Personal Finance",
       "category": "Career Kickstart",
-      "exam": null,
-      "lateTesting": null,
-      "noExamReason": "First end-of-course exam administration is May 2027; College Board states the 2027 AP Exam dates will be available in summer 2026. No May 2026 exam exists for this course.",
+      "exam": {
+        "date": "2027-05-04",
+        "session": "AM"
+      },
+      "lateTesting": {
+        "date": "2027-05-17",
+        "session": "PM"
+      },
       "format": {
         "sections": [
           {
@@ -156,7 +161,7 @@
           }
         ],
         "totalMinutes": 160,
-        "calculator": false,
+        "calculator": true,
         "delivery": "digital"
       },
       "passRate": "pending",
@@ -167,31 +172,31 @@
       "name": "AP Calculus AB",
       "category": "STEM",
       "exam": {
-        "date": "2026-05-11",
+        "date": "2027-05-10",
         "session": "AM"
       },
       "lateTesting": {
-        "date": "2026-05-21",
+        "date": "2027-05-20",
         "session": "PM"
       },
       "format": {
         "sections": [
           {
             "name": "Multiple Choice",
-            "questionCount": 45,
-            "minutes": 105,
+            "questionCount": 42,
+            "minutes": 100,
             "weightPercent": 50,
             "parts": [
               {
                 "name": "Part A",
-                "questionCount": 30,
-                "minutes": 60,
+                "questionCount": 29,
+                "minutes": 62,
                 "note": "calculator not permitted"
               },
               {
                 "name": "Part B",
-                "questionCount": 15,
-                "minutes": 45,
+                "questionCount": 13,
+                "minutes": 38,
                 "note": "graphing calculator required"
               }
             ]
@@ -217,7 +222,7 @@
             ]
           }
         ],
-        "totalMinutes": 195,
+        "totalMinutes": 190,
         "calculator": true,
         "delivery": "hybrid"
       },
@@ -229,31 +234,31 @@
       "name": "AP Calculus BC",
       "category": "STEM",
       "exam": {
-        "date": "2026-05-11",
+        "date": "2027-05-10",
         "session": "AM"
       },
       "lateTesting": {
-        "date": "2026-05-21",
+        "date": "2027-05-20",
         "session": "PM"
       },
       "format": {
         "sections": [
           {
             "name": "Multiple Choice",
-            "questionCount": 45,
-            "minutes": 105,
+            "questionCount": 42,
+            "minutes": 100,
             "weightPercent": 50,
             "parts": [
               {
                 "name": "Part A",
-                "questionCount": 30,
-                "minutes": 60,
+                "questionCount": 29,
+                "minutes": 62,
                 "note": "calculator not permitted"
               },
               {
                 "name": "Part B",
-                "questionCount": 15,
-                "minutes": 45,
+                "questionCount": 13,
+                "minutes": 38,
                 "note": "graphing calculator required"
               }
             ]
@@ -279,7 +284,7 @@
             ]
           }
         ],
-        "totalMinutes": 195,
+        "totalMinutes": 190,
         "calculator": true,
         "delivery": "hybrid"
       },
@@ -291,12 +296,12 @@
       "name": "AP Chemistry",
       "category": "STEM",
       "exam": {
-        "date": "2026-05-05",
-        "session": "AM"
+        "date": "2027-05-06",
+        "session": "PM"
       },
       "lateTesting": {
-        "date": "2026-05-20",
-        "session": "PM"
+        "date": "2027-05-20",
+        "session": "AM"
       },
       "format": {
         "sections": [
@@ -326,11 +331,11 @@
       "name": "AP Chinese Language and Culture",
       "category": "Languages",
       "exam": {
-        "date": "2026-05-08",
+        "date": "2027-05-13",
         "session": "PM"
       },
       "lateTesting": {
-        "date": "2026-05-21",
+        "date": "2027-05-21",
         "session": "AM"
       },
       "format": {
@@ -393,19 +398,23 @@
         "delivery": "digital"
       },
       "passRate": 85,
-      "portfolio": null
+      "portfolio": {
+        "deadline": "2027-04-30",
+        "weightPct": "pending",
+        "note": "Personalized Project Reference (PPR) submitted as final through the AP Digital Portfolio by 11:59 p.m. ET. College Board publishes no separate score weight for the PPR — it is the reference students use for the Project Presentation and Project Q&A free-response questions, which are scored as part of the exam."
+      }
     },
     {
       "id": "comparative-government-and-politics",
       "name": "AP Comparative Government and Politics",
       "category": "Humanities",
       "exam": {
-        "date": "2026-05-06",
-        "session": "PM"
+        "date": "2027-05-14",
+        "session": "AM"
       },
       "lateTesting": {
-        "date": "2026-05-18",
-        "session": "AM"
+        "date": "2027-05-20",
+        "session": "PM"
       },
       "format": {
         "sections": [
@@ -435,12 +444,12 @@
       "name": "AP Computer Science A",
       "category": "STEM",
       "exam": {
-        "date": "2026-05-15",
+        "date": "2027-05-12",
         "session": "PM"
       },
       "lateTesting": {
-        "date": "2026-05-22",
-        "session": "PM"
+        "date": "2027-05-20",
+        "session": "AM"
       },
       "format": {
         "sections": [
@@ -470,12 +479,12 @@
       "name": "AP Computer Science Principles",
       "category": "STEM",
       "exam": {
-        "date": "2026-05-14",
-        "session": "PM"
+        "date": "2027-05-14",
+        "session": "AM"
       },
       "lateTesting": {
-        "date": "2026-05-21",
-        "session": "AM"
+        "date": "2027-05-21",
+        "session": "PM"
       },
       "format": {
         "sections": [
@@ -499,7 +508,7 @@
       },
       "passRate": 63,
       "portfolio": {
-        "deadline": "2026-04-30",
+        "deadline": "2027-04-30",
         "weightPct": 30,
         "note": "Create performance task submitted as final in the AP Digital Portfolio by 11:59 p.m. ET; together with the exam-day written responses it counts for 30% of the AP score."
       }
@@ -508,9 +517,14 @@
       "id": "cybersecurity",
       "name": "AP Cybersecurity",
       "category": "Career Kickstart",
-      "exam": null,
-      "lateTesting": null,
-      "noExamReason": "First end-of-course exam administration is May 2027; College Board states the 2027 AP Exam dates will be available in summer 2026. No May 2026 exam exists for this course.",
+      "exam": {
+        "date": "2027-05-05",
+        "session": "AM"
+      },
+      "lateTesting": {
+        "date": "2027-05-18",
+        "session": "PM"
+      },
       "format": {
         "sections": [
           {
@@ -539,11 +553,11 @@
       "name": "AP English Language and Composition",
       "category": "Humanities",
       "exam": {
-        "date": "2026-05-13",
+        "date": "2027-05-12",
         "session": "AM"
       },
       "lateTesting": {
-        "date": "2026-05-21",
+        "date": "2027-05-21",
         "session": "AM"
       },
       "format": {
@@ -574,12 +588,12 @@
       "name": "AP English Literature and Composition",
       "category": "Humanities",
       "exam": {
-        "date": "2026-05-06",
+        "date": "2027-05-05",
         "session": "AM"
       },
       "lateTesting": {
-        "date": "2026-05-18",
-        "session": "PM"
+        "date": "2027-05-17",
+        "session": "AM"
       },
       "format": {
         "sections": [
@@ -609,11 +623,11 @@
       "name": "AP Environmental Science",
       "category": "STEM",
       "exam": {
-        "date": "2026-05-15",
-        "session": "AM"
+        "date": "2027-05-13",
+        "session": "PM"
       },
       "lateTesting": {
-        "date": "2026-05-22",
+        "date": "2027-05-20",
         "session": "AM"
       },
       "format": {
@@ -644,11 +658,11 @@
       "name": "AP European History",
       "category": "Humanities",
       "exam": {
-        "date": "2026-05-04",
+        "date": "2027-05-04",
         "session": "PM"
       },
       "lateTesting": {
-        "date": "2026-05-18",
+        "date": "2027-05-17",
         "session": "AM"
       },
       "format": {
@@ -698,11 +712,11 @@
       "name": "AP French Language and Culture",
       "category": "Languages",
       "exam": {
-        "date": "2026-05-12",
+        "date": "2027-05-06",
         "session": "AM"
       },
       "lateTesting": {
-        "date": "2026-05-20",
+        "date": "2027-05-17",
         "session": "PM"
       },
       "format": {
@@ -752,21 +766,25 @@
         ],
         "totalMinutes": 150,
         "calculator": false,
-        "delivery": "paper"
+        "delivery": "digital"
       },
       "passRate": 71,
-      "portfolio": null
+      "portfolio": {
+        "deadline": "2027-04-30",
+        "weightPct": "pending",
+        "note": "Personalized Project Reference (PPR) submitted as final through the AP Digital Portfolio by 11:59 p.m. ET. College Board publishes no separate score weight for the PPR — it is the reference students use for the Project Presentation and Project Q&A free-response questions, which are scored as part of the exam."
+      }
     },
     {
       "id": "german-language-and-culture",
       "name": "AP German Language and Culture",
       "category": "Languages",
       "exam": {
-        "date": "2026-05-13",
+        "date": "2027-05-07",
         "session": "AM"
       },
       "lateTesting": {
-        "date": "2026-05-22",
+        "date": "2027-05-20",
         "session": "PM"
       },
       "format": {
@@ -817,21 +835,25 @@
         ],
         "totalMinutes": 150,
         "calculator": false,
-        "delivery": "paper"
+        "delivery": "digital"
       },
       "passRate": 68,
-      "portfolio": null
+      "portfolio": {
+        "deadline": "2027-04-30",
+        "weightPct": "pending",
+        "note": "Personalized Project Reference (PPR) submitted as final through the AP Digital Portfolio by 11:59 p.m. ET. College Board publishes no separate score weight for the PPR — it is the reference students use for the Project Presentation and Project Q&A free-response questions, which are scored as part of the exam."
+      }
     },
     {
       "id": "human-geography",
       "name": "AP Human Geography",
       "category": "Humanities",
       "exam": {
-        "date": "2026-05-05",
+        "date": "2027-05-03",
         "session": "AM"
       },
       "lateTesting": {
-        "date": "2026-05-18",
+        "date": "2027-05-17",
         "session": "PM"
       },
       "format": {
@@ -862,12 +884,12 @@
       "name": "AP Italian Language and Culture",
       "category": "Languages",
       "exam": {
-        "date": "2026-05-08",
-        "session": "AM"
+        "date": "2027-05-03",
+        "session": "PM"
       },
       "lateTesting": {
-        "date": "2026-05-21",
-        "session": "PM"
+        "date": "2027-05-18",
+        "session": "AM"
       },
       "format": {
         "sections": [
@@ -918,22 +940,26 @@
         ],
         "totalMinutes": 150,
         "calculator": false,
-        "delivery": "paper"
+        "delivery": "digital"
       },
       "passRate": 69,
-      "portfolio": null
+      "portfolio": {
+        "deadline": "2027-04-30",
+        "weightPct": "pending",
+        "note": "Personalized Project Reference (PPR) submitted as final through the AP Digital Portfolio by 11:59 p.m. ET. College Board publishes no separate score weight for the PPR — it is the reference students use for the Project Presentation and Project Q&A free-response questions, which are scored as part of the exam."
+      }
     },
     {
       "id": "japanese-language-and-culture",
       "name": "AP Japanese Language and Culture",
       "category": "Languages",
       "exam": {
-        "date": "2026-05-12",
-        "session": "PM"
+        "date": "2027-05-11",
+        "session": "AM"
       },
       "lateTesting": {
-        "date": "2026-05-19",
-        "session": "AM"
+        "date": "2027-05-18",
+        "session": "PM"
       },
       "format": {
         "sections": [
@@ -988,19 +1014,23 @@
         "delivery": "digital"
       },
       "passRate": 72,
-      "portfolio": null
+      "portfolio": {
+        "deadline": "2027-04-30",
+        "weightPct": "pending",
+        "note": "Personalized Project Reference (PPR) submitted as final through the AP Digital Portfolio by 11:59 p.m. ET. College Board publishes no separate score weight for the PPR — it is the reference students use for the Project Presentation and Project Q&A free-response questions, which are scored as part of the exam."
+      }
     },
     {
       "id": "latin",
       "name": "AP Latin",
       "category": "Languages",
       "exam": {
-        "date": "2026-05-04",
-        "session": "AM"
+        "date": "2027-05-14",
+        "session": "PM"
       },
       "lateTesting": {
-        "date": "2026-05-18",
-        "session": "PM"
+        "date": "2027-05-20",
+        "session": "AM"
       },
       "format": {
         "sections": [
@@ -1030,12 +1060,12 @@
       "name": "AP Macroeconomics",
       "category": "Humanities",
       "exam": {
-        "date": "2026-05-08",
+        "date": "2027-05-07",
         "session": "PM"
       },
       "lateTesting": {
-        "date": "2026-05-20",
-        "session": "PM"
+        "date": "2027-05-21",
+        "session": "AM"
       },
       "format": {
         "sections": [
@@ -1065,11 +1095,11 @@
       "name": "AP Microeconomics",
       "category": "Humanities",
       "exam": {
-        "date": "2026-05-04",
+        "date": "2027-05-04",
         "session": "PM"
       },
       "lateTesting": {
-        "date": "2026-05-20",
+        "date": "2027-05-19",
         "session": "AM"
       },
       "format": {
@@ -1100,11 +1130,11 @@
       "name": "AP Music Theory",
       "category": "Arts",
       "exam": {
-        "date": "2026-05-11",
+        "date": "2027-05-10",
         "session": "PM"
       },
       "lateTesting": {
-        "date": "2026-05-21",
+        "date": "2027-05-19",
         "session": "AM"
       },
       "format": {
@@ -1130,9 +1160,31 @@
         ],
         "totalMinutes": 160,
         "calculator": false,
-        "delivery": "paper"
+        "delivery": "hybrid"
       },
       "passRate": 59,
+      "portfolio": null
+    },
+    {
+      "id": "networking",
+      "name": "AP Networking",
+      "category": "Career Kickstart",
+      "exam": {
+        "date": "2027-05-07",
+        "session": "PM"
+      },
+      "lateTesting": {
+        "date": "2027-05-17",
+        "session": "AM"
+      },
+      "examNote": "College Board schedules this exam for 2026-27 pilot schools only. AP Networking is in its third and final pilot in 2026-27 and the course launches in fall 2027, so College Board publishes no exam page for it yet and no section structure, duration, delivery mode, or calculator policy is published.",
+      "format": {
+        "sections": [],
+        "totalMinutes": "pending",
+        "calculator": "pending",
+        "delivery": "pending"
+      },
+      "passRate": "pending",
       "portfolio": null
     },
     {
@@ -1140,25 +1192,25 @@
       "name": "AP Physics 1: Algebra-Based",
       "category": "STEM",
       "exam": {
-        "date": "2026-05-06",
+        "date": "2027-05-05",
         "session": "PM"
       },
       "lateTesting": {
-        "date": "2026-05-22",
+        "date": "2027-05-19",
         "session": "AM"
       },
       "format": {
         "sections": [
           {
             "name": "Multiple Choice",
-            "questionCount": 40,
-            "minutes": 80,
+            "questionCount": 42,
+            "minutes": 85,
             "weightPercent": 50
           },
           {
             "name": "Free Response",
             "questionCount": 4,
-            "minutes": 100,
+            "minutes": 95,
             "weightPercent": 50,
             "note": "4 free-response questions"
           }
@@ -1175,25 +1227,25 @@
       "name": "AP Physics 2: Algebra-Based",
       "category": "STEM",
       "exam": {
-        "date": "2026-05-07",
+        "date": "2027-05-06",
         "session": "AM"
       },
       "lateTesting": {
-        "date": "2026-05-21",
+        "date": "2027-05-21",
         "session": "PM"
       },
       "format": {
         "sections": [
           {
             "name": "Multiple Choice",
-            "questionCount": 40,
-            "minutes": 80,
+            "questionCount": 42,
+            "minutes": 85,
             "weightPercent": 50
           },
           {
             "name": "Free Response",
             "questionCount": 4,
-            "minutes": 100,
+            "minutes": 95,
             "weightPercent": 50,
             "note": "4 free-response questions"
           }
@@ -1210,25 +1262,25 @@
       "name": "AP Physics C: Electricity and Magnetism",
       "category": "STEM",
       "exam": {
-        "date": "2026-05-14",
+        "date": "2027-05-05",
         "session": "PM"
       },
       "lateTesting": {
-        "date": "2026-05-22",
-        "session": "PM"
+        "date": "2027-05-20",
+        "session": "AM"
       },
       "format": {
         "sections": [
           {
             "name": "Multiple Choice",
-            "questionCount": 40,
-            "minutes": 80,
+            "questionCount": 42,
+            "minutes": 85,
             "weightPercent": 50
           },
           {
             "name": "Free Response",
             "questionCount": 4,
-            "minutes": 100,
+            "minutes": 95,
             "weightPercent": 50,
             "note": "4 free-response questions"
           }
@@ -1245,25 +1297,25 @@
       "name": "AP Physics C: Mechanics",
       "category": "STEM",
       "exam": {
-        "date": "2026-05-13",
-        "session": "PM"
+        "date": "2027-05-03",
+        "session": "AM"
       },
       "lateTesting": {
-        "date": "2026-05-21",
+        "date": "2027-05-20",
         "session": "PM"
       },
       "format": {
         "sections": [
           {
             "name": "Section I: Multiple Choice",
-            "questionCount": 40,
-            "minutes": 80,
+            "questionCount": 42,
+            "minutes": 85,
             "weightPercent": 50
           },
           {
             "name": "Section II: Free Response",
             "questionCount": 4,
-            "minutes": 100,
+            "minutes": 95,
             "weightPercent": 50,
             "note": "4 free-response questions"
           }
@@ -1280,30 +1332,30 @@
       "name": "AP Precalculus",
       "category": "STEM",
       "exam": {
-        "date": "2026-05-12",
+        "date": "2027-05-11",
         "session": "AM"
       },
       "lateTesting": {
-        "date": "2026-05-21",
+        "date": "2027-05-20",
         "session": "AM"
       },
       "format": {
         "sections": [
           {
             "name": "Multiple Choice",
-            "questionCount": 40,
-            "minutes": 120,
+            "questionCount": 42,
+            "minutes": 105,
             "weightPercent": 62.5,
             "parts": [
               {
                 "name": "Part A",
-                "questionCount": 28,
-                "minutes": 80,
+                "questionCount": 29,
+                "minutes": 65,
                 "note": "calculator not permitted"
               },
               {
                 "name": "Part B",
-                "questionCount": 12,
+                "questionCount": 13,
                 "minutes": 40,
                 "note": "graphing calculator required"
               }
@@ -1312,25 +1364,25 @@
           {
             "name": "Free Response",
             "questionCount": 4,
-            "minutes": 60,
+            "minutes": 70,
             "weightPercent": 37.5,
             "parts": [
               {
                 "name": "Part A",
                 "questionCount": 2,
-                "minutes": 30,
+                "minutes": 35,
                 "note": "graphing calculator required"
               },
               {
                 "name": "Part B",
                 "questionCount": 2,
-                "minutes": 30,
+                "minutes": 35,
                 "note": "calculator not permitted"
               }
             ]
           }
         ],
-        "totalMinutes": 180,
+        "totalMinutes": 175,
         "calculator": true,
         "delivery": "hybrid"
       },
@@ -1342,12 +1394,12 @@
       "name": "AP Psychology",
       "category": "Humanities",
       "exam": {
-        "date": "2026-05-12",
+        "date": "2027-05-14",
         "session": "PM"
       },
       "lateTesting": {
-        "date": "2026-05-22",
-        "session": "PM"
+        "date": "2027-05-21",
+        "session": "AM"
       },
       "format": {
         "sections": [
@@ -1397,7 +1449,7 @@
       },
       "passRate": 90,
       "portfolio": {
-        "deadline": "2026-04-30",
+        "deadline": "2027-04-30",
         "weightPct": 100,
         "note": "Academic paper (4,000–5,000 words, 75%) submitted as final in the AP Digital Portfolio by 11:59 p.m. ET; presentation and oral defense (25%) are teacher-scored. There is no end-of-course written exam."
       }
@@ -1407,11 +1459,11 @@
       "name": "AP Seminar",
       "category": "Humanities",
       "exam": {
-        "date": "2026-05-11",
+        "date": "2027-05-10",
         "session": "PM"
       },
       "lateTesting": {
-        "date": "2026-05-20",
+        "date": "2027-05-18",
         "session": "AM"
       },
       "format": {
@@ -1435,7 +1487,7 @@
       },
       "passRate": 88,
       "portfolio": {
-        "deadline": "2026-04-30",
+        "deadline": "2027-04-30",
         "weightPct": 55,
         "note": "Two performance tasks submitted as final in the AP Digital Portfolio by 11:59 p.m. ET: Team Project and Presentation (20%) and Individual Research-Based Essay and Presentation (35%). The end-of-course exam is the remaining 45%."
       }
@@ -1445,12 +1497,12 @@
       "name": "AP Spanish Language and Culture",
       "category": "Languages",
       "exam": {
-        "date": "2026-05-14",
+        "date": "2027-05-13",
         "session": "AM"
       },
       "lateTesting": {
-        "date": "2026-05-22",
-        "session": "AM"
+        "date": "2027-05-19",
+        "session": "PM"
       },
       "format": {
         "sections": [
@@ -1503,22 +1555,26 @@
         ],
         "totalMinutes": 150,
         "calculator": false,
-        "delivery": "paper"
+        "delivery": "digital"
       },
       "passRate": 83,
-      "portfolio": null
+      "portfolio": {
+        "deadline": "2027-04-30",
+        "weightPct": "pending",
+        "note": "Personalized Project Reference (PPR) submitted as final through the AP Digital Portfolio by 11:59 p.m. ET. College Board publishes no separate score weight for the PPR — it is the reference students use for the Project Presentation and Project Q&A free-response questions, which are scored as part of the exam."
+      }
     },
     {
       "id": "spanish-literature-and-culture",
       "name": "AP Spanish Literature and Culture",
       "category": "Languages",
       "exam": {
-        "date": "2026-05-13",
-        "session": "PM"
+        "date": "2027-05-14",
+        "session": "AM"
       },
       "lateTesting": {
-        "date": "2026-05-22",
-        "session": "AM"
+        "date": "2027-05-19",
+        "session": "PM"
       },
       "format": {
         "sections": [
@@ -1555,7 +1611,7 @@
         ],
         "totalMinutes": 180,
         "calculator": false,
-        "delivery": "paper"
+        "delivery": "digital"
       },
       "passRate": 71,
       "portfolio": null
@@ -1565,11 +1621,11 @@
       "name": "AP Statistics",
       "category": "STEM",
       "exam": {
-        "date": "2026-05-07",
+        "date": "2027-05-11",
         "session": "PM"
       },
       "lateTesting": {
-        "date": "2026-05-20",
+        "date": "2027-05-21",
         "session": "AM"
       },
       "format": {
@@ -1590,7 +1646,7 @@
         ],
         "totalMinutes": 180,
         "calculator": true,
-        "delivery": "hybrid"
+        "delivery": "digital"
       },
       "passRate": 62,
       "portfolio": null
@@ -1600,11 +1656,11 @@
       "name": "AP United States Government and Politics",
       "category": "Humanities",
       "exam": {
-        "date": "2026-05-05",
-        "session": "PM"
+        "date": "2027-05-04",
+        "session": "AM"
       },
       "lateTesting": {
-        "date": "2026-05-19",
+        "date": "2027-05-18",
         "session": "AM"
       },
       "format": {
@@ -1635,11 +1691,11 @@
       "name": "AP United States History",
       "category": "Humanities",
       "exam": {
-        "date": "2026-05-08",
+        "date": "2027-05-07",
         "session": "AM"
       },
       "lateTesting": {
-        "date": "2026-05-19",
+        "date": "2027-05-18",
         "session": "PM"
       },
       "format": {
@@ -1689,12 +1745,12 @@
       "name": "AP World History: Modern",
       "category": "Humanities",
       "exam": {
-        "date": "2026-05-07",
+        "date": "2027-05-06",
         "session": "AM"
       },
       "lateTesting": {
-        "date": "2026-05-18",
-        "session": "AM"
+        "date": "2027-05-18",
+        "session": "PM"
       },
       "format": {
         "sections": [
@@ -1751,9 +1807,9 @@
       },
       "passRate": 85,
       "portfolio": {
-        "deadline": "2026-05-08",
+        "deadline": "2027-05-07",
         "weightPct": 100,
-        "note": "Three portfolio components (Sustained Investigation Images, Sustained Investigation Written Evidence, Selected Works) submitted as final in the AP Digital Portfolio by 8 p.m. ET."
+        "note": "Three portfolio components (Sustained Investigation Images, Sustained Investigation Written Evidence, Selected Works) submitted as final in the AP Digital Portfolio by 11:59 p.m. ET."
       }
     },
     {
@@ -1770,9 +1826,9 @@
       },
       "passRate": 75,
       "portfolio": {
-        "deadline": "2026-05-08",
+        "deadline": "2027-05-07",
         "weightPct": 100,
-        "note": "Three portfolio components (Sustained Investigation Images, Sustained Investigation Written Evidence, Selected Works) submitted as final in the AP Digital Portfolio by 8 p.m. ET."
+        "note": "Three portfolio components (Sustained Investigation Images, Sustained Investigation Written Evidence, Selected Works) submitted as final in the AP Digital Portfolio by 11:59 p.m. ET."
       }
     },
     {
@@ -1789,9 +1845,9 @@
       },
       "passRate": 83,
       "portfolio": {
-        "deadline": "2026-05-08",
+        "deadline": "2027-05-07",
         "weightPct": 100,
-        "note": "Three portfolio components (Sustained Investigation Images, Sustained Investigation Written Evidence, Selected Works) submitted as final in the AP Digital Portfolio by 8 p.m. ET."
+        "note": "Three portfolio components (Sustained Investigation Images, Sustained Investigation Written Evidence, Selected Works) submitted as final in the AP Digital Portfolio by 11:59 p.m. ET."
       }
     }
   ]

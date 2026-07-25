@@ -41,10 +41,10 @@ interface Variant {
 }
 
 const KEEP_BIOLOGY = {
-  date: "2026-05-04",
-  session: "AM",
+  date: "2027-05-03",
+  session: "PM",
   keeperId: "biology",
-  memberIds: ["biology", "latin"],
+  memberIds: ["biology", "italian-language-and-culture"],
 };
 
 const SCENARIOS: Scenario[] = [
@@ -57,7 +57,7 @@ const SCENARIOS: Scenario[] = [
   },
   {
     key: "3week",
-    selection: ["biology", "latin", "seminar"],
+    selection: ["biology", "italian-language-and-culture", "seminar"],
     resolutions: [KEEP_BIOLOGY],
     weeks: ["week-1", "week-2", "late-testing"],
   },
@@ -71,7 +71,7 @@ const VARIANTS: Variant[] = [
 const THEMES = ["light", "dark"] as const;
 
 const fileFor = (slug: string, view: Variant["view"]) =>
-  `ap-exams-2026-${slug}-${view}.png`;
+  `ap-exams-2027-${slug}-${view}.png`;
 
 test.beforeAll(() => {
   mkdirSync(EVIDENCE_DIR, { recursive: true });
@@ -168,9 +168,9 @@ test("other export menu items still download single files (AC10)", async ({
   await expect(trigger).toBeEnabled();
 
   for (const [item, expected] of [
-    ["Save as .ics", "ap-exams-2026.ics"],
-    ["Save as .json", "ap-exams-2026.json"],
-    ["Save as .txt", "ap-exams-2026.txt"],
+    ["Save as .ics", "ap-exams-2027.ics"],
+    ["Save as .json", "ap-exams-2027.json"],
+    ["Save as .txt", "ap-exams-2027.txt"],
   ] as const) {
     await trigger.click();
     await expect(page.getByTestId("export-menu")).toBeVisible();

@@ -27,7 +27,7 @@ import { test, expect, type Locator, type Page } from "@playwright/test";
  * Evidence (Jon's mandated bounce set, light AND dark) is captured to
  * docs/super-board/runs/issue-44-qa-v2/.
  *
- * Dataset ground truth for the branch rule (verified against ap-2026.json in
+ * Dataset ground truth for the branch rule (verified against ap-2027.json in
  * this QA pass): 4 portfolio-only, 14 with parts, 24 partless — the partless
  * set includes AAS (5 sections), music-theory and business-with-personal-
  * finance (3 each), so a count-based branch would visibly fail them.

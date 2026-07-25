@@ -10,7 +10,7 @@ import {
   type KeyboardEvent,
 } from "react";
 import { createPortal } from "react-dom";
-import apData from "@/data/ap-2026.json";
+import apData from "@/data/ap-2027.json";
 import type { ApDataset, ApSubject } from "@/data/schema";
 import { useSelection } from "@/lib/selection";
 import { useResolutions } from "@/lib/resolutions";
@@ -200,7 +200,7 @@ function activeExportTheme(): ExportTheme {
  */
 function logNoDatedExams(which: string): void {
   console.info(
-    `No dated exams to export as ${which} — every selected subject has no May 2026 date.`,
+    `No dated exams to export as ${which} — every selected subject has no ${CYCLE} date.`,
   );
 }
 

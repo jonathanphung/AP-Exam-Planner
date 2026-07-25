@@ -1,0 +1,30 @@
+{
+ "id": "macroeconomics",
+ "name": "AP Macroeconomics",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-macroeconomics/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-macroeconomics/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": false,
+ "totalMinutesStated": 130,
+ "sectionsSumToTotal": true,
+ "changedFor2027": null,
+ "sections": [
+  {
+   "name": "Multiple Choice",
+   "questionCount": "60",
+   "minutes": 70,
+   "weightPercent": 66,
+   "quote": "Section I: Multiple Choice — 60 Questions | 1 Hour 10 Minutes | 66% of Exam Score. Questions require the use of economics content knowledge and reasoning across the range of course topics and skills in skill categories 1, 2, and 3."
+  },
+  {
+   "name": "Free Response",
+   "questionCount": "3",
+   "minutes": 60,
+   "weightPercent": 33,
+   "quote": "Section II: Free Response — 3 Questions | 1 Hour (includes 10-minute reading period) | 33% of Exam Score. 1 long question (50% of section score) and 2 short questions (25% each of section score)."
+  }
+ ],
+ "datasetDiscrepancies": []
+}

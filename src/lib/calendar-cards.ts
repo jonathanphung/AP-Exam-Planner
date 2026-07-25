@@ -69,7 +69,7 @@ export interface CalendarCard {
   label: string;
   /** Filename slug: "week-1" / "week-2" / "late-testing". */
   slug: string;
-  /** "May 4 – 8, 2026" — range label incl. year. */
+  /** "May 3 – 7, 2027" — range label incl. year. */
   rangeLabel: string;
   /** This week's grid: dated day columns + positioned exam blocks (effective). */
   week: CalendarWeekLayout;

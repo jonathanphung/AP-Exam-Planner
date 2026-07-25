@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import apData from "@/data/ap-2026.json";
+import apData from "@/data/ap-2027.json";
 import type { ApDataset } from "@/data/schema";
 import { ScheduleView } from "@/components/ScheduleView";
 import { CalendarView } from "@/components/CalendarView";

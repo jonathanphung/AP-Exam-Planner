@@ -1,0 +1,91 @@
+{
+ "id": "japanese-language-and-culture",
+ "name": "AP Japanese Language and Culture",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-japanese-language-and-culture/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-japanese-language-and-culture/assessment",
+ "fallbackUsed": "apstudents",
+ "noSitDownExam": false,
+ "totalMinutesStated": 120,
+ "totalMinutesVerbatim": "Approximately 2hrs",
+ "totalMinutesApproximate": true,
+ "sectionsSumToTotal": false,
+ "changedFor2027": null,
+ "sections": [
+  {
+   "name": "Section I: Free Response",
+   "questionCount": "4",
+   "minutes": "40-45",
+   "weightPercent": 50,
+   "quote": "apcentral (2026-07-09 spot-check): 'Section I: Free-Response — 4 Questions | 40–45 Minutes | 50% of Score'. Section I: Free Response — 4 questions — 50% of Score. Question 1: Project Presentation: 20% of Score. Question 2: Project Q&A: 15% of Score. Question 3: Story Narration: 7.5% of Score. Question 4: Email Response: 7.5% of Score. You'll have 30 minutes to complete both writing tasks (Questions 3 and 4).",
+   "parts": [
+    {
+     "name": "Question 1: Project Presentation",
+     "questionCount": "1",
+     "minutes": "pending",
+     "toolNote": "3 minutes to prepare; 3 minutes to present",
+     "quote": "Question 1: Project Presentation: 20% of Score Deliver a presentation in response to the project prompt about what you learned through your research. (3 minutes to prepare; 3 minutes to present.)"
+    },
+    {
+     "name": "Question 2: Project Q&A",
+     "questionCount": "4 pre-recorded questions",
+     "minutes": "pending",
+     "toolNote": "40 seconds for each response",
+     "quote": "Question 2: Project Q&A: 15% of Score Participate in a simulated question-and-answer exchange about your project and research by responding to 4 pre-recorded questions that are not known to you ahead of the exam. (40 seconds for each response.)"
+    },
+    {
+     "name": "Question 3: Story Narration + Question 4: Email Response (Writing)",
+     "questionCount": "2",
+     "minutes": 30,
+     "toolNote": "combined time for both writing tasks",
+     "quote": "Question 3: Story Narration: 7.5% of Score Write a story based on four provided pictures. Question 4: Email Response: 7.5% of Score Compose an email in response to an email received from a friend or member of the community. You'll have 30 minutes to complete both writing tasks (Questions 3 and 4)."
+    }
+   ]
+  },
+  {
+   "name": "Section II: Multiple Choice",
+   "questionCount": "55",
+   "minutes": 65,
+   "weightPercent": 50,
+   "quote": "apcentral (2026-07-09 spot-check): 'Section II: Multiple-Choice — 55 Questions | 65 Minutes | 50% of Score'. Section II: Multiple Choice — 55 questions — 50% of Score. Part A: Listening: 25 questions; 25 minutes; 25% of Score. Part B: Reading: 30 questions; 40 minutes; 25% of Score",
+   "parts": [
+    {
+     "name": "Part A: Listening",
+     "questionCount": "25",
+     "minutes": 25,
+     "toolNote": "listening/audio, no calculator (world language exam)",
+     "quote": "Part A: Listening: 25 questions; 25 minutes; 25% of Score"
+    },
+    {
+     "name": "Part B: Reading",
+     "questionCount": "30",
+     "minutes": 40,
+     "toolNote": "reading, no calculator (world language exam)",
+     "quote": "Part B: Reading: 30 questions; 40 minutes; 25% of Score"
+    }
+   ]
+  }
+ ],
+ "datasetDiscrepancies": [
+  {
+   "field": "mcqCount",
+   "dataset": "60–75",
+   "page": "55",
+   "quote": "Section II: Multiple Choice — 55 questions — 50% of Score (Part A: Listening: 25 questions; Part B: Reading: 30 questions)"
+  },
+  {
+   "field": "frqCount",
+   "dataset": "4",
+   "page": "4",
+   "quote": "Section I: Free Response — 4 questions — 50% of Score"
+  },
+  {
+   "field": "totalMinutes",
+   "dataset": "120",
+   "page": "not printed on Exam Components block",
+   "quote": "The Exam Components block prints no overall exam duration; the 2026 AP Japanese Language and Culture Exam Overview PDF states 'The exam will take approximately two hours and 15 minutes to complete... This includes a 10-minute break between Sections I and II.'"
+  }
+ ],
+ "spotCheckPatch2026_07_09": "issue #44 builder spot-check: this record was fetched from the apstudents assessment page (fallbackUsed: apstudents), which omits per-section times — the research README's lesson 1. The apcentral exam page prints both section durations ('4 Questions | 40–45 Minutes | 50% of Score'; '55 Questions | 65 Minutes | 50% of Score', https://apcentral.collegeboard.org/courses/ap-japanese-language-and-culture/exam, raw HTML 2026-07-09); both false 'pending' values corrected to the printed figures."
+}

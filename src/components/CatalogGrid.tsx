@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import apData from "@/data/ap-2026.json";
+import apData from "@/data/ap-2027.json";
 import { type ApDataset, type ApSubject, type Category } from "@/data/schema";
 import { useSelection } from "@/lib/selection";
 import { groupSubjectsByCategory } from "@/lib/catalog-groups";

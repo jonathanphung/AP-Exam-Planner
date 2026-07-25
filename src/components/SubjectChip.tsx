@@ -13,7 +13,7 @@ import { SubjectName } from "@/components/SubjectName";
  *   - a chevron expand button (`aria-expanded` + `aria-controls`) that reveals
  *     Tier 1 — the exam's timing/date (regular slot + published session start
  *     time, late-testing slot, portfolio deadline, or the sourced
- *     `noExamReason` when there is no May 2026 exam).
+ *     `noExamReason` when there is no exam in this cycle).
  *
  * From the expanded panel, a "Full exam details" button (Tier 2) opens the
  * shared InfoPanel dialog — the same component/data the desktop info button
@@ -41,7 +41,7 @@ interface SubjectChipProps {
 /**
  * Format an ISO calendar date as a *local* date. Dates in the dataset are
  * floating (no timezone) — building the Date from explicit parts avoids the
- * UTC-parse day-shift of `new Date("2026-05-04")` in negative-offset zones.
+ * UTC-parse day-shift of `new Date("2027-05-03")` in negative-offset zones.
  */
 function formatSlotDate(iso: string): string {
   const [year, month, day] = iso.split("-").map(Number);
@@ -217,11 +217,20 @@ export function SubjectChip({
               />
             )}
           </dl>
-          {/* No May 2026 exam: show the sourced reason — never an invented
-              date/time (PROJECT.md data rule). */}
+          {/* No exam in this cycle: show the sourced reason — never an
+              invented date/time (PROJECT.md data rule). */}
           {subject.noExamReason && (
             <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
               {subject.noExamReason}
+            </p>
+          )}
+          {/* A published qualifier on the exam itself (AP Networking's May 2027
+              date is "2026-27 pilot schools only"). Shown for the same reason
+              `noExamReason` is: a date without its published restriction would
+              read as an exam the student can sit. */}
+          {subject.examNote && (
+            <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+              {subject.examNote}
             </p>
           )}
 

@@ -1,0 +1,129 @@
+===== central =====
+Active Page:
+The Exam
+The Exam
+AP Cybersecurity
+The Course
+Course Audit
+Classroom Resources
+The Exam
+Professional Learning
+Exam Overview
+The AP Cybersecurity Exam assesses student understanding of the skills and learning objectives in the course framework. The exam includes multiple-choice and free-response questions.
+This is a fully digital exam. Students complete multiple-choice and free-response questions in the Bluebook testing app, with all responses automatically submitted at the end of the exam.
+For more information about how digital exams are administered, see
+Digital AP Exams.
+Exam Date
+The 2027 AP Exam schedule will be available in June 2026.
+Exam Format
+The AP Cybersecurity Exam has consistent question types, weighting, and scoring guidelines, so you and your students know what to expect on exam day.
+Section I: Multiple Choice
+60 Questions | 80 Minutes | 70% of Exam Score
+The multiple-choice section includes individual questions as well as sets of 2, 3, or 4 questions.
+Students analyze scenarios and digital evidence to identify vulnerabilities, recommend mitigations, and detect potential threats.
+Students explain key concepts in cybersecurity.
+Section II: Free Response
+1 Question | 50 Minutes | 30% of Exam Score
+The free-response question gives students different sources of information from the same device, including:
+a set of firewall rules
+several system and application logs
+a list of files with their permissions
+a device policy
+Students will use these sources to determine security issues, attacks, and how the system is configured.
+The questions ask students to:
+explain parts of the policy
+find signs of attacks in the logs
+configure file permissions and firewall rules
+Using evidence from the sources, students will also suggest ways to make the device more secure and show how they could fix or harden the device.
+Score Reporting
+Link
+AP Score Reports for Educators
+Access your score reports.
+Additional Resources
+Download
+AP Cybersecurity Course and Exam Description
+This is the core document for this course. Unit guides clearly lay out the course content and skills and recommend sequencing and pacing for them throughout the year.
+PDF
+5.67 MB
+===== student =====
+Active Page:
+AP Cybersecurity
+AP Cybersecurity
+Learn all about the course and exam. Already enrolled? Join your class in My AP.
+Go to My AP
+See How to Join Your Class
+Not a Student?
+Go
+to AP Central
+for resources for teachers, administrators, and coordinators.
+AP Cybersecurity
+Why Take the Course
+About the Course
+About the Exam
+Go to My AP
+Why Take the Course
+About the Course
+About the Exam
+About
+the Exam
+The AP Cybersecurity Exam will assess essential technical skills in the cybersecurity field. The exam will put you in the position of an analyst, leveraging career-connected scenarios to test your skills and ability to make evidence-based, contextually aware decisions.
+This is a fully digital exam. You’ll complete multiple-choice and free-response questions in the Bluebook testing app, with all responses automatically submitted at the end of the exam.
+Note:
+The 2027 AP Exam dates will be available in summer 2026.
+Exam Duration
+2hrs 10mins
+Exam Components
+Expand All
+Collapse All
+Section I: Multiple Choice
+60 Questions
+1hr 20mins
+70% of Score
+The multiple-choice section includes individual questions as well as sets of 2, 3, or 4 questions.
+You’ll be asked to analyze scenarios and digital evidence to:
+Apply foundational cybersecurity concepts to real-world situations.
+Identify, classify, and assess vulnerabilities.
+Recommend appropriate security controls or mitigations.
+Detect potential attacks or indicators of compromise (IoCs).
+Evaluate suspicious activity and determine whether it poses a security risk.
+Interpret logs, network data, or system behaviors to draw conclusions about what may be happening in a system.
+Section II: Free Response
+1 Question
+50mins
+30% of Score
+In this free-response question, you’ll be presented with several sources about a single device, such as:
+security policies
+firewall configurations
+file-system permissions
+network and application logs
+You’ll analyze these sources together to:
+Identify security issues.
+Detect evidence of attacks.
+Describe how configuration or permission changes would affect the device.
+Evaluate how security controls such as firewalls or automated systems influence network traffic and device behavior.
+You’ll be expected to cite evidence from the provided sources and explain your reasoning when describing attacks, permission settings, or the impact of policy or configuration modifications.
+Exam
+Essentials
+See Exam Day Policies
+Read About Accommodations
+Exam
+Preparation
+Download
+AP Cybersecurity Course and Exam Description
+This is the core document for the course. It clearly lays out the course content and describes the exam and the AP Program in general.
+PDF
+Link
+Services for Students with Disabilities
+Students with documented disabilities may be eligible for accommodations for the through-course assessment and the end-of-course exam. If you’re using assistive technology and need help accessing the PDFs in this section in another format, contact Services for Students with Disabilities at 212-713-8333 or by email at
+[email protected]
+. For information about taking AP Exams, or other College Board assessments, with accommodations, visit the Services for Students with Disabilities website.
+Credit and Placement
+Search AP Credit Policies
+Find colleges that grant credit and/or placement for AP Exam scores in this and other AP courses.
+Start a Search
+Additional Information
+Register for AP Exams
+How to Practice for AP Exams
+What to Bring on AP Exam Day
+View Your AP Scores
+Sending AP Scores

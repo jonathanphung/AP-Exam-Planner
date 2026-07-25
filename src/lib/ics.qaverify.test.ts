@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import ICAL from "ical.js";
-import apData from "../data/ap-2026.json";
+import apData from "../data/ap-2027.json";
 import type { ApDataset } from "../data/schema";
 import type { SlotResolution } from "./conflicts";
 import { buildIcsCalendar, type SessionStartTimes } from "./ics";
@@ -42,8 +42,8 @@ const SELECTED = [
   "united-states-history",
   "african-american-studies",
 ];
-const KEEP_BIOLOGY: SlotResolution = {
-  date: "2026-05-04",
+const KEEP_PHYSICS_C: SlotResolution = {
+  date: "2027-05-03",
   session: "AM",
   keeperId: "biology",
   memberIds: ["biology", "latin"],
@@ -52,7 +52,7 @@ const KEEP_BIOLOGY: SlotResolution = {
 const ics = buildIcsCalendar(
   SUBJECTS,
   SELECTED,
-  [KEEP_BIOLOGY],
+  [KEEP_PHYSICS_C],
   SESSION_START,
   FIXED_NOW,
 );
@@ -314,7 +314,7 @@ describe("issue #38 QA — real dataset, invariants re-derived", () => {
       expect(description).not.toMatch(/0 hours|and 0 minutes/);
       expect(description).not.toContain(": 0 Questions");
     }
-    expect(examSubjects).toBeGreaterThan(30); // 36 sit-down exams as of 2026-07
+    expect(examSubjects).toBeGreaterThan(30); // 39 sit-down exams in May 2027
   });
 
   it("AC5 — parses with ical.js; DESCRIPTION rows joined by literal \\n; every physical line ≤75 octets; CRLF-only", () => {

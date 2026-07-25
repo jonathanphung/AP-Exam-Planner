@@ -20,7 +20,7 @@ import { test, expect, type Page } from "@playwright/test";
 
 const EVIDENCE_DIR = "docs/super-board/runs/issue-3-qa-v1";
 
-const TOTAL_SUBJECTS = 42;
+const TOTAL_SUBJECTS = 43;
 const STEM_COUNT = 13;
 
 const catalog = (page: Page) =>
@@ -49,7 +49,7 @@ test.describe("issue #3 — subject catalog", () => {
   }) => {
     await page.goto("/");
 
-    // Every subject in ap-2026.json is rendered as a chip.
+    // Every subject in ap-2027.json is rendered as a chip.
     await expect(cards(page)).toHaveCount(TOTAL_SUBJECTS);
 
     // An exam subject: named chip inside its category's labeled section

@@ -1,0 +1,102 @@
+{
+ "id": "spanish-language-and-culture",
+ "name": "AP Spanish Language and Culture",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-spanish-language-and-culture/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-spanish-language-and-culture/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": false,
+ "totalMinutesStated": 150,
+ "totalMinutesVerbatim": "Approximately 2hrs 30mins",
+ "totalMinutesApproximate": true,
+ "sectionsSumToTotal": false,
+ "changedFor2027": null,
+ "sections": [
+  {
+   "name": "Section I: Free-Response",
+   "questionCount": "3",
+   "minutes": "65-70",
+   "weightPercent": 50,
+   "quote": "Section I: Free-Response — 3 Questions | 65–70 Minutes | 50% of Score",
+   "parts": [
+    {
+     "name": "Question 1: Project Presentation",
+     "questionCount": "1",
+     "minutes": "pending",
+     "toolNote": "3 minutes to prepare; 3 minutes to present",
+     "quote": "Question 1: Project Presentation: 20% of Score — Students deliver a presentation in response to the project prompt about what they learned through their research. (3 minutes to prepare; 3 minutes to present.)"
+    },
+    {
+     "name": "Question 2: Project Q&A",
+     "questionCount": "1",
+     "minutes": "pending",
+     "toolNote": "responding to 4 pre-recorded questions, 40 seconds per response",
+     "quote": "Question 2: Project Q&A: 15% of Score — Students participate in a question-and-answer exchange about their project and research by responding to 4 pre-recorded questions (40 seconds per response)"
+    },
+    {
+     "name": "Question 3: Argumentative Essay",
+     "questionCount": "1",
+     "minutes": 55,
+     "toolNote": "55 minutes, including 2 opportunities to listen to audio",
+     "quote": "Question 3: Argumentative Essay: 15% of Score — Students write an essay based on accompanying sources (print and audio) that present different viewpoints. (55 minutes, including 2 opportunities to listen to audio.)"
+    }
+   ]
+  },
+  {
+   "name": "Section II: Multiple-Choice",
+   "questionCount": "55",
+   "minutes": 80,
+   "weightPercent": 50,
+   "quote": "Section II: Multiple-Choice — 55 Questions | 80 Minutes | 50% of Score",
+   "parts": [
+    {
+     "name": "Part A: Listening",
+     "questionCount": "25",
+     "minutes": 40,
+     "toolNote": "digital exam via Bluebook",
+     "quote": "Part A: Listening: 25 questions; 40 minutes; 25% of Score"
+    },
+    {
+     "name": "Part B: Reading",
+     "questionCount": "30",
+     "minutes": 40,
+     "toolNote": "digital exam via Bluebook",
+     "quote": "Part B: Reading: 30 questions; 40 minutes; 25% of Score"
+    }
+   ]
+  }
+ ],
+ "datasetDiscrepancies": [
+  {
+   "field": "mcqCount",
+   "dataset": "65",
+   "page": "55",
+   "quote": "Section II: Multiple-Choice — 55 Questions | 80 Minutes | 50% of Score"
+  },
+  {
+   "field": "frqCount",
+   "dataset": "4",
+   "page": "3",
+   "quote": "Section I: Free-Response — 3 Questions | 65–70 Minutes | 50% of Score"
+  },
+  {
+   "field": "totalMinutes",
+   "dataset": "183",
+   "page": "pending",
+   "quote": "The page prints no single total exam time; it states Free-Response 65–70 Minutes and Multiple-Choice 80 Minutes."
+  },
+  {
+   "field": "mcqMinutes",
+   "dataset": "pending",
+   "page": "80",
+   "quote": "Section II: Multiple-Choice — 55 Questions | 80 Minutes | 50% of Score"
+  },
+  {
+   "field": "frqMinutes",
+   "dataset": "pending",
+   "page": "65-70",
+   "quote": "Section I: Free-Response — 3 Questions | 65–70 Minutes | 50% of Score"
+  }
+ ]
+}

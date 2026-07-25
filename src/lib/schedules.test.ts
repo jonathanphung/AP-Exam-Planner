@@ -31,14 +31,14 @@ import {
  */
 
 const RESOLUTION_A: SlotResolution = {
-  date: "2026-05-08",
+  date: "2027-05-07",
   session: "AM",
   keeperId: "us-history",
   memberIds: ["us-history", "art-history"],
 };
 
 const RESOLUTION_B: SlotResolution = {
-  date: "2026-05-12",
+  date: "2027-05-11",
   session: "PM",
   keeperId: "biology",
   memberIds: ["biology", "chemistry"],
@@ -86,7 +86,7 @@ describe("migration of pre-#29 visitors (adopt legacy keys as Schedule 1)", () =
       sanitizeResolutions([
         RESOLUTION_A,
         sameSlotAsA, // duplicate slot — first wins
-        { date: "2026-05-08" }, // malformed
+        { date: "2027-05-07" }, // malformed
         RESOLUTION_B,
       ]),
     ).toEqual([RESOLUTION_A, RESOLUTION_B]);

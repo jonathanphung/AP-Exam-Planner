@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
-import apData from "../src/data/ap-2026.json";
+import apData from "../src/data/ap-2027.json";
 import {
   LATE_TESTING_WINDOW,
   REGULAR_WINDOWS,
@@ -26,13 +26,13 @@ import { pressViewChip } from "./support/view-chip";
  *
  * Dataset-driven fixtures (asserted from the shipped JSON, never hardcoded
  * beyond ids):
- *   - AP Biology        STEM        2026-05-04 AM → late 2026-05-20 PM
- *   - AP Latin          Languages   2026-05-04 AM (collides with Biology)
- *   - AP Chemistry      STEM        2026-05-05 AM (same category as Biology)
- *   - AP European History Humanities 2026-05-04 PM, 195 min (axis-extension)
- *   - AP Spanish Literature and Culture  Languages  2026-05-13 PM (conflict-free)
- *   - AP Seminar        Humanities  2026-05-11 PM + portfolio 2026-04-30
- *   - AP Drawing        Arts        portfolio-only, deadline 2026-05-08
+ *   - AP Biology        STEM        2027-05-03 AM → late 2027-05-19 PM
+ *   - AP Italian Language and Culture          Languages   2027-05-03 AM (collides with Biology)
+ *   - AP Chemistry      STEM        2027-05-04 AM (same category as Biology)
+ *   - AP European History Humanities 2027-05-03 PM, 195 min (axis-extension)
+ *   - AP Spanish Literature and Culture  Languages  2027-05-12 PM (conflict-free)
+ *   - AP Seminar        Humanities  2027-05-10 PM + portfolio 2027-04-30
+ *   - AP Drawing        Arts        portfolio-only, deadline 2027-05-07
  *   - AP Cybersecurity  Career Kickstart — no exam, no portfolio (undated)
  *
  * Fixture rule: tests that seed selections via localStorage use CONFLICT-FREE
@@ -73,27 +73,32 @@ const byId = (id: string): Subject => {
 };
 
 const BIOLOGY = byId("biology");
-const LATIN = byId("latin");
+const ITALIAN = byId("italian-language-and-culture");
 const CHEMISTRY = byId("chemistry");
 const EURO_HISTORY = byId("european-history");
 const SPANISH_LIT = byId("spanish-literature-and-culture");
 const SEMINAR = byId("seminar");
 const DRAWING = byId("drawing");
-const CYBER = byId("cybersecurity");
 
 // Guard the fixture assumptions against dataset edits — if these ever fail,
 // the spec's scenario (not the app) needs re-picking.
 if (
-  BIOLOGY.exam!.date !== LATIN.exam!.date ||
-  BIOLOGY.exam!.session !== LATIN.exam!.session
+  BIOLOGY.exam!.date !== ITALIAN.exam!.date ||
+  BIOLOGY.exam!.session !== ITALIAN.exam!.session
 )
-  throw new Error("fixture drift: biology/latin no longer share a slot");
-if (BIOLOGY.lateTesting!.date !== "2026-05-20")
+  throw new Error("fixture drift: biology/italian no longer share a slot");
+if (BIOLOGY.lateTesting!.date !== "2027-05-19")
   throw new Error("fixture drift: biology late-testing date moved");
 if (BIOLOGY.category !== CHEMISTRY.category)
   throw new Error("fixture drift: biology/chemistry categories differ");
-if (CYBER.exam !== null || CYBER.portfolio !== null)
-  throw new Error("fixture drift: cybersecurity now has a dated entry");
+// May 2027 note: College Board schedules every listed course, so no shipped
+// subject is undated any more. The off-grid list's "no exam date" row therefore
+// has no browser-reachable fixture this cycle — `week-cards.test.ts` /
+// `calendar-cards.test.ts` keep that branch covered with a synthetic subject.
+if (DATASET.subjects.some((s) => s.exam === null && s.portfolio === null))
+  throw new Error(
+    "fixture drift: an undated subject exists again — restore the off-grid undated assertions",
+  );
 if (REGULAR_WINDOWS.length + 1 < 3)
   throw new Error(
     "fixture drift: fewer than 3 testing weeks — pager tests assume week 3 exists",
@@ -111,7 +116,7 @@ if (REGULAR_WINDOWS.length + 1 < 3)
 // Duration fixtures (bounce item A): the length assertions need PUBLISHED
 // numeric lengths, two of them different; the axis-extension check needs a
 // PM exam long enough that exam + buffer passes 4 PM (>= 181 min from 12:00).
-for (const s of [BIOLOGY, CHEMISTRY, LATIN, EURO_HISTORY]) {
+for (const s of [BIOLOGY, CHEMISTRY, ITALIAN, EURO_HISTORY]) {
   if (typeof s.format.totalMinutes !== "number" || s.format.totalMinutes <= 0)
     throw new Error(`fixture drift: ${s.id} no longer publishes totalMinutes`);
 }
@@ -126,8 +131,8 @@ if (
   throw new Error(
     "fixture drift: european-history no longer a >3h PM exam — re-pick the axis-extension fixture",
   );
-if (!LATIN.lateTesting)
-  throw new Error("fixture drift: latin lost its late-testing slot");
+if (!ITALIAN.lateTesting)
+  throw new Error("fixture drift: italian lost its late-testing slot");
 
 // ---------------------------------------------------------------------------
 // Locators
@@ -201,7 +206,7 @@ function datesOf(w: { start: string; end: string }): string[] {
   return out;
 }
 
-/** "MON" / "May 4" labels for a floating ISO date (mirrors the app's labels). */
+/** "MON" / "May 3" labels for a floating ISO date (mirrors the app's labels). */
 function weekdayOf(iso: string): string {
   const [y, m, d] = iso.split("-").map(Number);
   return new Intl.DateTimeFormat("en-US", { weekday: "short" })
@@ -481,11 +486,11 @@ test("AC3 — resolved conflict places the moved exam at its late-testing slot i
 
   // Drive the real resolution flow in the LIST view (where issue #5's
   // modal-on-collision behavior lives; the calendar-native path is covered by
-  // the Bounce C tests below): Biology and Latin share 2026-05-04 AM; keeping
-  // Latin moves Biology to its official late slot (2026-05-20 PM).
+  // the Bounce C tests below): Biology and Latin share 2027-05-03 AM; keeping
+  // Latin moves Biology to its official late slot (2027-05-19 PM).
   await openList(page);
   await select(page, BIOLOGY.name);
-  await select(page, LATIN.name);
+  await select(page, ITALIAN.name);
   const prompt = page.getByTestId("conflict-prompt");
   await expect(prompt).toBeVisible();
 
@@ -494,13 +499,13 @@ test("AC3 — resolved conflict places the moved exam at its late-testing slot i
   // the one real slot they share — no position invented for either.
   await page.keyboard.press("Escape");
   await openCalendar(page);
-  const may4Exams = calendarView(page).locator(
-    'ul[aria-label*="May 4"] [data-testid="calendar-block"]',
+  const sharedDayExams = calendarView(page).locator(
+    `ul[aria-label*="${monthDayOf(BIOLOGY.exam!.date)}"] [data-testid="calendar-block"]`,
   );
-  await expect(may4Exams).toHaveCount(2);
+  await expect(sharedDayExams).toHaveCount(2);
   const [bioBox, latinBox] = await Promise.all([
     blockFor(page, BIOLOGY.id).boundingBox(),
-    blockFor(page, LATIN.id).boundingBox(),
+    blockFor(page, ITALIAN.id).boundingBox(),
   ]);
   expect(bioBox && latinBox).toBeTruthy();
   // Same start time → same top edge; lane-split → non-overlapping x ranges.
@@ -517,7 +522,7 @@ test("AC3 — resolved conflict places the moved exam at its late-testing slot i
   await pressViewChip(page, "List");
   await expect(prompt.first()).toBeVisible();
   await prompt
-    .getByRole("button", { name: `Keep ${LATIN.name} at the regular time` })
+    .getByRole("button", { name: `Keep ${ITALIAN.name} at the regular time` })
     .first()
     .click();
 
@@ -526,7 +531,7 @@ test("AC3 — resolved conflict places the moved exam at its late-testing slot i
   await expect(
     listSection
       .locator("ol > li")
-      .filter({ hasText: "May 20" })
+      .filter({ hasText: monthDayOf(BIOLOGY.lateTesting!.date) })
       .filter({ hasText: BIOLOGY.name }),
   ).toHaveCount(1);
 
@@ -537,10 +542,10 @@ test("AC3 — resolved conflict places the moved exam at its late-testing slot i
   // at its regular AM slot — and Biology's block is NOT on this page. The
   // block label carries the true exam span (start – published end).
   await expect(indicator(page)).toContainText(`Week 1 of ${WEEK_COUNT}`);
-  const latinBlock = blockFor(page, LATIN.id);
+  const latinBlock = blockFor(page, ITALIAN.id);
   await expect(latinBlock).toHaveCount(1);
-  await expect(latinBlock).toContainText(startClockOf(LATIN));
-  await expect(latinBlock).toContainText(endClockOf(LATIN));
+  await expect(latinBlock).toContainText(startClockOf(ITALIAN));
+  await expect(latinBlock).toContainText(endClockOf(ITALIAN));
   await expect(blockFor(page, BIOLOGY.id)).toHaveCount(0);
 
   // Page to the late-testing week (the pager, not scrolling, reaches it).
@@ -551,24 +556,26 @@ test("AC3 — resolved conflict places the moved exam at its late-testing slot i
   await expect(lateSection).toBeVisible();
 
   // Calendar truth: exactly one Biology block, inside the late-testing week,
-  // in the May 20 column, at the PM session start read from the dataset.
+  // in its published late-testing day column, at that session's start time.
   const bioBlock = blockFor(page, BIOLOGY.id);
   await expect(bioBlock).toHaveCount(1);
   await expect(lateSection.getByTestId("calendar-block")).toHaveCount(1);
   await expect(bioBlock).toContainText(BIOLOGY.name);
-  // Late slot is a PM session: the block anchors at the PM start read from
-  // the dataset, spanning Biology's published length from there.
+  // The block anchors at the start time the dataset publishes for the late
+  // slot's session, spanning Biology's published length from there.
   await expect(bioBlock).toContainText(
-    clockOf(parseHourOf(DATASET.sessionStartTimes.PM)),
+    clockOf(
+      parseHourOf(DATASET.sessionStartTimes[BIOLOGY.lateTesting!.session]),
+    ),
   );
   await expect(bioBlock).toContainText("Moved to late testing");
-  // ...and inside the May 20 day column specifically.
-  const may20Exams = lateSection.locator(
-    'ul[aria-label*="May 20"] [data-testid="calendar-block"]',
+  // ...and inside its published late-testing day column specifically.
+  const lateDayExams = lateSection.locator(
+    `ul[aria-label*="${monthDayOf(BIOLOGY.lateTesting!.date)}"] [data-testid="calendar-block"]`,
   );
-  await expect(may20Exams).toHaveCount(1);
-  // Latin stayed behind on week 1 — one week mounted at a time.
-  await expect(blockFor(page, LATIN.id)).toHaveCount(0);
+  await expect(lateDayExams).toHaveCount(1);
+  // Italian stayed behind on week 1 — one week mounted at a time.
+  await expect(blockFor(page, ITALIAN.id)).toHaveCount(0);
 
   await page.screenshot({
     path: `${EVIDENCE_DIR}/ac3-moved-to-late-desktop.png`,
@@ -653,13 +660,13 @@ test("AC5 — portfolio deadlines and undated subjects land in the off-grid list
   page,
 }) => {
   await page.setViewportSize({ width: 1920, height: 1080 });
-  await seedSelection(page, [SEMINAR.id, DRAWING.id, CYBER.id]);
+  await seedSelection(page, [SEMINAR.id, DRAWING.id]);
   await page.goto("/");
   await openCalendar(page);
 
   // Default page (bounce item 5): Seminar's exam is the only placed block and
   // sits in the second window, so the calendar opens directly on that week —
-  // off-grid-only subjects (Drawing/Cyber) never influence the default.
+  // off-grid-only subjects (Drawing) never influence the default.
   await expect(indicator(page)).toContainText(
     `Week ${weekIndexOf(SEMINAR.exam!.date) + 1} of ${WEEK_COUNT}`,
   );
@@ -676,7 +683,7 @@ test("AC5 — portfolio deadlines and undated subjects land in the off-grid list
   ).toContainText("Portfolio due");
   await expect(
     section.locator("li").filter({ hasText: DRAWING.name }),
-  ).toContainText("May 8, 2026");
+  ).toContainText("May 7, 2027");
   await expect(blockFor(page, DRAWING.id)).toHaveCount(0);
 
   // Seminar: its exam IS on the grid, but its portfolio deadline (a date
@@ -686,11 +693,11 @@ test("AC5 — portfolio deadlines and undated subjects land in the off-grid list
     section.locator("li").filter({ hasText: SEMINAR.name }),
   ).toContainText("Portfolio due");
 
-  // Cybersecurity: no May 2026 exam at all → listed as undated, no block.
+  // No shipped May 2027 subject is undated, so the off-grid list must contain
+  // no "no exam date" row — the strip is portfolio deadlines only.
   await expect(
-    section.locator("li").filter({ hasText: CYBER.name }),
-  ).toContainText(`No ${DATASET.cycle} exam date`);
-  await expect(blockFor(page, CYBER.id)).toHaveCount(0);
+    section.locator("li").filter({ hasText: `No ${DATASET.cycle} exam date` }),
+  ).toHaveCount(0);
 
   // Exactly one block total (Seminar's exam) — nothing was guessed onto
   // the grid for the timeless/undated entries.
@@ -737,7 +744,7 @@ test("AC7 — banner names the dataset cycle on both views", async ({ page }) =>
   await openCalendar(page);
 
   // Asserted against the JSON the app ships — if the dataset cycle changes,
-  // this expectation changes with it (nothing hardcoded to "May 2026").
+  // this expectation changes with it (nothing hardcoded to "May 2027").
   // v3: the banner lives in the shared "My Schedule" header, so it is
   // visible on the calendar view AND the list view.
   const banner = page.getByText(
@@ -778,7 +785,6 @@ for (const vp of viewports) {
       SPANISH_LIT.id,
       SEMINAR.id,
       DRAWING.id,
-      CYBER.id,
     ]);
     await page.goto("/");
     await openCalendar(page);
@@ -1112,7 +1118,7 @@ test("Bounce C8 — activating a conflicted block opens the conflict dialog; res
   page,
 }) => {
   await page.setViewportSize({ width: 1920, height: 1080 });
-  await seedSelection(page, [BIOLOGY.id, LATIN.id]);
+  await seedSelection(page, [BIOLOGY.id, ITALIAN.id]);
   await page.goto("/");
   await openCalendar(page);
 
@@ -1141,10 +1147,10 @@ test("Bounce C8 — activating a conflicted block opens the conflict dialog; res
 
   // Calendar truth: Biology stays on week 1; Latin left the week-1 page...
   await expect(blockFor(page, BIOLOGY.id)).toHaveCount(1);
-  await expect(blockFor(page, LATIN.id)).toHaveCount(0);
+  await expect(blockFor(page, ITALIAN.id)).toHaveCount(0);
   // ...and sits marked on its late-testing page.
-  await gotoWeek(page, weekIndexOf(LATIN.lateTesting!.date) + 1);
-  const latinBlock = blockFor(page, LATIN.id);
+  await gotoWeek(page, weekIndexOf(ITALIAN.lateTesting!.date) + 1);
+  const latinBlock = blockFor(page, ITALIAN.id);
   await expect(latinBlock).toHaveCount(1);
   await expect(latinBlock).toContainText("Moved to late testing");
 
@@ -1153,8 +1159,8 @@ test("Bounce C8 — activating a conflicted block opens the conflict dialog; res
   await expect(
     page
       .locator('section[aria-label="My schedule"] ol > li')
-      .filter({ hasText: monthDayOf(LATIN.lateTesting!.date) })
-      .filter({ hasText: LATIN.name }),
+      .filter({ hasText: monthDayOf(ITALIAN.lateTesting!.date) })
+      .filter({ hasText: ITALIAN.name }),
   ).toHaveCount(1);
 });
 
@@ -1170,8 +1176,8 @@ const MOVED_BIO_SEED = [
   {
     date: BIOLOGY.exam!.date,
     session: BIOLOGY.exam!.session,
-    keeperId: LATIN.id,
-    memberIds: [BIOLOGY.id, LATIN.id],
+    keeperId: ITALIAN.id,
+    memberIds: [BIOLOGY.id, ITALIAN.id],
   },
 ];
 
@@ -1179,7 +1185,7 @@ test("Bounce C9 — swap: keep the moved exam at the regular time and move the o
   page,
 }) => {
   await page.setViewportSize({ width: 1920, height: 1080 });
-  await seedSelection(page, [BIOLOGY.id, LATIN.id]);
+  await seedSelection(page, [BIOLOGY.id, ITALIAN.id]);
   await seedResolutions(page, MOVED_BIO_SEED);
   await page.goto("/");
   await openCalendar(page);
@@ -1210,7 +1216,7 @@ test("Bounce C9 — swap: keep the moved exam at the regular time and move the o
 
   // Still on the late-testing page (manual paging wins): Latin is here now,
   // Biology is not.
-  const latinBlock = blockFor(page, LATIN.id);
+  const latinBlock = blockFor(page, ITALIAN.id);
   await expect(latinBlock).toHaveCount(1);
   await expect(latinBlock).toContainText("Moved to late testing");
   await expect(blockFor(page, BIOLOGY.id)).toHaveCount(0);
@@ -1221,14 +1227,14 @@ test("Bounce C9 — swap: keep the moved exam at the regular time and move the o
   await expect(blockFor(page, BIOLOGY.id)).not.toContainText(
     "Moved to late testing",
   );
-  await expect(blockFor(page, LATIN.id)).toHaveCount(0);
+  await expect(blockFor(page, ITALIAN.id)).toHaveCount(0);
 });
 
 test("Bounce C9 — switch back re-opens the conflict prompt so the collision is re-resolved", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1920, height: 1080 });
-  await seedSelection(page, [BIOLOGY.id, LATIN.id]);
+  await seedSelection(page, [BIOLOGY.id, ITALIAN.id]);
   await seedResolutions(page, MOVED_BIO_SEED);
   await page.goto("/");
   await openCalendar(page);
@@ -1257,7 +1263,7 @@ test("Bounce C9 — switch back re-opens the conflict prompt so the collision is
   await expect(page.getByRole("dialog")).toHaveCount(0);
 
   // Current (late) page now shows Latin moved; Biology returned to week 1.
-  await expect(blockFor(page, LATIN.id)).toContainText(
+  await expect(blockFor(page, ITALIAN.id)).toContainText(
     "Moved to late testing",
   );
   await expect(blockFor(page, BIOLOGY.id)).toHaveCount(0);

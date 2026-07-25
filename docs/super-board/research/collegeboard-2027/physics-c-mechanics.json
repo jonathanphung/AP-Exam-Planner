@@ -1,0 +1,32 @@
+{
+ "id": "physics-c-mechanics",
+ "name": "AP Physics C: Mechanics",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-physics-c-mechanics/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-physics-c-mechanics/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": false,
+ "totalMinutesStated": 180,
+ "totalMinutesVerbatim": "3hrs",
+ "totalMinutesApproximate": false,
+ "sectionsSumToTotal": true,
+ "changedFor2027": "Section I: 40 → 42 questions and 80 → 85 minutes; Section II: 100 → 95 minutes. Exam Duration unchanged at 3hrs.",
+ "sections": [
+  {
+   "name": "Section I: Multiple Choice",
+   "questionCount": "42",
+   "minutes": 85,
+   "weightPercent": 50,
+   "quote": "Section I: Multiple Choice — 42 Questions | 85 Minutes | 50% of Exam Score"
+  },
+  {
+   "name": "Section II: Free Response",
+   "questionCount": "4",
+   "minutes": 95,
+   "weightPercent": 50,
+   "quote": "Section II: Free Response — 4 Questions | 95 Minutes | 50% of Exam Score"
+  }
+ ],
+ "datasetDiscrepancies": []
+}

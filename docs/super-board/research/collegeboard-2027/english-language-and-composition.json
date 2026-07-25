@@ -1,0 +1,37 @@
+{
+ "id": "english-language-and-composition",
+ "name": "AP English Language and Composition",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-english-language-and-composition/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-english-language-and-composition/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": false,
+ "totalMinutesStated": 195,
+ "sectionsSumToTotal": true,
+ "changedFor2027": null,
+ "sections": [
+  {
+   "name": "Multiple Choice",
+   "questionCount": "45",
+   "minutes": 60,
+   "weightPercent": 45,
+   "quote": "Section I: Multiple Choice — 45 Questions | 1 hour | 45% of Exam Score"
+  },
+  {
+   "name": "Free Response",
+   "questionCount": "3",
+   "minutes": 135,
+   "weightPercent": 55,
+   "quote": "Section II: Free Response — 3 Questions | 2 hours 15 minutes (includes a 15-minute reading period) | 55% of Exam Score"
+  }
+ ],
+ "datasetDiscrepancies": [
+  {
+   "field": "mcqMinutes",
+   "dataset": "pending",
+   "page": "60",
+   "quote": "Section I: Multiple Choice — 45 Questions | 1 hour | 45% of Exam Score"
+  }
+ ]
+}

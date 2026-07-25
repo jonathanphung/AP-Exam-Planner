@@ -46,44 +46,44 @@ function subject(
     passRate: "pending",
     portfolio,
     ...(exam === null && portfolio === null
-      ? { noExamReason: "fixture: no May 2026 exam" }
+      ? { noExamReason: "fixture: no May 2027 exam" }
       : {}),
   } as ApSubject;
 }
 
-const MAY7PM: ExamSlot = { date: "2026-05-07", session: "PM" };
+const MAY7PM: ExamSlot = { date: "2027-05-06", session: "PM" };
 
 // Two subjects sharing May 7 PM, with DIFFERENT late slots.
-const alpha = subject("alpha", MAY7PM, { date: "2026-05-19", session: "PM" });
-const beta = subject("beta", MAY7PM, { date: "2026-05-20", session: "AM" });
+const alpha = subject("alpha", MAY7PM, { date: "2027-05-18", session: "PM" });
+const beta = subject("beta", MAY7PM, { date: "2027-05-19", session: "AM" });
 // Third subject on the same slot — its late slot equals beta's (late-late collision bait).
-const gamma = subject("gamma", MAY7PM, { date: "2026-05-20", session: "AM" });
+const gamma = subject("gamma", MAY7PM, { date: "2027-05-19", session: "AM" });
 // Same date as the trio but the OTHER session — never a conflict with them.
 const delta = subject(
   "delta",
-  { date: "2026-05-07", session: "AM" },
-  { date: "2026-05-21", session: "AM" },
+  { date: "2027-05-06", session: "AM" },
+  { date: "2027-05-20", session: "AM" },
 );
 // A second, independent conflict pair on May 12 AM; epsilon's late slot
 // collides with alpha's (cross-group late-late collision bait).
 const epsilon = subject(
   "epsilon",
-  { date: "2026-05-12", session: "AM" },
-  { date: "2026-05-19", session: "PM" },
+  { date: "2027-05-11", session: "AM" },
+  { date: "2027-05-18", session: "PM" },
 );
 const zeta = subject(
   "zeta",
-  { date: "2026-05-12", session: "AM" },
-  { date: "2026-05-22", session: "AM" },
+  { date: "2027-05-11", session: "AM" },
+  { date: "2027-05-21", session: "AM" },
 );
 // Portfolio-only subjects sharing one deadline date — must NEVER conflict.
 const portfolioA = subject("portfolio-a", null, null, {
-  deadline: "2026-04-30",
+  deadline: "2027-04-30",
   weightPct: 100,
   note: "fixture portfolio",
 });
 const portfolioB = subject("portfolio-b", null, null, {
-  deadline: "2026-04-30",
+  deadline: "2027-04-30",
   weightPct: 100,
   note: "fixture portfolio",
 });
@@ -132,13 +132,13 @@ describe("findSameSlotConflicts — same-slot grouping", () => {
       "beta",
     ]);
     expect(groups.map((g) => slotKey(g.slot))).toEqual([
-      "2026-05-07:PM",
-      "2026-05-12:AM",
+      "2027-05-06:PM",
+      "2027-05-11:AM",
     ]);
   });
 
   it("portfolio deadlines never trigger the conflict flow (AC7)", () => {
-    // Both share deadline 2026-04-30; neither has an exam slot.
+    // Both share deadline 2027-04-30; neither has an exam slot.
     expect(findSameSlotConflicts(ALL, ["portfolio-a", "portfolio-b"])).toEqual(
       [],
     );
@@ -154,13 +154,13 @@ describe("resolveSlots — late reassignment", () => {
     );
     expect(resolved.get("alpha")).toEqual({
       subjectId: "alpha",
-      date: "2026-05-07",
+      date: "2027-05-06",
       session: "PM",
       movedToLate: false,
     });
     expect(resolved.get("beta")).toEqual({
       subjectId: "beta",
-      date: "2026-05-20",
+      date: "2027-05-19",
       session: "AM",
       movedToLate: true,
     });
@@ -174,12 +174,12 @@ describe("resolveSlots — late reassignment", () => {
     );
     expect(resolved.get("beta")?.movedToLate).toBe(false);
     expect(resolved.get("alpha")).toMatchObject({
-      date: "2026-05-19",
+      date: "2027-05-18",
       session: "PM",
       movedToLate: true,
     });
     expect(resolved.get("gamma")).toMatchObject({
-      date: "2026-05-20",
+      date: "2027-05-19",
       session: "AM",
       movedToLate: true,
     });
@@ -189,7 +189,7 @@ describe("resolveSlots — late reassignment", () => {
     const resolved = resolveSlots(ALL, ["alpha", "delta"], []);
     expect(resolved.get("alpha")?.movedToLate).toBe(false);
     expect(resolved.get("delta")).toMatchObject({
-      date: "2026-05-07",
+      date: "2027-05-06",
       session: "AM",
       movedToLate: false,
     });
@@ -203,7 +203,7 @@ describe("resolveSlots — late reassignment", () => {
       [resolution(MAY7PM, "alpha", ["alpha", "beta"])],
     );
     expect(resolved.get("alpha")).toMatchObject({
-      date: "2026-05-07",
+      date: "2027-05-06",
       session: "PM",
       movedToLate: false,
     });
@@ -216,7 +216,7 @@ describe("resolveSlots — late reassignment", () => {
       [resolution(MAY7PM, "alpha", ["alpha", "beta"])],
     );
     expect(resolved.get("beta")).toMatchObject({
-      date: "2026-05-07",
+      date: "2027-05-06",
       session: "PM",
       movedToLate: false,
     });
@@ -264,7 +264,7 @@ describe("resolution validity + pruning", () => {
     const conflicts = conflictsFor(["alpha", "beta"]);
     const valid = resolution(MAY7PM, "alpha", ["alpha", "beta"]);
     const duplicate = resolution(MAY7PM, "beta", ["alpha", "beta"]);
-    const stale = resolution({ date: "2026-05-12", session: "AM" }, "epsilon", [
+    const stale = resolution({ date: "2027-05-11", session: "AM" }, "epsilon", [
       "epsilon",
       "zeta",
     ]);
@@ -279,7 +279,7 @@ describe("resolution validity + pruning", () => {
       resolution(MAY7PM, "alpha", ["alpha", "beta"]),
     ]);
     expect(unresolved).toHaveLength(1);
-    expect(slotKey(unresolved[0].slot)).toBe("2026-05-12:AM");
+    expect(slotKey(unresolved[0].slot)).toBe("2027-05-11:AM");
   });
 });
 
@@ -291,7 +291,7 @@ describe("findLateLateCollisions — late-late collision detection", () => {
       ["alpha", "beta", "epsilon", "zeta"],
       [
         resolution(MAY7PM, "beta", ["alpha", "beta"]),
-        resolution({ date: "2026-05-12", session: "AM" }, "zeta", [
+        resolution({ date: "2027-05-11", session: "AM" }, "zeta", [
           "epsilon",
           "zeta",
         ]),
@@ -299,12 +299,12 @@ describe("findLateLateCollisions — late-late collision detection", () => {
     );
     const collisions = findLateLateCollisions(resolved);
     expect(collisions).toHaveLength(1);
-    expect(collisions[0].slot).toEqual({ date: "2026-05-19", session: "PM" });
+    expect(collisions[0].slot).toEqual({ date: "2027-05-18", session: "PM" });
     expect([...collisions[0].subjectIds].sort()).toEqual(["alpha", "epsilon"]);
   });
 
   it("flags two moved exams from the SAME group whose own late slots coincide", () => {
-    // Keep alpha: beta and gamma both move to 2026-05-20 AM.
+    // Keep alpha: beta and gamma both move to 2027-05-19 AM.
     const resolved = resolveSlots(
       ALL,
       ["alpha", "beta", "gamma"],
@@ -312,7 +312,7 @@ describe("findLateLateCollisions — late-late collision detection", () => {
     );
     const collisions = findLateLateCollisions(resolved);
     expect(collisions).toHaveLength(1);
-    expect(collisions[0].slot).toEqual({ date: "2026-05-20", session: "AM" });
+    expect(collisions[0].slot).toEqual({ date: "2027-05-19", session: "AM" });
     expect([...collisions[0].subjectIds].sort()).toEqual(["beta", "gamma"]);
   });
 

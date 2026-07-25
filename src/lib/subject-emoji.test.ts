@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import apData from "../data/ap-2026.json";
+import apData from "../data/ap-2027.json";
 import { CATEGORIES, parseApDataset } from "../data/schema";
 import {
   CATEGORY_EMOJI,
@@ -12,7 +12,7 @@ import {
  * Unit tests for the decorative subject-emoji lookup (issue #20).
  *
  * The load-bearing guarantee (AC1/AC5): the mapping resolves a non-empty emoji
- * for EVERY subject id shipped in `ap-2026.json`, so a future subject added
+ * for EVERY subject id shipped in `ap-2027.json`, so a future subject added
  * without an emoji fails CI here instead of rendering blank in the UI.
  */
 

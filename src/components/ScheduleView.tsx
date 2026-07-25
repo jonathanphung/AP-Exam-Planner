@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import apData from "@/data/ap-2026.json";
+import apData from "@/data/ap-2027.json";
+import { CYCLE } from "@/data/cycle";
 import type { ApDataset, ApSubject } from "@/data/schema";
 import { useSelection } from "@/lib/selection";
 import {
@@ -224,7 +225,7 @@ export function ScheduleView() {
           {undated.length > 0 && (
             <div className="rounded-lg border border-dashed border-slate-300 p-3 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
               <p className="font-medium text-slate-600 dark:text-slate-300">
-                No May 2026 exam date
+                {`No ${CYCLE} exam date`}
               </p>
               <ul className="mt-1 list-disc break-words pl-5">
                 {undated.map((subject) => (

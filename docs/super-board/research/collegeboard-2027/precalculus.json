@@ -1,0 +1,64 @@
+{
+ "id": "precalculus",
+ "name": "AP Precalculus",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-precalculus/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-precalculus/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": false,
+ "totalMinutesStated": 175,
+ "totalMinutesVerbatim": "2hrs 55mins",
+ "totalMinutesApproximate": false,
+ "sectionsSumToTotal": true,
+ "changedFor2027": "Section I: 40 → 42 questions, 120 → 105 minutes (Part A 28q/80min → 29q/65min, Part B 12q/40min → 13q/40min). Section II: 60 → 70 minutes (Part A 30 → 35, Part B 30 → 35). Exam Duration 3hrs → 2hrs 55mins.",
+ "sections": [
+  {
+   "name": "Multiple Choice",
+   "questionCount": "42",
+   "minutes": 105,
+   "weightPercent": 62.5,
+   "quote": "Section I: Multiple Choice — 42 Questions | 1 Hour and 45 Minutes | 62.5% of Exam Score",
+   "parts": [
+    {
+     "name": "Part A",
+     "questionCount": "29",
+     "minutes": 65,
+     "toolNote": "calculator not permitted",
+     "quote": "Part A: 29 questions; 65 minutes; 43.75% of exam score (calculator not permitted)"
+    },
+    {
+     "name": "Part B",
+     "questionCount": "13",
+     "minutes": 40,
+     "toolNote": "graphing calculator required",
+     "quote": "Part B: 13 questions; 40 minutes; 18.75% of exam score (graphing calculator required)"
+    }
+   ]
+  },
+  {
+   "name": "Free Response",
+   "questionCount": "4",
+   "minutes": 70,
+   "weightPercent": 37.5,
+   "quote": "Section II: Free Response — 4 Questions | 1 Hour and 10 Minutes | 37.5% of Exam Score",
+   "parts": [
+    {
+     "name": "Part A",
+     "questionCount": "2",
+     "minutes": 35,
+     "toolNote": "graphing calculator required",
+     "quote": "Part A: 2 questions; 35 minutes; 18.75% of exam score (graphing calculator required)"
+    },
+    {
+     "name": "Part B",
+     "questionCount": "2",
+     "minutes": 35,
+     "toolNote": "calculator not permitted",
+     "quote": "Part B: 2 questions; 35 minutes; 18.75% of exam score (calculator not permitted)"
+    }
+   ]
+  }
+ ],
+ "datasetDiscrepancies": []
+}

@@ -1,0 +1,45 @@
+{
+ "id": "english-literature-and-composition",
+ "name": "AP English Literature and Composition",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-english-literature-and-composition/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-english-literature-and-composition/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": false,
+ "totalMinutesStated": 180,
+ "totalMinutesVerbatim": "3hrs",
+ "totalMinutesApproximate": false,
+ "sectionsSumToTotal": true,
+ "changedFor2027": null,
+ "sections": [
+  {
+   "name": "Section I: Multiple Choice",
+   "questionCount": "55",
+   "minutes": 60,
+   "weightPercent": 45,
+   "quote": "Section I: Multiple Choice — 55 Questions | 1 Hour | 45% of Exam Score. Includes 5 sets of questions with 8–13 questions per set. Each set is preceded by a passage of prose fiction, drama, or poetry of varying difficulty."
+  },
+  {
+   "name": "Section II: Free Response",
+   "questionCount": "3",
+   "minutes": 120,
+   "weightPercent": 55,
+   "quote": "Section II: Free Response — 3 Questions | 2 Hours | 55% of Exam Score. Comprises three essay prompts: literary analysis of a provided poem, literary analysis of a prose fiction or drama passage, and analysis of a student-selected work."
+  }
+ ],
+ "datasetDiscrepancies": [
+  {
+   "field": "mcqMinutes",
+   "dataset": "pending",
+   "page": "60",
+   "quote": "Section I: Multiple Choice — 55 Questions | 1 Hour | 45% of Exam Score"
+  },
+  {
+   "field": "frqMinutes",
+   "dataset": "pending",
+   "page": "120",
+   "quote": "Section II: Free Response — 3 Questions | 2 Hours | 55% of Exam Score"
+  }
+ ]
+}

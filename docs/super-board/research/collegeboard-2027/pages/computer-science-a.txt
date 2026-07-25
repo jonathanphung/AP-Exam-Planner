@@ -1,0 +1,165 @@
+===== central =====
+Active Page:
+The Exam
+The Exam
+AP Computer Science A
+Sign In to AP Classroom
+Article
+Review the Free-Response Questions from the AP Exam
+The Course
+Course Audit
+Classroom Resources
+The Exam
+Professional Learning
+Exam Overview
+This is a fully digital exam. Students complete multiple-choice and free-response questions in the Bluebook testing app, with all responses automatically submitted at the end of the exam. The
+Java Quick Reference (.pdf)
+is included in Bluebook and lists the accessible methods from the Java library that may be included on the exam.
+Schools can print this reference information and provide it to students on exam day.
+Exam questions assess the course concepts and skills outlined in the course framework. For more information, download the
+AP Computer Science A Course and Exam Description (.pdf)
+(CED). Scoring guidelines for each of the sample free-response questions in the CED are also available.
+Encourage your students to visit the
+AP Computer Science A student page
+for exam information.
+Exam Date
+Fri, May 15, 2026
+12 PM Local
+AP Computer Science A Exam
+Add
+to Calendar
+Exam Format
+Section I: Multiple Choice
+42 Questions | 1 Hour 30 Minutes | 55% of Exam Score
+The multiple-choice section includes mostly individual questions, occasionally with 1–2 sets of questions (2 questions per set).
+Computational Thinking Practices 1, 2, 3, 4, and 5 are all assessed in the multiple-choice section.
+Section II: Free Response
+4 Questions | 1 Hour 30 Minutes | 45% of Exam Score
+All free-response questions assess Computational Thinking Practice 2: Develop Code, with the following focus:
+Question 1:
+Methods and Control Structures—Students will write 2 methods or 1 constructor and 1 method of a given class based on provided specifications and examples. In Part A the method or constructor will require students to write iterative or conditional statements, or both, as well as statements that call methods in the specified class. In Part B the method or constructor will require calling String methods.
+Question 2:
+Class Design—Students will be instructed to design and implement a class based on provided specifications and examples. A second class might also be included. Students will be provided with a scenario and specifications in the form of a table demonstrating ways to interact with the class and the results. The class must include a class header, instance variables, a constructor, a method, and implementation of the constructor and required method.
+Question 3:
+Data Analysis with ArrayList—Students will be provided with a scenario and its associated class(es). Students will write 1 method of a given class based on provided specifications and examples. The method requires students to use, analyze, and manipulate data in an ArrayList structure.
+Question 4:
+2D Array—Students will be provided with a scenario and its associated class(es). Students will write 1 method of a given class based on provided specifications and examples. The method requires students to use, analyze, and manipulate data in a 2D array structure.
+Test Previews for Digital AP Exams
+Link
+Practice on Bluebook
+Download the Bluebook app and log in with your College Board account information to access test previews for the digital AP Exams.
+Reference Information
+Reference materials are available for this course and will be printed and mailed to schools, in addition to being available in Bluebook in the test preview and on exam day.
+Article
+Reference Information for Specific AP Exams
+Access reference sheets and exam day details.
+Exam Questions and Scoring Information
+Article
+AP Computer Science A Exam Questions and Scoring Information
+View free-response questions from past exams.
+Score Reporting
+Link
+AP Score Reports for Educators
+Access your score reports.
+===== student =====
+Active Page:
+AP Computer Science A
+AP Computer Science A
+Learn all about the course and exam. Already enrolled? Join your class in My AP.
+Go to My AP
+See How to Join Your Class
+Not a Student?
+Go
+to AP Central
+for resources for teachers, administrators, and coordinators.
+AP Computer Science A
+Why Take the Course
+About the Course
+About the Exam
+Go to My AP
+Why Take the Course
+About the Course
+About the Exam
+About
+the Exam
+The AP Computer Science A Exam will test your understanding of the programming concepts covered in the course units, as well as your ability to read and write code for computer programs.
+This is a fully digital exam. You’ll complete multiple-choice and free-response questions in the Bluebook testing app, with all responses automatically submitted at the end of the exam.
+Reference materials, such as equations sheets and reference tables, are available for this course. Go to
+Reference Information for Specific AP Exams
+to find reference materials for AP Computer Science A and exam day details.
+Exam Duration
+3hrs
+Exam
+Date
+Fri, May 15, 2026
+12 PM Local
+AP Computer Science A Exam
+This is the regularly scheduled date for the AP Computer Science A Exam.
+Details
+Add
+to Calendar
+Exam Components
+Expand All
+Collapse All
+Section 1: Multiple Choice
+42 questions
+55% of Score
+The multiple-choice section includes individual, single questions as well as occasional sets of 2 questions. You’ll be asked to:
+Determine the required code segments to produce a given output
+Identify the output, value, or result of given program code based on initial values
+Analyze program code for correctness, equivalence, and errors
+Describe the behavior and conditions that lead to results in a program
+Section 2: Free Response
+4 questions
+45% of Score
+In the free-response section, you’ll respond to four questions with written answers:
+Question 1: Methods and Control Structures—You’ll be asked to write program code to create objects of a class and call methods, and satisfy method specifications using expressions, conditional statements, and iterative statements.
+Question 2: Class Design—You’ll be asked to write program code to define a new type by creating a class and satisfy method specifications using expressions, conditional statements, and iterative statements.
+Question 3: Data Analysis with
+ArrayList
+—You’ll be asked to write program code to satisfy method specifications and create, traverse, and manipulate elements in an
+ArrayList
+structure.
+Question 4: 2D Array—You’ll be asked to write program code to satisfy method specifications and create, traverse, and manipulate elements in 2D array objects.
+Exam
+Essentials
+See Exam Day Policies
+Read About Accommodations
+Exam
+Preparation
+Link
+AP Classroom Resources
+Once you join your AP class section online, you’ll be able to access course project materials along with any assignments from your teacher and your assignment results in AP Classroom. Sign in to access them.
+Go to AP Classroom
+Link
+Practice on Bluebook
+Download the Bluebook app and log in with your College Board account information to access test previews for the digital AP Exams.
+Link
+Free-Response Questions and Scoring Information
+Go to AP Central to review free-response questions and scoring guidelines from past AP Computer Science A exams.
+Download
+AP Computer Science A Course and Exam Description
+This is the core document for the course. It clearly lays out the course content and describes the exam and AP Program in general.
+PDF
+Download
+AP Computer Science A Course and Exam Description Clarifications and Corrections
+This document provides teachers with clarifications and/or corrections for the AP Computer Science A Course and Exam Description.
+PDF
+Link
+Reference Information for Specific AP Exams
+Access reference sheets and exam day details.
+Link
+Services for Students with Disabilities
+Students with documented disabilities may be eligible for accommodations for the through-course assessment and the end-of-course exam. If you’re using assistive technology and need help accessing the PDFs in this section in another format, contact Services for Students with Disabilities at 212-713-8333 or by email at
+[email protected]
+. For information about taking AP Exams, or other College Board assessments, with accommodations, visit the Services for Students with Disabilities website.
+Credit and Placement
+Search AP Credit Policies
+Find colleges that grant credit and/or placement for AP Exam scores in this and other AP courses.
+Start a Search
+Additional Information
+Register for AP Exams
+How to Practice for AP Exams
+What to Bring on AP Exam Day
+View Your AP Scores
+Sending AP Scores

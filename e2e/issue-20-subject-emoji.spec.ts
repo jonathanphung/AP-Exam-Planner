@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
-import apData from "../src/data/ap-2026.json";
+import apData from "../src/data/ap-2027.json";
 import { pressViewChip } from "./support/view-chip";
 
 /**
@@ -25,7 +25,7 @@ import { pressViewChip } from "./support/view-chip";
  */
 
 const EVIDENCE_DIR = "docs/super-board/runs/issue-20-qa-v1";
-const TOTAL_SUBJECTS = 42;
+const TOTAL_SUBJECTS = 43;
 
 type Subject = {
   id: string;
@@ -38,7 +38,7 @@ const SUBJECTS = (apData as { subjects: Subject[] }).subjects;
 // A handful of hand-picked glyphs to spot-check the map end-to-end in the DOM.
 const BIOLOGY_EMOJI = "🧬";
 const US_HISTORY_EMOJI = "🗽";
-const LATIN_EMOJI = "📜";
+const ITALIAN_EMOJI = "🇮🇹";
 const CALCULUS_AB_EMOJI = "➗";
 
 const catalog = (page: Page) =>
@@ -143,15 +143,15 @@ test.describe("issue #20 — decorative subject emoji everywhere the name shows"
   }) => {
     await page.goto("/");
 
-    // Select AP Biology + AP Latin: they share the 2026-05-04 AM slot, so this
+    // Select AP Biology + AP Italian Language and Culture: they share the 2027-05-03 AM slot, so this
     // both populates the schedule AND raises the conflict prompt (issue #5).
     await select(page, "AP Biology");
-    await select(page, "AP Latin");
+    await select(page, "AP Italian Language and Culture");
     await openList(page);
 
     // Schedule list rows carry the emoji next to the name.
     await expect(schedule(page)).toContainText(BIOLOGY_EMOJI);
-    await expect(schedule(page)).toContainText(LATIN_EMOJI);
+    await expect(schedule(page)).toContainText(ITALIAN_EMOJI);
 
     // Conflict prompt is up, and its bulleted subject list carries the emoji.
     await expect(conflictPrompt(page)).toContainText("Exam time conflict");
@@ -159,8 +159,8 @@ test.describe("issue #20 — decorative subject emoji everywhere the name shows"
       conflictPrompt(page).locator("ul > li").filter({ hasText: "AP Biology" }),
     ).toContainText(BIOLOGY_EMOJI);
     await expect(
-      conflictPrompt(page).locator("ul > li").filter({ hasText: "AP Latin" }),
-    ).toContainText(LATIN_EMOJI);
+      conflictPrompt(page).locator("ul > li").filter({ hasText: "AP Italian Language and Culture" }),
+    ).toContainText(ITALIAN_EMOJI);
   });
 
   test("AC2 — emoji shows in the info-panel title (and stays aria-hidden there)", async ({
@@ -204,7 +204,7 @@ test.describe("issue #20 — decorative subject emoji everywhere the name shows"
       // Populate the schedule + raise a conflict so one screenshot shows the
       // emoji across the catalog, the schedule rows, and the conflict prompt.
       await select(page, "AP Biology");
-      await select(page, "AP Latin");
+      await select(page, "AP Italian Language and Culture");
       await openList(page);
       await expect(conflictPrompt(page)).toBeVisible();
       await page.screenshot({

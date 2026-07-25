@@ -1,0 +1,55 @@
+{
+ "id": "psychology",
+ "name": "AP Psychology",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-psychology/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-psychology/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": false,
+ "totalMinutesStated": 160,
+ "totalMinutesVerbatim": "2hrs 40mins",
+ "totalMinutesApproximate": false,
+ "sectionsSumToTotal": false,
+ "changedFor2027": null,
+ "sections": [
+  {
+   "name": "Multiple Choice",
+   "questionCount": "75",
+   "minutes": 90,
+   "weightPercent": 66.7,
+   "quote": "75 Questions | 90 Minutes | 66.7% of Exam Score"
+  },
+  {
+   "name": "Free Response",
+   "questionCount": "2",
+   "minutes": 70,
+   "weightPercent": 33.3,
+   "quote": "2 Questions | 70 Minutes | 33.3% of Exam Score",
+   "parts": [
+    {
+     "name": "Part A - Article Analysis Question (AAQ)",
+     "questionCount": "1",
+     "minutes": "pending",
+     "toolNote": "n/a",
+     "quote": "Article Analysis Question (AAQ)"
+    },
+    {
+     "name": "Part B - Evidence-Based Question (EBQ)",
+     "questionCount": "1",
+     "minutes": "pending",
+     "toolNote": "n/a",
+     "quote": "Evidence-Based Question (EBQ)"
+    }
+   ]
+  }
+ ],
+ "datasetDiscrepancies": [
+  {
+   "field": "totalMinutes",
+   "dataset": "160",
+   "page": "pending",
+   "quote": "The page does not state a combined total exam duration."
+  }
+ ]
+}

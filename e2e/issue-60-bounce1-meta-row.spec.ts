@@ -12,7 +12,7 @@ import { test, expect } from "@playwright/test";
  * The bounce treatment: the pair recedes INTO the footer chrome — it is page
  * furniture, not a call to action.
  *
- *     Data: College Board AP calendar … — May 2026 cycle
+ *     Data: College Board AP calendar … — May 2027 cycle
  *     Not affiliated with College Board.
  *
  *          Send us Feedback  ·  ⌂ GitHub

@@ -1,0 +1,45 @@
+{
+ "id": "microeconomics",
+ "name": "AP Microeconomics",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-microeconomics/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-microeconomics/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": false,
+ "totalMinutesStated": 130,
+ "totalMinutesVerbatim": "2hrs 10mins",
+ "totalMinutesApproximate": false,
+ "sectionsSumToTotal": false,
+ "changedFor2027": null,
+ "sections": [
+  {
+   "name": "Multiple Choice",
+   "questionCount": "60",
+   "minutes": 70,
+   "weightPercent": 66,
+   "quote": "60 Questions | 1 Hour 10 Minutes | 66% of Exam Score"
+  },
+  {
+   "name": "Free Response",
+   "questionCount": "3",
+   "minutes": 60,
+   "weightPercent": 33,
+   "quote": "3 Questions | 1 Hour (includes a 10-minute reading period) | 33% of Exam Score"
+  }
+ ],
+ "datasetDiscrepancies": [
+  {
+   "field": "mcqMinutes",
+   "dataset": "70",
+   "page": "70",
+   "quote": "60 Questions | 1 Hour 10 Minutes | 66% of Exam Score"
+  },
+  {
+   "field": "totalMinutes",
+   "dataset": "130",
+   "page": "not printed",
+   "quote": "The page does not print a combined total exam duration; 130 equals the sum of the two published section times (70 + 60)."
+  }
+ ]
+}

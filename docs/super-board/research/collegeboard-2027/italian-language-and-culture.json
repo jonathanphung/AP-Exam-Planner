@@ -1,0 +1,91 @@
+{
+ "id": "italian-language-and-culture",
+ "name": "AP Italian Language and Culture",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-italian-language-and-culture/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-italian-language-and-culture/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": false,
+ "totalMinutesStated": 150,
+ "totalMinutesVerbatim": "Approximately 2hrs 30mins",
+ "totalMinutesApproximate": true,
+ "sectionsSumToTotal": "n/a",
+ "changedFor2027": null,
+ "sections": [
+  {
+   "name": "Section II: Multiple-Choice",
+   "questionCount": "55",
+   "minutes": 80,
+   "weightPercent": 50,
+   "quote": "55 Questions | 80 Minutes | 50% of Score",
+   "parts": [
+    {
+     "name": "Part A: Listening",
+     "questionCount": "25",
+     "minutes": 40,
+     "toolNote": "n/a",
+     "quote": "Part A: Listening — 25 questions; 40 minutes; 25% of Score"
+    },
+    {
+     "name": "Part B: Reading",
+     "questionCount": "30",
+     "minutes": 40,
+     "toolNote": "n/a",
+     "quote": "Part B: Reading — 30 questions; 40 minutes; 25% of Score"
+    }
+   ]
+  },
+  {
+   "name": "Section I: Free-Response",
+   "questionCount": "3",
+   "minutes": "65-70",
+   "weightPercent": 50,
+   "quote": "3 Questions | 65–70 Minutes | 50% of Score",
+   "parts": [
+    {
+     "name": "Project Presentation",
+     "questionCount": "1",
+     "minutes": "pending",
+     "toolNote": "3 minutes to prepare; 3 minutes to present",
+     "quote": "Project Presentation — 20% of Score — 3 minutes to prepare; 3 minutes to present"
+    },
+    {
+     "name": "Project Q&A",
+     "questionCount": "4",
+     "minutes": "pending",
+     "toolNote": "4 pre-recorded questions; 40 seconds for each response",
+     "quote": "Project Q&A — 15% of Score — 4 pre-recorded questions with 40 seconds for each response"
+    },
+    {
+     "name": "Argumentative Essay",
+     "questionCount": "1",
+     "minutes": 55,
+     "toolNote": "including 2 opportunities to listen to audio",
+     "quote": "Argumentative Essay — 15% of Score — 55 minutes, including 2 opportunities to listen to audio"
+    }
+   ]
+  }
+ ],
+ "datasetDiscrepancies": [
+  {
+   "field": "mcqCount",
+   "dataset": "65",
+   "page": "55",
+   "quote": "Section II: Multiple-Choice — 55 Questions | 80 Minutes | 50% of Score"
+  },
+  {
+   "field": "frqCount",
+   "dataset": "4",
+   "page": "3",
+   "quote": "Section I: Free-Response — 3 Questions | 65–70 Minutes | 50% of Score"
+  },
+  {
+   "field": "totalMinutes",
+   "dataset": "180",
+   "page": "pending",
+   "quote": "The page prints Section II as 80 Minutes and Section I as 65–70 Minutes but does not print an overall exam total."
+  }
+ ],
+ "spotCheckPatch2026_07_09": "issue #44 builder spot-check against the live apcentral page (raw HTML): Section I minutes had been recorded as 'pending' although this record's own quote prints '3 Questions | 65–70 Minutes | 50% of Score' — corrected to 65-70."
+}

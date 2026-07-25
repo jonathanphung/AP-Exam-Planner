@@ -1,0 +1,39 @@
+{
+ "id": "music-theory",
+ "name": "AP Music Theory",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-music-theory/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-music-theory/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": false,
+ "totalMinutesStated": 160,
+ "totalMinutesVerbatim": "~ 2hrs 40mins",
+ "totalMinutesApproximate": true,
+ "sectionsSumToTotal": "n/a - page does not print a combined total exam time; the three published section times sum to 160 minutes (80 + 70 + 10)",
+ "changedFor2027": null,
+ "sections": [
+  {
+   "name": "Section I: Multiple Choice",
+   "questionCount": "75",
+   "minutes": 80,
+   "weightPercent": 45,
+   "quote": "Section I: Multiple Choice  75 Questions | ~1 Hour 20 Minutes | 45% of Exam Score"
+  },
+  {
+   "name": "Section IIA: Free Response: Written",
+   "questionCount": "7",
+   "minutes": 70,
+   "weightPercent": 45,
+   "quote": "Section IIA: Free Response: Written  7 questions | ~1 hour and 10 minutes | 45% of Exam Score"
+  },
+  {
+   "name": "Section IIB: Free Response: Sight Singing",
+   "questionCount": "2",
+   "minutes": 10,
+   "weightPercent": 10,
+   "quote": "Section IIB: Free Response: Sight Singing  2 questions | ~10 minutes | 10% of Exam Score"
+  }
+ ],
+ "datasetDiscrepancies": []
+}

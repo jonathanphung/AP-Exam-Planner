@@ -11,7 +11,7 @@ import AxeBuilder from "@axe-core/playwright";
  * (multi-part Calculus AB, range-valued AP Chinese, portfolio-only
  * AP Drawing; light + dark).
  *
- * Fixtures (values traced to docs/super-board/research/collegeboard-2026/
+ * Fixtures (values traced to docs/super-board/research/collegeboard-2027/
  * and independently live-spot-checked during this QA pass):
  *   - AP Calculus AB   — MC 45q/105min/50% with Part A 30q/60min (no
  *                        calculator) + Part B 15q/45min (graphing calculator);
@@ -158,7 +158,7 @@ test.describe("issue #44 — per-section exam details", () => {
       dialog(page).getByRole("heading", { name: "Portfolio component" }),
     ).toBeVisible();
     await expect(rowValue(page, "Weight")).toContainText("100%");
-    await expect(rowValue(page, "Deadline")).toContainText("May 8, 2026");
+    await expect(rowValue(page, "Deadline")).toContainText("May 7, 2027");
   });
 
   test("AC12/AC7 — Calculus AB nests its published Part A/B rows beneath each section, visually subordinate and programmatically associated with the parent", async ({
@@ -169,19 +169,19 @@ test.describe("issue #44 — per-section exam details", () => {
 
     // Section row: name | questions | length | weight.
     const mc = row(page, /^Multiple Choice$/);
-    await expect(mc).toContainText("45");
-    await expect(mc).toContainText("1 h 45 min");
+    await expect(mc).toContainText("42");
+    await expect(mc).toContainText("1 h 40 min");
     await expect(mc).toContainText("50%");
 
     // Part rows are programmatically associated: the row header's accessible
     // name carries the sr-only "<section> — " prefix.
     const mcPartA = row(page, /Multiple Choice\s*—\s*Part A/);
-    await expect(mcPartA).toContainText("30");
-    await expect(mcPartA).toContainText("1 h");
+    await expect(mcPartA).toContainText("29");
+    await expect(mcPartA).toContainText("1 h 2 min");
     await expect(mcPartA).toContainText("calculator not permitted");
     const mcPartB = row(page, /Multiple Choice\s*—\s*Part B/);
-    await expect(mcPartB).toContainText("15");
-    await expect(mcPartB).toContainText("45 min");
+    await expect(mcPartB).toContainText("13");
+    await expect(mcPartB).toContainText("38 min");
     await expect(mcPartB).toContainText("graphing calculator required");
 
     // The Free Response section has its own, distinct A/B split.
@@ -200,8 +200,8 @@ test.describe("issue #44 — per-section exam details", () => {
       .evaluate((el) => parseFloat(getComputedStyle(el).paddingLeft));
     expect(partPad).toBeGreaterThan(sectionPad);
 
-    // "Exam length" stays the published 195 total (= 3 h 15 min).
-    await expect(rowValue(page, "Exam length")).toHaveText("3 h 15 min");
+    // "Exam length" stays the published 190 total (= 3 h 10 min).
+    await expect(rowValue(page, "Exam length")).toHaveText("3 h 10 min");
   });
 
   test("AC4/AC14 — AP Chinese renders its published ranges verbatim, in the page's printed section order, and 'Exam length' stays the published total (never a section sum)", async ({
@@ -210,7 +210,7 @@ test.describe("issue #44 — per-section exam details", () => {
     await page.goto("/");
     await openInfo(page, "AP Chinese Language and Culture");
 
-    // The 2026 page prints Free-Response FIRST; the table preserves that order.
+    // The 2027 page prints Free-Response FIRST; the table preserves that order.
     const rowHeaders = sectionsTable(page).locator("tbody th[scope='row']");
     await expect(rowHeaders.first()).toContainText("Section I: Free-Response");
 

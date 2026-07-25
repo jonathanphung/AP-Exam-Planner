@@ -1,0 +1,30 @@
+{
+ "id": "united-states-government-and-politics",
+ "name": "AP United States Government and Politics",
+ "cycle": "May 2027",
+ "fetchedAt": "2026-07-24",
+ "sourceUrl": "https://apcentral.collegeboard.org/courses/ap-united-states-government-and-politics/exam",
+ "totalMinutesSource": "https://apstudents.collegeboard.org/courses/ap-united-states-government-and-politics/assessment",
+ "fallbackUsed": "none",
+ "noSitDownExam": false,
+ "totalMinutesStated": 180,
+ "sectionsSumToTotal": true,
+ "changedFor2027": null,
+ "sections": [
+  {
+   "name": "Multiple Choice",
+   "questionCount": "55",
+   "minutes": 80,
+   "weightPercent": 50,
+   "quote": "Section I: Multiple Choice — 55 Questions | 1 Hour 20 minutes | 50% of Exam Score"
+  },
+  {
+   "name": "Free Response",
+   "questionCount": "4",
+   "minutes": 100,
+   "weightPercent": 50,
+   "quote": "Section II: Free Response — 4 Questions | 1 Hour 40 minutes | 50% of Exam Score"
+  }
+ ],
+ "datasetDiscrepancies": []
+}

@@ -1,5 +1,5 @@
 import { test, expect, type Page, type Browser } from "@playwright/test";
-import apData from "../src/data/ap-2026.json";
+import apData from "../src/data/ap-2027.json";
 import { REGULAR_WINDOWS, LATE_TESTING_WINDOW } from "../src/data/schema";
 import { pressViewChip } from "./support/view-chip";
 
@@ -53,29 +53,29 @@ const byId = (id: string): Subject => {
 // Conflict pair — CROSS-category so "both go orange regardless of category"
 // is actually exercised (STEM Biology + Languages Latin share 05-04 AM).
 const BIOLOGY = byId("biology"); // STEM, 05-04 AM (conflicts w/ Latin → orange)
-const LATIN = byId("latin"); // Languages, 05-04 AM (conflicts w/ Biology → orange)
+const ITALIAN = byId("italian-language-and-culture"); // Languages, 05-04 AM (conflicts w/ Biology → orange)
 // Conflict-free per-category blocks (Career Kickstart has no exam-bearing
 // subject, so it never renders a grid block — it appears only as a legend /
 // off-grid dot, which carries no block text and no AA-for-text obligation).
 const CHEMISTRY = byId("chemistry"); // STEM, 05-05 AM — a clean blue block
 const EURO_HISTORY = byId("european-history"); // Humanities, 05-04 PM
-const CHINESE = byId("chinese-language-and-culture"); // Languages, 05-08 PM
+const FRENCH = byId("french-language-and-culture"); // Languages, 05-08 PM
 const MUSIC_THEORY = byId("music-theory"); // Arts, 05-11 PM
 
 // ---- Guard fixture assumptions against dataset drift -----------------------
 if (
-  BIOLOGY.exam!.date !== LATIN.exam!.date ||
-  BIOLOGY.exam!.session !== LATIN.exam!.session
+  BIOLOGY.exam!.date !== ITALIAN.exam!.date ||
+  BIOLOGY.exam!.session !== ITALIAN.exam!.session
 )
-  throw new Error("fixture drift: biology/latin no longer share a slot");
-if (BIOLOGY.category === LATIN.category)
-  throw new Error("fixture drift: biology/latin now share a category");
-if (BIOLOGY.category !== "STEM" || LATIN.category !== "Languages")
-  throw new Error("fixture drift: biology/latin categories moved");
+  throw new Error("fixture drift: biology/italian no longer share a slot");
+if (BIOLOGY.category === ITALIAN.category)
+  throw new Error("fixture drift: biology/italian now share a category");
+if (BIOLOGY.category !== "STEM" || ITALIAN.category !== "Languages")
+  throw new Error("fixture drift: biology/italian categories moved");
 if (!BIOLOGY.lateTesting)
   throw new Error("fixture drift: biology has no late-testing slot");
 {
-  const clean = [CHEMISTRY, EURO_HISTORY, CHINESE, MUSIC_THEORY];
+  const clean = [CHEMISTRY, EURO_HISTORY, FRENCH, MUSIC_THEORY];
   if (new Set(clean.map((s) => s.category)).size !== 4)
     throw new Error("fixture drift: pastel set no longer spans 4 categories");
   const conflictSlot = `${BIOLOGY.exam!.date}:${BIOLOGY.exam!.session}`;
@@ -89,7 +89,7 @@ if (!BIOLOGY.lateTesting)
   if (
     CHEMISTRY.category !== "STEM" ||
     EURO_HISTORY.category !== "Humanities" ||
-    CHINESE.category !== "Languages" ||
+    FRENCH.category !== "Languages" ||
     MUSIC_THEORY.category !== "Arts"
   )
     throw new Error("fixture drift: pastel-set categories moved");
@@ -270,19 +270,19 @@ test("AC1/AC2 — unresolved conflict paints both blocks orange with a caution m
   page,
 }) => {
   await page.setViewportSize({ width: 1920, height: 1080 });
-  await seedSelection(page, [BIOLOGY.id, LATIN.id]);
+  await seedSelection(page, [BIOLOGY.id, ITALIAN.id]);
   await page.goto("/");
   await openCalendar(page);
   await gotoWeek(page, weekNumberOf(BIOLOGY.exam!.date));
 
   const bio = blockButton(page, BIOLOGY.id);
-  const latin = blockButton(page, LATIN.id);
+  const italian = blockButton(page, ITALIAN.id);
   await expect(bio).toBeVisible();
-  await expect(latin).toBeVisible();
+  await expect(italian).toBeVisible();
 
   // Both wear the shared orange conflict style, NOT their category hues
   // (STEM blue #C7CEEA / Languages green #C9E89B) — category is overridden.
-  for (const btn of [bio, latin]) {
+  for (const btn of [bio, italian]) {
     const cls = (await btn.getAttribute("class")) ?? "";
     expect(cls).toContain("bg-[#FDBA74]");
     expect(cls).toContain("border-[#EA580C]");
@@ -293,7 +293,7 @@ test("AC1/AC2 — unresolved conflict paints both blocks orange with a caution m
   // ⚠️ marker present on both; it is decorative (aria-hidden), so the conflict
   // is ALSO carried in words in the accessible name and a visible caption.
   await expect(page.getByTestId("block-conflict-marker")).toHaveCount(2);
-  for (const s of [BIOLOGY, LATIN]) {
+  for (const s of [BIOLOGY, ITALIAN]) {
     await expect(blockButton(page, s.id)).toHaveAttribute(
       "aria-label",
       /unresolved time conflict/i,
@@ -315,30 +315,30 @@ test("AC3 — resolved conflict drops the orange: keeper returns to its pastel c
   page,
 }) => {
   await page.setViewportSize({ width: 1920, height: 1080 });
-  await seedSelection(page, [BIOLOGY.id, LATIN.id]);
-  // Keep Latin at the regular time; Biology moves to its published late slot.
+  await seedSelection(page, [BIOLOGY.id, ITALIAN.id]);
+  // Keep Italian at the regular time; Biology moves to its published late slot.
   await seedResolutions(page, [
     {
       date: BIOLOGY.exam!.date,
       session: BIOLOGY.exam!.session,
-      keeperId: LATIN.id,
-      memberIds: [BIOLOGY.id, LATIN.id],
+      keeperId: ITALIAN.id,
+      memberIds: [BIOLOGY.id, ITALIAN.id],
     },
   ]);
   await page.goto("/");
   await openCalendar(page);
 
-  // Regular week: Latin is back to its Languages (green #C9E89B) pastel — no
+  // Regular week: Italian is back to its Languages (green #C9E89B) pastel — no
   // orange, no ⚠️, and the accessible name no longer mentions a conflict.
-  await gotoWeek(page, weekNumberOf(LATIN.exam!.date));
-  const latinCls = (await blockButton(page, LATIN.id).getAttribute("class")) ?? "";
+  await gotoWeek(page, weekNumberOf(ITALIAN.exam!.date));
+  const latinCls = (await blockButton(page, ITALIAN.id).getAttribute("class")) ?? "";
   expect(latinCls).toContain("bg-[#C9E89B]");
   expect(latinCls).not.toContain("bg-[#FDBA74]");
-  await expect(blockButton(page, LATIN.id)).toHaveAttribute(
+  await expect(blockButton(page, ITALIAN.id)).toHaveAttribute(
     "aria-label",
-    /Languages|Latin/i,
+    /Languages|Italian/i,
   );
-  await expect(blockButton(page, LATIN.id)).not.toHaveAttribute(
+  await expect(blockButton(page, ITALIAN.id)).not.toHaveAttribute(
     "aria-label",
     /time conflict/i,
   );
@@ -367,10 +367,10 @@ test("AC4 — the four block-bearing categories render distinct pastel fills, no
   await seedSelection(page, [
     CHEMISTRY.id, // clean STEM (blue)
     EURO_HISTORY.id, // Humanities (yellow)
-    CHINESE.id, // Languages (green)
+    FRENCH.id, // Languages (green)
     MUSIC_THEORY.id, // Arts (pink)
     BIOLOGY.id,
-    LATIN.id, // Biology+Latin collide → an orange block exists to compare
+    ITALIAN.id, // Biology+Italian collide → an orange block exists to compare
   ]);
   await page.goto("/");
   await openCalendar(page);
@@ -379,8 +379,8 @@ test("AC4 — the four block-bearing categories render distinct pastel fills, no
   await gotoWeek(page, weekNumberOf(CHEMISTRY.exam!.date)); // week with STEM/Hum/Lang
   catalog.STEM = await bgColor(page, CHEMISTRY.id);
   catalog.Humanities = await bgColor(page, EURO_HISTORY.id);
-  catalog.Languages = await bgColor(page, CHINESE.id);
-  const orange = await bgColor(page, LATIN.id); // Latin conflicts w/ Biology → orange
+  catalog.Languages = await bgColor(page, FRENCH.id);
+  const orange = await bgColor(page, ITALIAN.id); // Italian conflicts w/ Biology → orange
   await gotoWeek(page, weekNumberOf(MUSIC_THEORY.exam!.date));
   catalog.Arts = await bgColor(page, MUSIC_THEORY.id);
 
@@ -409,8 +409,8 @@ async function measureAllContrast(
   await gotoWeek(page, weekNumberOf(CHEMISTRY.exam!.date));
   out["STEM (blue)"] = await contrastRatio(page, CHEMISTRY.id);
   out["Humanities (yellow)"] = await contrastRatio(page, EURO_HISTORY.id);
-  out["Languages (green)"] = await contrastRatio(page, CHINESE.id);
-  out["Conflict (orange)"] = await contrastRatio(page, LATIN.id);
+  out["Languages (green)"] = await contrastRatio(page, FRENCH.id);
+  out["Conflict (orange)"] = await contrastRatio(page, ITALIAN.id);
   await gotoWeek(page, weekNumberOf(MUSIC_THEORY.exam!.date));
   out["Arts (pink)"] = await contrastRatio(page, MUSIC_THEORY.id);
   return out;
@@ -427,14 +427,14 @@ for (const scheme of ["light", "dark"] as const) {
       viewport: { width: 1920, height: 1080 },
     });
     const page = await context.newPage();
-    // Biology + Latin collide → both orange; Chemistry/Euro/Chinese/Music are
+    // Biology + Italian collide → both orange; Chemistry/Euro/French/Music are
     // the four conflict-free category blocks we measure the pastel text on.
     await seedSelection(page, [
       CHEMISTRY.id,
       BIOLOGY.id,
-      LATIN.id,
+      ITALIAN.id,
       EURO_HISTORY.id,
-      CHINESE.id,
+      FRENCH.id,
       MUSIC_THEORY.id,
     ]);
     await page.goto("/");

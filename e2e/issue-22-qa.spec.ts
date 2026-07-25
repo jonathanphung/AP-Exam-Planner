@@ -9,18 +9,18 @@ import { test, expect, type Page } from "@playwright/test";
  * are written to the run evidence folder and committed to the issue branch so
  * they render inline on the issue / PR.
  *
- * Fixtures (from src/data/ap-2026.json):
+ * Fixtures (from src/data/ap-2027.json):
  *   - AP Biology        — STEM; exam Mon May 4 AM (8 a.m.), late Wed May 20 PM
  *                         (12 p.m.); pattern CB URL `ap-biology/exam`.
- *   - AP Drawing        — Arts; portfolio-only, deadline Fri May 8 2026;
+ *   - AP Drawing        — Arts; portfolio-only, deadline Fri May 7 2027;
  *                         exception CB URL `ap-drawing/portfolio`.
- *   - AP Cybersecurity  — Career Kickstart; `noExamReason` (first exam 2027);
+ *   - AP Networking     — Career Kickstart; published pilot-only exam qualifier;
  *                         no date/time may be shown.
  *   - AP World History: Modern — exception CB URL `ap-world-history/exam`
  *                         (no "-modern" suffix; patterned URL 404s).
  *
  * Category counts pinned by `pnpm test:data`: STEM 13, Humanities 14,
- * Languages 8, Arts 5, Career Kickstart 2 → 42 subjects.
+ * Languages 8, Arts 5, Career Kickstart 3 → 43 subjects.
  *
  * AC10/AC11 (verified-link rule + single source of truth) are additionally
  * pinned at unit level by `src/lib/college-board-links.test.ts` (full 42/42
@@ -37,9 +37,9 @@ const CATEGORY_COUNTS: readonly { name: string; count: number }[] = [
   { name: "Humanities", count: 14 },
   { name: "Languages", count: 8 },
   { name: "Arts", count: 5 },
-  { name: "Career Kickstart", count: 2 },
+  { name: "Career Kickstart", count: 3 },
 ];
-const TOTAL_SUBJECTS = 42;
+const TOTAL_SUBJECTS = 43;
 
 const catalog = (page: Page) =>
   page.locator('section[aria-label="Subject catalog"]');
@@ -264,9 +264,9 @@ test.describe("issue #22 — mobile category-grouped chips + progressive disclos
       .locator("li")
       .filter({ hasText: "AP Biology" })
       .locator("dl");
-    await expect(bioPanel).toContainText("Mon, May 4 · AM (8 a.m. local time)");
+    await expect(bioPanel).toContainText("Mon, May 3 · PM (12 p.m. local time)");
     await expect(bioPanel).toContainText(
-      "Wed, May 20 · PM (12 p.m. local time)",
+      "Wed, May 19 · AM (8 a.m. local time)",
     );
 
     await page.screenshot({
@@ -280,19 +280,19 @@ test.describe("issue #22 — mobile category-grouped chips + progressive disclos
       .locator("li")
       .filter({ has: expandButton(page, "AP Drawing") });
     await expect(drawingLi).toContainText("Portfolio due");
-    await expect(drawingLi).toContainText("Fri, May 8, 2026");
+    await expect(drawingLi).toContainText("Fri, May 7, 2027");
     await expect(drawingLi.locator("dt", { hasText: "Exam" })).toHaveCount(0);
 
-    // noExamReason subject: the sourced reason verbatim — never a date/time.
-    await expandButton(page, "AP Cybersecurity").click();
+    // Published exam qualifier: for May 2027 no course carries a
+    // `noExamReason` (all are scheduled), but AP Networking's date is
+    // restricted to pilot schools — the qualifier renders verbatim beside the
+    // timing rows so a date never reads as an exam anyone can sit.
+    await expandButton(page, "AP Networking").click();
     const cyberLi = catalog(page)
       .locator("li")
-      .filter({ has: expandButton(page, "AP Cybersecurity") });
-    await expect(cyberLi).toContainText(
-      "First end-of-course exam administration is May 2027",
-    );
-    await expect(cyberLi.locator("dt")).toHaveCount(0);
-    await expect(cyberLi).not.toContainText("May 4");
+      .filter({ has: expandButton(page, "AP Networking") });
+    await expect(cyberLi).toContainText("pilot schools only");
+    await expect(cyberLi).toContainText("Fri, May 7");
 
     await cyberLi.scrollIntoViewIfNeeded();
     await page.screenshot({

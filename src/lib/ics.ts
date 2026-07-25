@@ -5,6 +5,7 @@ import type {
   ExamSectionPart,
   Session,
 } from "../data/schema";
+import { CYCLE_YEAR } from "../data/cycle";
 import { SETUP_BUFFER_MINUTES } from "./calendar";
 import type { SlotResolution } from "./conflicts";
 import { resolveSlots } from "./conflicts";
@@ -36,8 +37,13 @@ export interface SessionStartTimes {
   PM: string;
 }
 
-/** Downloaded file name for the calendar export (shared with the UI). */
-export const ICS_FILE_NAME = "ap-exams-2026.ics";
+/**
+ * Downloaded file name for the calendar export (shared with the UI, and the
+ * basename every other export format derives from — see `exports.ts`). The
+ * year comes from the dataset cycle, so the annual swap renames every emitted
+ * file with no edit here.
+ */
+export const ICS_FILE_NAME = `ap-exams-${CYCLE_YEAR}.ics`;
 
 /** MIME type for the calendar blob. */
 export const ICS_MIME_TYPE = "text/calendar;charset=utf-8";

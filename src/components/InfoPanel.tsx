@@ -2,6 +2,7 @@
 
 import { Fragment, type ReactNode, useId, useRef } from "react";
 import type { ApSubject, ExamSection } from "@/data/schema";
+import { CYCLE } from "@/data/cycle";
 import { useModalDialog } from "@/lib/modal";
 import {
   questionCountLabel,
@@ -87,7 +88,7 @@ function formatMinutes(total: number): string {
 /**
  * Format an ISO calendar date as a *local* date (floating — no timezone).
  * Building the Date from explicit parts avoids the UTC-parse day-shift of
- * `new Date("2026-04-30")` in negative-offset zones.
+ * `new Date("2027-04-30")` in negative-offset zones.
  */
 function formatDeadline(iso: string): string {
   const [year, month, day] = iso.split("-").map(Number);
@@ -363,7 +364,7 @@ export function InfoPanel({ subject, onClose }: InfoPanelProps) {
       )} · ${subject.exam.session}`
     : portfolio
       ? "Portfolio-only — no written exam"
-      : "No May 2026 exam";
+      : `No ${CYCLE} exam`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4">
