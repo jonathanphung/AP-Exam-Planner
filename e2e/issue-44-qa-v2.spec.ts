@@ -1,4 +1,5 @@
 import { test, expect, type Locator, type Page } from "@playwright/test";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA v2 (issue #44, Jon's PR #48 design bounce) — independent
@@ -24,8 +25,9 @@ import { test, expect, type Locator, type Page } from "@playwright/test";
  *   4. the table case keeps its `mt-2` spacing above the metadata list
  *      (pixel-untouched includes the gap between table and rows below).
  *
- * Evidence (Jon's mandated bounce set, light AND dark) is captured to
- * docs/super-board/runs/issue-44-qa-v2/.
+ * Evidence (Jon's mandated bounce set, light AND dark) is captured to the
+ * `issue-44-qa-v2` evidence folder resolved by `evidenceDir()`
+ * (e2e/support/evidence.ts).
  *
  * Dataset ground truth for the branch rule (verified against ap-2027.json in
  * this QA pass): 4 portfolio-only, 14 with parts, 24 partless — the partless
@@ -36,7 +38,7 @@ import { test, expect, type Locator, type Page } from "@playwright/test";
  * and AAS are the correct fixtures, as the builder's handoff flagged.
  */
 
-const EVIDENCE_DIR = "docs/super-board/runs/issue-44-qa-v2";
+const EVIDENCE_DIR = evidenceDir("issue-44-qa-v2");
 const SELECTION_KEY = "apx.selection.v1";
 const THEME_KEY = "apx.theme.v1";
 

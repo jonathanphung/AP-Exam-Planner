@@ -5,6 +5,7 @@ import {
   REGULAR_WINDOWS,
 } from "../src/data/schema";
 import { pressViewChip } from "./support/view-chip";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #19) — week-paged calendar grid view for selected
@@ -45,8 +46,7 @@ import { pressViewChip } from "./support/view-chip";
 
 // Env-overridable so a re-verification pass writes a fresh evidence set
 // instead of rewriting a prior run's committed screenshots.
-const EVIDENCE_DIR =
-  process.env.QA_EVIDENCE_DIR ?? "docs/super-board/runs/issue-19-qa-v3";
+const EVIDENCE_DIR = evidenceDir("issue-19-qa-v3");
 
 const SELECTION_KEY = "apx.selection.v1";
 const RESOLUTIONS_KEY = "apx.resolutions.v1";

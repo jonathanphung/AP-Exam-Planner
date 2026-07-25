@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #60) — pin the support pair ("Send us Feedback" + the
@@ -36,7 +37,7 @@ import { test, expect, type Page } from "@playwright/test";
  *   note-desktop-page-bottom-nudge.png                — the disclosed sticky/footer trade-off
  */
 
-const EVIDENCE_DIR = "docs/super-board/runs/issue-60-qa-v1";
+const EVIDENCE_DIR = evidenceDir("issue-60-qa-v1");
 
 const DESKTOP = { width: 1440, height: 900 };
 const DESKTOP_WIDE = { width: 1920, height: 1080 };

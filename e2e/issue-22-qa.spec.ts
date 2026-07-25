@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #22) — category-grouped mobile chips with
@@ -28,7 +29,7 @@ import { test, expect, type Page } from "@playwright/test";
  * class below.
  */
 
-const EVIDENCE_DIR = "docs/super-board/runs/issue-22-qa-v1";
+const EVIDENCE_DIR = evidenceDir("issue-22-qa-v1");
 
 const MOBILE = { width: 375, height: 667 } as const;
 

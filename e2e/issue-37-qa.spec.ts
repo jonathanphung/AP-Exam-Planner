@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import apData from "../src/data/ap-2027.json";
 import { LATE_TESTING_WINDOW, REGULAR_WINDOWS } from "../src/data/schema";
 import { pressViewChip } from "./support/view-chip";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #37) — annual dataset swap to the May 2027 cycle.
@@ -22,13 +23,12 @@ import { pressViewChip } from "./support/view-chip";
  */
 
 /**
- * Where the visual-evidence tests write. Overridable so a later QA pass on the
- * same card writes its own folder instead of overwriting the pass that the
- * issue/PR comments already link to:
- *   QA_EVIDENCE_DIR=docs/super-board/runs/issue-37-qa-v2 pnpm exec playwright test e2e/issue-37-qa.spec.ts
+ * Where the visual-evidence tests write. The per-spec `QA_EVIDENCE_DIR`
+ * override this spec introduced is now the shared `evidenceDir()` helper
+ * (issue #71 AC7), so a default `pnpm test:e2e` no longer rewrites ANY
+ * committed evidence folder — see e2e/support/evidence.ts.
  */
-const EVIDENCE_DIR =
-  process.env.QA_EVIDENCE_DIR ?? "docs/super-board/runs/issue-37-qa-v1";
+const EVIDENCE_DIR = evidenceDir("issue-37-qa-v1");
 
 type Slot = { date: string; session: "AM" | "PM" } | null;
 type Subject = {

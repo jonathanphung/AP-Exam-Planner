@@ -1,6 +1,7 @@
 import { test, expect, type Download, type Page } from "@playwright/test";
 import { readFileSync, writeFileSync } from "node:fs";
 import { pressViewChip } from "./support/view-chip";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #51) — the "Export" menu button.
@@ -37,7 +38,7 @@ import { pressViewChip } from "./support/view-chip";
  * by the `evidence — …` tests below.
  */
 
-const EVIDENCE_DIR = "docs/super-board/runs/issue-51-qa-v1";
+const EVIDENCE_DIR = evidenceDir("issue-51-qa-v1");
 
 const exportButton = (page: Page) => page.getByTestId("export-menu-button");
 const exportMenu = (page: Page) => page.getByTestId("export-menu");

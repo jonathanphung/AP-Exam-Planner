@@ -1,6 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import apData from "../src/data/ap-2027.json";
 import { pressViewChip } from "./support/view-chip";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #4) — personal schedule view grouped by date & session
@@ -22,7 +23,7 @@ import { pressViewChip } from "./support/view-chip";
  *   - AP Cybersecurity      no May 2027 exam, no portfolio (Career Kickstart)
  */
 
-const EVIDENCE_DIR = "docs/super-board/runs/issue-4-qa-v1";
+const EVIDENCE_DIR = evidenceDir("issue-4-qa-v1");
 
 const schedule = (page: Page) =>
   page.locator('section[aria-label="My schedule"]');

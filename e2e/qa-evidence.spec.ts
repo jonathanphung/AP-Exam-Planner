@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #1) — evidence spec.
@@ -10,7 +11,7 @@ import { test, expect } from "@playwright/test";
  * they render inline on the issue / PR.
  */
 
-const EVIDENCE_DIR = "docs/super-board/runs/issue-1-qa-v1";
+const EVIDENCE_DIR = evidenceDir("issue-1-qa-v1");
 
 const viewports = [
   { name: "desktop", width: 1920, height: 1080 },

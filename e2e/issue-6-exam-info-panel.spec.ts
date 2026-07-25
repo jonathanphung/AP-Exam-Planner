@@ -1,4 +1,5 @@
 import { test, expect, type Locator, type Page } from "@playwright/test";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #6) — exam info panel with format details + pass rate.
@@ -19,7 +20,7 @@ import { test, expect, type Locator, type Page } from "@playwright/test";
  *                            2027-04-30 (AC4).
  */
 
-const EVIDENCE_DIR = "docs/super-board/runs/issue-6-qa-v1";
+const EVIDENCE_DIR = evidenceDir("issue-6-qa-v1");
 
 const catalog = (page: Page) =>
   page.locator('section[aria-label="Subject catalog"]');

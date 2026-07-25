@@ -2,6 +2,7 @@ import { test, expect, type Page } from "@playwright/test";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import apData from "../src/data/ap-2027.json";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #49) — Tester evidence spec.
@@ -40,8 +41,7 @@ test.use({
   launchOptions: { ignoreDefaultArgs: ["--hide-scrollbars"] },
 });
 
-const EVIDENCE_DIR =
-  process.env.QA_EVIDENCE_DIR ?? "docs/super-board/runs/issue-49-qa-v1";
+const EVIDENCE_DIR = evidenceDir("issue-49-qa-v1");
 
 const DESKTOP = { width: 1920, height: 1080 };
 const TABLET = { width: 1024, height: 768 };

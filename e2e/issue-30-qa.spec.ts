@@ -2,6 +2,7 @@ import { test, expect, type Page, type Browser } from "@playwright/test";
 import apData from "../src/data/ap-2027.json";
 import { REGULAR_WINDOWS, LATE_TESTING_WINDOW } from "../src/data/schema";
 import { pressViewChip } from "./support/view-chip";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #30) — evidence spec.
@@ -24,12 +25,14 @@ import { pressViewChip } from "./support/view-chip";
  *     that never render grid blocks in these fixtures) carry the SAME pastel
  *     accent classes as the block scheme, light + dark variants.
  *
- * Screenshots land in docs/super-board/runs/issue-30-qa-v2/ and are committed
- * to the issue branch so they render inline on the issue / PR. (v2 re-captures
+ * Screenshots land in the `issue-30-qa-v2` evidence folder resolved by
+ * `evidenceDir()` (e2e/support/evidence.ts); a lane capturing committed
+ * evidence points that at docs/super-board/runs/ so they render inline on the
+ * issue / PR. (v2 re-captures
  * the light+dark evidence after Jon's exact-hex palette bounce on PR #34.)
  */
 
-const EVIDENCE_DIR = "docs/super-board/runs/issue-30-qa-v2";
+const EVIDENCE_DIR = evidenceDir("issue-30-qa-v2");
 const SELECTION_KEY = "apx.selection.v1";
 const RESOLUTIONS_KEY = "apx.resolutions.v1";
 

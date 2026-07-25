@@ -1,6 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { pressViewChip } from "./support/view-chip";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #7) — export selected exams as an ICS calendar file.
@@ -17,7 +18,7 @@ import { pressViewChip } from "./support/view-chip";
  * committed to the issue branch so they render inline on the issue / PR.
  */
 
-const EVIDENCE_DIR = "docs/super-board/runs/issue-7-qa-v1";
+const EVIDENCE_DIR = evidenceDir("issue-7-qa-v1");
 
 const schedule = (page: Page) =>
   page.locator('section[aria-label="My schedule"]');

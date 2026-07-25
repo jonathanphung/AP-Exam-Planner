@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { writeFileSync } from "node:fs";
 import { test, expect } from "@playwright/test";
 import {
   SHOW_SCROLLBARS,
@@ -6,6 +6,7 @@ import {
   openExamDetailsOpener,
   registerDialogShiftTests,
 } from "./support/scroll-shift";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * Issue #49 — REAL CHROME channel (`channel: "chrome"`), the Jon bounce pass 1.
@@ -81,8 +82,7 @@ test("real Chrome: logged measurement table — shell rect.left steady closed �
     `shell drift open - closed:      ${open.shellLeft - closed.shellLeft}px  (must be 0 — no shift)`,
     `shell drift reclosed - closed:  ${reclosed.shellLeft - closed.shellLeft}px  (must be 0 — restored)`,
   ].join("\n");
-  const dir = "docs/super-board/runs/issue-49-build-v2";
-  mkdirSync(dir, { recursive: true });
+  const dir = evidenceDir("issue-49-build-v2");
   writeFileSync(`${dir}/real-chrome-measurements.txt`, `${table}\n`);
   await testInfo.attach("real-chrome-measurements", {
     body: table,

@@ -1,5 +1,6 @@
 import { test, expect, type Locator, type Page } from "@playwright/test";
 import { pressViewChip } from "./support/view-chip";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #45, v3 — rebuild after the statistics.frqType bounce).
@@ -22,14 +23,16 @@ import { pressViewChip } from "./support/view-chip";
  * popup at desktop + mobile covers the first two surfaces directly; a
  * calendar-popup test covers the third.
  *
- * Screenshots land in docs/super-board/runs/issue-45-qa-v3/ and are committed
- * to the issue branch so they render inline on the issue / PR. Every value
+ * Screenshots land in the `issue-45-qa-v3` evidence folder resolved by
+ * `evidenceDir()` (e2e/support/evidence.ts); a lane capturing committed
+ * evidence points that at docs/super-board/runs/ so they render inline on the
+ * issue / PR. Every value
  * asserted here is the College Board published figure recorded verbatim in
  * docs/super-board/research/collegeboard-2026/<id>.json (post-171cb15) and
  * src/data/sources.md.
  */
 
-const EVIDENCE_DIR = "docs/super-board/runs/issue-45-qa-v3";
+const EVIDENCE_DIR = evidenceDir("issue-45-qa-v3");
 
 const viewports = [
   { name: "desktop", width: 1920, height: 1080 },

@@ -1,4 +1,5 @@
 import { test, expect, type Page, type Locator } from "@playwright/test";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #24) — desktop catalog grouped by category by default,
@@ -28,7 +29,7 @@ import { test, expect, type Page, type Locator } from "@playwright/test";
  * Languages 8, Arts 5, Career Kickstart 3 → 43 subjects.
  */
 
-const EVIDENCE_DIR = "docs/super-board/runs/issue-24-qa-v1";
+const EVIDENCE_DIR = evidenceDir("issue-24-qa-v1");
 
 const CANONICAL_ORDER = [
   "STEM",

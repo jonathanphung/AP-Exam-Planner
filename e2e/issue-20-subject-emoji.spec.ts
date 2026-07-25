@@ -1,6 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import apData from "../src/data/ap-2027.json";
 import { pressViewChip } from "./support/view-chip";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #20) — decorative subject emoji next to every name.
@@ -24,7 +25,7 @@ import { pressViewChip } from "./support/view-chip";
  * `pnpm test:unit`; this spec covers the visual/interaction surface.
  */
 
-const EVIDENCE_DIR = "docs/super-board/runs/issue-20-qa-v1";
+const EVIDENCE_DIR = evidenceDir("issue-20-qa-v1");
 const TOTAL_SUBJECTS = 43;
 
 type Subject = {

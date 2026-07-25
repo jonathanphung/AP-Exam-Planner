@@ -1,4 +1,5 @@
 import { test, expect, type Locator, type Page } from "@playwright/test";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #50) — replace the U+2197 `↗` character with an
@@ -36,12 +37,13 @@ import { test, expect, type Locator, type Page } from "@playwright/test";
  *         SVG arrow, zero text arrows); evidence screenshots light+dark ×
  *         desktop/tablet/mobile plus College Board button closeups.
  *
- * Screenshots land in docs/super-board/runs/issue-50-qa-v1/ and are
- * committed to the issue branch so they render inline on the issue / PR.
+ * Screenshots land in the `issue-50-qa-v1` evidence folder resolved by
+ * `evidenceDir()` (e2e/support/evidence.ts); a lane capturing committed
+ * evidence points that at docs/super-board/runs/ so they render inline on the
+ * issue / PR.
  */
 
-const EVIDENCE_DIR =
-  process.env.QA_EVIDENCE_DIR ?? "docs/super-board/runs/issue-50-qa-v1";
+const EVIDENCE_DIR = evidenceDir("issue-50-qa-v1");
 
 const SIDEBAR = '[data-testid="resources-sidebar"]';
 // Scoped to the resources panel: the #29 footer row added non-resource

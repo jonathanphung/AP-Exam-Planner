@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #3) — catalog grid, search, category filter, selection.
@@ -18,7 +19,7 @@ import { test, expect, type Page } from "@playwright/test";
  * preserving each AC's original intent.
  */
 
-const EVIDENCE_DIR = "docs/super-board/runs/issue-3-qa-v1";
+const EVIDENCE_DIR = evidenceDir("issue-3-qa-v1");
 
 const TOTAL_SUBJECTS = 43;
 const STEM_COUNT = 13;

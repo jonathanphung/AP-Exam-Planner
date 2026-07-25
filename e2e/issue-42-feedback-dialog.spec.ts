@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #42) — in-app feedback dialog.
@@ -23,7 +24,7 @@ import AxeBuilder from "@axe-core/playwright";
  * null) to drive the failure state.
  */
 
-const EVIDENCE_DIR = "docs/super-board/runs/issue-42-qa-v2";
+const EVIDENCE_DIR = evidenceDir("issue-42-qa-v2");
 const REPO_URL = "https://github.com/jonathanphung/AP-Exam-Planner";
 const THEME_KEY = "apx.theme.v1";
 const MAX_LEN = 2000;

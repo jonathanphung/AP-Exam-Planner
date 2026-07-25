@@ -1,4 +1,5 @@
 import { test, expect, type Page, type Locator } from "@playwright/test";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA (issue #57) — even out the collapsed subject-pill height so a
@@ -28,7 +29,7 @@ import { test, expect, type Page, type Locator } from "@playwright/test";
  *   - selected-row-{light,dark}-desktop.png       — selected + unselected at the new height
  */
 
-const EVIDENCE_DIR = "docs/super-board/runs/issue-57-qa-v1";
+const EVIDENCE_DIR = evidenceDir("issue-57-qa-v1");
 
 const RESERVED_PX = 56; // min-h-14 = 3.5rem
 const TOUCH_FLOOR = 44; // issue #8 AC5 / issue #22

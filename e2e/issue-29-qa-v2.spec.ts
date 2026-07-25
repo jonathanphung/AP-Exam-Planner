@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { evidenceDir } from "./support/evidence";
 
 /**
  * super-board QA v2 (issue #29) — re-verification of Jon's post-approval
@@ -25,8 +26,7 @@ import { test, expect, type Page } from "@playwright/test";
  * fresh evidence screenshots for the v2 run.
  */
 
-const EVIDENCE_DIR =
-  process.env.QA_EVIDENCE_DIR ?? "docs/super-board/runs/issue-29-qa-v2";
+const EVIDENCE_DIR = evidenceDir("issue-29-qa-v2");
 
 const DESKTOP = { width: 1920, height: 1080 };
 /** Short desktop viewport: guarantees the panel overflows and must scroll internally. */
