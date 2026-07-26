@@ -70,8 +70,9 @@ export const JSON_EXPORT_VERSION = 1;
  *
  * - `subjects` carries the FULL dataset record of every selected subject,
  *   verbatim, in the user's selection order. The hard data rule (PRD
- *   §7.5/§8/§11) extends to exports: a `"pending"` value in the dataset is
- *   serialized as the literal string `"pending"` — never dropped, never
+ *   §7.5/§8/§11) extends to exports: an unpublished value is ABSENT from the
+ *   dataset (issue #84 retired the literal `"pending"`) and stays absent in
+ *   the export — never back-filled with a zero, never
  *   fabricated into a number. Verbatim serialization of the dataset records
  *   guarantees this by construction (verified by the round-trip unit test).
  * - Selected ids with no dataset record (a stale selection surviving a

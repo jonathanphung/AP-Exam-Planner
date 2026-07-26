@@ -60,7 +60,6 @@ function subject(
     exam,
     lateTesting,
     format: { ...FORMAT },
-    passRate: "pending",
     portfolio,
     ...(exam === null && portfolio === null
       ? { noExamReason: "fixture: no May 2027 exam" }
@@ -92,7 +91,6 @@ const PORTFOLIO_NOTE =
   "Two performance tasks, submitted as final in the AP Digital Portfolio by 11:59 p.m. ET: Team Project and Presentation (20%); Individual Research-Based Essay and Presentation (35%).";
 const seminar = subject("seminar", "AP Seminar", null, null, {
   deadline: "2027-04-30",
-  weightPct: "pending",
   note: PORTFOLIO_NOTE,
 } as Portfolio);
 // Career-Kickstart-style: no exam, no portfolio → contributes no event.
@@ -302,10 +300,12 @@ describe("formatDurationHM (issue #38 part A)", () => {
 });
 
 describe("buildIcsCalendar — issue #38 sections[] edge handling", () => {
-  // A section whose duration is genuinely unpublished ("pending"), a
-  // project-style component with NO printed question count (omission), and an
-  // unpublished total — the AP African American Studies shape, synthetically.
-  const pendingExam = {
+  // A section whose duration is genuinely unpublished, a project-style
+  // component with NO printed question count, and an unpublished total — the
+  // AP African American Studies shape, synthetically. All three states are
+  // omission since issue #84; the row simply drops the segment it has no
+  // published value for.
+  const unpublishedExam = {
     ...subject(
       "pend",
       "AP Pending",
@@ -317,20 +317,16 @@ describe("buildIcsCalendar — issue #38 sections[] edge handling", () => {
         {
           name: "Section I: Multiple Choice",
           questionCount: 40,
-          minutes: "pending",
           weightPercent: 60,
         },
         {
           name: "Individual Student Project",
-          minutes: "pending",
-          weightPercent: "pending",
+          weightPercent: 40,
         },
       ],
-      totalMinutes: "pending",
-      calculator: "pending",
       delivery: "digital",
     },
-  } as ApSubject;
+  } as unknown as ApSubject;
 
   // A parts-based exam (the Calculus AB shape): Part A/B rows nest under
   // their section, carrying the published calculator note.
@@ -373,7 +369,7 @@ describe("buildIcsCalendar — issue #38 sections[] edge handling", () => {
   } as ApSubject;
 
   const ics = buildIcsCalendar(
-    [pendingExam, partsExam],
+    [unpublishedExam, partsExam],
     ["pend", "parts"],
     [],
     SESSION_START,
@@ -381,27 +377,39 @@ describe("buildIcsCalendar — issue #38 sections[] edge handling", () => {
   );
   const unfolded = ics.replace(/\r\n /g, "");
 
-  it("emits NO DTEND when totalMinutes is pending (never invents a duration)", () => {
+  it("emits NO DTEND when no total length is published (never invents a duration)", () => {
     expect(unfolded).toContain("DTSTART:20270512T080000");
-    // The parts exam (published total) still gets its DTEND; the pending one
-    // has exactly none — one DTEND across the two events.
+    // The parts exam (published total) still gets its DTEND; the one with no
+    // published length has exactly none — one DTEND across the two events.
     expect((unfolded.match(/DTEND:/g) ?? []).length).toBe(1);
     expect(unfolded).toContain("DTEND:20270513T114500"); // 08:00 + 195 + 30
   });
 
-  it('renders a pending section duration as "Duration pending", not a number', () => {
+  it("drops the duration segment — and the whole Total Length row — where no length is published (issue #84)", () => {
+    // Before #84 these printed "Duration pending". A .ics DESCRIPTION has no
+    // column grid to leave a hole in, so an unpublished value is simply absent
+    // rather than announced as forthcoming.
     expect(unfolded).toContain(
-      "Section I: Multiple Choice: 40 Questions | Duration pending | 60% of Score",
+      "Section I: Multiple Choice: 40 Questions | 60% of Score",
     );
-    expect(unfolded).toContain("Total Length: Duration pending");
+    expect(unfolded).not.toContain("Duration pending");
+    // No published total → no total row at all, so the +30 setup allowance is
+    // never attached to a non-value. Scoped to the pend event's own
+    // DESCRIPTION line so the parts event's total cannot satisfy it.
+    const pendDescription = unfolded
+      .slice(unfolded.indexOf("UID:pend-exam@"))
+      .split("\r\n")
+      .find((line) => line.startsWith("DESCRIPTION:"))!;
+    expect(pendDescription).not.toContain("Total Length:");
+    expect(unfolded).toContain(
+      "Total Length: 3 hours and 15 minutes (+ 30 minutes for exam setup time)",
+    );
   });
 
-  it("drops the questions segment when College Board prints no count (omission ≠ pending)", () => {
-    // The project component has no questionCount at all — the row starts
-    // straight at the duration; a pending weight renders as "Weight pending".
-    expect(unfolded).toContain(
-      "Individual Student Project: Duration pending | Weight pending",
-    );
+  it("drops the questions segment when College Board prints no count", () => {
+    // The project component has no questionCount and no length at all — the
+    // row is its name and its published weight, nothing invented.
+    expect(unfolded).toContain("Individual Student Project: 40% of Score");
     expect(unfolded).not.toContain("undefined");
   });
 
@@ -478,7 +486,6 @@ describe("buildIcsCalendar — per-part weights resolve to an exam share (issue 
           // the section's own stored weight (examSectionSchema refuses a pair
           // that disagrees), so this section is 20% like the "of 20%" says.
           name: "Performance Task 1: Team Project and Presentation",
-          minutes: "pending",
           weightPercent: 20,
           parts: [
             {
@@ -498,7 +505,7 @@ describe("buildIcsCalendar — per-part weights resolve to an exam share (issue 
           weightPercent: 17,
           parts: [
             { name: "Question 1: Long Essay–Comparison", questionCount: 1 },
-            { name: "Question 2: Short Essay–Attribution", questionCount: 1, weightPercent: "pending" },
+            { name: "Question 2: Short Essay–Attribution", questionCount: 1 },
           ],
         },
       ],
@@ -546,12 +553,14 @@ describe("buildIcsCalendar — per-part weights resolve to an exam share (issue 
     expect(unfolded).not.toContain("50% of 20%");
   });
 
-  it("drops the weight segment entirely where no per-part weight is published, and keeps 'pending' distinct", () => {
+  it("drops the weight segment entirely where no per-part weight is published", () => {
+    // Both rows take this branch since issue #84: "Weight pending" was the
+    // only other outcome and no part in the dataset ever produced it.
     expect(unfolded).toContain("- Question 1: Long Essay–Comparison: 1 Question");
     expect(unfolded).not.toMatch(/Question 1: Long Essay–Comparison: 1 Question \|/);
-    expect(unfolded).toContain(
-      "- Question 2: Short Essay–Attribution: 1 Question | Weight pending",
-    );
+    expect(unfolded).toContain("- Question 2: Short Essay–Attribution: 1 Question");
+    expect(unfolded).not.toMatch(/Question 2: Short Essay–Attribution: 1 Question \|/);
+    expect(unfolded).not.toContain("Weight pending");
   });
 });
 

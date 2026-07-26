@@ -63,7 +63,7 @@ Secondary: a parent or counselor checking a student's exam load.
 
 ### 7.5 Exam info panel
 - Per subject: MCQ count, FRQ count and type, total exam length, calculator policy, digital or paper format.
-- Most recent published pass rate, percent scoring 3 or higher. Source from College Board's annual AP Score Distribution report. Do not estimate or invent numbers. Leave the field marked "pending" if not yet sourced for a subject.
+- Most recent published pass rate, percent scoring 3 or higher. Source from College Board's annual AP Score Distribution report. Do not estimate or invent numbers. Where College Board publishes no distribution for a subject, omit the field: the row stays and its cell shows the not-published dash (issue #84 retired the earlier "pending" marker). A subject that has never been administered also carries a sourced one-line reason, so the dash does not read as missing data.
 
 ### 7.6 Calendar export
 - One button generates a standard ICS file with every selected exam as a timed event: date, start time based on session, subject name.

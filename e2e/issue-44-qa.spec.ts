@@ -260,25 +260,39 @@ test.describe("issue #44 — per-section exam details", () => {
     await expect(rowValue(page, "Exam length")).toHaveText("2 h");
   });
 
-  test("AC13 — genuinely unpublished values degrade to a visible 'pending' badge; the row keeps its name, count, and published note", async ({
+  test("AC13 — genuinely unpublished values degrade to a visible dash; the row keeps its name, count, and published note", async ({
     page,
   }) => {
     await page.goto("/");
     await openInfo(page, "AP Chinese Language and Culture");
 
-    // Q3's minutes are unpublished (the page prints only a combined figure).
+    // Q3's length is unpublished: College Board prints only the combined
+    // "30 minutes to complete both writing tasks", which is never split.
+    // Issue #84 replaced the `pending` badge with the dash after confirming
+    // against the live page that no per-question figure exists — and the
+    // combined figure is still on screen, in the row's note.
     const q3 = row(page, /Question 3: Story Narration/);
-    await expect(q3.getByText("pending", { exact: true })).toBeVisible();
+    await expect(q3.getByRole("cell").nth(1)).toContainText("—");
+    await expect(q3.getByRole("cell").nth(1).getByText("none published")).toHaveCount(1);
     await expect(q3).toContainText("1"); // question count still shown
     await expect(q3).toContainText("Questions 3 & 4 combined 30 minutes");
 
-    // All four FR part rows carry the badge — none are blanked or dropped.
+    // All four FR part rows dash their Length — none are blanked or dropped —
+    // and the retired badge appears nowhere.
+    for (const name of [
+      /Question 1: Project Presentation/,
+      /Question 2: Project Q&A/,
+      /Question 3: Story Narration/,
+      /Question 4: Email Response/,
+    ] as const) {
+      await expect(row(page, name).getByRole("cell").nth(1)).toContainText("—");
+    }
     await expect(
       sectionsTable(page).getByText("pending", { exact: true }),
-    ).toHaveCount(4);
+    ).toHaveCount(0);
   });
 
-  test("AC3/AC13 — omission and 'pending' are distinct states in one row (AAS Individual Student Project: no printed question count vs unpublished minutes)", async ({
+  test("AC3/AC13 — every unpublished cell degrades to the same dash (AAS Individual Student Project: no printed question count, no printed duration)", async ({
     page,
   }) => {
     await page.goto("/");
@@ -312,12 +326,13 @@ test.describe("issue #44 — per-section exam details", () => {
     const isp = row(page, /^Individual Student Project$/);
     const cells = isp.getByRole("cell");
     // Questions: the page prints NO count (it's a project, not a question
-    // set) → the not-published dash, not a fabricated count and not "pending".
+    // set) → the not-published dash, not a fabricated count.
     await expect(cells.nth(0)).toContainText("—");
-    // Minutes: a duration exists but is unpublished → the pending badge.
-    await expect(
-      cells.nth(1).getByText("pending", { exact: true }),
-    ).toBeVisible();
+    // Minutes: issue #84 re-checked the live page — the Exam Format block
+    // times every other component and gives the project no time allocation at
+    // all, so this is the SAME not-published dash, not a second affordance.
+    await expect(cells.nth(1)).toContainText("—");
+    await expect(cells.nth(1).getByText("none published")).toHaveCount(1);
     // Weight: published 8.5% renders.
     await expect(cells.nth(2)).toHaveText("8.5%");
   });

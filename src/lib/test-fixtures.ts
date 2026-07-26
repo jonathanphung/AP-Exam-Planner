@@ -32,12 +32,11 @@ export const UNDATED_SUBJECT: ApSubject = {
   noExamReason:
     "Test fixture: a listed course whose first exam administration has not been scheduled yet.",
   format: {
+    // College Board publishes nothing about this course's exam — every format
+    // field is absent, the only shape the schema allows alongside no sections
+    // (issue #84 replaced the literal "pending" with omission).
     sections: [],
-    totalMinutes: "pending",
-    calculator: "pending",
-    delivery: "pending",
   },
-  passRate: "pending",
   portfolio: null,
 };
 

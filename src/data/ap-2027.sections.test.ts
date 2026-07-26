@@ -15,10 +15,16 @@ import { parseApDataset } from "./schema";
  * by hand — or fabricated — without the diff showing up here.
  *
  * Hard data rule (PRD §7.5/§8/§11): nothing is estimated, back-computed, or
- * summed into an aggregate College Board does not print. A genuinely
- * unpublished value is the literal "pending"; a value the page prints nothing
- * for (a project component's question count) is OMITTED — the two states are
- * never conflated.
+ * summed into an aggregate College Board does not print. A value the page
+ * prints nothing for is OMITTED, and the surfaces render it as the
+ * not-published dash.
+ *
+ * Issue #84 removed the third state this suite used to police — the literal
+ * "pending", for a figure College Board publishes that the capture had missed.
+ * All 33 of them were re-verified against the live pages on 2026-07-25 and
+ * none was published anywhere, so the provenance records now carry `null`
+ * (with a `pendingResolved2026_07_25` field naming the page and the quote) and
+ * the normalizer below turns that into an omitted field.
  */
 
 const PROVENANCE_DIR = join(
@@ -46,7 +52,8 @@ interface ProvenancePart {
 interface ProvenanceSection {
   name: string;
   questionCount?: string;
-  minutes: number | string;
+  /** `null` where College Board prints no length for the section (issue #84). */
+  minutes?: number | string | null;
   weightPercent: number | string;
   parts?: ProvenancePart[];
 }
@@ -60,8 +67,8 @@ interface ProvenanceRecord {
 // Normalization rules (mirrors src/data/sources.md "sections[] populate").
 // ---------------------------------------------------------------------------
 
-/** "42" → 42; "55–75"/"55-75" → "55–75"; "pending" → "pending";
- *  "n/a" → omitted; descriptive text → omitted, carried into the note. */
+/** "42" → 42; "55–75"/"55-75" → "55–75"; "n/a" → omitted;
+ *  descriptive text → omitted, carried into the note. */
 function normalizeQuestionCount(raw: string | undefined): {
   value?: number | string;
   extraNote?: string;
@@ -69,7 +76,13 @@ function normalizeQuestionCount(raw: string | undefined): {
   if (raw === undefined || raw === null) return {};
   const s = String(raw).trim();
   if (s === "n/a" || s === "") return {};
-  if (s === "pending") return { value: "pending" };
+  // Issue #84 retired the "pending" state; a record that reintroduces one
+  // fails here rather than silently becoming a note that reads "pending".
+  if (s === "pending") {
+    throw new Error(
+      'provenance questionCount "pending": the state was removed in issue #84 — omit the field, or record the published count',
+    );
+  }
   if (/^\d+$/.test(s)) return { value: Number(s) };
   const range = s.match(/^(\d+)\s*[–-]\s*(\d+)$/);
   if (range) return { value: `${range[1]}–${range[2]}` };
@@ -79,9 +92,10 @@ function normalizeQuestionCount(raw: string | undefined): {
 function normalizeMinutes(raw: number | string): number | string {
   if (typeof raw === "number") return raw;
   const s = String(raw).trim();
-  if (s === "pending") return "pending";
   const range = s.match(/^(\d+)\s*[–-]\s*(\d+)$/);
   if (range) return `${range[1]}–${range[2]}`;
+  // "pending" lands here on purpose (issue #84): a record that reintroduces it
+  // fails loudly instead of quietly shipping a fourth state.
   throw new Error(`unparseable provenance minutes: ${JSON.stringify(raw)}`);
 }
 
@@ -106,10 +120,7 @@ function normalizeNote(raw: string | undefined): string | undefined {
  */
 function normalizePartWeight(p: ProvenancePart) {
   if (p.weightPercent !== undefined) {
-    return {
-      weightPercent:
-        p.weightPercent === "pending" ? "pending" : Number(p.weightPercent),
-    };
+    return { weightPercent: Number(p.weightPercent) };
   }
   if (p.weightPrinted !== undefined) return { weightPrinted: p.weightPrinted };
   return {};
@@ -136,9 +147,10 @@ function normalizeSection(s: ProvenanceSection) {
   return {
     name: s.name,
     ...(qc.value !== undefined ? { questionCount: qc.value } : {}),
-    minutes: normalizeMinutes(s.minutes),
-    weightPercent:
-      s.weightPercent === "pending" ? "pending" : Number(s.weightPercent),
+    ...(s.minutes === undefined || s.minutes === null
+      ? {}
+      : { minutes: normalizeMinutes(s.minutes) }),
+    weightPercent: Number(s.weightPercent),
     ...(qc.extraNote !== undefined ? { note: qc.extraNote } : {}),
     ...(s.parts && s.parts.length > 0
       ? { parts: s.parts.map(normalizePart) }
@@ -255,26 +267,29 @@ describe("ap-2027.json sections[] (issue #44)", () => {
     // AP Networking is the single 2027 exception: the exam is on the published
     // May 2027 schedule (pilot schools only) but the course has no AP Central
     // exam page yet, so there is nothing to publish. That state is not a licence
-    // to guess — every other format field must be "pending" too, and no other
-    // subject may take this branch.
+    // to guess — every other format field must be absent too (issue #84
+    // replaced the literal "pending" with omission), and no other subject may
+    // take this branch.
     const noFormat: string[] = [];
     for (const subject of dataset.subjects) {
       if (subject.exam === null) continue;
       if (subject.format.sections.length > 0) continue;
       noFormat.push(subject.id);
-      expect(subject.format.totalMinutes, `${subject.id} totalMinutes`).toBe(
-        "pending",
-      );
-      expect(subject.format.delivery, `${subject.id} delivery`).toBe("pending");
-      expect(subject.format.calculator, `${subject.id} calculator`).toBe(
-        "pending",
-      );
+      expect(
+        subject.format.totalMinutes,
+        `${subject.id} totalMinutes`,
+      ).toBeUndefined();
+      expect(subject.format.delivery, `${subject.id} delivery`).toBeUndefined();
+      expect(
+        subject.format.calculator,
+        `${subject.id} calculator`,
+      ).toBeUndefined();
       expect(subject.examNote, `${subject.id} examNote`).toBeTruthy();
     }
     expect(noFormat).toEqual(["networking"]);
   });
 
-  it("AP Seminar lacks a multiple-choice section entirely — omitted, never 'pending'", () => {
+  it("AP Seminar lacks a multiple-choice section entirely — omitted, never zeroed", () => {
     // Issue #73: the two back-computed "End-of-Course Exam – …Section" rows
     // (13.5% / 31.5% — 30%/70% of 45%, multiplied out) were replaced with the
     // three components College Board's Assessment Format actually prints, each
@@ -377,7 +392,7 @@ describe("ap-2027.json sections[] (issue #44)", () => {
     ).toBe(55);
   });
 
-  it("keeps genuinely unpublished durations as the literal 'pending' — never invented, never split from a combined figure", () => {
+  it("omits durations College Board does not publish — never invented, never split from a combined figure (issue #84)", () => {
     // AAS's Individual Student Project prints a weight but no duration —
     // it is completed during the course, and the page prints no minutes.
     // (Exact-name match: "Section IB: Individual Student Project—Exam Day
@@ -387,7 +402,7 @@ describe("ap-2027.json sections[] (issue #44)", () => {
       byId.get("african-american-studies")?.format.sections ?? [];
     expect(
       aas.find((s) => s.name === "Individual Student Project")?.minutes,
-    ).toBe("pending");
+    ).toBeUndefined();
     // Psychology's AAQ/EBQ parts have no printed times — only the section's
     // 70 minutes is published, and it is never divided between them.
     const psychFr = byId
@@ -395,19 +410,30 @@ describe("ap-2027.json sections[] (issue #44)", () => {
       ?.format.sections.find((s) => /free.?response/i.test(s.name));
     expect(psychFr?.minutes).toBe(70);
     expect(psychFr?.parts?.map((p) => p.minutes)).toEqual([
-      "pending",
-      "pending",
+      undefined,
+      undefined,
     ]);
     // Chinese prints "30 minutes to complete both writing tasks (Questions 3
     // and 4)" — a combined figure that is never split 15/15 across the parts.
+    // The combined figure is not lost with the Length cell: it ships verbatim
+    // in each row's note, which is what makes the omission honest instead of
+    // lossy.
     const cnFr = byId
       .get("chinese-language-and-culture")
       ?.format.sections.find((s) => /free.?response/i.test(s.name));
-    expect(
-      cnFr?.parts
-        ?.filter((p) => /story narration|email response/i.test(p.name))
-        .map((p) => p.minutes),
-    ).toEqual(["pending", "pending"]);
+    const cnWriting =
+      cnFr?.parts?.filter((p) =>
+        /story narration|email response/i.test(p.name),
+      ) ?? [];
+    expect(cnWriting.map((p) => p.minutes)).toEqual([undefined, undefined]);
+    expect(cnWriting.map((p) => p.note)).toEqual([
+      "Questions 3 & 4 combined 30 minutes",
+      "Questions 3 & 4 combined 30 minutes",
+    ]);
+    // AP Seminar's two through-course performance tasks have no exam-day time
+    // allocation at all; only the End-of-Course Exam is timed.
+    const seminar = byId.get("seminar")?.format.sections ?? [];
+    expect(seminar.map((s) => s.minutes)).toEqual([undefined, undefined, 120]);
   });
 
   it("'Total Length' stays the published totalMinutes, independent of section sums", () => {
@@ -425,11 +451,10 @@ describe("ap-2027.json sections[] (issue #44)", () => {
     ).toBe(120);
   });
 
-  it("weights are published numbers (or 'pending'), and 2-section exams' printed weights are 0–100", () => {
+  it("weights are published numbers, and 2-section exams' printed weights are 0–100", () => {
     for (const subject of dataset.subjects) {
       for (const section of subject.format.sections) {
         const w = section.weightPercent;
-        if (w === "pending") continue;
         expect(typeof w, `${subject.id} "${section.name}" weight`).toBe(
           "number",
         );
@@ -498,7 +523,7 @@ describe("ap-2027.json sections[] (issue #44)", () => {
     expect(checkedPrinted).toBeGreaterThanOrEqual(11);
   });
 
-  it("keeps a part's minutes OMITTED where the page prints no length, distinct from 'pending' (issue #73)", () => {
+  it("keeps a part's minutes OMITTED where the page prints no length (issue #73, single-stated by #84)", () => {
     const artHistoryFr = byId
       .get("art-history")
       ?.format.sections.find((s) => s.name === "Section II: Free Response");
@@ -510,14 +535,16 @@ describe("ap-2027.json sections[] (issue #44)", () => {
       expect(part.weightPercent, `${part.name} weightPercent`).toBeUndefined();
       expect(part.weightPrinted, `${part.name} weightPrinted`).toBeUndefined();
     }
-    // AP Psychology's AAQ/EBQ halves are the other state: a length exists
-    // (the section prints 70 minutes) but no per-part figure is published.
+    // AP Psychology's AAQ/EBQ halves reach the same state by a different
+    // route: a length exists for the SECTION (70 minutes) but College Board
+    // publishes no per-part figure, and #84 confirmed against the live page
+    // that there is nothing to publish. Both are omission now.
     const psychFr = byId
       .get("psychology")
       ?.format.sections.find((s) => /free.?response/i.test(s.name));
     expect(psychFr?.parts?.map((p) => p.minutes)).toEqual([
-      "pending",
-      "pending",
+      undefined,
+      undefined,
     ]);
   });
 

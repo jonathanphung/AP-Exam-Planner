@@ -60,11 +60,11 @@ const PART_ROWS: PartRow[] = dataset.subjects.flatMap((subject) =>
 /**
  * The Weight cell as #73 rendered it — the rule this issue supersedes,
  * re-implemented here so "unchanged" can be checked rather than asserted.
- * `PartWeightValue`'s four branches, flattened to text: `35%`, the verbatim
- * printed phrase, the pending badge, the not-published dash.
+ * `PartWeightValue`'s branches, flattened to text: `35%`, the verbatim
+ * printed phrase, the not-published dash. (#73 had a fourth, the pending
+ * badge; issue #84 retired it — no part row in the dataset ever reached it.)
  */
 function cellBefore(part: ExamSectionPart): string {
-  if (part.weightPercent === "pending") return "[pending]";
   if (typeof part.weightPercent === "number") return `${part.weightPercent}%`;
   if (part.weightPrinted !== undefined) return part.weightPrinted;
   return "—";
@@ -81,8 +81,6 @@ function cellAfter(
       return `${weight.value}%${weight.each ? " each" : ""}`;
     case "printed":
       return weight.text;
-    case "pending":
-      return "[pending]";
     case "unpublished":
       return "—";
   }

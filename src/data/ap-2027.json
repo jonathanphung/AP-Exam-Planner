@@ -54,7 +54,6 @@
           },
           {
             "name": "Individual Student Project",
-            "minutes": "pending",
             "weightPercent": 8.5
           }
         ],
@@ -211,7 +210,7 @@
         "calculator": true,
         "delivery": "digital"
       },
-      "passRate": "pending",
+      "passRateNote": "AP Business with Personal Finance launches in fall 2026 and its exam is first administered in May 2027, so College Board has published no score distribution for it yet.",
       "portfolio": null
     },
     {
@@ -404,28 +403,24 @@
               {
                 "name": "Question 1: Project Presentation",
                 "questionCount": 1,
-                "minutes": "pending",
                 "weightPercent": 20,
                 "note": "3 minutes to prepare; 3 minutes to present"
               },
               {
                 "name": "Question 2: Project Q&A",
                 "questionCount": 1,
-                "minutes": "pending",
                 "weightPercent": 15,
                 "note": "4 pre-recorded questions; 40 seconds for each response"
               },
               {
                 "name": "Question 3: Story Narration",
                 "questionCount": 1,
-                "minutes": "pending",
                 "weightPercent": 7.5,
                 "note": "Questions 3 & 4 combined 30 minutes"
               },
               {
                 "name": "Question 4: Email Response",
                 "questionCount": 1,
-                "minutes": "pending",
                 "weightPercent": 7.5,
                 "note": "Questions 3 & 4 combined 30 minutes"
               }
@@ -459,7 +454,6 @@
       "passRate": 85,
       "portfolio": {
         "deadline": "2027-04-30",
-        "weightPct": "pending",
         "note": "Personalized Project Reference (PPR) submitted as final through the AP Digital Portfolio by 11:59 p.m. ET. College Board publishes no separate score weight for the PPR — it is the reference students use for the Project Presentation and Project Q&A free-response questions, which are scored as part of the exam."
       }
     },
@@ -604,7 +598,7 @@
         "calculator": false,
         "delivery": "digital"
       },
-      "passRate": "pending",
+      "passRateNote": "AP Cybersecurity launches in fall 2026 and its exam is first administered in May 2027, so College Board has published no score distribution for it yet.",
       "portfolio": null
     },
     {
@@ -791,14 +785,12 @@
               {
                 "name": "Question 1: Project Presentation",
                 "questionCount": 1,
-                "minutes": "pending",
                 "weightPercent": 20,
                 "note": "3 minutes to prepare; 3 minutes to present"
               },
               {
                 "name": "Question 2: Project Q&A",
                 "questionCount": 1,
-                "minutes": "pending",
                 "weightPercent": 15,
                 "note": "4 pre-recorded questions; 40 seconds for each response"
               },
@@ -839,7 +831,6 @@
       "passRate": 71,
       "portfolio": {
         "deadline": "2027-04-30",
-        "weightPct": "pending",
         "note": "Personalized Project Reference (PPR) submitted as final through the AP Digital Portfolio by 11:59 p.m. ET. College Board publishes no separate score weight for the PPR — it is the reference students use for the Project Presentation and Project Q&A free-response questions, which are scored as part of the exam."
       }
     },
@@ -866,14 +857,12 @@
               {
                 "name": "Question 1: Project Presentation",
                 "questionCount": 1,
-                "minutes": "pending",
                 "weightPercent": 20,
                 "note": "3 minutes to prepare; 3 minutes to present"
               },
               {
                 "name": "Question 2: Project Q&A",
                 "questionCount": 1,
-                "minutes": "pending",
                 "weightPercent": 15,
                 "note": "4 pre-recorded questions; 40 seconds for each response"
               },
@@ -914,7 +903,6 @@
       "passRate": 68,
       "portfolio": {
         "deadline": "2027-04-30",
-        "weightPct": "pending",
         "note": "Personalized Project Reference (PPR) submitted as final through the AP Digital Portfolio by 11:59 p.m. ET. College Board publishes no separate score weight for the PPR — it is the reference students use for the Project Presentation and Project Q&A free-response questions, which are scored as part of the exam."
       }
     },
@@ -976,14 +964,12 @@
               {
                 "name": "Question 1: Project Presentation",
                 "questionCount": 1,
-                "minutes": "pending",
                 "weightPercent": 20,
                 "note": "3 minutes to prepare; 3 minutes to present"
               },
               {
                 "name": "Question 2: Project Q&A",
                 "questionCount": 1,
-                "minutes": "pending",
                 "weightPercent": 15,
                 "note": "4 pre-recorded questions; 40 seconds for each response"
               },
@@ -1024,7 +1010,6 @@
       "passRate": 69,
       "portfolio": {
         "deadline": "2027-04-30",
-        "weightPct": "pending",
         "note": "Personalized Project Reference (PPR) submitted as final through the AP Digital Portfolio by 11:59 p.m. ET. College Board publishes no separate score weight for the PPR — it is the reference students use for the Project Presentation and Project Q&A free-response questions, which are scored as part of the exam."
       }
     },
@@ -1051,28 +1036,24 @@
               {
                 "name": "Question 1: Project Presentation",
                 "questionCount": 1,
-                "minutes": "pending",
                 "weightPercent": 20,
                 "note": "3 minutes to prepare; 3 minutes to present"
               },
               {
                 "name": "Question 2: Project Q&A",
                 "questionCount": 1,
-                "minutes": "pending",
                 "weightPercent": 15,
                 "note": "4 pre-recorded questions; 40 seconds for each response"
               },
               {
                 "name": "Question 3: Story Narration",
                 "questionCount": 1,
-                "minutes": "pending",
                 "weightPercent": 7.5,
                 "note": "Questions 3 & 4 combined 30 minutes"
               },
               {
                 "name": "Question 4: Email Response",
                 "questionCount": 1,
-                "minutes": "pending",
                 "weightPercent": 7.5,
                 "note": "Questions 3 & 4 combined 30 minutes"
               }
@@ -1106,7 +1087,6 @@
       "passRate": 72,
       "portfolio": {
         "deadline": "2027-04-30",
-        "weightPct": "pending",
         "note": "Personalized Project Reference (PPR) submitted as final through the AP Digital Portfolio by 11:59 p.m. ET. College Board publishes no separate score weight for the PPR — it is the reference students use for the Project Presentation and Project Q&A free-response questions, which are scored as part of the exam."
       }
     },
@@ -1291,12 +1271,9 @@
       },
       "examNote": "College Board schedules this exam for 2026-27 pilot schools only. AP Networking is in its third and final pilot in 2026-27 and the course launches in fall 2027, so College Board publishes no exam page for it yet and no section structure, duration, delivery mode, or calculator policy is published.",
       "format": {
-        "sections": [],
-        "totalMinutes": "pending",
-        "calculator": "pending",
-        "delivery": "pending"
+        "sections": []
       },
-      "passRate": "pending",
+      "passRateNote": "AP Networking is in its 2026-27 pilot; College Board's AP Career Kickstart timeline puts the course launch in fall 2027 and the first exam administration in May 2028, so no score distribution has been published for it yet.",
       "portfolio": null
     },
     {
@@ -1533,13 +1510,11 @@
             "parts": [
               {
                 "name": "Free-Response Question 1: Article Analysis Question (AAQ)",
-                "questionCount": 1,
-                "minutes": "pending"
+                "questionCount": 1
               },
               {
                 "name": "Free-Response Question 2: Evidence-Based Question (EBQ)",
-                "questionCount": 1,
-                "minutes": "pending"
+                "questionCount": 1
               }
             ]
           }
@@ -1586,7 +1561,6 @@
         "sections": [
           {
             "name": "Performance Task 1: Team Project and Presentation",
-            "minutes": "pending",
             "weightPercent": 20,
             "parts": [
               {
@@ -1603,7 +1577,6 @@
           },
           {
             "name": "Performance Task 2: Individual Research-Based Essay and Presentation",
-            "minutes": "pending",
             "weightPercent": 35,
             "parts": [
               {
@@ -1680,14 +1653,12 @@
               {
                 "name": "Question 1: Project Presentation",
                 "questionCount": 1,
-                "minutes": "pending",
                 "weightPercent": 20,
                 "note": "3 minutes to prepare; 3 minutes to present"
               },
               {
                 "name": "Question 2: Project Q&A",
                 "questionCount": 1,
-                "minutes": "pending",
                 "weightPercent": 15,
                 "note": "4 pre-recorded questions; 40 seconds for each response"
               },
@@ -1728,7 +1699,6 @@
       "passRate": 83,
       "portfolio": {
         "deadline": "2027-04-30",
-        "weightPct": "pending",
         "note": "Personalized Project Reference (PPR) submitted as final through the AP Digital Portfolio by 11:59 p.m. ET. College Board publishes no separate score weight for the PPR — it is the reference students use for the Project Presentation and Project Q&A free-response questions, which are scored as part of the exam."
       }
     },

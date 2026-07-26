@@ -58,7 +58,7 @@ type Subject = {
   exam: { date: string; session: "AM" | "PM" } | null;
   lateTesting: { date: string; session: "AM" | "PM" } | null;
   portfolio: { deadline: string } | null;
-  format: { totalMinutes: number | "pending" };
+  format: { totalMinutes?: number };
 };
 
 const DATASET = apData as {

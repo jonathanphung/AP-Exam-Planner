@@ -202,7 +202,7 @@ test.describe("issue #44 QA v3 — one presentation (#73 bounce, superseding PR 
     expect(clip.vertical, "dt clips vertically").toBeLessThanOrEqual(1);
   });
 
-  test("pending badge and omitted question count stay DISTINCT states in AAS's table (issue #73: AAS renders the table now)", async ({
+  test("every unpublished cell in AAS's table is the SAME not-published dash (issue #73 shape, #84 single state)", async ({
     page,
   }) => {
     await page.goto("/");
@@ -210,8 +210,13 @@ test.describe("issue #44 QA v3 — one presentation (#73 bounce, superseding PR 
 
     // Issue #73: AAS's printed "Section II: Free Response" carries published
     // SAQ / DBQ part rows, so the whole subject renders the 4-column table.
-    // The two honest-degradation states this test exists for are unchanged,
-    // they are just cells now instead of stat phrases.
+    // This test used to pin TWO honest-degradation states apart (the dash for
+    // an omitted question count, the pending badge for an unpublished
+    // duration). Issue #84 re-verified the Individual Student Project against
+    // the live College Board page — it prints a weight and a description but
+    // NO time allocation — so both cells are the same not-published dash now,
+    // and the badge is gone from the component. What the test still guards is
+    // that neither cell is blank and neither invents a number.
     const isp = sectionsTable(page)
       .getByRole("row")
       .filter({
@@ -223,17 +228,19 @@ test.describe("issue #44 QA v3 — one presentation (#73 bounce, superseding PR 
     const cells = isp.getByRole("cell");
     await expect(cells).toHaveCount(3);
     // Questions: College Board prints NO count (a project, not a question
-    // set) → the not-published dash, never a pending badge.
+    // set) → the not-published dash.
     await expect(cells.nth(0)).toContainText("—");
-    await expect(cells.nth(0).getByText("pending", { exact: true })).toHaveCount(
-      0,
-    );
-    // Length: a duration exists but is unpublished → the pending badge.
-    await expect(
-      cells.nth(1).getByText("pending", { exact: true }),
-    ).toBeVisible();
+    await expect(cells.nth(0).getByText("none published")).toHaveCount(1);
+    // Length: College Board prints no time allocation for the project either
+    // → the SAME dash, with the same sr-only text. One style, not two.
+    await expect(cells.nth(1)).toContainText("—");
+    await expect(cells.nth(1).getByText("none published")).toHaveCount(1);
     // Weight: the published 8.5% renders as a number.
     await expect(cells.nth(2)).toHaveText("8.5%");
+    // The retired badge must not come back anywhere in the dialog.
+    await expect(dialog(page).getByText("pending", { exact: true })).toHaveCount(
+      0,
+    );
   });
 
   test("the prose block's zone divider does not survive anywhere: a formerly-partless exam (Biology) and a part-carrying one (Calc AB) get the same table-branch metadata spacing", async ({

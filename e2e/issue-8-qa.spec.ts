@@ -475,7 +475,7 @@ test.describe("issue #8 QA evidence", () => {
     await ctx2.close();
   });
 
-  test("AC5 evidence — info panel with textual 'pending' badge", async ({
+  test("AC5 evidence — info panel with the textual not-published dash", async ({
     page,
   }) => {
     await page.goto("/");
@@ -488,7 +488,10 @@ test.describe("issue #8 QA evidence", () => {
       .click();
     const panel = page.getByRole("dialog");
     await expect(panel).toBeVisible();
-    await expect(panel.getByText("pending", { exact: true })).toBeVisible();
+    // Issue #84: the unpublished affordance is the dash plus its sr-only
+    // label — a non-color, textual cue, which is what AC5 is about.
+    await expect(panel.getByText("none published").first()).toBeVisible();
+    await expect(panel.getByText("pending", { exact: true })).toHaveCount(0);
     await page.screenshot({
       path: `${EVIDENCE_DIR}/ac5-info-panel-pending-desktop.png`,
     });

@@ -127,9 +127,13 @@ describe("issue #7 QA — ICS export against the shipped ap-2027.json", () => {
     expect(description).toContain(
       "- Evidence-Based argument essay (1 long essay): 1 Question | 90 Minutes | 31.5% of Score",
     );
+    // Issue #84: the through-course performance tasks have no published
+    // exam-day duration, so the row carries only its published weight — no
+    // "Duration pending" placeholder promising a figure that does not exist.
     expect(description).toContain(
-      "Performance Task 1: Team Project and Presentation: Duration pending | 20% of Score",
+      "Performance Task 1: Team Project and Presentation: 20% of Score",
     );
+    expect(description).not.toContain("Duration pending");
     expect(description).toContain(
       "- Individual research report (1,200 words): 10% of Score",
     );

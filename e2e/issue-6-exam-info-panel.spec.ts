@@ -129,7 +129,7 @@ test.describe("issue #6 — exam info panel", () => {
     );
   });
 
-  test("AC3 — a 'pending' value renders as a visible muted badge, never blank or fabricated", async ({
+  test("AC3 — an unpublished value renders as a visible dash with its screen-reader label, never blank or fabricated", async ({
     page,
   }) => {
     await page.goto("/");
@@ -137,16 +137,21 @@ test.describe("issue #6 — exam info panel", () => {
     await expect(dialog(page)).toBeVisible();
 
     const passRate = rowValue(page, "Pass rate");
-    // The pass-rate badge reads "pending" and is visible…
-    await expect(passRate.getByText("pending", { exact: true })).toBeVisible();
+    // The pass-rate cell shows the dash — and the dash carries its own
+    // sr-only text, so AT hears "none published" rather than silence.
+    await expect(passRate).toContainText("—");
+    await expect(passRate.getByText("none published")).toHaveCount(1);
     // …the human-readable label is still shown…
     await expect(passRate).toContainText("scored 3 or higher");
-    // …and no fabricated percentage is rendered in its place.
+    // …no fabricated percentage is rendered in its place…
     await expect(passRate).not.toContainText("%");
+    // …and the reason nothing is published is on screen, so a dash on a course
+    // nobody has sat yet does not read as a bug (issue #84 AC4).
+    await expect(passRate).toContainText("score distribution");
 
-    // Cybersecurity's only pending field is the pass rate → exactly one badge.
+    // The retired "pending" badge is gone from the whole dialog (issue #84).
     await expect(dialog(page).getByText("pending", { exact: true })).toHaveCount(
-      1,
+      0,
     );
   });
 

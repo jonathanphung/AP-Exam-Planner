@@ -43,7 +43,7 @@ function subject(
     exam,
     lateTesting,
     format: { ...FORMAT },
-    passRate: "pending",
+    passRate: undefined,
     portfolio,
     ...(exam === null && portfolio === null
       ? { noExamReason: "fixture: no May 2027 exam" }

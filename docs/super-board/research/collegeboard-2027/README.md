@@ -40,5 +40,31 @@ copied forward without that diff.
 `networking.json` has `sections: []` and no `totalMinutes`. AP Networking is on
 the published 2027 exam schedule ("Networking (2026-27 pilot schools only)") but
 has no AP Central exam page and no AP Students assessment page — both 404 as of
-2026-07-24. Its `notes` field records that. Nothing about its format is
-estimated.
+2026-07-24, re-checked and still 404 on 2026-07-25. Its `notes` field records
+that. Nothing about its format is estimated.
+
+## Issue #84 — the `"pending"` re-verification (2026-07-25)
+
+Nine records carried `"minutes": "pending"` on a section or a part, meaning
+"College Board prints a duration here that this capture does not have". Issue
+#84 went back to the **live** page behind each one — deliberately not to the
+captured text in `pages/`, since the capture is what produced the claim — and
+found that College Board prints no such duration in any of the nine cases.
+
+Those values are now `null`, which the sections test normalizes to an omitted
+field, and each record carries a `pendingResolved2026_07_25` string naming the
+URL, the date, what the page actually prints, and why the printed phrasing is
+not a duration that can be stored. The dataset renders them as the
+not-published dash.
+
+Two things deliberately did NOT change:
+
+- The `quote` fields. They are what the page printed and they still are.
+- The `"pending"` strings inside `datasetDiscrepancies`. Those describe the
+  *2026* dataset's state at capture time — audit history, not a shipped value.
+
+The lesson from the 2026 cycle still holds and is now enforced rather than
+remembered: **never write an unpublished marker over a number you have not
+checked on the live page.** The difference is that there is no marker left to
+write — `src/data/ap-2027.test.ts` fails if the string `"pending"` appears
+anywhere in the shipped JSON.

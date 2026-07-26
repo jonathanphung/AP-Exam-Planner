@@ -23,7 +23,7 @@ import type { Schedule, ScheduleEntry } from "./schedule";
  * Unit tests for the pure calendar-grid layout logic (issue #19).
  * Fixtures are synthetic Schedule shapes so every branch (exam placement,
  * duration-proportional heights, buffer-aware lane splitting, the
- * marked-approximate "pending" fallback, portfolio/off-grid routing,
+ * marked-approximate unpublished-length fallback, portfolio/off-grid routing,
  * unparseable times) is exercised regardless of the real dataset's contents.
  */
 
@@ -78,12 +78,12 @@ function scheduleOf(entries: ScheduleEntry[], undated: Schedule["undated"] = [])
   };
 }
 
-// bio: a real 3h15m exam; euro: 2h; latin: published length "pending" — the
+// bio: a real 3h15m exam; euro: 2h; latin: no published length — the
 // documented nominal/approximate fallback path.
 const SUBJECT_INFO: ReadonlyMap<string, SubjectCalendarInfo> = new Map([
   ["bio", { category: "STEM", totalMinutes: 195 }],
   ["euro", { category: "Humanities", totalMinutes: 120 }],
-  ["latin", { category: "Languages", totalMinutes: "pending" }],
+  ["latin", { category: "Languages", totalMinutes: undefined }],
 ] as const);
 
 describe("enumerateDates", () => {
@@ -204,7 +204,7 @@ describe("buildCalendarLayout", () => {
     );
   });
 
-  it("falls back to the documented nominal block for 'pending' lengths, marked approximate (A2)", () => {
+  it("falls back to the documented nominal block for unpublished lengths, marked approximate (A2)", () => {
     const layout = buildCalendarLayout(
       scheduleOf([examEntry("latin", "2027-05-03", "PM")]),
       START_TIMES,

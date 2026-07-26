@@ -101,7 +101,7 @@ describe("issue #38 QA — real dataset, invariants re-derived", () => {
       const endMatch = ics.match(
         new RegExp(`UID:${id}-exam@[^]*?DTEND:(\\d{8}T\\d{6})`),
       );
-      if (total === "pending") {
+      if (total === undefined) {
         expect(endMatch).toBeNull(); // never invent a duration
         continue;
       }
@@ -129,19 +129,14 @@ describe("issue #38 QA — real dataset, invariants re-derived", () => {
         const question =
           section.questionCount === undefined
             ? undefined
-            : section.questionCount === "pending"
-              ? "Questions pending"
-              : section.questionCount === 1
-                ? "1 Question"
-                : `${section.questionCount} Questions`;
+            : section.questionCount === 1
+              ? "1 Question"
+              : `${section.questionCount} Questions`;
         const minutes =
-          section.minutes === "pending"
-            ? "Duration pending"
+          section.minutes === undefined
+            ? undefined
             : `${section.minutes} Minutes`;
-        const weight =
-          section.weightPercent === "pending"
-            ? "Weight pending"
-            : `${section.weightPercent}% of Score`;
+        const weight = `${section.weightPercent}% of Score`;
         const row = `${section.name}: ${[question, minutes, weight]
           .filter((s) => s !== undefined)
           .join(" | ")}`;
@@ -155,12 +150,14 @@ describe("issue #38 QA — real dataset, invariants re-derived", () => {
     }
   });
 
-  it("AC3/AC4 — real pending duration prints 'Duration pending'; published Total kept; parts nest; setup merged into the total row", () => {
+  it("AC3/AC4 — an unpublished duration drops its segment; published Total kept; parts nest; setup merged into the total row", () => {
     // AP African American Studies: the Individual Student Project's duration
-    // is genuinely unpublished — the row stays honest while the published
-    // 165-minute total still renders as hours-and-minutes.
+    // is genuinely unpublished — the row carries its published weight and
+    // nothing else (issue #84 replaced "Duration pending" with omission),
+    // while the published 165-minute total still renders as hours-and-minutes.
     const aas = examDescription("african-american-studies");
-    expect(aas).toContain("Individual Student Project: Duration pending");
+    expect(aas).toContain("Individual Student Project: 8.5% of Score");
+    expect(aas).not.toContain("Duration pending");
     expect(aas).toContain(
       "Total Length: 2 hours and 45 minutes (+ 30 minutes for exam setup time)",
     );
@@ -244,7 +241,6 @@ describe("issue #38 QA — real dataset, invariants re-derived", () => {
       part: ExamSectionPart,
       sectionWeight: ExamSection["weightPercent"],
     ): string | undefined => {
-      if (part.weightPercent === "pending") return "Weight pending";
       if (typeof part.weightPercent === "number") {
         return `${part.weightPercent}% of Score`;
       }
@@ -320,10 +316,7 @@ describe("issue #38 QA — real dataset, invariants re-derived", () => {
         cursor = index + 1;
       };
       for (const section of subject.format.sections) {
-        const weight =
-          section.weightPercent === "pending"
-            ? "Weight pending"
-            : `${section.weightPercent}% of Score`;
+        const weight = `${section.weightPercent}% of Score`;
         expectRow(
           `${section.name}: ${[
             derivedQuestion(section.questionCount),
@@ -345,11 +338,22 @@ describe("issue #38 QA — real dataset, invariants re-derived", () => {
           );
         }
       }
-      // The final line is always the total row with the merged setup
-      // parenthetical — and never a zero-part phrasing or a "0 Questions" row.
-      expect(lines[lines.length - 1], `${subject.id} total row`).toMatch(
-        /^Total Length: .+ \(\+ 30 minutes for exam setup time\)$/,
-      );
+      // The final line is the total row with the merged setup parenthetical —
+      // and never a zero-part phrasing or a "0 Questions" row. AP Networking
+      // is the one exception: College Board publishes no length for it, so
+      // since issue #84 there is no total row to attach the allowance to.
+      if (subject.format.totalMinutes === undefined) {
+        expect(subject.id, "only AP Networking has no published length").toBe(
+          "networking",
+        );
+        expect(description, `${subject.id} total row`).not.toContain(
+          "Total Length:",
+        );
+      } else {
+        expect(lines[lines.length - 1], `${subject.id} total row`).toMatch(
+          /^Total Length: .+ \(\+ 30 minutes for exam setup time\)$/,
+        );
+      }
       expect(description).not.toMatch(/0 hours|and 0 minutes/);
       expect(description).not.toContain(": 0 Questions");
     }

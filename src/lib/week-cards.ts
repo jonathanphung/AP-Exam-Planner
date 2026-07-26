@@ -88,6 +88,16 @@ export interface WeekCardRow {
    */
   endClock: string | null;
   /** True when the exam length is `"pending"` — the row shows start, no end. */
+  /**
+   * The block height is this app's nominal fallback, not a published length.
+   *
+   * Deliberately NOT renamed by issue #84, which retired the dataset's
+   * `"pending"` state: this flag is about OUR block being approximate, not
+   * about a dataset cell awaiting a College Board figure. The user-facing
+   * "Length pending" marker it drives is pinned by e2e specs and committed
+   * evidence (#71, #74); re-wording it is a copy decision that needs its own
+   * screenshots, not a side effect of a data change.
+   */
   lengthPending: boolean;
   /** True when a conflict resolution moved this exam to its late-testing slot. */
   movedToLate: boolean;

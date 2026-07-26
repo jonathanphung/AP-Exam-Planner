@@ -67,13 +67,18 @@ import {
  *                   this app cannot convert, so the string ships verbatim
  *                   rather than as a guess. Unreachable for the shipped
  *                   dataset — `examSectionSchema` rejects an unparseable form
- *                   and there is no section whose own weight is "pending"
- *                   carrying converted parts — but the renderers stay total.
- *   - `pending`     College Board publishes a weight this capture does not
- *                   have; the caller shows its pending affordance.
+ *                   and every section carries a published weight to multiply
+ *                   by — but the renderers stay total.
  *   - `unpublished` College Board publishes no per-part weight at all (AP Art
  *                   History's six free-response questions); the caller shows
- *                   its not-published affordance. NOT the same as `pending`.
+ *                   its not-published affordance.
+ *
+ * A fourth kind, `pending`, existed until issue #84 for "College Board
+ * publishes a weight this capture does not have". No part in the dataset ever
+ * reached it once the 33 pending values were re-verified — they were all
+ * genuinely unpublished — and the schema no longer has a state that could
+ * produce it, so it is gone rather than left as an unreachable branch every
+ * renderer has to keep a case for.
  *
  * ## Why this multiplies now, when #73 said never (issue #83, 2026-07-25)
  *
@@ -103,7 +108,6 @@ import {
 export type PartWeight =
   | { kind: "percent"; value: number; each: boolean }
   | { kind: "printed"; text: string }
-  | { kind: "pending" }
   | { kind: "unpublished" };
 
 /**
@@ -129,15 +133,13 @@ export function partWeight(
   part: ExamSectionPart,
   sectionWeightPercent: ExamSection["weightPercent"],
 ): PartWeight {
-  if (part.weightPercent === "pending") return { kind: "pending" };
   if (typeof part.weightPercent === "number") {
     return { kind: "percent", value: part.weightPercent, each: false };
   }
   if (part.weightPrinted !== undefined) {
     const printed = parsePrintedWeight(part.weightPrinted);
     // An exam-denominated string is already the answer; anything else is a
-    // share of this section. A section whose own weight is unpublished has
-    // nothing to multiply by, so its parts keep the printed string.
+    // share of this section.
     const denominator =
       printed === null
         ? undefined

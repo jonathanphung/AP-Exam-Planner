@@ -188,12 +188,6 @@ describe("partWeight — every published denominator, resolved to the exam", () 
     ).toEqual({ kind: "percent", value: 43.75, each: false });
   });
 
-  it("falls back to the verbatim string when the section's own weight is unpublished — nothing to multiply by", () => {
-    expect(
-      partWeight(part({ weightPrinted: "50% of section score" }), "pending"),
-    ).toEqual({ kind: "printed", text: "50% of section score" });
-  });
-
   it("falls back to the verbatim string on a form the grammar cannot read (the schema rejects it first; renderers must still be total)", () => {
     expect(partWeight(part({ weightPrinted: "half the section" }), 33)).toEqual(
       { kind: "printed", text: "half the section" },
@@ -211,12 +205,6 @@ describe("partWeight — every published denominator, resolved to the exam", () 
         50,
       ),
     ).toEqual({ kind: "unpublished" });
-  });
-
-  it("reports PENDING separately from unpublished — the two states never collapse", () => {
-    expect(partWeight(part({ weightPercent: "pending" }), 50)).toEqual({
-      kind: "pending",
-    });
   });
 
   it("prefers the exam-denominated number when a record somehow carries both (schema forbids it; renderers must still be total)", () => {
