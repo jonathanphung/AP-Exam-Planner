@@ -1,0 +1,34 @@
+super-board QA v1 — issue #84 / PR #86 — raw suite output
+branch issue-84-resolve-pending-values @ 3e2c5c8 | base main @ 5a703c9
+captured 2026-07-26T05:52:04Z
+
+== npx tsc --noEmit ==
+exit=0
+
+== npx vitest run src/data src/lib ==
+
+ Test Files  25 passed (25)
+      Tests  347 passed (347)
+   Start at  00:52:12
+   Duration  1.93s (transform 2.72s, setup 0ms, import 7.34s, tests 906ms, environment 4ms)
+
+
+== npx playwright test e2e/issue-84-qa.spec.ts (this lane) ==
+
+Running 13 tests using 2 workers
+
+  ok  1 [chromium] › e2e\issue-84-qa.spec.ts:236:7 › issue #84 — the 33 resolved values, at the DOM › the derivation still covers exactly 33 values (8ms)
+  ok  2 [chromium] › e2e\issue-84-qa.spec.ts:252:7 › issue #84 — the 33 resolved values, at the DOM › AC3 — the no-published-format trio: AP Networking states the gap in prose, and renders no empty rows (1.0s)
+  ok  3 [chromium] › e2e\issue-84-qa.spec.ts:294:7 › issue #84 — the 33 resolved values, at the DOM › AC3 — every one of the 33 renders the dash with its screen-reader label (3.0s)
+  ok  4 [chromium] › e2e\issue-84-qa.spec.ts:317:7 › issue #84 — the 33 resolved values, at the DOM › AC2 — across the whole catalogue, every PUBLISHED length still shows its figure (9.0s)
+  ok  5 [chromium] › e2e\issue-84-qa.spec.ts:359:7 › issue #84 — the 33 resolved values, at the DOM › AC5 — the retired badge appears in no subject's dialog (7.8s)
+  ok  6 [chromium] › e2e\issue-84-qa.spec.ts:371:7 › issue #84 — the 33 resolved values, at the DOM › AC3 — every unpublished cell in the catalogue uses the SAME dash affordance (7.8s)
+  ok  7 [chromium] › e2e\issue-84-qa.spec.ts:408:7 › issue #84 — the 33 resolved values, at the DOM › AC4 — all three never-administered courses answer the pass-rate question the same way (7.7s)
+  ok  8 [chromium] › e2e\issue-84-qa.spec.ts:454:11 › issue #84 AC7 — evidence › light · desktop (2.0s)
+  ok  9 [chromium] › e2e\issue-84-qa.spec.ts:454:11 › issue #84 AC7 — evidence › light · tablet (1.6s)
+  ok 10 [chromium] › e2e\issue-84-qa.spec.ts:454:11 › issue #84 AC7 — evidence › light · mobile (1.4s)
+  ok 11 [chromium] › e2e\issue-84-qa.spec.ts:454:11 › issue #84 AC7 — evidence › dark · desktop (1.9s)
+  ok 12 [chromium] › e2e\issue-84-qa.spec.ts:454:11 › issue #84 AC7 — evidence › dark · tablet (1.5s)
+  ok 13 [chromium] › e2e\issue-84-qa.spec.ts:454:11 › issue #84 AC7 — evidence › dark · mobile (1.4s)
+
+  13 passed (28.4s)
