@@ -115,27 +115,31 @@ describe("issue #7 QA — ICS export against the shipped ap-2027.json", () => {
     const description = String(seminar?.getFirstPropertyValue("description"));
     // Seminar's published components are the three College Board's Assessment
     // Format prints (issue #73) — the two through-course performance tasks and
-    // the end-of-course exam — with each task's components as nested part rows
-    // carrying their printed NESTED weights verbatim. "50% of 20%" is never
-    // multiplied out to "10% of Score", and the two end-of-course rows no
-    // longer carry the back-computed 13.5% / 31.5%.
+    // the end-of-course exam. Their SECTION weights are still the printed
+    // 20/35/45; issue #83 multiplies each task's nested part weights out into
+    // exam shares, so "50% of 20%" reaches the reader as "10% of Score".
     expect(description).toContain(
       "End-of-Course Exam: 4 Questions | 120 Minutes | 45% of Score",
     );
     expect(description).toContain(
-      "- Understanding and analyzing an argument (3 short-answer questions): 3 Questions | 30 Minutes | 30% of 45%",
+      "- Understanding and analyzing an argument (3 short-answer questions): 3 Questions | 30 Minutes | 13.5% of Score",
     );
     expect(description).toContain(
-      "- Evidence-Based argument essay (1 long essay): 1 Question | 90 Minutes | 70% of 45%",
+      "- Evidence-Based argument essay (1 long essay): 1 Question | 90 Minutes | 31.5% of Score",
     );
     expect(description).toContain(
       "Performance Task 1: Team Project and Presentation: Duration pending | 20% of Score",
     );
     expect(description).toContain(
-      "- Individual research report (1,200 words): 50% of 20%",
+      "- Individual research report (1,200 words): 10% of Score",
     );
-    expect(description).not.toContain("13.5% of Score");
-    expect(description).not.toContain("31.5% of Score");
+    // No relative phrasing survives into the flat text …
+    expect(description).not.toMatch(/\d% of \d+%/);
+    expect(description).not.toContain("of section score");
+    // … and 13.5/31.5 stay PART rows: the section rows are still College
+    // Board's own three components, never the pre-#73 back-computed pair.
+    expect(description).not.toMatch(/^(?!- ).*: .*13\.5% of Score/m);
+    expect(description).not.toMatch(/^(?!- ).*: .*31\.5% of Score/m);
     expect(description).toContain(
       "Total Length: 2 hours (+ 30 minutes for exam setup time)",
     );

@@ -417,14 +417,24 @@ describe("buildIcsCalendar — issue #38 sections[] edge handling", () => {
 });
 
 /**
- * Issue #73 — the part row's weight segment, one printed denominator per case.
+ * Issue #73 → #83 — the part row's weight segment, one printed denominator
+ * per case.
  *
  * `partRow()` used to emit `questions | minutes` and stop, while the section
- * row above it emitted `N% of Score`. It now carries the part's published
- * weight in the same third slot — and the printed denominator decides the
- * shape, because a .ics DESCRIPTION is flat text with no room for a footnote.
+ * row above it emitted `N% of Score`. #73 gave it the part's published weight
+ * in the same third slot, and where College Board's denominator was not the
+ * exam it emitted the printed phrase verbatim — a .ics DESCRIPTION is flat
+ * text with no room for a footnote, so a bare "50% of Score" would have read
+ * as half the exam.
+ *
+ * #83 resolves the denominator instead of routing around it: every row is now
+ * `N% of Score` because every weight has been multiplied into an exam share,
+ * with `each` kept inline on a per-question row. These cases pin the
+ * arithmetic and the one thing #73 was right to worry about — that a reader of
+ * this flat text can never be shown a number whose denominator they have to
+ * guess.
  */
-describe("buildIcsCalendar — per-part weights keep their printed denominator (issue #73)", () => {
+describe("buildIcsCalendar — per-part weights resolve to an exam share (issue #73, converted by #83)", () => {
   const weightsExam = {
     ...subject(
       "weights",
@@ -446,7 +456,7 @@ describe("buildIcsCalendar — per-part weights keep their printed denominator (
           ],
         },
         {
-          name: "Section II: Other denominators",
+          name: "Section II: Section-denominated",
           questionCount: 3,
           minutes: 60,
           weightPercent: 33,
@@ -457,7 +467,26 @@ describe("buildIcsCalendar — per-part weights keep their printed denominator (
               weightPrinted: "50% of section score",
             },
             {
+              name: "Short free-response questions",
+              questionCount: 2,
+              weightPrinted: "each worth 25% of section score",
+            },
+          ],
+        },
+        {
+          // A nested weight spells its denominator out, and it always matches
+          // the section's own stored weight (examSectionSchema refuses a pair
+          // that disagrees), so this section is 20% like the "of 20%" says.
+          name: "Performance Task 1: Team Project and Presentation",
+          minutes: "pending",
+          weightPercent: 20,
+          parts: [
+            {
               name: "Individual research report (1,200 words)",
+              weightPrinted: "50% of 20%",
+            },
+            {
+              name: "Team multimedia presentation and defense",
               weightPrinted: "50% of 20%",
             },
           ],
@@ -492,19 +521,29 @@ describe("buildIcsCalendar — per-part weights keep their printed denominator (
     expect(unfolded).toContain("- Part B: 13 Questions | 38 Minutes | 43.75% of Score");
   });
 
-  it("renders a section-denominated weight VERBATIM — never converted to an exam share", () => {
+  it("multiplies a section-denominated weight into an exam share (50% of a 33% section)", () => {
     expect(unfolded).toContain(
-      "- Long free-response question: 1 Question | 50% of section score",
+      "- Long free-response question: 1 Question | 16.5% of Score",
     );
-    // 50% of a 33% section is ~16.5% of the exam. That number must not appear.
-    expect(unfolded).not.toContain("16.5");
+    // The relative phrasing is what this row must never carry into flat text.
+    expect(unfolded).not.toContain("of section score");
   });
 
-  it("renders a nested weight verbatim and drops the length segment College Board prints nothing for", () => {
+  it("keeps the per-question qualifier inline — 8.25% is what ONE of the two short FRQs is worth", () => {
+    expect(unfolded).toContain(
+      "- Short free-response questions: 2 Questions | 8.25% of Score each",
+    );
+    // Without "each" this row would understate itself by a factor of two.
+    expect(unfolded).not.toMatch(/8\.25% of Score(?! each)/);
+  });
+
+  it("multiplies a nested weight and drops the length segment College Board prints nothing for", () => {
     // RFC 5545 escapes the comma in "1,200", so match around it.
-    expect(unfolded).toContain("- Individual research report (1\\,200 words): 50% of 20%");
+    expect(unfolded).toContain(
+      "- Individual research report (1\\,200 words): 10% of Score",
+    );
     expect(unfolded).not.toContain("undefined");
-    expect(unfolded).not.toContain("| 10% of Score");
+    expect(unfolded).not.toContain("50% of 20%");
   });
 
   it("drops the weight segment entirely where no per-part weight is published, and keeps 'pending' distinct", () => {

@@ -160,25 +160,65 @@ function NotPublishedDash() {
 }
 
 /**
- * A part row's share of the score (issue #73).
+ * A part row's share of the score (issue #73, converted by #83).
  *
  * Before #73 this cell was an unconditional dash for every part of every
  * exam — not because College Board publishes nothing, but because the schema
- * had nowhere to put it. It now renders what the page actually prints, and
- * the printed denominator decides the shape:
+ * had nowhere to put it. #73 then rendered the printed weight, and where
+ * College Board's denominator was not the exam it rendered the phrase
+ * verbatim: `50% of section score`, `each worth 25% of section score`. The
+ * doc here said that phrase must "never [be] converted into an
+ * exam-denominated number, which would tell a student one AP Macroeconomics
+ * question is half their grade."
  *
- *   - exam-denominated → `35%` (matches the section row's `50%`);
- *   - any other denominator → the printed string verbatim, wrapped so a long
- *     phrase like "each worth 25% of section score" can break — never
- *     converted into an exam-denominated number, which would tell a student
- *     one AP Macroeconomics question is half their grade;
- *   - unpublished → the dash, which now means what it says.
+ * Issue #83 supersedes that, and the old reasoning is kept above rather than
+ * deleted because half of it still holds: the forbidden move was RELABELLING
+ * the literal 50 as 50% of the exam. Multiplying is a different operation —
+ * Section II is 33% of the exam, so 50% of it is 16.5% of the exam, which is
+ * both true and the number the student was trying to work out. Jon raised it
+ * from the AP Microeconomics card, where this cell was spending four wrapped
+ * lines to avoid saying "16.5%". The conversion itself lives in
+ * {@link partWeight}; this component only decides how the result reads:
+ *
+ *   - a converted or exam-denominated weight → `16.5%` / `35%`, the same
+ *     shape as the section row's `50%` — and short enough that the Weight
+ *     column's budget (see {@link SectionsTable}) stops being contested;
+ *   - a PER-QUESTION weight ("each worth 25% of section score" on a row whose
+ *     Questions cell reads 2) → the number plus a visible `each`. A bare
+ *     `8.25%` on that row would read as the row's total, which is wrong by a
+ *     factor of two, so the qualifier is on screen and not merely in the
+ *     accessible name;
+ *   - a form the converter cannot read → the printed string verbatim, wrapped.
+ *     Unreachable for the shipped dataset (the schema rejects it) and kept as
+ *     the honest fallback: a phrase nobody can parse still beats a number
+ *     nobody can trust;
+ *   - unpublished → the dash, which means what it says.
  */
-function PartWeightValue({ part }: { part: ExamSectionPart }) {
-  const weight = partWeight(part);
+function PartWeightValue({
+  part,
+  sectionWeightPercent,
+}: {
+  part: ExamSectionPart;
+  sectionWeightPercent: ExamSection["weightPercent"];
+}) {
+  const weight = partWeight(part, sectionWeightPercent);
   switch (weight.kind) {
     case "percent":
-      return <>{weight.value}%</>;
+      return (
+        <>
+          {weight.value}%
+          {weight.each && (
+            // Its own line: the Weight column is budgeted at 5rem and
+            // "8.25% each" does not fit on one. `block` puts the break where
+            // this component chooses it rather than wherever the column runs
+            // out, and the sr-only word makes the AT reading of the cell
+            // "8.25% each question" instead of the ambiguous "8.25% each".
+            <span className="block text-xs leading-snug font-normal text-slate-500 dark:text-slate-400">
+              each<span className="sr-only"> question</span>
+            </span>
+          )}
+        </>
+      );
     case "printed":
       // `inline-block` + `break-words`: the phrase wraps INSIDE the Weight
       // column's budget instead of asking for a wider column — the same rule
@@ -272,10 +312,12 @@ const sectionsTableNumCell = `py-2.5 ${sectionsTableGutter} text-right align-bas
  * has sections — no per-subject width, no special case for the observed one.
  * Two column contents can still exceed their budget, and both wrap inside it
  * rather than widening it: a published length ({@link NoBreakGroups}) and a
- * part's printed weight ({@link PartWeightValue}, "each worth 25% of section
- * score"). The Length column is the widest share because it is the only one
- * that can hold a {@link PendingBadge} (AAS's Individual Student Project),
- * which is a fixed ~61px pill that cannot wrap.
+ * part's weight ({@link PartWeightValue} — since issue #83 that is at most a
+ * short percentage plus a per-question `each` on its own line, where before it
+ * was the full "each worth 25% of section score" phrase; the budget did not
+ * change, the pressure on it dropped). The Length column is the widest share
+ * because it is the only one that can hold a {@link PendingBadge} (AAS's
+ * Individual Student Project), which is a fixed ~61px pill that cannot wrap.
  */
 function SectionsTable({ sections }: { sections: readonly ExamSection[] }) {
   return (
@@ -389,7 +431,10 @@ function SectionsTable({ sections }: { sections: readonly ExamSection[] }) {
                   )}
                 </td>
                 <td className={`${sectionsTableNumCell} text-sm text-slate-600 dark:text-slate-300`}>
-                  <PartWeightValue part={part} />
+                  <PartWeightValue
+                    part={part}
+                    sectionWeightPercent={section.weightPercent}
+                  />
                 </td>
               </tr>
             ))}

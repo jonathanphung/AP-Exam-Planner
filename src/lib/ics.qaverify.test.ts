@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 import ICAL from "ical.js";
 import apData from "../data/ap-2027.json";
-import type { ApDataset, ExamSectionPart } from "../data/schema";
+import type {
+  ApDataset,
+  ExamSection,
+  ExamSectionPart,
+} from "../data/schema";
 import type { SlotResolution } from "./conflicts";
 import { buildIcsCalendar, type SessionStartTimes } from "./ics";
 
@@ -227,18 +231,33 @@ describe("issue #38 QA — real dataset, invariants re-derived", () => {
         : minutes === "pending"
           ? "Duration pending"
           : `${minutes} Minutes`;
-    // Issue #73: a part row carries its published weight in the same
-    // `questions | length | weight` slot the section row uses — as `N% of
-    // Score` only when College Board's printed denominator IS the exam score,
-    // and verbatim ("50% of section score", "50% of 20%") otherwise.
+    // Issue #73 → #83: a part row carries its published weight in the same
+    // `questions | length | weight` slot the section row uses, and it is
+    // ALWAYS an exam share now — a relatively-printed weight ("50% of section
+    // score", "70% of 45%") is multiplied by the section's own stored
+    // weightPercent before it reaches the reader, and the per-question
+    // "each worth …" form keeps an inline `each`.
+    //
+    // Re-derived here by hand, with its own regex and its own arithmetic, so
+    // this spec cannot agree with `partWeight()` merely by calling it.
     const derivedPartWeight = (
       part: ExamSectionPart,
+      sectionWeight: ExamSection["weightPercent"],
     ): string | undefined => {
       if (part.weightPercent === "pending") return "Weight pending";
       if (typeof part.weightPercent === "number") {
         return `${part.weightPercent}% of Score`;
       }
-      return part.weightPrinted;
+      if (part.weightPrinted === undefined) return undefined;
+      const printed = /^(each worth )?(\d+(?:\.\d+)?)% of (?:section score|(\d+(?:\.\d+)?)%)$/.exec(
+        part.weightPrinted,
+      );
+      if (!printed || typeof sectionWeight !== "number") {
+        return part.weightPrinted;
+      }
+      // Integer-first so 70 × 35 is 2450, not 2449.999999999999.
+      const share = Math.round(Number(printed[2]) * sectionWeight) / 100;
+      return `${share}% of Score${printed[1] ? " each" : ""}`;
     };
 
     let examSubjects = 0;
@@ -319,7 +338,7 @@ describe("issue #38 QA — real dataset, invariants re-derived", () => {
             `- ${part.name}: ${[
               derivedQuestion(part.questionCount),
               derivedMinutes(part.minutes),
-              derivedPartWeight(part),
+              derivedPartWeight(part, section.weightPercent),
             ]
               .filter((s) => s !== undefined)
               .join(" | ")}${part.note ? ` (${part.note})` : ""}`,

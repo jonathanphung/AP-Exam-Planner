@@ -24,10 +24,19 @@ import apData from "../src/data/ap-2027.json";
  * Both are asserted as absences, because a regression here reintroduces a
  * plausible number rather than an obvious blank.
  *
+ * **Issue #83 (2026-07-25) amends #2, and only #2.** Multiplying a part weight
+ * by its own section's published share is now what these cells do: 16.5%,
+ * 8.25% each, 10%, 24.5%, 13.5%, 31.5%. Rule #1 is untouched and still
+ * asserted — relabelling the printed 50 as an exam share is a different
+ * operation from multiplying it by 33, and it is still the thing that would
+ * tell a student one question is half their grade. AP Seminar's 13.5/31.5 come
+ * back as PART rows under College Board's own 45% End-of-Course Exam section,
+ * never as the two invented sections that carried them before #73.
+ *
  * Subjects under test, one per rendering state:
  *   AP Calculus BC     — exam-denominated part weights (35% / 15% / 16.7% / 33.3%)
- *   AP Macroeconomics  — section-denominated, verbatim ("50% of section score")
- *   AP Seminar         — nested, verbatim ("50% of 20%" … "70% of 45%")
+ *   AP Macroeconomics  — section-denominated, converted ("50% of section score" → 16.5%)
+ *   AP Seminar         — nested, converted ("50% of 20%" → 10% … "70% of 45%" → 31.5%)
  *   AP Japanese        — D3 un-merge: Q3/Q4 are separate 7.5% rows, like AP Chinese
  *   AP Art History     — parts present, weights honestly dashed (CB prints none)
  *
@@ -124,54 +133,68 @@ test.describe("issue #73 — printed section titles + per-part weights", () => {
     }
   });
 
-  test("AC2 — a section-denominated weight renders VERBATIM and never as a bare exam percent (AP Macroeconomics)", async ({
+  test("AC2 (as amended by #83) — a section-denominated weight is multiplied by its section's share, and the printed numerator is never relabelled (AP Macroeconomics)", async ({
     page,
   }) => {
     await page.goto("/");
     await openInfo(page, "AP Macroeconomics");
 
+    // 50% of a Section II worth 33% of the exam is 16.5% of the exam.
     await expect(row(page, /Long free-response question/)).toContainText(
-      "50% of section score",
+      "16.5%",
     );
-    await expect(row(page, /Short free-response questions/)).toContainText(
-      "each worth 25% of section score",
-    );
+    // 25% of the same section is 8.25% — PER QUESTION, on a 2-question row.
+    const shortFrqs = row(page, /Short free-response questions/);
+    await expect(shortFrqs).toContainText("8.25%");
+    await expect(shortFrqs).toContainText("each");
 
     const body = (await dialog(page).innerText()).replace(/\s+/g, " ");
-    // 16.5% is the forbidden 50% × 33% back-computation.
-    expect(body).not.toMatch(/16\.5\s*%/);
-    // Every 50% in this dialog must be qualified by its printed denominator.
-    for (const match of body.matchAll(/50\s*%(.{0,22})/g)) {
-      expect(
-        match[1],
-        `unqualified 50% in the AP Macroeconomics dialog: "${match[0]}"`,
-      ).toMatch(/of section score/);
-    }
+    // The relative phrasing is what the conversion replaces …
+    expect(body).not.toMatch(/of section score/);
+    // … and the failure mode #73 named is still forbidden: the printed 50 and
+    // 25 must never appear as this exam's part weights, which is exactly what
+    // relabelling (rather than multiplying) would produce. The lookbehind-free
+    // guard skips the "25" inside "8.25%".
+    const partRowText = (
+      await dialog(page)
+        .getByRole("row")
+        .filter({ has: page.getByRole("rowheader", { name: /free-response q/ }) })
+        .allInnerTexts()
+    ).join(" | ");
+    expect(partRowText, "the printed 50 was relabelled as an exam share").not.toMatch(
+      /(^|[^\d.])50%/,
+    );
+    expect(partRowText, "the printed 25 was relabelled as an exam share").not.toMatch(
+      /(^|[^\d.])25%/,
+    );
   });
 
-  test("AC10 — AP Seminar's nested weights render verbatim; the multiplied-out 13.5% / 31.5% are gone", async ({
+  test("AC10 (as amended by #83) — AP Seminar's nested weights are multiplied out at PART level; the sections are still College Board's own three", async ({
     page,
   }) => {
     await page.goto("/");
     await openInfo(page, "AP Seminar");
 
     const expected: [RegExp, string][] = [
-      [/Individual research report \(1,200 words\)/, "50% of 20%"],
-      [/Team multimedia presentation and defense/, "50% of 20%"],
-      [/Individual written argument \(2,000 words\)/, "70% of 35%"],
-      [/Individual multimedia presentation/, "20% of 35%"],
-      [/Oral defense/, "10% of 35%"],
-      [/Understanding and analyzing an argument/, "30% of 45%"],
-      [/Evidence-Based argument essay/, "70% of 45%"],
+      [/Individual research report \(1,200 words\)/, "10%"],
+      [/Team multimedia presentation and defense/, "10%"],
+      [/Individual written argument \(2,000 words\)/, "24.5%"],
+      [/Individual multimedia presentation/, "7%"],
+      [/Oral defense/, "3.5%"],
+      [/Understanding and analyzing an argument/, "13.5%"],
+      [/Evidence-Based argument essay/, "31.5%"],
     ];
     for (const [name, weight] of expected) {
       await expect(row(page, name), `${name} → ${weight}`).toContainText(weight);
     }
 
-    // main shipped these two multiplied-out numbers; the capture prints neither.
     const body = await dialog(page).innerText();
-    expect(body).not.toContain("13.5%");
-    expect(body).not.toContain("31.5%");
+    // No arithmetic is left for the reader to do.
+    expect(body).not.toMatch(/% of \d+%/);
+    // 13.5 / 31.5 are back — but as PART rows under a 45% End-of-Course Exam,
+    // never as the two invented SECTIONS main used to carry in their place.
+    await expect(row(page, /^End-of-Course Exam$/)).toContainText("45%");
+    await expect(row(page, /Short-Answer/)).toHaveCount(0);
   });
 
   test("D3 — AP Japanese and AP Chinese model Questions 3 and 4 identically: two 7.5% rows, no summed 15%", async ({
@@ -314,8 +337,17 @@ test.describe("issue #73 — printed section titles + per-part weights", () => {
 
     // Exam-denominated part → "35% of Score", matching the section convention.
     expect(ics).toMatch(/Part A[^\\]{0,60}35% of Score/);
-    // Section-denominated part → printed verbatim, never a bare "50% of Score".
-    expect(ics).toContain("50% of section score");
+    // Section-denominated part → multiplied into an exam share by #83, so the
+    // flat text says what it means: 50% of a 33% section is 16.5% of the exam,
+    // and the two short FRQs are 8.25% EACH (dropping "each" would understate
+    // that row by a factor of two).
+    expect(ics).toContain("Long free-response question: 1 Question | 16.5% of Score");
+    expect(ics).toContain(
+      "Short free-response questions: 2 Questions | 8.25% of Score each",
+    );
+    // No relative phrasing survives into a plain-text row that has no room to
+    // qualify it — the reason #73 printed these verbatim in the first place.
+    expect(ics).not.toContain("of section score");
     // Art History publishes no per-question weight: the segment is dropped, not
     // filled with a number or the word "pending".
     expect(ics).not.toMatch(/Long Essay.{0,40}% of Score/);

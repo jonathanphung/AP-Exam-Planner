@@ -28,9 +28,12 @@ import apData from "../src/data/ap-2027.json";
  *
  * Two column contents can still exceed their budget, and the interesting claim
  * is that they wrap INSIDE it rather than widening it: a published length
- * ("1 h 30 min") and a part's printed weight ("each worth 25% of section
- * score", AC5's "same defect class in a different column"). Both are asserted
- * against the same control widths.
+ * ("1 h 30 min") and a part's weight cell (AC5's "same defect class in a
+ * different column"). Both are asserted against the same control widths.
+ * Issue #83 shrank the second one — the Weight column used to hold the
+ * four-line phrase "each worth 25% of section score" and now holds "8.25%"
+ * over a per-question "each" — so AC5 pins the same rule against the widest
+ * cell the column actually has today. The budget itself did not change.
  *
  * Overflow is measured as `scrollWidth > clientWidth` per cell rather than by
  * eye, and swept across every subject that has sections at four widths, since
@@ -61,8 +64,13 @@ const byId = (id: string): Subject => {
 const LONGEST_NOTE = byId("comparative-government-and-politics");
 /** Publishes no section note at all: the control the budget must match. */
 const NO_NOTE = byId("calculus-bc");
-/** The longest printed part weight in the dataset (AC5). */
-const LONGEST_PRINTED_WEIGHT = byId("macroeconomics");
+/**
+ * The widest thing the Weight column holds (AC5): AP Macroeconomics' short
+ * free-response row, whose converted 8.25% carries a per-question "each" on a
+ * second line (issue #83 — it used to hold the four-line "each worth 25% of
+ * section score" phrase).
+ */
+const WIDEST_WEIGHT_CELL = byId("macroeconomics");
 
 const dialog = (page: Page) => page.getByRole("dialog");
 const expandButton = (page: Page, name: string) =>
@@ -217,29 +225,51 @@ test.describe("issue #73 second bounce — the sections table budgets its column
     expect(await clippedCells(page), "clipped cells (long note)").toEqual([]);
     await closeInfo(page);
 
-    // AC5 — same rule, different column: the printed weight is verbatim text
-    // in a cell, and it must wrap rather than widen the Weight column.
-    await openInfo(page, LONGEST_PRINTED_WEIGHT.name);
+    // AC5 — same rule, different column: whatever the Weight cell holds must
+    // stay inside the Weight column's budget rather than widen it.
+    //
+    // Issue #83 changed what it holds. This case was written against the
+    // four-line "each worth 25% of section score" phrase; that cell now reads
+    // "8.25%" over a per-question "each", because the relative weight is
+    // multiplied by its section's 33% before it is shown. The budget rule is
+    // untouched — the pressure on it dropped — so the case keeps checking the
+    // rule against the widest thing the column actually holds today: a
+    // two-line cell whose qualifier sits on its own line.
+    await openInfo(page, WIDEST_WEIGHT_CELL.name);
     const withPrinted = await columnWidths(page);
     for (const [i, w] of withPrinted.entries()) {
       expect(
         w,
-        `column ${i} widened for a printed weight (${withPrinted.join("/")} vs ${control.join("/")})`,
+        `column ${i} widened for a part weight (${withPrinted.join("/")} vs ${control.join("/")})`,
       ).toBeCloseTo(control[i], 1);
     }
-    const printed = dialog(page).getByText("each worth 25% of section score");
-    await expect(printed).toBeVisible();
-    const printedBox = await printed.evaluate((el) => {
-      const r = el.getBoundingClientRect();
-      const line = parseFloat(getComputedStyle(el).lineHeight);
-      return { width: r.width, lines: Math.round(r.height / line) };
-    });
-    expect(printedBox.lines, "the printed weight did not wrap").toBeGreaterThan(1);
+    const weightCell = (name: RegExp) =>
+      dialog(page)
+        .getByRole("row")
+        .filter({ has: page.getByRole("rowheader", { name }) })
+        .locator("td")
+        .nth(2);
+    const converted = weightCell(/Short free-response/);
+    await expect(converted).toContainText("8.25%");
+    const perQuestion = converted.locator("span").first();
+    await expect(perQuestion).toHaveText(/^each/);
+    const box = await converted.evaluate((el) => ({
+      height: el.getBoundingClientRect().height,
+      qualifier: el.querySelector("span")!.getBoundingClientRect().width,
+    }));
+    // The single-line control: same padding, same column, one value.
+    const oneLine = await weightCell(/^Section II: Free Response$/).evaluate(
+      (el) => el.getBoundingClientRect().height,
+    );
     expect(
-      printedBox.width,
-      "the printed weight is wider than the Weight column",
+      box.height,
+      "the per-question qualifier is not on its own line under the number",
+    ).toBeGreaterThan(oneLine);
+    expect(
+      box.qualifier,
+      "the weight cell is wider than the Weight column",
     ).toBeLessThanOrEqual(withPrinted[3] + 1);
-    expect(await clippedCells(page), "clipped cells (printed weight)").toEqual([]);
+    expect(await clippedCells(page), "clipped cells (part weight)").toEqual([]);
     await closeInfo(page);
   });
 
@@ -349,7 +379,7 @@ test.describe("issue #73 second bounce — the sections table budgets its column
     ];
     for (const theme of ["light", "dark"] as const) {
       if (theme === "dark") await seedDarkTheme(page);
-      for (const subject of [LONGEST_NOTE, LONGEST_PRINTED_WEIGHT]) {
+      for (const subject of [LONGEST_NOTE, WIDEST_WEIGHT_CELL]) {
         for (const vp of viewports) {
           await page.setViewportSize({ width: vp.width, height: vp.height });
           await page.goto("/");

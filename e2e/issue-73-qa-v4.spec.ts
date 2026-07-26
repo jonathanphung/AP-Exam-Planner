@@ -80,8 +80,12 @@ const byId = (id: string): Subject => {
 const REPORTED = byId("comparative-government-and-politics");
 /** No note at all — the control the reported subject must match. */
 const NO_NOTE = byId("calculus-bc");
-/** Carries the longest printed part weight (AC5). */
-const PRINTED_WEIGHT = byId("macroeconomics");
+/**
+ * Carries the tallest part-weight cell (AC5): since issue #83 that is the
+ * converted "8.25%" over its per-question "each", not the old four-line
+ * "each worth 25% of section score" phrase.
+ */
+const PART_WEIGHT = byId("macroeconomics");
 /** Carries the dataset's longest section/part name — the Section column's worst case. */
 const LONGEST_NAME = byId("business-with-personal-finance");
 /** Puts an unwrappable `pending` pill next to an omission dash (AC6). */
@@ -308,7 +312,7 @@ test.describe("issue #73 second bounce — QA v4: the column budget holds", () =
     }
   });
 
-  test("AC5 — same rule in the Weight column: a printed weight grown past its budget wraps inside it and moves nothing", async ({
+  test("AC5 — same rule in the Weight column: a weight qualifier grown past its budget wraps inside it and moves nothing", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1920, height: 1080 });
@@ -318,29 +322,34 @@ test.describe("issue #73 second bounce — QA v4: the column budget holds", () =
     const control = await columnWidths(page);
     await closeInfo(page);
 
-    await openInfo(page, PRINTED_WEIGHT.name);
-    const printed = dialog(page).getByText("each worth 25% of section score");
-    await expect(printed).toBeVisible();
+    // Issue #83: this cell used to hold the verbatim "each worth 25% of
+    // section score"; it now holds the converted 8.25% over a per-question
+    // "each". The budget rule under test is unchanged — text in the Weight
+    // column wraps inside the column instead of widening it — so the case
+    // grows the qualifier that is actually there now.
+    await openInfo(page, PART_WEIGHT.name);
+    const printed = dialog(page)
+      .getByRole("row")
+      .filter({ has: page.getByRole("rowheader", { name: /Short free-response/ }) })
+      .locator("td")
+      .nth(2)
+      .locator("span")
+      .first();
+    await expect(printed).toHaveText(/^each/);
 
     const before = await columnWidths(page);
     for (const [i, w] of before.entries()) {
       expect(
         w,
-        `column ${i} widened for the shipped printed weight (${before.join("/")} vs ${control.join("/")})`,
+        `column ${i} widened for the shipped part weight (${before.join("/")} vs ${control.join("/")})`,
       ).toBeCloseTo(control[i], 1);
     }
 
-    const grown = await dialog(page).evaluate((el) => {
-      const cells = [...el.querySelectorAll("table tbody tr")].map(
-        (row) => row.children[3],
-      );
-      const cell = cells.find((c) => c?.textContent?.includes("of section score"));
-      const span = cell?.querySelector("span");
-      if (!span) return null;
-      span.textContent = `${span.textContent} of the total examination score as printed by the College Board`;
+    const grown = await printed.evaluate((el) => {
+      el.textContent = `${el.textContent} of the total examination score as printed by the College Board`;
       return true;
     });
-    expect(grown, "no printed-weight span found to grow — fixture drifted").toBe(true);
+    expect(grown, "no weight qualifier found to grow — fixture drifted").toBe(true);
 
     const after = await columnWidths(page);
     for (const [i, w] of after.entries()) {
@@ -518,7 +527,7 @@ test.describe("issue #73 second bounce — QA v4: the column budget holds", () =
     // where the dialog stops growing, is where a mis-tuned budget shows up —
     // and none of these widths is in the builder's sweep.
     const problems: string[] = [];
-    const subjects = [REPORTED, PRINTED_WEIGHT, LONGEST_NAME, PENDING_PILL];
+    const subjects = [REPORTED, PART_WEIGHT, LONGEST_NAME, PENDING_PILL];
     for (const width of [399, 400, 401, 639, 640, 641]) {
       const floor = declaredGutter(width) - 0.5;
       await page.setViewportSize({ width, height: 900 });
@@ -578,7 +587,7 @@ test.describe("issue #73 second bounce — QA v4: the column budget holds", () =
     await page.setViewportSize({ width: 375, height: 800 });
     await page.goto("/");
 
-    for (const subject of [REPORTED, PRINTED_WEIGHT, PENDING_PILL]) {
+    for (const subject of [REPORTED, PART_WEIGHT, PENDING_PILL]) {
       await openInfo(page, subject.name);
       const structure = await dialog(page).evaluate((el) => {
         const rows = [...el.querySelectorAll("table tbody tr")];
@@ -617,7 +626,7 @@ test.describe("issue #73 second bounce — QA v4: the column budget holds", () =
 
     await seedDarkTheme(page);
     await page.goto("/");
-    await openInfo(page, PRINTED_WEIGHT.name);
+    await openInfo(page, PART_WEIGHT.name);
     const dark = await new AxeBuilder({ page }).include('[role="dialog"]').analyze();
     expect(
       dark.violations.filter((v) => ["serious", "critical"].includes(v.impact ?? "")),
@@ -638,7 +647,7 @@ test.describe("issue #73 second bounce — QA v4: the column budget holds", () =
     ];
     for (const theme of ["light", "dark"] as const) {
       if (theme === "dark") await seedDarkTheme(page);
-      for (const subject of [REPORTED, PRINTED_WEIGHT]) {
+      for (const subject of [REPORTED, PART_WEIGHT]) {
         for (const vp of viewports) {
           await page.setViewportSize({ width: vp.width, height: vp.height });
           await page.goto("/");
