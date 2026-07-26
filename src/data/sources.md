@@ -405,7 +405,10 @@ fails CI.
   back-computed and are gone; see "Per-part weights" below.)
 - **`weightPercent` / `weightPrinted`** (part level, issue #73): a part carries
   at most ONE of them, chosen by the denominator College Board printed. See
-  "Per-part weights" below — cross-denominator conversion is forbidden.
+  "Per-part weights" below — the STORED value is never converted between
+  denominators. (Issue #83 changed only what the surfaces *display*; no stored
+  weight moved fields, and the dataset JSON is byte-identical across that
+  change.)
 - **`parts[]`**: present only where the page publishes a split or a printed
   per-question breakdown; `toolNote` carried verbatim into `note`
   (`"n/a"`/`"none"`/`null` → omitted). A part's `minutes` is **omitted** where
@@ -507,11 +510,37 @@ different denominators**:
 
 AP Macroeconomics' long free-response question is 50% of Section II, and
 Section II is 33% of the exam. Storing `50` in the exam-denominated field
-would tell a student one question is half their grade; multiplying it out to
-16.5% is exactly the back-computation `schema.ts` forbids. **Converting
-between denominators is prohibited** — the printed string ships verbatim
-instead, and `ap-2027.sections.test.ts` refuses any `weightPrinted` that is a
-bare exam-denominated share (that belongs in `weightPercent`).
+would tell a student one question is half their grade. **Storing a converted
+value is prohibited** — the printed string is the datum, and
+`ap-2027.sections.test.ts` refuses any `weightPrinted` that is a bare
+exam-denominated share (that belongs in `weightPercent`).
+
+#### Issue #83 (2026-07-25) — the printed string stays; the screen shows 16.5%
+
+D1 above conflated two operations, and #83 separates them. Relabelling a
+printed `50` as 50% of the exam is still forbidden and still impossible here.
+Multiplying is not: 50% of a section worth 33% of the exam **is** 16.5% of the
+exam, and that is the figure a student is trying to work out when they read
+the row. The 11 relatively-weighted parts (2 Macro, 2 Micro, 7 Seminar) now
+render as `16.5%`, `8.25% each`, `10%`, `24.5%`, `7%`, `3.5%`, `13.5%`,
+`31.5%` on both surfaces that show parts.
+
+The arithmetic is a **presentation** step, not a storage one:
+`parsePrintedWeight()` in `schema.ts` reads the grammar, `partWeight()` in
+`src/lib/exam-sections.ts` multiplies by the section's own stored
+`weightPercent`, and this file's provenance chain is untouched — which is
+precisely why the presentation layer was chosen over rewriting the 11 parts
+into `weightPercent` and relaxing the one-weight-field rule. The verbatim
+College Board strings remain in the JSON, so the "traces EVERY populated part
+weight" test below still greps all 63 of them out of the captures.
+
+Two guards keep the conversion honest, both in `examSectionSchema`: a printed
+form the grammar cannot read is a **schema error** (never a silently wrong
+number), and a nested `X% of Y%` whose `Y` disagrees with its section's stored
+`weightPercent` is a schema error too. The denominator is always the stored
+section value — College Board prints 66/33 for Micro and Macro, which sums to
+99, and part rows that reconcile with their own section (16.5 + 8.25 + 8.25 =
+33) beat part rows that reconcile with a "corrected" 33.33.
 
 Where each populated weight came from — every one re-greppable in the capture,
 and asserted line-by-line by the "traces EVERY populated part weight" test:
@@ -585,6 +614,13 @@ their seven scored components as part rows carrying the nested weights
 verbatim. `portfolio` is unchanged and is a different fact — the AP Digital
 Portfolio **submission deadline** for the two through-course tasks, not their
 score share.
+
+Note what did NOT come back with #83: the old 13.5/31.5 lived at **section**
+level, replacing two of College Board's three printed components with two
+computed ones. #83 reinstates 13.5% and 31.5% only as the **part** rows
+"Understanding and analyzing an argument" and "Evidence-Based argument essay"
+under a 45% End-of-Course Exam section — the printed section structure is
+still the one on screen, and the section weights are still College Board's.
 
 ### `precalculus` — AP Central and AP Students disagree on rounding
 

@@ -101,7 +101,7 @@ const noHorizontalScroll = (page: Page) =>
   );
 
 test.describe("issue #44 — per-section exam details", () => {
-  test("AC3/AC11 — AP Seminar has NO multiple-choice row: its three published components render with College Board's names and printed nested weights, and omission is never shown as 'pending'", async ({
+  test("AC3/AC11 — AP Seminar has NO multiple-choice row: its three published components render with College Board's names and their nested part weights resolved to exam shares (#83), and omission is never shown as 'pending'", async ({
     page,
   }) => {
     await page.goto("/");
@@ -126,20 +126,27 @@ test.describe("issue #44 — per-section exam details", () => {
     // The nonexistent MC section is omitted entirely.
     await expect(dialog(page).getByText(/multiple.?choice/i)).toHaveCount(0);
 
-    // Nested weights render VERBATIM — never multiplied into an exam share.
+    // Issue #83: a nested weight is multiplied by its section's own published
+    // share, so the reader gets the exam-denominated figure instead of the
+    // arithmetic. "50% of 20%" is 10% of the AP Seminar score.
     await expect(
       row(page, /Individual research report \(1,200 words\)/),
-    ).toContainText("50% of 20%");
-    await expect(row(page, /Oral defense/)).toContainText("10% of 35%");
+    ).toContainText("10%");
+    await expect(row(page, /Oral defense/)).toContainText("3.5%");
     await expect(
       row(page, /Understanding and analyzing an argument/),
-    ).toContainText("30% of 45%");
+    ).toContainText("13.5%");
     await expect(row(page, /Evidence-Based argument essay/)).toContainText(
-      "70% of 45%",
+      "31.5%",
     );
-    // The multiplied-out figures the dataset used to carry must be gone.
-    await expect(dialog(page).getByText("13.5%")).toHaveCount(0);
-    await expect(dialog(page).getByText("31.5%")).toHaveCount(0);
+    // No relative phrasing survives anywhere in the dialog.
+    await expect(dialog(page).getByText(/% of \d+%/)).toHaveCount(0);
+    await expect(dialog(page).getByText(/of section score/)).toHaveCount(0);
+    // 13.5 / 31.5 are PART rows now. The two invented End-of-Course
+    // SECTIONS that carried them before #73 must still be gone: College
+    // Board's own three components are the only section rows here.
+    await expect(row(page, /Short-Answer/)).toHaveCount(0);
+    await expect(sectionsTable(page).locator("tbody > tr")).toHaveCount(10);
 
     // The three components' own weights are the printed exam-denominated ones.
     await expect(

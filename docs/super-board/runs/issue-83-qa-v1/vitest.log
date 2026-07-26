@@ -1,0 +1,9 @@
+
+ RUN  v4.1.9 C:/Users/jonat/repos/AP-Exam-Planner/AP-Exam-Planner/.worktrees/issue-83-qa
+
+
+ Test Files  25 passed (25)
+      Tests  345 passed (345)
+   Start at  22:53:56
+   Duration  3.94s (transform 5.26s, setup 0ms, import 13.93s, tests 1.14s, environment 6ms)
+

@@ -236,21 +236,32 @@ function minutesSegment(
 }
 
 /**
- * A part row's weight segment (issue #73).
+ * A part row's weight segment (issue #73, converted by #83).
  *
- * Mirrors the section row's `50% of Score` convention when College Board's
- * printed denominator IS the exam score, and emits the printed string
- * verbatim ("50% of section score", "50% of 20%") when it is not — the .ics
- * DESCRIPTION is plain text with no room for a footnote, so an unqualified
- * "50% of Score" on AP Macroeconomics' long free-response question would read
- * as half the exam. A part College Board publishes no weight for drops the
- * segment entirely, exactly as an omitted question count does.
+ * Every part now mirrors the section row's `50% of Score` convention, because
+ * every weight reaching this function is exam-denominated: #73 emitted
+ * College Board's relative phrases verbatim ("50% of section score",
+ * "50% of 20%") on the reasoning that the .ics DESCRIPTION is plain text with
+ * no room for a footnote, so an unqualified "50% of Score" on AP
+ * Macroeconomics' long free-response question would read as half the exam.
+ *
+ * #83 removes the ambiguity at the source instead of routing around it —
+ * {@link partWeight} multiplies the relative weight by its section's stored
+ * share, so the row says `16.5% of Score` and means it. The footnote problem
+ * is gone with the footnote. A per-question weight keeps its qualifier
+ * inline (`8.25% of Score each`), since the plain-text row has no second line
+ * to put it on and dropping it would misstate a 2-question row by a factor of
+ * two. A part College Board publishes no weight for drops the segment
+ * entirely, exactly as an omitted question count does.
  */
-function partWeightSegment(part: ExamSectionPart): string | undefined {
-  const weight = partWeight(part);
+function partWeightSegment(
+  part: ExamSectionPart,
+  sectionWeightPercent: ExamSection["weightPercent"],
+): string | undefined {
+  const weight = partWeight(part, sectionWeightPercent);
   switch (weight.kind) {
     case "percent":
-      return `${weight.value}% of Score`;
+      return `${weight.value}% of Score${weight.each ? " each" : ""}`;
     case "printed":
       return weight.text;
     case "pending":
@@ -265,11 +276,14 @@ function partWeightSegment(part: ExamSectionPart): string | undefined {
  * permitted)` row — the same `questions | length | weight` shape as the
  * section row above it.
  */
-function partRow(part: ExamSectionPart): string {
+function partRow(
+  part: ExamSectionPart,
+  sectionWeightPercent: ExamSection["weightPercent"],
+): string {
   const segments = [
     questionSegment(part.questionCount),
     minutesSegment(part.minutes),
-    partWeightSegment(part),
+    partWeightSegment(part, sectionWeightPercent),
   ]
     .filter((s): s is string => s !== undefined)
     .join(" | ");
@@ -339,7 +353,7 @@ function buildExamDescription(
       .join(" | ");
     rows.push(`${section.name}: ${segments}`);
     for (const part of section.parts ?? []) {
-      rows.push(partRow(part));
+      rows.push(partRow(part, section.weightPercent));
     }
   }
 

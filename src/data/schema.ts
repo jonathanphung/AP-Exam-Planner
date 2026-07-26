@@ -90,34 +90,135 @@ const minutesValue = z.union([
  * carries the page's calculator/tool rule or other printed descriptor,
  * verbatim.
  *
- * PER-PART WEIGHTS (issue #73) — the printed denominator is part of the datum.
- * College Board prints per-part weights against THREE different denominators
- * and the app must never convert between them:
+ * PER-PART WEIGHTS (issue #73, storage rule unchanged) — the printed
+ * denominator is part of the datum. College Board prints per-part weights
+ * against THREE different denominators and the STORED value never converts
+ * between them:
  *
  *   1. % of the EXAM score   "Part A: … (35% of score)"          calculus-bc
  *   2. % of the SECTION      "1 long free-response question       macroeconomics
  *                             (50% of section score)."
  *   3. % of another %        "50% of 20%"                         seminar
  *
- * AP Macroeconomics' long free-response question is 50% *of Section II*, and
- * Section II is 33% of the exam. Writing `50` into an exam-denominated field
- * would tell a student one question is half their grade. Multiplying to
- * "16.5% of exam score" is the back-computation this file forbids below.
- * Therefore:
- *
  *   - `weightPercent` — a number ONLY when the printed denominator is the exam
  *     score (form 1). Rendered as `N%`.
  *   - `weightPrinted` — the printed weight VERBATIM for every other form
  *     ("50% of section score", "each worth 25% of section score",
- *     "50% of 20%"). Rendered as-is, never parsed into arithmetic.
+ *     "50% of 20%").
  *   - Both omitted — College Board publishes no weight for this part; the
  *     surfaces render the not-published dash. This is the honest state for
  *     21 of the 38 sit-down subjects (AP Art History prints no per-question
  *     weight anywhere, and its Section II 50% is NEVER divided by six).
  *
  * The two fields are mutually exclusive: a part carries at most one, so no
- * caller ever has to decide which denominator won.
+ * caller ever has to decide which denominator won. Issue #83 kept that rule
+ * rather than relaxing it — see below.
+ *
+ * ## Issue #83 (2026-07-25) — the RENDERED value is now exam-denominated
+ *
+ * #73's doc said a relative weight must reach the screen verbatim and be
+ * "never converted into an exam-denominated number, which would tell a student
+ * one AP Macroeconomics question is half their grade." That reasoning is kept
+ * here on purpose, because it is still true of the thing it was about:
+ * RELABELLING. Writing the literal `50` into `weightPercent` would claim one
+ * FRQ is half the exam, and that is still forbidden — form 2 and form 3 still
+ * may not be stored as a bare number.
+ *
+ * It never applied to MULTIPLYING. `50% of section score` where the section is
+ * 33% of the exam genuinely IS 16.5% of the exam, and 16.5% is the number a
+ * student wants. So the surfaces now do that arithmetic at render time
+ * ({@link parsePrintedWeight} here for the grammar, `partWeight()` in
+ * src/lib/exam-sections.ts for the multiplication).
+ *
+ * Doing it in the presentation layer — rather than rewriting the 11 affected
+ * parts into `weightPercent` and relaxing the mutual-exclusion rule above — is
+ * what preserves #73's audit trail: the verbatim College Board string stays
+ * the stored datum, so `ap-2027.sections.test.ts` can still round-trip all 63
+ * traced weights against the committed provenance, and the dataset JSON did
+ * not change by a single byte for this issue.
+ *
+ * The exam denominator ALWAYS comes from the section's own stored
+ * `weightPercent` (33 for the Macro/Micro FRQ section, 20/35/45 for Seminar's
+ * three), never from a re-derived "true" figure: College Board prints 66/33
+ * for Micro and Macro, which sums to 99, and part rows that sum to their own
+ * section beat part rows that sum to a corrected 100.
  */
+/**
+ * What a `weightPrinted` string is denominated in (issue #83).
+ *
+ *   - `section` — "50% of section score": the denominator is the section this
+ *     part hangs under, whatever that section's stored `weightPercent` says.
+ *   - `nested`  — "50% of 20%": College Board spells the denominator out. The
+ *     spelled-out figure and the section's stored weight must agree, which the
+ *     section schema below enforces; the renderer still multiplies by the
+ *     STORED one so there is exactly one source of truth.
+ *   - `exam`    — "35% of score" / "43.75% of exam score": already
+ *     exam-denominated, so the conversion is the identity. The dataset stores
+ *     this form in `weightPercent` instead (`ap-2027.sections.test.ts` refuses
+ *     it in `weightPrinted`), but the grammar covers it so the converter is
+ *     total over everything College Board prints.
+ */
+export type PrintedWeightBase =
+  | { of: "section" }
+  | { of: "nested"; percent: number }
+  | { of: "exam" };
+
+/** A parsed {@link sectionPartSchema} `weightPrinted` string (issue #83). */
+export interface PrintedWeight {
+  /** The numerator College Board prints — 50 in "50% of section score". */
+  percent: number;
+  /** What that numerator is a percentage OF. */
+  base: PrintedWeightBase;
+  /**
+   * True for "each worth 25% of section score" — the weight belongs to ONE
+   * question of a multi-question row, not to the row. Callers must keep the
+   * per-question qualifier visible: a bare number on a row whose Questions
+   * cell reads 2 reads as the row total and is wrong.
+   */
+  each: boolean;
+  /** The original string, verbatim — the provenance never leaves the datum. */
+  text: string;
+}
+
+/**
+ * The whole grammar of printed per-part weights, in one regex (issue #83).
+ *
+ * Deliberately strict: it matches the three forms College Board actually
+ * prints and nothing else, so a future capture that introduces a fourth
+ * ("half the section score", "50% of Part A") fails the section schema loudly
+ * instead of being silently multiplied out into a wrong number.
+ *
+ * Positional groups, not named ones — this file compiles at the repo's ES2017
+ * target, where named capture groups are a syntax error:
+ *   [1] the optional "each worth " prefix   [2] the printed numerator
+ *   [3] a spelled-out denominator ("of 20%")   [4] a worded denominator
+ */
+const PRINTED_WEIGHT_PATTERN =
+  /^(each worth )?(\d+(?:\.\d+)?)% of (?:(\d+(?:\.\d+)?)%|(section score|exam score|score))$/;
+
+/**
+ * Parse a printed weight into its numerator + denominator, or `null` when the
+ * string is not one of the published forms. Pure and total — never throws, so
+ * a renderer can fall back to printing the string verbatim.
+ */
+export function parsePrintedWeight(printed: string): PrintedWeight | null {
+  const match = PRINTED_WEIGHT_PATTERN.exec(printed.trim());
+  if (!match) return null;
+  const [, each, percent, nested, worded] = match;
+  const base: PrintedWeightBase =
+    nested !== undefined
+      ? { of: "nested", percent: Number(nested) }
+      : worded === "section score"
+        ? { of: "section" }
+        : { of: "exam" };
+  return {
+    percent: Number(percent),
+    base,
+    each: each !== undefined,
+    text: printed,
+  };
+}
+
 export const sectionPartSchema = z
   .strictObject({
     name: z.string().min(1),
@@ -162,14 +263,53 @@ export const sectionPartSchema = z
  * sections changed in the 2027 swap, so a 2027 value must be verified against
  * the 2027 folder.)
  */
-export const examSectionSchema = z.strictObject({
-  name: z.string().min(1),
-  questionCount: questionCount.optional(),
-  minutes: minutesValue,
-  weightPercent: z.union([z.number().min(0).max(100), pending]),
-  note: z.string().min(1).optional(),
-  parts: z.array(sectionPartSchema).min(2).optional(),
-});
+export const examSectionSchema = z
+  .strictObject({
+    name: z.string().min(1),
+    questionCount: questionCount.optional(),
+    minutes: minutesValue,
+    weightPercent: z.union([z.number().min(0).max(100), pending]),
+    note: z.string().min(1).optional(),
+    parts: z.array(sectionPartSchema).min(2).optional(),
+  })
+  // Issue #83 — a printed part weight is only shippable if the renderer can
+  // convert it. The three checks below are the "fail loudly" half of that
+  // change: the surfaces multiply a relative weight by this section's stored
+  // `weightPercent`, so anything the grammar cannot read, or that disagrees
+  // with the section it hangs under, has to stop at the schema rather than
+  // reach a student as a confidently wrong percentage.
+  .superRefine((section, ctx) => {
+    section.parts?.forEach((part, index) => {
+      if (part.weightPrinted === undefined) return;
+      const parsed = parsePrintedWeight(part.weightPrinted);
+      if (parsed === null) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["parts", index, "weightPrinted"],
+          message: `unrecognised printed weight ${JSON.stringify(part.weightPrinted)} — the published forms are "X% of section score", "X% of Y%" and "X% of exam score", optionally prefixed "each worth ". Teach parsePrintedWeight the new form before shipping it.`,
+        });
+        return;
+      }
+      if (
+        parsed.base.of === "nested" &&
+        typeof section.weightPercent === "number" &&
+        parsed.base.percent !== section.weightPercent
+      ) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["parts", index, "weightPrinted"],
+          message: `"${part.weightPrinted}" is denominated in ${parsed.base.percent}% but its section carries weightPercent ${section.weightPercent} — one of the two is a mis-capture, and the renderer multiplies by the section's value`,
+        });
+      }
+      if (parsed.each && typeof part.questionCount !== "number") {
+        ctx.addIssue({
+          code: "custom",
+          path: ["parts", index, "questionCount"],
+          message: `"${part.weightPrinted}" is a per-question weight, so the row needs a published question count to multiply against`,
+        });
+      }
+    });
+  });
 
 export const formatSchema = z.strictObject({
   /**

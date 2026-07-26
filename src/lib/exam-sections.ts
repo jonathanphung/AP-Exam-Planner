@@ -1,4 +1,8 @@
-import type { ExamSectionPart } from "@/data/schema";
+import {
+  parsePrintedWeight,
+  type ExamSection,
+  type ExamSectionPart,
+} from "../data/schema";
 
 /**
  * Presentation helpers for the exam-details section breakdown.
@@ -49,37 +53,104 @@ import type { ExamSectionPart } from "@/data/schema";
  */
 
 /**
- * What a part row's weight cell should say (issue #73).
+ * What a part row's weight cell should say (issue #73, converted by #83).
  *
- * College Board prints per-part weights against three different denominators
- * and this app never converts between them (see `sectionPartSchema`). Both
- * surfaces that render parts — the info-panel table and the .ics DESCRIPTION —
- * resolve the cell through this one function so they can never disagree about
- * which denominator won:
+ * Both surfaces that render parts — the info-panel table and the .ics
+ * DESCRIPTION — resolve the cell through this one function so they can never
+ * disagree about what a part is worth:
  *
- *   - `percent`     the printed denominator is the EXAM score; `value` is the
- *                   published number, ready to be suffixed with `%`.
- *   - `printed`     the printed denominator is anything else ("50% of section
- *                   score", "50% of 20%"); `text` is verbatim and must be
- *                   rendered as-is — never parsed, never multiplied out.
+ *   - `percent`     the part's share OF THE EXAM, ready to be suffixed with
+ *                   `%`. `each` marks the value as per-question rather than
+ *                   per-row (see below) — callers MUST keep that qualifier
+ *                   visible.
+ *   - `printed`     the fallback: College Board printed a weight in a form
+ *                   this app cannot convert, so the string ships verbatim
+ *                   rather than as a guess. Unreachable for the shipped
+ *                   dataset — `examSectionSchema` rejects an unparseable form
+ *                   and there is no section whose own weight is "pending"
+ *                   carrying converted parts — but the renderers stay total.
  *   - `pending`     College Board publishes a weight this capture does not
  *                   have; the caller shows its pending affordance.
  *   - `unpublished` College Board publishes no per-part weight at all (AP Art
  *                   History's six free-response questions); the caller shows
  *                   its not-published affordance. NOT the same as `pending`.
+ *
+ * ## Why this multiplies now, when #73 said never (issue #83, 2026-07-25)
+ *
+ * #73 shipped `printed` as the normal outcome for the 11 parts College Board
+ * weights relatively, on the reasoning that "50% of section score" must not
+ * become an exam-denominated 50 — which would tell a student one AP
+ * Macroeconomics free-response question is half their grade. That reasoning
+ * stands, and the dataset still obeys it: nothing back-computes a stored
+ * value, and `weightPercent` still means "College Board printed this against
+ * the exam".
+ *
+ * It was about RELABELLING, though, not about arithmetic. Jon's #83 read of
+ * the AP Microeconomics card — where the Weight column spent four wrapped
+ * lines saying `50% of section score` / `each worth 25% of section score` —
+ * is that the conversion is exactly what a student is trying to do in their
+ * head: Section II is 33% of the exam, so the long FRQ is 16.5% of it. So the
+ * multiplication happens HERE, once, at the point of display, from the
+ * section's own stored weight.
+ *
+ * Two properties make that safe, and both are pinned by tests:
+ *   - the denominator is the section's STORED `weightPercent`, so every part
+ *     of a section sums exactly back to that section (16.5 + 8.25 + 8.25 = 33)
+ *     — see `src/data/ap-2027.sections.test.ts`;
+ *   - `each` survives the conversion, so a 2-question row still says its
+ *     8.25% is per question.
  */
 export type PartWeight =
-  | { kind: "percent"; value: number }
+  | { kind: "percent"; value: number; each: boolean }
   | { kind: "printed"; text: string }
   | { kind: "pending" }
   | { kind: "unpublished" };
 
-export function partWeight(part: ExamSectionPart): PartWeight {
+/**
+ * Two decimal places (AC2) — `70% of 35%` is 24.5, not 24.499999999999996.
+ * Integers first (`70 * 35 / 100`) keeps all 11 shipped values exact anyway;
+ * the rounding is the guard for a future non-integer capture.
+ */
+function roundToCents(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+/**
+ * @param part                  the part row being rendered
+ * @param sectionWeightPercent  the STORED weight of the section this part
+ *                              hangs under — the denominator a relative weight
+ *                              is multiplied by. Never a re-derived figure:
+ *                              College Board prints 66/33 for Micro and Macro
+ *                              (which sums to 99) and part rows that reconcile
+ *                              with their own section beat rows that reconcile
+ *                              with a corrected 100.
+ */
+export function partWeight(
+  part: ExamSectionPart,
+  sectionWeightPercent: ExamSection["weightPercent"],
+): PartWeight {
   if (part.weightPercent === "pending") return { kind: "pending" };
   if (typeof part.weightPercent === "number") {
-    return { kind: "percent", value: part.weightPercent };
+    return { kind: "percent", value: part.weightPercent, each: false };
   }
   if (part.weightPrinted !== undefined) {
+    const printed = parsePrintedWeight(part.weightPrinted);
+    // An exam-denominated string is already the answer; anything else is a
+    // share of this section. A section whose own weight is unpublished has
+    // nothing to multiply by, so its parts keep the printed string.
+    const denominator =
+      printed === null
+        ? undefined
+        : printed.base.of === "exam"
+          ? 100
+          : sectionWeightPercent;
+    if (printed !== null && typeof denominator === "number") {
+      return {
+        kind: "percent",
+        value: roundToCents((printed.percent * denominator) / 100),
+        each: printed.each,
+      };
+    }
     return { kind: "printed", text: part.weightPrinted };
   }
   return { kind: "unpublished" };

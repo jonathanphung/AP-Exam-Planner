@@ -1,0 +1,41 @@
+copied
+    +                     <div data-scroll-lock-anchor={true} className=\"mx-auto fl...\">
+    +                       <Sidebar>
+    +                       <main className=\"flex min-w...\" aria-label=\"Exam planner\">
+    +                         <CatalogGrid>
+    +                           <section aria-label=\"Subject ca...\" className=\"flex flex-...\">
+    +                             <div className=\"flex flex-...\">
+    +                               <div className=\"flex flex-...\">
+    +                                 <label>
+    +                                 <input
+    +                                   id=\"subject-search\"
+    +                                   type=\"search\"
+    +                                   value=\"\"
+    +                                   onChange={function onChange}
+    +                                   placeholder=\"e.g. bio\"
+    +                                   autoComplete=\"off\"
+    +                                   className=\"min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 tex...\"
+    + -                                 style={{caret-color:\"transparent\"}}
+    +                                 >
+    +                               ...
+    +                             ...
+    +                         ...
+    +                 ...
+    +               ...
+    + ",
+    + ]
+
+      63 |       meaningfulErrors,
+      64 |       `Unexpected console errors: ${meaningfulErrors.join(", ")}`,
+    > 65 |     ).toEqual([]);
+         |       ^
+      66 |   });
+      67 | }
+      68 |
+        at C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-83-qa\e2e\qa-evidence.spec.ts:65:7
+
+    Error Context: test-results\qa-evidence-AC2-—-renders--05bfa-sole-errors-mobile-375x667--chromium\error-context.md
+
+  1 failed
+    [chromium] › e2e\qa-evidence.spec.ts:23:7 › AC2 — / renders header + populated main with no console errors (mobile 375x667) 
+  633 passed (5.6m)
