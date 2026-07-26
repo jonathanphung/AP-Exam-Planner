@@ -483,10 +483,18 @@ test.describe("issue #71 QA — published qualifier on every schedule surface", 
         path: `${EVIDENCE_DIR}/list-${vp.name}.png`,
         fullPage: true,
       });
+      // `<= 0`, not `=== 0` (corrected under issue #80). Issue #49's
+      // `scrollbar-gutter: stable` reserves the scrollbar's strip inside the
+      // root's content box; `documentElement.clientWidth` reports the full
+      // viewport and does not subtract that reservation, so the resting delta
+      // is −10 whenever the bar itself takes no layout space — every default
+      // Playwright run, since Chromium launches with `--hide-scrollbars`.
+      // Overflow means a POSITIVE delta; a negative one is the gutter doing
+      // its job.
       expect(
         await horizontalOverflow(page),
         "the qualifier paragraph must not push the page sideways",
-      ).toBe(0);
+      ).toBeLessThanOrEqual(0);
 
       await pressViewChip(page, "Calendar");
       await gotoWeek(page, weekIndexOf(NOTED!.exam!.date) + 1);
@@ -497,7 +505,10 @@ test.describe("issue #71 QA — published qualifier on every schedule surface", 
         path: `${EVIDENCE_DIR}/calendar-${vp.name}.png`,
         fullPage: true,
       });
-      expect(await horizontalOverflow(page)).toBe(0);
+      // `<= 0`, not `=== 0` — see the note on the List-view assertion above:
+      // #49's reserved gutter rests at −10, not 0, whenever the scrollbar
+      // itself takes no layout space.
+      expect(await horizontalOverflow(page)).toBeLessThanOrEqual(0);
     });
   }
 });

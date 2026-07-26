@@ -220,13 +220,22 @@ for (const [label, vp] of [
     ).toHaveAccessibleName(GITHUB_NAME);
 
     // No horizontal overflow from the row at this width.
+    //
+    // `<= 0`, not `=== 0` (corrected under issue #80). Issue #49's
+    // `scrollbar-gutter: stable` reserves the scrollbar's strip inside the
+    // root's content box; `documentElement.clientWidth` reports the full
+    // viewport and does not subtract that reservation, so the resting delta
+    // is −10 whenever the bar itself takes no layout space — every default
+    // Playwright run, since Chromium launches with `--hide-scrollbars`.
+    // Overflow means a POSITIVE delta; a negative one is the gutter doing
+    // its job.
     expect(
       await page.evaluate(
         () =>
           document.documentElement.scrollWidth -
           document.documentElement.clientWidth,
       ),
-    ).toBe(0);
+    ).toBeLessThanOrEqual(0);
 
     await page.screenshot({
       path: `${EVIDENCE_DIR}/${label}-quiet-meta-row.png`,
