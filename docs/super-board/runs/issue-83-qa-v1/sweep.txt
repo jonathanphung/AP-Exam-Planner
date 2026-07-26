@@ -1,0 +1,17 @@
+subjects swept:    38
+part rows checked: 76
+converted:         11
+unchanged:         65
+
+converted rows:
+  macroeconomics · Long free-response question
+  macroeconomics · Short free-response questions
+  microeconomics · Long free-response question
+  microeconomics · Short free-response questions
+  seminar · Individual research report (1,200 words)
+  seminar · Team multimedia presentation and defense (8–10 minutes, plus defense questions)
+  seminar · Individual written argument (2,000 words)
+  seminar · Individual multimedia presentation (6–8 minutes)
+  seminar · Oral defense (2 questions from the teacher)
+  seminar · Understanding and analyzing an argument (3 short-answer questions)
+  seminar · Evidence-Based argument essay (1 long essay)
