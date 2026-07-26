@@ -14,18 +14,50 @@
  "changedFor2027": null,
  "sections": [
   {
-   "name": "Multiple Choice",
+   "name": "Section I: Multiple Choice",
    "questionCount": "80",
    "minutes": 60,
    "weightPercent": 50,
    "quote": "80 Questions | 1 Hour | 50% of Exam Score"
   },
   {
-   "name": "Free Response",
+   "name": "Section II: Free Response",
    "questionCount": "6",
    "minutes": 120,
    "weightPercent": 50,
-   "quote": "6 Questions | 2 Hours | 50% of Exam Score"
+   "quote": "6 Questions | 2 Hours | 50% of Exam Score",
+   "parts": [
+    {
+     "name": "Question 1: Long Essay–Comparison",
+     "questionCount": "1",
+     "quote": "Question 1: Long Essay–Comparison will ask you to compare a required work of art and another of your choosing and explain the significance of the similarities and differences."
+    },
+    {
+     "name": "Question 2: Long Essay–Visual/Contextual Analysis",
+     "questionCount": "1",
+     "quote": "Question 2: Long Essay–Visual/Contextual Analysis will ask you to select and identify a work of art and make assertions about it based on evidence."
+    },
+    {
+     "name": "Question 3: Short Essay–Visual Analysis",
+     "questionCount": "1",
+     "quote": "Question 3: Short Essay–Visual Analysis will ask you to describe a work of art beyond the image set and connect it to an artistic tradition, style, or practice."
+    },
+    {
+     "name": "Question 4: Short Essay–Contextual Analysis",
+     "questionCount": "1",
+     "quote": "Question 4: Short Essay–Contextual Analysis will ask you to describe contextual influences of a work of art in the image set and explain how context can influence artistic decisions."
+    },
+    {
+     "name": "Question 5: Short Essay–Attribution",
+     "questionCount": "1",
+     "quote": "Question 5: Short Essay–Attribution will ask you to attribute a work of art beyond the image set to a particular artist, culture, or style, and justify your attribution."
+    },
+    {
+     "name": "Question 6: Short Essay–Continuity and Change",
+     "questionCount": "1",
+     "quote": "Question 6: Short Essay–Continuity and Change will ask you to analyze the relationship between a provided work of art and a related artistic tradition, style, or practice."
+    }
+   ]
   }
  ],
  "datasetDiscrepancies": []

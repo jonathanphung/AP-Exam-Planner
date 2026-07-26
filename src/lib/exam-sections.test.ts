@@ -1,79 +1,151 @@
 import { describe, expect, it } from "vitest";
-import type { ExamSection } from "@/data/schema";
-import { questionCountLabel, sectionsHavePartRows } from "./exam-sections";
+import type { ExamSectionPart } from "@/data/schema";
+import { minuteGroups, partWeight } from "./exam-sections";
 
 /**
- * Issue #44 (Jon's PR #48 design bounce) — the hasParts branch rule.
+ * Two describe blocks that used to live here left with the layout they
+ * described (Jon's #73 bounce — one presentation for every exam):
  *
- * The InfoPanel renders the 4-column sections table ONLY when a section has
- * published part rows; otherwise every section becomes a spacious
- * metadata-style row. The rule is parts-based, never count-based: a
- * 5-section exam with no parts (AP African American Studies) must NOT get
- * the table.
+ *   - "sectionsHavePartRows — the table-vs-rows branch rule" asserted that a
+ *     partless exam must NOT get the table (issue #44 / Jon's PR #48 design
+ *     bounce). Every exam gets the table now, so the rule it pinned no longer
+ *     exists — keeping the block would have kept a helper alive purely to be
+ *     tested. The runtime replacement is an e2e contract, not a unit one:
+ *     `e2e/issue-73-one-presentation.spec.ts` walks all 38 sit-down subjects
+ *     and fails if any renders something other than the table.
+ *   - "questionCountLabel — singular/plural and verbatim ranges" pinned the
+ *     prose block's "1 question" / "55–75 questions" phrasing; the table's
+ *     Questions column is a bare number under its own column header.
+ *
+ * Both are in `git show 741a900:src/lib/exam-sections.test.ts` if a future
+ * layout brings the helpers back.
  */
 
-const section = (overrides: Partial<ExamSection> = {}): ExamSection => ({
-  name: "Multiple Choice",
-  questionCount: 60,
-  minutes: 90,
-  weightPercent: 50,
+/**
+ * Issue #73 — the part weight cell, one denominator at a time.
+ *
+ * Before #73 every part row's weight cell was a hardcoded dash. The cell now
+ * resolves through {@link partWeight}, and the ONLY thing these cases have to
+ * prove is that the printed denominator survives: an exam-denominated number
+ * stays a number, and everything else stays the printed string. No case may
+ * produce a value the capture does not print.
+ */
+const part = (overrides: Partial<ExamSectionPart> = {}): ExamSectionPart => ({
+  name: "Part A",
+  questionCount: 29,
+  minutes: 62,
   ...overrides,
 });
 
-const parts: ExamSection["parts"] = [
-  { name: "Part A", questionCount: 30, minutes: 60, note: "No calculator" },
-  { name: "Part B", questionCount: 15, minutes: 45 },
-];
-
-describe("sectionsHavePartRows — the table-vs-rows branch rule", () => {
-  it("is false for a portfolio-only subject (no sections at all)", () => {
-    expect(sectionsHavePartRows([])).toBe(false);
+describe("partWeight — three printed denominators, zero conversions", () => {
+  it("keeps an EXAM-denominated weight as a number (Calculus BC Part A: '35% of score')", () => {
+    expect(partWeight(part({ weightPercent: 35 }))).toEqual({
+      kind: "percent",
+      value: 35,
+    });
   });
 
-  it("is false for a plain two-section exam with no parts (AP Biology shape)", () => {
+  it("keeps a fractional exam-denominated weight exactly as published (Precalculus '43.75% of exam score')", () => {
+    // AP Central prints 43.75%; the AP Students block rounds it to
+    // "approximately 44%". The exact figure is the one that ships.
+    expect(partWeight(part({ weightPercent: 43.75 }))).toEqual({
+      kind: "percent",
+      value: 43.75,
+    });
+  });
+
+  it("keeps a SECTION-denominated weight verbatim — never multiplied into an exam share (Macroeconomics '50% of section score')", () => {
+    const macro = part({
+      name: "Long free-response question",
+      questionCount: 1,
+      minutes: undefined,
+      weightPrinted: "50% of section score",
+    });
+    const weight = partWeight(macro);
+    expect(weight).toEqual({ kind: "printed", text: "50% of section score" });
+    // Section II is 33% of the exam, so 50% of it is ~16.5% — a number this
+    // app must never compute, print, or store. The string is the whole datum.
+    expect(weight).not.toHaveProperty("value");
+    expect(JSON.stringify(weight)).not.toContain("16.5");
+  });
+
+  it("keeps a NESTED weight verbatim (Seminar '50% of 20%')", () => {
+    const weight = partWeight(
+      part({
+        name: "Individual research report (1,200 words)",
+        questionCount: undefined,
+        minutes: undefined,
+        weightPrinted: "50% of 20%",
+      }),
+    );
+    expect(weight).toEqual({ kind: "printed", text: "50% of 20%" });
+    // 50% of 20% is 10% of the AP Seminar score — again, never multiplied out.
+    expect(JSON.stringify(weight)).not.toContain("10%\"");
+  });
+
+  it("reports UNPUBLISHED when College Board prints no per-part weight (Art History's six essay questions)", () => {
     expect(
-      sectionsHavePartRows([section(), section({ name: "Free Response" })]),
-    ).toBe(false);
+      partWeight(
+        part({
+          name: "Question 1: Long Essay–Comparison",
+          questionCount: 1,
+          minutes: undefined,
+        }),
+      ),
+    ).toEqual({ kind: "unpublished" });
   });
 
-  it("is false for a MULTI-section exam with no parts — the rule is parts-based, not count-based (AAS shape, 5 sections)", () => {
+  it("reports PENDING separately from unpublished — the two states never collapse", () => {
+    expect(partWeight(part({ weightPercent: "pending" }))).toEqual({
+      kind: "pending",
+    });
+  });
+
+  it("prefers the exam-denominated number when a record somehow carries both (schema forbids it; renderers must still be total)", () => {
     expect(
-      sectionsHavePartRows([
-        section({ name: "Section I: Multiple Choice" }),
-        section({ name: "Section IB: Validation Question" }),
-        section({ name: "Section II: Short-Answer Questions" }),
-        section({ name: "Section II: Document-Based Question" }),
-        section({ name: "Individual Student Project", minutes: "pending" }),
-      ]),
-    ).toBe(false);
-  });
-
-  it("is true when any section has a published part split (Calculus AB shape)", () => {
-    expect(sectionsHavePartRows([section({ parts })])).toBe(true);
-  });
-
-  it("is true when only a later section has parts (World History: Modern shape)", () => {
-    expect(
-      sectionsHavePartRows([
-        section({ name: "Section IA: Multiple Choice" }),
-        section({ name: "Section IB: Short Answer" }),
-        section({ name: "Section II: Free Response", parts }),
-      ]),
-    ).toBe(true);
+      partWeight(
+        part({ weightPercent: 25, weightPrinted: "50% of section score" }),
+      ),
+    ).toEqual({ kind: "percent", value: 25 });
   });
 });
 
-describe("questionCountLabel — singular/plural and verbatim ranges", () => {
-  it("uses the singular for exactly one question", () => {
-    expect(questionCountLabel(1)).toBe("1 question");
+/**
+ * Jon's second #73 bounce — the Length column is budgeted now, so a duration
+ * can wrap. These cases pin the two halves of that: the groups are the only
+ * places it may break, and joining them reproduces the exact string this app
+ * has printed since issue #6 (nothing here may quietly re-format a duration
+ * while making it wrappable).
+ */
+describe("minuteGroups — a duration breaks between its units, never inside one", () => {
+  it("splits hours from minutes (90 -> '1 h' + '30 min')", () => {
+    expect(minuteGroups(90)).toEqual(["1 h", "30 min"]);
   });
 
-  it("uses the plural for other counts", () => {
-    expect(questionCountLabel(3)).toBe("3 questions");
-    expect(questionCountLabel(60)).toBe("60 questions");
+  it("keeps a whole-hour duration in one group — nothing to break (180)", () => {
+    expect(minuteGroups(180)).toEqual(["3 h"]);
   });
 
-  it("renders a published range verbatim, plural", () => {
-    expect(questionCountLabel("55–75")).toBe("55–75 questions");
+  it("keeps a sub-hour duration in one group (50)", () => {
+    expect(minuteGroups(50)).toEqual(["50 min"]);
+  });
+
+  it("never splits a unit from its number", () => {
+    for (const total of [45, 50, 60, 62, 90, 105, 165, 195]) {
+      for (const group of minuteGroups(total)) {
+        expect(group, `"${group}" must carry its own unit`).toMatch(
+          /^\d+ (h|min)$/,
+        );
+      }
+    }
+  });
+
+  it("joins back to the string the panel has always printed", () => {
+    const printed = (total: number) => minuteGroups(total).join(" ");
+    expect(printed(90)).toBe("1 h 30 min");
+    expect(printed(165)).toBe("2 h 45 min");
+    expect(printed(180)).toBe("3 h");
+    expect(printed(50)).toBe("50 min");
+    expect(printed(60)).toBe("1 h");
   });
 });

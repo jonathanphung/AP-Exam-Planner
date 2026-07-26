@@ -12,14 +12,14 @@
  "changedFor2027": null,
  "sections": [
   {
-   "name": "Multiple Choice",
+   "name": "Section I: Multiple Choice",
    "questionCount": "55",
    "minutes": 60,
    "weightPercent": 50,
    "quote": "Section I: Multiple Choice — 55 Questions | 60 Minutes | 50% of Exam Score"
   },
   {
-   "name": "Free Response",
+   "name": "Section II: Free Response",
    "questionCount": "4",
    "minutes": 90,
    "weightPercent": 50,

@@ -23,21 +23,29 @@ import { evidenceDir } from "./support/evidence";
  *                        Section II: Multiple-Choice 55q/65min/50%.
  *                        totalMinutes 120 is the published figure — sections
  *                        deliberately do not sum to it.
- *   - AP Seminar       — NO multiple-choice section exists: exactly two
- *                        published End-of-Course rows, zero "pending".
+ *   - AP Seminar       — NO multiple-choice section exists: the three
+ *                        components College Board's Assessment Format prints,
+ *                        with printed NESTED weights on their part rows
+ *                        (issue #73), zero "pending".
  *   - AP Drawing       — portfolio-only: no sections, no table at all.
- *   - AP African American Studies — 5 published sections; the Individual
- *                        Student Project row distinguishes omission (no
- *                        question count printed) from pending (minutes exist
- *                        but unpublished).
+ *   - AP African American Studies — the four components College Board prints
+ *                        (issue #73 collapsed two invented sibling "Section
+ *                        II:" rows into the single printed one); the
+ *                        Individual Student Project row distinguishes
+ *                        omission (no question count printed) from pending
+ *                        (minutes exist but unpublished).
  *
- * Layout branch (Jon's PR #48 design bounce, pass 2): exams whose sections
- * have NO published parts (Seminar, AAS, Biology) render spacious two-line
- * blocks — no table, no column header: a medium-weight name line above a
- * muted left-aligned stats line that wraps only between `·`-separated stat
- * phrases (never inside one); exams WITH parts (Calculus AB, the languages)
- * keep the table, pixel-untouched. The branch is parts-based, never
- * count-based.
+ * Layout (Jon's #73 bounce, 2026-07-25): ONE presentation. Every exam with at
+ * least one published section renders this table, whether or not its sections
+ * carry parts. That supersedes Jon's PR #48 design bounce, pass 2, which this
+ * suite used to verify: partless exams (Biology, Music Theory) rendered
+ * spacious two-line blocks instead — no table, no column header, a
+ * medium-weight name line above a muted left-aligned stats line that wrapped
+ * only between `·`-separated phrases. The two cases below that pinned that
+ * layout now pin the single one: a partless exam renders the same table, one
+ * row per section with no nested rows, and it survives 375/320 without
+ * horizontal scroll. The prose block was a deliberate call, replaced by a
+ * later deliberate call — see src/lib/exam-sections.ts for the full history.
  */
 
 const EVIDENCE_DIR = evidenceDir("issue-44-qa-v1");
@@ -71,15 +79,6 @@ const row = (page: Page, name: string | RegExp): Locator =>
 const rowValue = (page: Page, label: string): Locator =>
   dialog(page).locator("dl > div").filter({ hasText: label }).locator("dd");
 
-/**
- * A spacious section row of the partless layout (PR #48 bounce): the
- * dl row whose dt carries the section name. Regex anchors distinguish
- * names that are substrings of each other (AAS has both "Individual Student
- * Project" and "Section IB: Individual Student Project—…").
- */
-const summaryRow = (page: Page, name: string | RegExp): Locator =>
-  dialog(page).locator("dl > div").filter({ hasText: name });
-
 async function seedSelection(page: Page, ids: string[]) {
   await page.addInitScript(
     ([key, value]) => window.localStorage.setItem(key, value),
@@ -102,39 +101,51 @@ const noHorizontalScroll = (page: Page) =>
   );
 
 test.describe("issue #44 — per-section exam details", () => {
-  test("AC3/AC11 — AP Seminar has NO multiple-choice row: only its two published End-of-Course sections render (as spacious partless rows), with College Board's names, and omission is never shown as 'pending'", async ({
+  test("AC3/AC11 — AP Seminar has NO multiple-choice row: its three published components render with College Board's names and printed nested weights, and omission is never shown as 'pending'", async ({
     page,
   }) => {
     await page.goto("/");
     await openInfo(page, "AP Seminar");
 
-    // PR #48 bounce: no parts → no table, no column header.
-    await expect(sectionsTable(page)).toHaveCount(0);
-    await expect(dialog(page).getByRole("columnheader")).toHaveCount(0);
+    // Issue #73: the components carry printed part rows, so the 4-column
+    // table is the correct layout (PR #48 bounce rule is parts-based).
+    await expect(sectionsTable(page)).toHaveCount(1);
 
-    // Exactly the two published sections — nothing invented, nothing zeroed.
+    // Exactly the three components College Board's Assessment Format prints.
     await expect(
-      summaryRow(page, "End-of-Course Exam – Short-Answer Section"),
+      row(page, /^Performance Task 1: Team Project and Presentation$/),
     ).toHaveCount(1);
     await expect(
-      summaryRow(page, "End-of-Course Exam – Essay Section"),
+      row(
+        page,
+        /^Performance Task 2: Individual Research-Based Essay and Presentation$/,
+      ),
     ).toHaveCount(1);
+    await expect(row(page, /^End-of-Course Exam$/)).toHaveCount(1);
 
-    // The nonexistent MC section is omitted entirely…
+    // The nonexistent MC section is omitted entirely.
     await expect(dialog(page).getByText(/multiple.?choice/i)).toHaveCount(0);
-    // …and never conflated with "not yet published".
-    await expect(
-      dialog(page).getByText("pending", { exact: true }),
-    ).toHaveCount(0);
 
-    // Published values render in the "<count> questions · <length> ·
-    // <weight>% of score" shape — singular "1 question" for the essay.
+    // Nested weights render VERBATIM — never multiplied into an exam share.
     await expect(
-      summaryRow(page, /Short-Answer Section/).locator("dd"),
-    ).toHaveText("3 questions · 30 min · 13.5% of score");
-    await expect(summaryRow(page, /Essay Section/).locator("dd")).toHaveText(
-      "1 question · 1 h 30 min · 31.5% of score",
+      row(page, /Individual research report \(1,200 words\)/),
+    ).toContainText("50% of 20%");
+    await expect(row(page, /Oral defense/)).toContainText("10% of 35%");
+    await expect(
+      row(page, /Understanding and analyzing an argument/),
+    ).toContainText("30% of 45%");
+    await expect(row(page, /Evidence-Based argument essay/)).toContainText(
+      "70% of 45%",
     );
+    // The multiplied-out figures the dataset used to carry must be gone.
+    await expect(dialog(page).getByText("13.5%")).toHaveCount(0);
+    await expect(dialog(page).getByText("31.5%")).toHaveCount(0);
+
+    // The three components' own weights are the printed exam-denominated ones.
+    await expect(
+      row(page, /^Performance Task 1: Team Project and Presentation$/),
+    ).toContainText("20%");
+    await expect(row(page, /^End-of-Course Exam$/)).toContainText("45%");
   });
 
   test("AC2 — a portfolio-only subject (AP Drawing) renders NO section table and no exam-format rows; its portfolio block carries the story", async ({
@@ -169,7 +180,7 @@ test.describe("issue #44 — per-section exam details", () => {
     await openInfo(page, "AP Calculus AB");
 
     // Section row: name | questions | length | weight.
-    const mc = row(page, /^Multiple Choice$/);
+    const mc = row(page, /^Section I: Multiple Choice$/);
     await expect(mc).toContainText("42");
     await expect(mc).toContainText("1 h 40 min");
     await expect(mc).toContainText("50%");
@@ -180,10 +191,13 @@ test.describe("issue #44 — per-section exam details", () => {
     await expect(mcPartA).toContainText("29");
     await expect(mcPartA).toContainText("1 h 2 min");
     await expect(mcPartA).toContainText("calculator not permitted");
+    // Issue #73: the weight cell is the published share, not a dash.
+    await expect(mcPartA).toContainText("35%");
     const mcPartB = row(page, /Multiple Choice\s*—\s*Part B/);
     await expect(mcPartB).toContainText("13");
     await expect(mcPartB).toContainText("38 min");
     await expect(mcPartB).toContainText("graphing calculator required");
+    await expect(mcPartB).toContainText("15%");
 
     // The Free Response section has its own, distinct A/B split.
     const frPartA = row(page, /Free Response\s*—\s*Part A/);
@@ -263,191 +277,133 @@ test.describe("issue #44 — per-section exam details", () => {
     await page.goto("/");
     await openInfo(page, "AP African American Studies");
 
-    // PR #48 bounce: 5 sections but NO parts → the spacious partless rows,
-    // not the table (the branch rule is parts-based, never count-based).
-    await expect(sectionsTable(page)).toHaveCount(0);
-    await expect(dialog(page).getByRole("columnheader")).toHaveCount(0);
+    // Issue #73: the two invented sibling "Section II:" rows collapsed into
+    // the single "Section II: Free Response" College Board prints, with the
+    // Short-Answer Questions (18%) and Document-Based Question (12%) as its
+    // published parts — so AAS renders the 4-column table (the PR #48 branch
+    // rule is parts-based) rather than the spacious partless blocks.
+    await expect(sectionsTable(page)).toHaveCount(1);
 
-    // All five published sections render (the branch rule's real test).
+    // The four published components, in College Board's printed order.
     for (const name of [
-      "Section I: Multiple Choice",
-      "Section IB: Individual Student Project—Exam Day Validation Question",
-      "Section II: Short-Answer Questions",
-      "Section II: Document-Based Question",
-    ]) {
-      await expect(summaryRow(page, name)).toHaveCount(1);
+      /^Section I: Multiple Choice$/,
+      /^Section IB: Individual Student Project—Exam Day Validation Question$/,
+      /^Section II: Free Response$/,
+      /^Individual Student Project$/,
+    ] as const) {
+      await expect(row(page, name)).toHaveCount(1);
     }
-    const isp = summaryRow(page, /^Individual Student Project/);
-    await expect(isp).toHaveCount(1);
+    // Section II's printed 4 questions / 1 h 25 min / 30%, with its parts
+    // nested and carrying their own published weights.
+    const frq = row(page, /^Section II: Free Response$/);
+    await expect(frq).toContainText("4");
+    await expect(frq).toContainText("1 h 25 min");
+    await expect(frq).toContainText("30%");
+    await expect(row(page, /Free Response\s*—\s*Short-Answer Questions/)).toContainText("18%");
+    await expect(row(page, /Free Response\s*—\s*Document-Based Question/)).toContainText("12%");
 
+    const isp = row(page, /^Individual Student Project$/);
+    const cells = isp.getByRole("cell");
     // Questions: the page prints NO count (it's a project, not a question
-    // set) → the questions segment is omitted entirely — omission, not a
-    // fabricated count and not a pending badge.
-    await expect(isp.locator("dd")).not.toContainText("question");
-    // Minutes: a duration exists but is unpublished → the pending badge
-    // inline in its slot of the value string.
+    // set) → the not-published dash, not a fabricated count and not "pending".
+    await expect(cells.nth(0)).toContainText("—");
+    // Minutes: a duration exists but is unpublished → the pending badge.
     await expect(
-      isp.locator("dd").getByText("pending", { exact: true }),
+      cells.nth(1).getByText("pending", { exact: true }),
     ).toBeVisible();
     // Weight: published 8.5% renders.
-    await expect(isp.locator("dd")).toContainText("8.5% of score");
+    await expect(cells.nth(2)).toHaveText("8.5%");
   });
 
-  test("PR #48 bounce pass 2 + '9px matched' follow-up — a partless exam (AP Biology) renders two-line section blocks: name line above a muted left-aligned stats line, 9px block padding with hairlines, and an 11px matched gap before the metadata divider", async ({
+  test("Jon's #73 bounce — an exam with NO published parts (AP Biology) renders the SAME table as a part-carrying exam: exactly one row per section, no nested or placeholder rows, and the prose presentation is gone", async ({
     page,
   }) => {
     await page.goto("/");
     await openInfo(page, "AP Biology");
 
-    // No table, no column header — the spacious layout.
-    await expect(sectionsTable(page)).toHaveCount(0);
-    await expect(dialog(page).getByRole("columnheader")).toHaveCount(0);
-    await expect(rowValue(page, "Multiple Choice")).toHaveText(
-      "60 questions · 1 h 30 min · 50% of score",
-    );
+    // The table, with the same four column headers Calculus AB gets.
+    await expect(sectionsTable(page)).toHaveCount(1);
+    const colHeaders = sectionsTable(page).locator("thead th[scope='col']");
+    await expect(colHeaders).toHaveCount(4);
+    await expect(colHeaders).toHaveText([
+      "Section",
+      "Questions",
+      "Length",
+      "Weight",
+    ]);
 
-    const block = summaryRow(page, "Multiple Choice");
-    const name = block.locator("dt");
-    const stats = block.locator("dd");
+    // Exactly 2 body rows for Biology's 2 sections — a section with no parts
+    // is ONE row and nothing else: not an empty part row, not a placeholder.
+    await expect(sectionsTable(page).locator("tbody tr")).toHaveCount(2);
+    // …and every one of them is a scoped section row header (a11y parity with
+    // the part-carrying case, which the dt/dd blocks used to provide).
+    await expect(
+      sectionsTable(page).locator("tbody th[scope='row']"),
+    ).toHaveCount(2);
 
-    // Two-line block: the name line sits fully ABOVE the stats line, and both
-    // are LEFT-aligned to the same edge (bounce-1's right-aligned values are
-    // gone).
-    const nameBox = (await name.boundingBox())!;
-    const statsBox = (await stats.boundingBox())!;
-    expect(nameBox.y + nameBox.height).toBeLessThanOrEqual(statsBox.y + 1);
-    expect(Math.abs(nameBox.x - statsBox.x)).toBeLessThanOrEqual(1);
+    const mc = row(page, /^Section I: Multiple Choice$/);
+    await expect(mc.getByRole("cell").nth(0)).toHaveText("60");
+    await expect(mc.getByRole("cell").nth(1)).toHaveText("1 h 30 min");
+    await expect(mc.getByRole("cell").nth(2)).toHaveText("50%");
+    const fr = row(page, /Section II: Free Response/);
+    await expect(fr.getByRole("cell").nth(0)).toHaveText("6");
+    await expect(fr.getByRole("cell").nth(1)).toHaveText("1 h 30 min");
+    await expect(fr.getByRole("cell").nth(2)).toHaveText("50%");
+    // The published FRQ-composition note survives the port, in the row header.
+    await expect(fr).toContainText("2 long, 4 short");
 
-    // Name line is medium weight at full strength; stats line is muted —
-    // the hierarchy bounce-1's uniform density lacked.
-    await expect(name).toHaveCSS("font-weight", "500");
-    const color = (loc: Locator) =>
-      loc.evaluate((el) => getComputedStyle(el).color);
-    expect(await color(stats)).not.toBe(await color(name));
-
-    // "9px matched" spacing follow-up (Jon, 2026-07-10): each partless
-    // section block keeps 9px above and below its content, with a hairline
-    // between blocks. Tailwind v4's divide-y draws that hairline as
-    // border-BOTTOM on every child except the last — so the hairline lives
-    // on the MC block's bottom edge, and the FR (last) block has no border
-    // of its own (the zone divider below is the metadata <dl>'s border-top,
-    // asserted next).
-    const frBlock = summaryRow(page, "Free Response");
-    const blockSpacing = await frBlock.evaluate((el) => {
-      const cs = getComputedStyle(el);
-      return {
-        paddingTop: cs.paddingTop,
-        paddingBottom: cs.paddingBottom,
-        borderTopWidth: cs.borderTopWidth,
-        borderBottomWidth: cs.borderBottomWidth,
-      };
-    });
-    expect(blockSpacing.paddingTop).toBe("9px");
-    expect(blockSpacing.paddingBottom).toBe("9px");
-    // Hairline BETWEEN blocks: bottom edge of the non-last block…
-    expect(
-      await block.evaluate((el) => getComputedStyle(el).borderBottomWidth),
-    ).toBe("1px");
-    // …and none on the last block, so nothing doubles up against the zone
-    // divider below it.
-    expect(blockSpacing.borderTopWidth).toBe("0px");
-    expect(blockSpacing.borderBottomWidth).toBe("0px");
-
-    // Sections→metadata gap matched to the metadata rhythm: the last block's
-    // content sits exactly 11px above the divider (9px block bottom padding
-    // + 2px metadata-group top margin), and the first metadata row keeps its
-    // usual 10px below the divider — the same distance every metadata row
-    // keeps from its hairlines.
-    const metaDl = dialog(page)
+    // No trace of the superseded prose presentation: no stat phrases, and the
+    // metadata group carries the table branch's shipped mt-2 with no zone
+    // divider (the divider only ever existed to separate the prose blocks).
+    await expect(dialog(page).getByTestId("stat-phrase")).toHaveCount(0);
+    const meta = await dialog(page)
       .locator("dl")
-      .filter({ hasText: "Exam length" });
-    const metaSpacing = await metaDl.evaluate((el) => {
-      const cs = getComputedStyle(el);
-      return {
-        marginTop: cs.marginTop,
-        paddingTop: cs.paddingTop,
-        borderTopWidth: cs.borderTopWidth,
-      };
-    });
-    expect(metaSpacing.marginTop).toBe("2px");
-    expect(metaSpacing.paddingTop).toBe("0px");
-    expect(metaSpacing.borderTopWidth).toBe("1px");
-
-    // The sections group and the metadata group read as distinct zones: the
-    // gap between the last section block and the first metadata row is larger
-    // than the gap between the two section blocks.
-    const frBox = (await summaryRow(page, "Free Response").boundingBox())!;
-    const metaBox = (await summaryRow(page, "Exam length").boundingBox())!;
-    const mcBox = (await block.boundingBox())!;
-    const interBlockGap = frBox.y - (mcBox.y + mcBox.height);
-    const zoneGap = metaBox.y - (frBox.y + frBox.height);
-    expect(zoneGap).toBeGreaterThan(interBlockGap);
-
-    // No stat phrase ever line-breaks: all of a phrase's inline fragments
-    // sit on ONE line. Chromium fragments an inline span's client rects per
-    // text node (e.g. "60 questions" + " ·" → two same-line rects), so rect
-    // COUNT cannot detect wrapping — a mid-phrase wrap means a fragment on a
-    // fully separate line (some rect's top at/below another's bottom).
-    const phrases = dialog(page).getByTestId("stat-phrase");
-    const count = await phrases.count();
-    expect(count).toBeGreaterThan(0);
-    for (let i = 0; i < count; i++) {
-      expect(
-        await phrases.nth(i).evaluate((el) => {
-          const rects = [...el.getClientRects()].filter(
-            (r) => r.width > 0 && r.height > 0,
-          );
-          return rects.some((a) =>
-            rects.some((b) => a.top >= b.bottom - 0.5),
-          );
-        }),
-        `stat phrase ${i} must not wrap mid-phrase`,
-      ).toBe(false);
-    }
+      .filter({ hasText: "Exam length" })
+      .evaluate((el) => {
+        const cs = getComputedStyle(el);
+        return { marginTop: cs.marginTop, borderTopWidth: cs.borderTopWidth };
+      });
+    expect(meta.marginTop).toBe("8px");
+    expect(meta.borderTopWidth).toBe("0px");
   });
 
-  test("PR #48 bounce — mobile Tier-2 (375×667 and 320px): the partless layout keeps every row visible, no horizontal scroll, and no stat phrase ever wraps mid-phrase", async ({
+  test("Jon's #73 bounce — mobile Tier-2 (375×667 and 320px): a partless exam's table fits with no horizontal scroll, and the dataset's longest College Board section name wraps instead of clipping", async ({
     page,
   }) => {
-    // A phrase wraps mid-phrase iff one of its inline fragments lands on a
-    // fully separate line. Chromium emits multiple SAME-line rects per text
-    // node inside the span, so rect count alone cannot distinguish a wrap
-    // from benign fragmentation — vertical separation can.
-    const noMidPhraseWrap = async () => {
-      const phrases = dialog(page).getByTestId("stat-phrase");
-      const count = await phrases.count();
-      expect(count).toBeGreaterThan(0);
-      for (let i = 0; i < count; i++) {
-        expect(
-          await phrases.nth(i).evaluate((el) => {
-            const rects = [...el.getClientRects()].filter(
-              (r) => r.width > 0 && r.height > 0,
-            );
-            return rects.some((a) =>
-              rects.some((b) => a.top >= b.bottom - 0.5),
-            );
-          }),
-          `stat phrase ${i} must not wrap mid-phrase`,
-        ).toBe(false);
-      }
-    };
-
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/");
     await openInfo(page, "AP Biology");
 
-    await expect(sectionsTable(page)).toHaveCount(0);
-    await expect(rowValue(page, "Multiple Choice")).toBeVisible();
-    await expect(rowValue(page, "Free Response")).toBeVisible();
+    await expect(sectionsTable(page)).toBeVisible();
+    await expect(row(page, /^Section I: Multiple Choice$/)).toBeVisible();
+    await expect(row(page, /Section II: Free Response/)).toBeVisible();
     expect(await noHorizontalScroll(page)).toBe(true);
-    await noMidPhraseWrap();
 
-    // #8 bar holds at 320px with the dialog open — the stats line may wrap
-    // BETWEEN phrases here, but never inside one.
+    // #8 bar holds at 320px with the partless dialog open.
     await page.setViewportSize({ width: 320, height: 667 });
-    await expect(rowValue(page, "Multiple Choice")).toBeVisible();
+    await expect(row(page, /^Section I: Multiple Choice$/)).toBeVisible();
     expect(await noHorizontalScroll(page)).toBe(true);
-    await noMidPhraseWrap();
+    await page.keyboard.press("Escape");
+    await expect(dialog(page)).toHaveCount(0);
+
+    // The narrowest-width guarantee the prose block gave for free ("nothing
+    // shares the line") has to be re-earned by the table: the dataset's
+    // longest section name — 89 characters, AP Business with Personal
+    // Finance — must wrap inside its cell, never clip or force page scroll.
+    await openInfo(page, "AP Business with Personal Finance");
+    const longest = sectionsTable(page)
+      .locator("tbody th[scope='row']")
+      .filter({ hasText: /^Section II, Part A: Free-Response Question 1/ });
+    await expect(longest).toHaveText(
+      "Section II, Part A: Free-Response Question 1: Business Canvas Project Exam-Day Validation",
+    );
+    const clip = await longest.evaluate((el) => ({
+      horizontal: el.scrollWidth - el.clientWidth,
+      vertical: el.scrollHeight - el.clientHeight,
+    }));
+    expect(clip.horizontal, "section name clips horizontally").toBeLessThanOrEqual(1);
+    expect(clip.vertical, "section name clips vertically").toBeLessThanOrEqual(1);
+    expect(await noHorizontalScroll(page)).toBe(true);
   });
 
   test("AC15 — the calendar event popup shares the same sections table", async ({
@@ -552,9 +508,16 @@ const evidenceCases = [
       dialog(page).getByRole("heading", { name: "Portfolio component" }),
   },
   {
+    // Issue #73 replaced AP Seminar's two invented `End-of-Course Exam –
+    // Short-Answer/Essay Section` rows (whose 13.5% / 31.5% were `30% of 45%`
+    // and `70% of 45%` multiplied out) with the three components College Board
+    // prints. Seminar therefore has parts now, so it renders the 4-column
+    // TABLE rather than the partless `dl` this case used to wait on — the
+    // readiness locator has to be a table row, not a summary row, or the
+    // screenshot is taken against an element that no longer exists.
     file: "seminar-no-mc",
     subject: "AP Seminar",
-    ready: (page: Page) => summaryRow(page, /Short-Answer Section/),
+    ready: (page: Page) => row(page, /^End-of-Course Exam$/),
   },
 ] as const;
 

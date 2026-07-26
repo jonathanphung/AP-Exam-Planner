@@ -28,25 +28,34 @@
    "quote": "Section IB: Individual Student Project—Exam Day Validation Question — 1 Question | 10 Minutes | 1.5% of Exam Score"
   },
   {
-   "name": "Section II: Short-Answer Questions",
-   "questionCount": "3",
-   "minutes": 40,
-   "weightPercent": 18,
-   "quote": "Section II: Short-Answer Questions — 3 Questions | 40 Minutes | 18% of Exam Score"
-  },
-  {
-   "name": "Section II: Document-Based Question",
-   "questionCount": "1",
-   "minutes": 45,
-   "weightPercent": 12,
-   "quote": "Section II: Document-Based Question — 1 Question | 45 Minutes | 12% of Exam Score"
+   "name": "Section II: Free Response",
+   "questionCount": "4",
+   "minutes": 85,
+   "weightPercent": 30,
+   "quote": "Section II: Free Response — 4 Questions | 1hr 25mins | 30% of Score",
+   "parts": [
+    {
+     "name": "Short-Answer Questions",
+     "questionCount": "3",
+     "minutes": 40,
+     "weightPercent": 18,
+     "quote": "Short-Answer Questions — 3 Questions | 40 Minutes | 18% of Exam Score"
+    },
+    {
+     "name": "Document-Based Question",
+     "questionCount": "1",
+     "minutes": 45,
+     "weightPercent": 12,
+     "quote": "Document-Based Question — 1 Question | 45 Minutes | 12% of Exam Score"
+    }
+   ]
   },
   {
    "name": "Individual Student Project",
    "questionCount": "n/a",
    "minutes": "pending",
    "weightPercent": 8.5,
-   "quote": "Individual Student Project — 8.5% of Exam Score (three-week independent research project with oral defense, scored by teacher rubric; no exam-day time allocation)"
+   "quote": "Individual Student Project | 8.5% of Exam Score (three-week independent research project with oral defense, scored by teacher rubric; no exam-day time allocation)"
   }
  ],
  "datasetDiscrepancies": [

@@ -1,0 +1,238 @@
+
+Running 10 tests using 2 workers
+
+  x   2 [chromium] › e2e\issue-73-qa-v4.spec.ts:205:7 › issue #73 second bounce — QA v4: the column budget holds › AC1 — the table declares its widths in CSS and the declaration is honored: fixed layout, four budgeted columns, and not the equal-quarters fallback (1.6s)
+  x   1 [chromium] › e2e\issue-73-qa-v4.spec.ts:245:7 › issue #73 second bounce — QA v4: the column budget holds › AC1 + AC2 — content cannot buy width: growing the rendered note by several hundred characters moves no column, and the note wraps inside its budget (1.9s)
+  x   3 [chromium] › e2e\issue-73-qa-v4.spec.ts:311:7 › issue #73 second bounce — QA v4: the column budget holds › AC5 — same rule in the Weight column: a printed weight grown past its budget wraps inside it and moves nothing (1.8s)
+  x   5 [chromium] › e2e\issue-73-qa-v4.spec.ts:397:7 › issue #73 second bounce — QA v4: the column budget holds › AC3 + AC4 — the reported crunch is gone on the subject Jon named, and the same budget applies to a subject with no note at all (1.4s)
+  x   6 [chromium] › e2e\issue-73-qa-v4.spec.ts:431:7 › issue #73 second bounce — QA v4: the column budget holds › AC6 — no cell is blank, and pending / verbatim / not-published stay three distinguishable states under the budget (10.9s)
+  x   4 [chromium] › e2e\issue-73-qa-v4.spec.ts:366:7 › issue #73 second bounce — QA v4: the column budget holds › AC3 — the numbers are never crowded: every adjacent pair of rendered values keeps the declared gutter, in every row of every subject that has a table (21.5s)
+  ok  8 [chromium] › e2e\issue-73-qa-v4.spec.ts:553:7 › issue #73 second bounce — QA v4: the column budget holds › AC1 — the dataset's longest section name survives the narrowest Section column, which is where the remainder is smallest (883ms)
+  x   7 [chromium] › e2e\issue-73-qa-v4.spec.ts:512:7 › issue #73 second bounce — QA v4: the column budget holds › AC1 + AC3 — the seam the budget introduces holds: the widths step from percentages to fixed units at a viewport the table width does not follow (9.0s)
+  ok  9 [chromium] › e2e\issue-73-qa-v4.spec.ts:575:7 › issue #73 second bounce — QA v4: the column budget holds › the port to a budgeted table did not cost accessibility: scoped row headers, one section prefix per part row, and no serious axe violation (5.5s)
+  ok 10 [chromium] › e2e\issue-73-qa-v4.spec.ts:629:7 › issue #73 second bounce — QA v4: the column budget holds › AC7 — evidence at the extremes: the longest note and the longest printed weight, light and dark, plus the narrowest supported width (15.2s)
+
+
+  1) [chromium] › e2e\issue-73-qa-v4.spec.ts:205:7 › issue #73 second bounce — QA v4: the column budget holds › AC1 — the table declares its widths in CSS and the declaration is honored: fixed layout, four budgeted columns, and not the equal-quarters fallback 
+
+    Error: the table still auto-sizes from its content
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "fixed"
+    Received: "auto"
+
+      222 |       };
+      223 |     });
+    > 224 |     expect(layout.tableLayout, "the table still auto-sizes from its content").toBe(
+          |                                                                               ^
+      225 |       "fixed",
+      226 |     );
+      227 |     expect(layout.cols, "no per-column budget is declared").toBe(4);
+        at C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-73-qa\e2e\issue-73-qa-v4.spec.ts:224:79
+
+    Error Context: test-results\issue-73-qa-v4-issue-73-se-4a006-the-equal-quarters-fallback-chromium\error-context.md
+
+  2) [chromium] › e2e\issue-73-qa-v4.spec.ts:245:7 › issue #73 second bounce — QA v4: the column budget holds › AC1 + AC2 — content cannot buy width: growing the rendered note by several hundred characters moves no column, and the note wraps inside its budget 
+
+    Error: 1920px: column 0 moved with the shipped note (278.75/62.44/73.45/47.36 vs control 225.3/80.64/94.88/61.19)
+
+    expect(received).toBeCloseTo(expected, precision)
+
+    Expected: 225.3
+    Received: 278.75
+
+    Expected precision:    1
+    Expected difference: < 0.05
+    Received difference:   53.44999999999999
+
+      271 |           w,
+      272 |           `${width}px: column ${i} moved with the shipped note (${before.join("/")} vs control ${control.join("/")})`,
+    > 273 |         ).toBeCloseTo(control[i], 1);
+          |           ^
+      274 |       }
+      275 |
+      276 |       // Grow it. React is not re-rendering an open dialog, so the mutation
+        at C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-73-qa\e2e\issue-73-qa-v4.spec.ts:273:11
+
+    Error Context: test-results\issue-73-qa-v4-issue-73-se-684a7-ote-wraps-inside-its-budget-chromium\error-context.md
+
+  3) [chromium] › e2e\issue-73-qa-v4.spec.ts:311:7 › issue #73 second bounce — QA v4: the column budget holds › AC5 — same rule in the Weight column: a printed weight grown past its budget wraps inside it and moves nothing 
+
+    Error: column 0 widened for the shipped printed weight (178.98/62.44/73.45/147.13 vs 225.3/80.64/94.88/61.19)
+
+    expect(received).toBeCloseTo(expected, precision)
+
+    Expected: 225.3
+    Received: 178.98
+
+    Expected precision:    1
+    Expected difference: < 0.05
+    Received difference:   46.32000000000002
+
+      328 |         w,
+      329 |         `column ${i} widened for the shipped printed weight (${before.join("/")} vs ${control.join("/")})`,
+    > 330 |       ).toBeCloseTo(control[i], 1);
+          |         ^
+      331 |     }
+      332 |
+      333 |     const grown = await dialog(page).evaluate((el) => {
+        at C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-73-qa\e2e\issue-73-qa-v4.spec.ts:330:9
+
+    Error Context: test-results\issue-73-qa-v4-issue-73-se-a1071-inside-it-and-moves-nothing-chromium\error-context.md
+
+  4) [chromium] › e2e\issue-73-qa-v4.spec.ts:366:7 › issue #73 second bounce — QA v4: the column budget holds › AC3 — the numbers are never crowded: every adjacent pair of rendered values keeps the declared gutter, in every row of every subject that has a table 
+
+    Error: rendered values are crowding their neighbour — the crunch this bounce exists to remove
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  -  1
+    + Received  + 34
+
+    - Array []
+    + Array [
+    +   "1920px african-american-studies \"Section I: Multiple Choice\" cells 1→2: 8px < 11.5px",
+    +   "1920px african-american-studies \"Section II: Free Response\" cells 1→2: 8px < 11.5px",
+    +   "1920px business-with-personal-finance \"Section I: Multiple Choice\" cells 1→2: 8px < 11.5px",
+    +   "1920px chinese-language-and-culture \"Section I: Free-Response\" cells 1→2: 8px < 11.5px",
+    +   "1920px comparative-government-and-politics \"Section II: Free Response4 free-response\" cells 1→2: 8px < 11.5px",
+    +   "1920px english-language-and-composition \"Section II: Free Response3 essays (synth\" cells 1→2: 9.89px < 11.5px",
+    +   "1920px european-history \"Section II: Document-Based Question and \" cells 1→2: 8px < 11.5px",
+    +   "1920px french-language-and-culture \"Section I: Free-Response\" cells 1→2: 9.05px < 11.5px",
+    +   "1920px french-language-and-culture \"Section II: Multiple-Choice\" cells 1→2: 8px < 11.5px",
+    +   "1920px german-language-and-culture \"Section I: Free-Response\" cells 1→2: 9.05px < 11.5px",
+    +   "1920px german-language-and-culture \"Section II: Multiple-Choice\" cells 1→2: 8px < 11.5px",
+    +   "1920px italian-language-and-culture \"Section I: Free-Response\" cells 1→2: 9.05px < 11.5px",
+    +   "1920px italian-language-and-culture \"Section II: Multiple-Choice\" cells 1→2: 8px < 11.5px",
+    +   "1920px japanese-language-and-culture \"Section I: Free-Response\" cells 1→2: 8px < 11.5px",
+    +   "1920px latin \"Section II: Free Responsetranslation, sh\" cells 1→2: 8px < 11.5px",
+    +   "1920px macroeconomics \"Section I: Multiple Choice\" cells 1→2: 8px < 11.5px",
+    +   "1920px microeconomics \"Section I: Multiple Choice\" cells 1→2: 8px < 11.5px",
+    +   "1920px music-theory \"Section I: Multiple Choice\" cells 1→2: 10.11px < 11.5px",
+    +   "1920px music-theory \"Section IIA: Free Response: Written\" cells 1→2: 10.11px < 11.5px",
+    +   "1920px psychology \"Section I: Multiple Choice\" cells 1→2: 8px < 11.5px",
+    +   "1920px psychology \"Section I: Multiple Choice\" cells 2→3: 10.22px < 11.5px",
+    +   "1920px psychology \"Section II: Free Response\" cells 1→2: 8px < 11.5px",
+    +   "1920px psychology \"Section II: Free Response\" cells 2→3: 10.22px < 11.5px",
+    +   "1920px seminar \"End-of-Course Exam — Evidence-Based argu\" cells 1→2: 8px < 11.5px",
+    +   "1920px spanish-language-and-culture \"Section I: Free-Response\" cells 1→2: 9.05px < 11.5px",
+    +   "1920px spanish-language-and-culture \"Section II: Multiple-Choice\" cells 1→2: 8px < 11.5px",
+    +   "1920px statistics \"Section I: Multiple Choice\" cells 1→2: 8px < 11.5px",
+    +   "1920px statistics \"Section II: Free Response3 multi-part qu\" cells 1→2: 8px < 11.5px",
+    +   "1920px united-states-government-and-politics \"Section I: Multiple Choice\" cells 1→2: 8px < 11.5px",
+    +   "1920px united-states-government-and-politics \"Section II: Free Response4 free-response\" cells 1→2: 8px < 11.5px",
+    +   "1920px united-states-history \"Section II: Document-Based Question and \" cells 1→2: 8px < 11.5px",
+    +   "1920px world-history-modern \"Section II: Document-Based Question and \" cells 1→2: 8px < 11.5px",
+    + ]
+
+      392 |       problems,
+      393 |       "rendered values are crowding their neighbour — the crunch this bounce exists to remove",
+    > 394 |     ).toEqual([]);
+          |       ^
+      395 |   });
+      396 |
+      397 |   test("AC3 + AC4 — the reported crunch is gone on the subject Jon named, and the same budget applies to a subject with no note at all", async ({
+        at C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-73-qa\e2e\issue-73-qa-v4.spec.ts:394:7
+
+    Error Context: test-results\issue-73-qa-v4-issue-73-se-4a16e-ry-subject-that-has-a-table-chromium\error-context.md
+
+  5) [chromium] › e2e\issue-73-qa-v4.spec.ts:397:7 › issue #73 second bounce — QA v4: the column budget holds › AC3 + AC4 — the reported crunch is gone on the subject Jon named, and the same budget applies to a subject with no note at all 
+
+    Error: comparative-government-and-politics: tightest pair {"row":"Section II: Free Response4 free-response","pair":"1→2","gap":8}
+
+    expect(received).toBeGreaterThanOrEqual(expected)
+
+    Expected: >= 11.5
+    Received:    8
+
+      413 |         worst,
+      414 |         `${subject.id}: tightest pair ${JSON.stringify(gaps.find((g) => g.gap === worst))}`,
+    > 415 |       ).toBeGreaterThanOrEqual(11.5);
+          |         ^
+      416 |       await closeInfo(page);
+      417 |     }
+      418 |
+        at C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-73-qa\e2e\issue-73-qa-v4.spec.ts:415:9
+
+    Error Context: test-results\issue-73-qa-v4-issue-73-se-d58ff-subject-with-no-note-at-all-chromium\error-context.md
+
+  6) [chromium] › e2e\issue-73-qa-v4.spec.ts:431:7 › issue #73 second bounce — QA v4: the column budget holds › AC6 — no cell is blank, and pending / verbatim / not-published stay three distinguishable states under the budget 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: "65–70"
+    Received: undefined
+
+      505 |       })),
+      506 |     );
+    > 507 |     expect(groups[0]?.text).toBe("65–70");
+          |                             ^
+      508 |     expect(groups.every((g) => g.nowrap)).toBe(true);
+      509 |     await closeInfo(page);
+      510 |   });
+        at C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-73-qa\e2e\issue-73-qa-v4.spec.ts:507:29
+
+    Error Context: test-results\issue-73-qa-v4-issue-73-se-ad85f-ble-states-under-the-budget-chromium\error-context.md
+
+  7) [chromium] › e2e\issue-73-qa-v4.spec.ts:512:7 › issue #73 second bounce — QA v4: the column budget holds › AC1 + AC3 — the seam the budget introduces holds: the widths step from percentages to fixed units at a viewport the table width does not follow 
+
+    Error: the budget breaks down at its own breakpoints
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  -  1
+    + Received  + 30
+
+    - Array []
+    + Array [
+    +   "400px comparative-government-and-politics \"Section II: Free Response4 free-response\" 1→2: 8px < 11.5px",
+    +   "400px macroeconomics \"Section I: Multiple Choice\" 1→2: 8px < 11.5px",
+    +   "400px macroeconomics \"Section II: Free Response — Long free-re\" 2→3: 11.02px < 11.5px",
+    +   "400px macroeconomics \"Section II: Free Response — Short free-r\" 2→3: 11.02px < 11.5px",
+    +   "400px business-with-personal-finance \"Section I: Multiple Choice\" 1→2: 8px < 11.5px",
+    +   "400px african-american-studies \"Section I: Multiple Choice\" 1→2: 8px < 11.5px",
+    +   "400px african-american-studies \"Section II: Free Response\" 1→2: 8px < 11.5px",
+    +   "401px comparative-government-and-politics \"Section II: Free Response4 free-response\" 1→2: 8px < 11.5px",
+    +   "401px macroeconomics \"Section I: Multiple Choice\" 1→2: 8px < 11.5px",
+    +   "401px business-with-personal-finance \"Section I: Multiple Choice\" 1→2: 8px < 11.5px",
+    +   "401px african-american-studies \"Section I: Multiple Choice\" 1→2: 8px < 11.5px",
+    +   "401px african-american-studies \"Section II: Free Response\" 1→2: 8px < 11.5px",
+    +   "639px comparative-government-and-politics \"Section II: Free Response4 free-response\" 1→2: 8px < 11.5px",
+    +   "639px macroeconomics \"Section I: Multiple Choice\" 1→2: 8px < 11.5px",
+    +   "639px macroeconomics \"Section II: Free Response — Short free-r\" 2→3: 11.36px < 11.5px",
+    +   "639px business-with-personal-finance \"Section I: Multiple Choice\" 1→2: 8px < 11.5px",
+    +   "639px african-american-studies \"Section I: Multiple Choice\" 1→2: 8px < 11.5px",
+    +   "639px african-american-studies \"Section II: Free Response\" 1→2: 8px < 11.5px",
+    +   "640px comparative-government-and-politics \"Section II: Free Response4 free-response\" 1→2: 8px < 11.5px",
+    +   "640px macroeconomics \"Section I: Multiple Choice\" 1→2: 8px < 11.5px",
+    +   "640px business-with-personal-finance \"Section I: Multiple Choice\" 1→2: 8px < 11.5px",
+    +   "640px african-american-studies \"Section I: Multiple Choice\" 1→2: 8px < 11.5px",
+    +   "640px african-american-studies \"Section II: Free Response\" 1→2: 8px < 11.5px",
+    +   "641px comparative-government-and-politics \"Section II: Free Response4 free-response\" 1→2: 8px < 11.5px",
+    +   "641px macroeconomics \"Section I: Multiple Choice\" 1→2: 8px < 11.5px",
+    +   "641px business-with-personal-finance \"Section I: Multiple Choice\" 1→2: 8px < 11.5px",
+    +   "641px african-american-studies \"Section I: Multiple Choice\" 1→2: 8px < 11.5px",
+    +   "641px african-american-studies \"Section II: Free Response\" 1→2: 8px < 11.5px",
+    + ]
+
+      548 |       }
+      549 |     }
+    > 550 |     expect(problems, "the budget breaks down at its own breakpoints").toEqual([]);
+          |                                                                       ^
+      551 |   });
+      552 |
+      553 |   test("AC1 — the dataset's longest section name survives the narrowest Section column, which is where the remainder is smallest", async ({
+        at C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-73-qa\e2e\issue-73-qa-v4.spec.ts:550:71
+
+    Error Context: test-results\issue-73-qa-v4-issue-73-se-bb5d1-table-width-does-not-follow-chromium\error-context.md
+
+  7 failed
+    [chromium] › e2e\issue-73-qa-v4.spec.ts:205:7 › issue #73 second bounce — QA v4: the column budget holds › AC1 — the table declares its widths in CSS and the declaration is honored: fixed layout, four budgeted columns, and not the equal-quarters fallback 
+    [chromium] › e2e\issue-73-qa-v4.spec.ts:245:7 › issue #73 second bounce — QA v4: the column budget holds › AC1 + AC2 — content cannot buy width: growing the rendered note by several hundred characters moves no column, and the note wraps inside its budget 
+    [chromium] › e2e\issue-73-qa-v4.spec.ts:311:7 › issue #73 second bounce — QA v4: the column budget holds › AC5 — same rule in the Weight column: a printed weight grown past its budget wraps inside it and moves nothing 
+    [chromium] › e2e\issue-73-qa-v4.spec.ts:366:7 › issue #73 second bounce — QA v4: the column budget holds › AC3 — the numbers are never crowded: every adjacent pair of rendered values keeps the declared gutter, in every row of every subject that has a table 
+    [chromium] › e2e\issue-73-qa-v4.spec.ts:397:7 › issue #73 second bounce — QA v4: the column budget holds › AC3 + AC4 — the reported crunch is gone on the subject Jon named, and the same budget applies to a subject with no note at all 
+    [chromium] › e2e\issue-73-qa-v4.spec.ts:431:7 › issue #73 second bounce — QA v4: the column budget holds › AC6 — no cell is blank, and pending / verbatim / not-published stay three distinguishable states under the budget 
+    [chromium] › e2e\issue-73-qa-v4.spec.ts:512:7 › issue #73 second bounce — QA v4: the column budget holds › AC1 + AC3 — the seam the budget introduces holds: the widths step from percentages to fixed units at a viewport the table width does not follow 
+  3 passed (51.0s)

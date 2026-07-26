@@ -2,40 +2,40 @@ import { test, expect, type Locator, type Page } from "@playwright/test";
 import { evidenceDir } from "./support/evidence";
 
 /**
- * super-board QA v2 (issue #44, Jon's PR #48 design bounce) — independent
- * verification of the partless spacious layout.
+ * super-board QA v2 (issue #44, Jon's PR #48 design bounce) — retargeted by
+ * Jon's #73 bounce onto the single presentation that replaced it.
  *
- * The bounce rule under test (parts-based, never count-based):
- *   - ANY section has published parts → the 4-column table, completely
- *     unchanged (Calculus AB, the language exams).
- *   - NO section has parts → no table, no column header: one spacious
- *     two-line block per section (bounce pass 2 — medium-weight name line
- *     above a muted left-aligned stats line that wraps only between
- *     `·`-separated stat phrases), in a group visually distinct from the
- *     metadata rows below ("Exam length", "Calculator", …).
+ * ## What this suite used to verify, and why it changed
  *
- * This suite adds coverage the builder's revision did not have:
- *   1. the CALENDAR EVENT POPUP surface renders the partless layout too
- *      (the builder's calendar-popup test only exercised the table case);
- *   2. a section `note` renders in the partless layout (Biology's FR
- *      composition note) — the old flat `frqType` strings must survive the
- *      layout switch;
- *   3. singular "1 question" inside a multi-section partless exam (AAS
- *      Section IB) — the branch rule's real test is AAS's 5 partless rows;
- *   4. the table case keeps its `mt-2` spacing above the metadata list
- *      (pixel-untouched includes the gap between table and rows below).
+ * PR #48's rule was parts-based, never count-based: an exam whose sections
+ * carried parts got the 4-column table, and an exam with NO parts got one
+ * spacious two-line block per section instead (no table, no column header —
+ * medium-weight name line above a muted left-aligned stats line that wrapped
+ * only between `·`-separated phrases). Jon's #73 bounce supersedes that: the
+ * split meant AP Human Geography presented nothing like AP Calculus BC even
+ * though every number the table needs is published for both. Every exam with
+ * sections now renders the table.
  *
- * Evidence (Jon's mandated bounce set, light AND dark) is captured to the
- * `issue-44-qa-v2` evidence folder resolved by `evidenceDir()`
- * (e2e/support/evidence.ts).
+ * The four checks below are the same four, pointed at the surviving layout:
+ *   1. the CALENDAR EVENT POPUP surface renders the table for a partless
+ *      exam too (this suite's original point: the builder's calendar-popup
+ *      test only ever exercised a part-carrying subject);
+ *   2. a section `note` still renders for a partless exam (Biology's FR
+ *      composition note) — the old flat `frqType` strings have now survived
+ *      TWO layout switches;
+ *   3. a multi-section partless exam (AP Music Theory, 3 sections) gets one
+ *      table row per section and no nested rows — the case a naive
+ *      `sections.length === 2` port would have missed;
+ *   4. the metadata list keeps its `mt-2` spacing below the table — which is
+ *      now the ONLY spacing case, since the prose block's zone divider is
+ *      gone.
  *
- * Dataset ground truth for the branch rule (verified against ap-2027.json in
- * this QA pass): 4 portfolio-only, 14 with parts, 24 partless — the partless
- * set includes AAS (5 sections), music-theory and business-with-personal-
- * finance (3 each), so a count-based branch would visibly fail them.
- * Note: Jon's bounce comment suggested Psychology / World History: Modern as
- * partless fixtures — both actually HAVE parts (Part A/B splits), so Biology
- * and AAS are the correct fixtures, as the builder's handoff flagged.
+ * Evidence is captured to the `issue-44-qa-v2` evidence folder resolved by
+ * `evidenceDir()` (e2e/support/evidence.ts).
+ *
+ * Dataset ground truth after #73 (ap-2027.json): 5 portfolio-only subjects
+ * with no sections at all, 20 with parts, 18 partless — and all 38 with
+ * sections render the identical table.
  */
 
 const EVIDENCE_DIR = evidenceDir("issue-44-qa-v2");
@@ -58,9 +58,16 @@ async function openInfo(page: Page, name: string) {
 
 const sectionsTable = (page: Page) => dialog(page).locator("table");
 
-/** A spacious/metadata row of the dialog's <dl>, by its dt text. */
-const summaryRow = (page: Page, name: string | RegExp): Locator =>
-  dialog(page).locator("dl > div").filter({ hasText: name });
+/**
+ * A section (or part) row of the sections table, by its row header.
+ *
+ * Replaces this suite's `summaryRow` (`dl > div` filtered by dt text), which
+ * read the PR #48 prose blocks — a `dl` that no longer carries sections.
+ */
+const row = (page: Page, name: string | RegExp): Locator =>
+  dialog(page)
+    .getByRole("row")
+    .filter({ has: page.getByRole("rowheader", { name }) });
 
 async function seedSelection(page: Page, ids: string[]) {
   await page.addInitScript(
@@ -76,8 +83,8 @@ async function seedDarkTheme(page: Page) {
   );
 }
 
-test.describe("issue #44 QA v2 — partless layout (PR #48 bounce), independent checks", () => {
-  test("calendar event popup (third surface) renders the partless spacious layout — no table, no column header, exact value string", async ({
+test.describe("issue #44 QA v2 — one presentation (#73 bounce, superseding PR #48), independent checks", () => {
+  test("calendar event popup (third surface) renders the table for a PARTLESS exam — the surface the original suite only ever checked with a part-carrying subject", async ({
     page,
   }) => {
     await seedSelection(page, ["biology"]);
@@ -91,118 +98,103 @@ test.describe("issue #44 QA v2 — partless layout (PR #48 bounce), independent 
 
     await expect(dialog(page)).toBeVisible();
     await expect(dialog(page)).toContainText("AP Biology");
-    // The bounce reaches this surface too: no table, no column header.
-    await expect(sectionsTable(page)).toHaveCount(0);
-    await expect(dialog(page).getByRole("columnheader")).toHaveCount(0);
-    await expect(
-      summaryRow(page, "Multiple Choice").locator("dd"),
-    ).toHaveText("60 questions · 1 h 30 min · 50% of score");
+    // #73 reaches this surface too — all three render the same InfoPanel.
+    await expect(sectionsTable(page)).toHaveCount(1);
+    await expect(dialog(page).getByRole("columnheader")).toHaveCount(4);
+    const mc = row(page, /^Section I: Multiple Choice$/);
+    await expect(mc.getByRole("cell")).toHaveText(["60", "1 h 30 min", "50%"]);
   });
 
-  test("a section note survives the layout switch: Biology's FR composition note renders as the block's third muted line, below the exact stats line", async ({
+  test("a section note survives the SECOND layout switch: Biology's FR composition note renders under the section name in the row header, below the printed title", async ({
     page,
   }) => {
     await page.goto("/");
     await openInfo(page, "AP Biology");
 
-    // Bounce pass 2: line 1 = name (dt), line 2 = stats, line 3 = note.
-    const fr = summaryRow(page, "Free Response");
-    await expect(fr.locator("dt")).toHaveText("Free Response");
-    await expect(fr.locator("dd")).toContainText(
-      "6 questions · 1 h 30 min · 50% of score",
+    const fr = row(page, /Section II: Free Response/);
+    const header = fr.getByRole("rowheader");
+    // Issue #73: the printed title carries College Board's "Section II:" prefix.
+    await expect(header).toContainText("Section II: Free Response");
+    await expect(fr.getByRole("cell")).toHaveText(["6", "1 h 30 min", "50%"]);
+
+    const note = header.getByText(
+      "6 free-response questions (2 long, 4 short)",
     );
-    const note = fr
-      .locator("dd")
-      .getByText("6 free-response questions (2 long, 4 short)");
     await expect(note).toBeVisible();
-    // The note sits on its own line BELOW the last stat phrase.
-    const lastPhrase = fr.getByTestId("stat-phrase").last();
-    const phraseBox = (await lastPhrase.boundingBox())!;
+    // The note sits on its own line BELOW the section name, not inline with it.
+    const headerBox = (await header.boundingBox())!;
     const noteBox = (await note.boundingBox())!;
-    expect(noteBox.y).toBeGreaterThanOrEqual(phraseBox.y + phraseBox.height - 1);
+    expect(noteBox.y).toBeGreaterThan(headerBox.y);
+    expect(noteBox.height).toBeLessThan(headerBox.height);
   });
 
-  test("singular '1 question' inside the 5-section partless exam (AAS Section IB), and all five blocks are two-line: name above left-aligned stats, no stat phrase ever wrapping — even for AAS's longest section name", async ({
+  // AP African American Studies was this suite's multi-section PARTLESS stress
+  // case. Issue #73 collapsed its two invented sibling "Section II:" rows into
+  // the single "Section II: Free Response" College Board prints, with the SAQ
+  // and DBQ as parts, so AAS carries part rows now. AP Music Theory is the
+  // remaining multi-section exam with NO parts — and the one subject Jon's #73
+  // bounce called out by name as proof the fix cannot be `sections.length ===
+  // 2`. It also carries the longest partless section name in the dataset.
+
+  test("a 3-section exam with NO parts (AP Music Theory) gets one table row per section and no nested rows — the case a count-based port would miss", async ({
     page,
   }) => {
     await page.goto("/");
-    await openInfo(page, "AP African American Studies");
+    await openInfo(page, "AP Music Theory");
 
-    await expect(sectionsTable(page)).toHaveCount(0);
+    await expect(sectionsTable(page)).toHaveCount(1);
+    // Exactly 3 body rows for 3 sections: no nested part rows, no placeholders.
+    await expect(sectionsTable(page).locator("tbody tr")).toHaveCount(3);
     await expect(
-      summaryRow(page, /Section IB: Individual Student Project/).locator("dd"),
-    ).toHaveText("1 question · 10 min · 1.5% of score");
+      sectionsTable(page).locator("tbody th[scope='row']"),
+    ).toHaveCount(3);
+
     await expect(
-      summaryRow(page, "Section II: Document-Based Question").locator("dd"),
-    ).toHaveText("1 question · 45 min · 12% of score");
+      row(page, /^Section I: Multiple Choice$/).getByRole("cell"),
+    ).toHaveText(["75", "1 h 20 min", "45%"]);
+    await expect(
+      row(page, /^Section IIA: Free Response: Written$/).getByRole("cell"),
+    ).toHaveText(["7", "1 h 10 min", "45%"]);
+    await expect(
+      row(page, /^Section IIB: Free Response: Sight Singing$/).getByRole("cell"),
+    ).toHaveText(["2", "10 min", "10%"]);
 
-    // Bounce pass 2: every section is a two-line block — the name line (dt,
-    // medium weight) sits fully above the stats line (dd), both left-aligned
-    // to the same edge, and no `·`-separated stat phrase ever line-breaks.
-    // AAS is the stress test: 5 blocks, including the longest section name in
-    // the dataset ("Section IB: …—Exam Day Validation Question"), which may
-    // wrap freely on its own line without squeezing the stats.
-    for (const name of [
-      "Section I: Multiple Choice",
-      /Section IB: Individual Student Project/,
-      "Section II: Short-Answer Questions",
-      "Section II: Document-Based Question",
-      /^Individual Student Project/,
-    ] as const) {
-      const block = summaryRow(page, name).first();
-      const nameBox = (await block.locator("dt").boundingBox())!;
-      const statsBox = (await block.locator("dd").boundingBox())!;
-      expect(
-        nameBox.y + nameBox.height,
-        `${String(name)}: name line must sit above the stats line`,
-      ).toBeLessThanOrEqual(statsBox.y + 1);
-      expect(
-        Math.abs(nameBox.x - statsBox.x),
-        `${String(name)}: stats must be left-aligned with the name`,
-      ).toBeLessThanOrEqual(1);
-      await expect(block.locator("dt")).toHaveCSS("font-weight", "500");
+    // The longest partless section name wraps inside its cell rather than
+    // clipping — the guarantee the prose block used to get for free.
+    const longest = sectionsTable(page)
+      .locator("tbody th[scope='row']")
+      .filter({ hasText: /Sight Singing/ });
+    const clip = await longest.evaluate((el) => ({
+      horizontal: el.scrollWidth - el.clientWidth,
+      vertical: el.scrollHeight - el.clientHeight,
+    }));
+    expect(clip.horizontal).toBeLessThanOrEqual(1);
+    expect(clip.vertical).toBeLessThanOrEqual(1);
+  });
 
-      // Mid-phrase wrap = a fragment on a fully separate line. Chromium
-      // fragments an inline span's client rects per text node (and the
-      // pending badge is its own atomic fragment), so rect count cannot
-      // detect wrapping — vertical separation can.
-      const phrases = block.getByTestId("stat-phrase");
-      const count = await phrases.count();
-      expect(count).toBeGreaterThan(0);
-      for (let i = 0; i < count; i++) {
-        expect(
-          await phrases.nth(i).evaluate((el) => {
-            const rects = [...el.getClientRects()].filter(
-              (r) => r.width > 0 && r.height > 0,
-            );
-            return rects.some((a) =>
-              rects.some((b) => a.top >= b.bottom - 0.5),
-            );
-          }),
-          `${String(name)}: stat phrase ${i} must not wrap mid-phrase`,
-        ).toBe(false);
-      }
+  test("the metadata list keeps its mt-2 gap below the table — for the part-carrying case AND the partless one, which is now the same case", async ({
+    page,
+  }) => {
+    for (const subject of ["AP Calculus AB", "AP Biology"] as const) {
+      await page.goto("/");
+      await openInfo(page, subject);
+
+      await expect(sectionsTable(page)).toBeVisible();
+      await expect(dialog(page).getByRole("columnheader")).toHaveCount(4);
+      // The metadata <dl> keeps its table-offset margin (mt-2 = 8px).
+      const marginTop = await dialog(page)
+        .locator("dl")
+        .first()
+        .evaluate((el) => getComputedStyle(el).marginTop);
+      expect(marginTop, `${subject} metadata margin`).toBe("8px");
+      // No spacious section rows leak into the <dl> for either subject — the
+      // prose block's "<n> questions · <length> · <weight>% of score" string
+      // must not survive anywhere.
+      await expect(
+        dialog(page).locator("dl > div").filter({ hasText: "% of score" }),
+        `${subject} prose leak`,
+      ).toHaveCount(0);
     }
-  });
-
-  test("table case pixel-untouched: Calculus AB keeps the 4-column table, part rows, AND the mt-2 gap above the metadata list", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    await openInfo(page, "AP Calculus AB");
-
-    await expect(sectionsTable(page)).toBeVisible();
-    await expect(dialog(page).getByRole("columnheader")).toHaveCount(4);
-    // The metadata <dl> keeps its table-offset margin (mt-2 = 8px).
-    const marginTop = await dialog(page)
-      .locator("dl")
-      .first()
-      .evaluate((el) => getComputedStyle(el).marginTop);
-    expect(marginTop).toBe("8px");
-    // And no spacious section rows leak into the <dl> for the table case.
-    await expect(
-      dialog(page).locator("dl > div").filter({ hasText: "% of score" }),
-    ).toHaveCount(0);
   });
 });
 
@@ -214,8 +206,8 @@ const viewports = [
   { name: "mobile", width: 375, height: 667 },
 ] as const;
 
-// 1 + 4: the fix itself (plain 2-section AP Biology) at the three standard
-// viewports — mobile.png IS the mobile Tier-2 partless evidence.
+// 1 + 4: the fix itself (plain 2-section AP Biology, no parts) at the three
+// standard viewports — mobile.png IS the mobile Tier-2 evidence.
 for (const vp of viewports) {
   test(`evidence — partless Biology (${vp.name} ${vp.width}x${vp.height}, light)`, async ({
     page,
@@ -223,7 +215,7 @@ for (const vp of viewports) {
     await page.setViewportSize({ width: vp.width, height: vp.height });
     await page.goto("/");
     await openInfo(page, "AP Biology");
-    await expect(summaryRow(page, "Multiple Choice").locator("dd")).toBeVisible();
+    await expect(row(page, /^Section I: Multiple Choice$/)).toBeVisible();
     await page.screenshot({ path: `${EVIDENCE_DIR}/${vp.name}.png` });
   });
 }
@@ -232,13 +224,13 @@ const evidenceCases = [
   {
     file: "biology-partless",
     subject: "AP Biology",
-    ready: (page: Page) => summaryRow(page, "Multiple Choice").locator("dd"),
+    ready: (page: Page) => row(page, /^Section I: Multiple Choice$/),
   },
   {
-    file: "aas-5-sections-partless",
-    subject: "AP African American Studies",
+    file: "music-theory-3-sections-partless",
+    subject: "AP Music Theory",
     ready: (page: Page) =>
-      summaryRow(page, "Section II: Document-Based Question").locator("dd"),
+      row(page, /^Section IIB: Free Response: Sight Singing$/),
   },
   {
     file: "calculus-ab-table-unchanged",

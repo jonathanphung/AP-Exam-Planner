@@ -14,7 +14,7 @@
  "changedFor2027": "Section I: 45 → 42 questions, 105 → 100 minutes (Part A 30q/60min → 29q/62min, Part B 15q/45min → 13q/38min). Exam Duration 3hrs 15mins → 3hrs 10mins.",
  "sections": [
   {
-   "name": "Multiple Choice",
+   "name": "Section I: Multiple Choice",
    "questionCount": "42",
    "minutes": 100,
    "weightPercent": 50,
@@ -24,20 +24,22 @@
      "name": "Part A",
      "questionCount": "29",
      "minutes": 62,
+     "weightPercent": 35,
      "toolNote": "calculator not permitted",
-     "quote": "Part A: 29 questions; 62 minutes (calculator not permitted)."
+     "quote": "Part A: 29 questions | Graphing calculator not permitted (35% of score)"
     },
     {
      "name": "Part B",
      "questionCount": "13",
      "minutes": 38,
+     "weightPercent": 15,
      "toolNote": "graphing calculator required",
-     "quote": "Part B: 13 questions; 38 minutes (graphing calculator required)."
+     "quote": "Part B: 13 questions | Graphing calculator required for some questions (15% of score)"
     }
    ]
   },
   {
-   "name": "Free Response",
+   "name": "Section II: Free Response",
    "questionCount": "6",
    "minutes": 90,
    "weightPercent": 50,
@@ -47,15 +49,17 @@
      "name": "Part A",
      "questionCount": "2",
      "minutes": 30,
+     "weightPercent": 16.7,
      "toolNote": "graphing calculator required",
-     "quote": "Part A: 2 questions; 30 minutes (graphing calculator required)."
+     "quote": "Part A: 2 problems | Graphing calculator required (16.7% of score)"
     },
     {
      "name": "Part B",
      "questionCount": "4",
      "minutes": 60,
+     "weightPercent": 33.3,
      "toolNote": "calculator not permitted",
-     "quote": "Part B: 4 questions; 60 minutes (calculator not permitted)."
+     "quote": "Part B: 4 problems | Graphing calculator not permitted (33.3% of score)"
     }
    ]
   }

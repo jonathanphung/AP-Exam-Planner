@@ -171,11 +171,13 @@ test.describe("issue #7 — export to calendar", () => {
     // timing breakdown straight from format.sections[] (the #44 model); the
     // total is phrased as hours-and-minutes with the +30 setup allowance
     // merged into that same row as OUR allowance.
+    // Issue #73: the section titles carry College Board's printed
+    // "Section <roman>:" prefix.
     expect(unfolded).toContain(
-      "Multiple Choice: 60 Questions | 90 Minutes | 50% of Score",
+      "Section I: Multiple Choice: 60 Questions | 90 Minutes | 50% of Score",
     );
     expect(unfolded).toContain(
-      "Free Response: 6 Questions | 90 Minutes | 50% of Score",
+      "Section II: Free Response: 6 Questions | 90 Minutes | 50% of Score",
     );
     expect(unfolded).toContain(
       "Total Length: 3 hours (+ 30 minutes for exam setup time)",

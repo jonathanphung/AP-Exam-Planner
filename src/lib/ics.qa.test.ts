@@ -113,14 +113,29 @@ describe("issue #7 QA — ICS export against the shipped ap-2027.json", () => {
     const seminar = uid(vcal, "seminar-exam@ap-exam-planner");
     expect(seminar).toBeDefined();
     const description = String(seminar?.getFirstPropertyValue("description"));
-    // Seminar's published sections are its two end-of-course components — the
-    // rows are exactly those, in dataset order…
+    // Seminar's published components are the three College Board's Assessment
+    // Format prints (issue #73) — the two through-course performance tasks and
+    // the end-of-course exam — with each task's components as nested part rows
+    // carrying their printed NESTED weights verbatim. "50% of 20%" is never
+    // multiplied out to "10% of Score", and the two end-of-course rows no
+    // longer carry the back-computed 13.5% / 31.5%.
     expect(description).toContain(
-      "End-of-Course Exam – Short-Answer Section: 3 Questions | 30 Minutes | 13.5% of Score",
+      "End-of-Course Exam: 4 Questions | 120 Minutes | 45% of Score",
     );
     expect(description).toContain(
-      "End-of-Course Exam – Essay Section: 1 Question | 90 Minutes | 31.5% of Score",
+      "- Understanding and analyzing an argument (3 short-answer questions): 3 Questions | 30 Minutes | 30% of 45%",
     );
+    expect(description).toContain(
+      "- Evidence-Based argument essay (1 long essay): 1 Question | 90 Minutes | 70% of 45%",
+    );
+    expect(description).toContain(
+      "Performance Task 1: Team Project and Presentation: Duration pending | 20% of Score",
+    );
+    expect(description).toContain(
+      "- Individual research report (1,200 words): 50% of 20%",
+    );
+    expect(description).not.toContain("13.5% of Score");
+    expect(description).not.toContain("31.5% of Score");
     expect(description).toContain(
       "Total Length: 2 hours (+ 30 minutes for exam setup time)",
     );

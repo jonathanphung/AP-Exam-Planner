@@ -14,14 +14,14 @@
  "changedFor2027": null,
  "sections": [
   {
-   "name": "Multiple Choice",
+   "name": "Section I: Multiple Choice",
    "questionCount": "60",
    "minutes": 60,
    "weightPercent": 50,
    "quote": "Section I: Multiple Choice — Questions: 60 — Time: 1 Hour (60 minutes) — Exam Score: 50%. Approximately 30%–40% of the multiple-choice questions will reference stimulus material, including maps, tables, charts, graphs, images, infographics, and/or landscapes."
   },
   {
-   "name": "Free Response",
+   "name": "Section II: Free Response",
    "questionCount": "3",
    "minutes": 75,
    "weightPercent": 50,

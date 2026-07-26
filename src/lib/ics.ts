@@ -7,6 +7,7 @@ import type {
 } from "../data/schema";
 import { CYCLE_YEAR } from "../data/cycle";
 import { SETUP_BUFFER_MINUTES } from "./calendar";
+import { partWeight } from "./exam-sections";
 import type { SlotResolution } from "./conflicts";
 import { resolveSlots } from "./conflicts";
 import {
@@ -227,13 +228,49 @@ function questionSegment(
  * averaged) / `"Duration pending"` for a section that exists but whose length
  * College Board has not published. Never an invented number (PRD §7.5).
  */
-function minutesSegment(minutes: ExamSection["minutes"]): string {
+function minutesSegment(
+  minutes: ExamSection["minutes"] | undefined,
+): string | undefined {
+  if (minutes === undefined) return undefined;
   return minutes === "pending" ? "Duration pending" : `${minutes} Minutes`;
 }
 
-/** One `Part A: 30 Questions | 60 Minutes (calculator not permitted)` row. */
+/**
+ * A part row's weight segment (issue #73).
+ *
+ * Mirrors the section row's `50% of Score` convention when College Board's
+ * printed denominator IS the exam score, and emits the printed string
+ * verbatim ("50% of section score", "50% of 20%") when it is not — the .ics
+ * DESCRIPTION is plain text with no room for a footnote, so an unqualified
+ * "50% of Score" on AP Macroeconomics' long free-response question would read
+ * as half the exam. A part College Board publishes no weight for drops the
+ * segment entirely, exactly as an omitted question count does.
+ */
+function partWeightSegment(part: ExamSectionPart): string | undefined {
+  const weight = partWeight(part);
+  switch (weight.kind) {
+    case "percent":
+      return `${weight.value}% of Score`;
+    case "printed":
+      return weight.text;
+    case "pending":
+      return "Weight pending";
+    case "unpublished":
+      return undefined;
+  }
+}
+
+/**
+ * One `Part A: 30 Questions | 60 Minutes | 35% of Score (calculator not
+ * permitted)` row — the same `questions | length | weight` shape as the
+ * section row above it.
+ */
 function partRow(part: ExamSectionPart): string {
-  const segments = [questionSegment(part.questionCount), minutesSegment(part.minutes)]
+  const segments = [
+    questionSegment(part.questionCount),
+    minutesSegment(part.minutes),
+    partWeightSegment(part),
+  ]
     .filter((s): s is string => s !== undefined)
     .join(" | ");
   const note = part.note ? ` (${part.note})` : "";

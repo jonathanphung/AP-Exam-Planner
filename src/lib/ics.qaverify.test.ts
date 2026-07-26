@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import ICAL from "ical.js";
 import apData from "../data/ap-2027.json";
-import type { ApDataset } from "../data/schema";
+import type { ApDataset, ExamSectionPart } from "../data/schema";
 import type { SlotResolution } from "./conflicts";
 import { buildIcsCalendar, type SessionStartTimes } from "./ics";
 
@@ -219,8 +219,27 @@ describe("issue #38 QA — real dataset, invariants re-derived", () => {
           : count === 1
             ? "1 Question"
             : `${count} Questions`;
-    const derivedMinutes = (minutes: number | string): string =>
-      minutes === "pending" ? "Duration pending" : `${minutes} Minutes`;
+    const derivedMinutes = (
+      minutes: number | string | undefined,
+    ): string | undefined =>
+      minutes === undefined
+        ? undefined
+        : minutes === "pending"
+          ? "Duration pending"
+          : `${minutes} Minutes`;
+    // Issue #73: a part row carries its published weight in the same
+    // `questions | length | weight` slot the section row uses — as `N% of
+    // Score` only when College Board's printed denominator IS the exam score,
+    // and verbatim ("50% of section score", "50% of 20%") otherwise.
+    const derivedPartWeight = (
+      part: ExamSectionPart,
+    ): string | undefined => {
+      if (part.weightPercent === "pending") return "Weight pending";
+      if (typeof part.weightPercent === "number") {
+        return `${part.weightPercent}% of Score`;
+      }
+      return part.weightPrinted;
+    };
 
     let examSubjects = 0;
     for (const subject of SUBJECTS) {
@@ -300,6 +319,7 @@ describe("issue #38 QA — real dataset, invariants re-derived", () => {
             `- ${part.name}: ${[
               derivedQuestion(part.questionCount),
               derivedMinutes(part.minutes),
+              derivedPartWeight(part),
             ]
               .filter((s) => s !== undefined)
               .join(" | ")}${part.note ? ` (${part.note})` : ""}`,
@@ -329,7 +349,7 @@ describe("issue #38 QA — real dataset, invariants re-derived", () => {
     // DESCRIPTION section breaks are the escaped literal "\n", not raw newlines
     // (biology's two section rows are adjacent in the wire format).
     expect(unfold(ics)).toContain(
-      "50% of Score\\nFree Response: 6 Questions | 90 Minutes",
+      "50% of Score\\nSection II: Free Response: 6 Questions | 90 Minutes",
     );
   });
 });

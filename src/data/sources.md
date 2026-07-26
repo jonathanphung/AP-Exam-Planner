@@ -382,8 +382,10 @@ fails CI.
 ### Normalization rules (provenance record → dataset)
 
 - **Section names verbatim** — the titles College Board prints ("Section IIB:
-  Free Response: Sight Singing"), never forced into an MCQ/FRQ mold. Two
-  records (`german-`, `italian-language-and-culture`) listed Section II before
+  Free Response: Sight Singing"), never forced into an MCQ/FRQ mold, and
+  since issue #73 including the printed `Section <roman>:` prefix on every
+  sit-down subject (see "Printed section titles" below). Two records
+  (`german-`, `italian-language-and-culture`) listed Section II before
   Section I in fetch order; the dataset restores the printed Section I/II
   order (sorting applies only when every section name carries a parseable
   "Section <roman>" prefix).
@@ -397,16 +399,25 @@ fails CI.
   `"pending"` stays literal. **Never back-computed** — AP Japanese's section
   totals stay `"pending"` even though its part times (25 + 40) are published,
   because the page prints no section total.
-- **`weightPercent`**: verbatim numbers (AP Seminar's 13.5/31.5 are the
-  page's printed "30% of 45%" / "70% of 45%" shares of the End-of-Course
-  Exam's 45%, as recorded and skeptic-verified in the provenance).
-- **`parts[]`**: present only where the page publishes a split; `toolNote`
-  carried verbatim into `note` (`"n/a"`/`"none"` → omitted).
+- **`weightPercent`** (section level): verbatim printed numbers, always the
+  share of the **exam** score. (Until issue #73 AP Seminar shipped 13.5/31.5
+  here — the printed "30% of 45%" / "70% of 45%" multiplied out. Those were
+  back-computed and are gone; see "Per-part weights" below.)
+- **`weightPercent` / `weightPrinted`** (part level, issue #73): a part carries
+  at most ONE of them, chosen by the denominator College Board printed. See
+  "Per-part weights" below — cross-denominator conversion is forbidden.
+- **`parts[]`**: present only where the page publishes a split or a printed
+  per-question breakdown; `toolNote` carried verbatim into `note`
+  (`"n/a"`/`"none"`/`null` → omitted). A part's `minutes` is **omitted** where
+  the page prints no length for it at all (AP Art History's six essay
+  questions, AP Seminar's research report) and `"pending"` where a length
+  exists but is unpublished (AP Psychology's AAQ/EBQ halves of a printed
+  70-minute section) — the same omission-vs-pending rule `questionCount` uses.
 - **No fabricated aggregates**: sub-parts are never summed into a parent the
   page does not print. AP Music Theory stays 7 + 2 in separate sections ("9"
-  appears nowhere); AP African American Studies' five components stay five
-  sections ("5" likewise). Same class of error as back-computing from the
-  total (PRD §7.5/§8/§11).
+  appears nowhere); AP African American Studies' project component is never
+  folded into an exam-day section ("5" likewise). Same class of error as
+  back-computing from the total (PRD §7.5/§8/§11).
 - **`frqType` carryover**: the old flat `frqType` composition strings (sourced
   in issues #2/#45) were kept as the free-response section's `note` for the 20
   plain two-section exams (exactly one section named like a free-response
@@ -415,14 +426,16 @@ fails CI.
   published structure supersedes the old aggregate description, several of
   which were fabricated sums.
 
-### Spot-check finding — four commentary `toolNote`s replaced with page text
+### Spot-check finding — four commentary `toolNote`s (resolved by issue #73)
 
 The `japanese-` and `spanish-language-and-culture` MC Listening/Reading part
-records carry fetcher commentary as `toolNote` ("listening/audio, no
+records carried fetcher commentary as `toolNote` ("listening/audio, no
 calculator (world language exam)", "digital exam via Bluebook") while their
-own verbatim `quote` fields print "…; **25% of Score**" — exactly the text the
-chinese record used. Those four parts use the printed weight share instead;
-every other note is verbatim from the record.
+own verbatim `quote` fields printed "…; **25% of Score**". Issue #44 worked
+around this by scraping the printed share back out of the quote inside the
+round-trip test. Issue #73 gave the weight a field of its own, so those four
+records now carry `weightPercent: 25` and no `toolNote` at all, and the
+scrape-the-quote workaround is deleted.
 
 ### Spot-check finding — four false `"pending"` values corrected (2026-07-09)
 
@@ -442,6 +455,166 @@ All four were corrected in the dataset AND in the provenance records (per-id
 and consolidated, `spotCheckPatch2026_07_09` notes), and
 `src/data/ap-2027.sections.test.ts` pins them so a future re-source cannot
 regress them back to "pending".
+
+## Printed section titles and per-part weights (issue #73)
+
+Two problems the #44 model left open, both fixed from the same 2026-07-24
+captures already committed under
+`docs/super-board/research/collegeboard-2027/pages/<id>.txt` — no new fetch.
+
+### Printed section titles (decision **D2** — Roman)
+
+College Board contradicts itself between its two pages for the same exam: the
+AP Central `/exam` page prints `Section I: Multiple Choice`, and the AP
+Students `/assessment` block on the same capture prints `Section 1:`
+(`art-history.txt:99`, `european-history.txt:105`). **AP Central's Roman form
+wins**, because AP Central is already this repo's structure source for section
+names, weights, and part splits (see the section above). 24 subjects shipped
+the un-prefixed `Multiple Choice` / `Free Response` form and now carry the
+printed one; `ap-2027.sections.test.ts` fails on any bare or Arabic-numbered
+section name.
+
+Four subjects' titles changed by more than a prefix:
+
+| Subject | Was | AP Central prints | Line |
+|---|---|---|---|
+| `computer-science-principles` | `Multiple Choice` / `Written Response` | `Section I: End-of-Course Multiple-Choice Exam` / `Section II: Create Performance Task and Written Response` | `computer-science-principles.txt:36,41` |
+| `united-states-history` | `Section II: Free Response (Document-Based Question and Long Essay)` | `Section II: Document-Based Question and Long Essay` | `united-states-history.txt:45` |
+| `world-history-modern` | `Section IA:` / `Section IB:` / `Section II: Free Response` | `Section I, Part A:` / `Section I, Part B:` / `Section II: Document-Based Question and Long Essay` | `world-history-modern.txt:33,38,45` |
+| `japanese-language-and-culture` | `Section I: Free Response` / `Section II: Multiple Choice` | `Section I: Free-Response` / `Section II: Multiple-Choice` (hyphenated, as the other five language exams already were) | `japanese-language-and-culture.txt:40,58` |
+
+`african-american-studies` lost an invented structure rather than a name: the
+dataset had two sibling `Section II:` sections (Short-Answer 18%,
+Document-Based 12%) where College Board prints **one** `Section II: Free
+Response` (4 Questions | 1hr 25mins | 30% of Score) with those two as its
+parts (`african-american-studies.txt:142-159`). Five sections → four. The
+`Individual Student Project` (8.5%) stays the separate top-level component the
+page prints it as (`:60`, `:164`).
+
+### Per-part weights (decision **D1** — the denominator is part of the datum)
+
+Before #73 the part-row weight cell was a hardcoded `––` on every subject, and
+the 13 weights the dataset did hold were smuggled into `note` free text in
+three inconsistent phrasings. They now have fields. What forced two fields
+rather than one is that College Board prints per-part weights against **three
+different denominators**:
+
+| Form | Example (verbatim) | Capture | Stored as |
+|---|---|---|---|
+| % of the **exam** score | `43.75% of exam score` | `precalculus.txt:36` | `weightPercent: 43.75` |
+| % of the **section** score | `1 long free-response question (50% of section score).` | `macroeconomics.txt:35` | `weightPrinted: "50% of section score"` |
+| % **of another %** | `50% of 20%` | `seminar.txt:42` | `weightPrinted: "50% of 20%"` |
+
+AP Macroeconomics' long free-response question is 50% of Section II, and
+Section II is 33% of the exam. Storing `50` in the exam-denominated field
+would tell a student one question is half their grade; multiplying it out to
+16.5% is exactly the back-computation `schema.ts` forbids. **Converting
+between denominators is prohibited** — the printed string ships verbatim
+instead, and `ap-2027.sections.test.ts` refuses any `weightPrinted` that is a
+bare exam-denominated share (that belongs in `weightPercent`).
+
+Where each populated weight came from — every one re-greppable in the capture,
+and asserted line-by-line by the "traces EVERY populated part weight" test:
+
+| Subject | Parts weighted | Printed as | Source block | Lines |
+|---|---|---|---|---|
+| `african-american-studies` | 2 (SAQ 18%, DBQ 12%) | exam | AP Central + AP Students | `:44,51` / `:147,159` |
+| `calculus-ab` | 4 (35 / 15 / 16.7 / 33.3) | exam | **AP Students only** — AP Central prints the part splits with no weight | `:115,117,125,127` |
+| `calculus-bc` | 4 (35 / 15 / 16.7 / 33.3) | exam | **AP Students only** | `:115,117,125,127` |
+| `chinese-language-and-culture` | 6 (20 / 15 / 7.5 / 7.5 / 25 / 25) | exam | AP Central + AP Students | `:44,47,50,53,59,61` |
+| `european-history` | 2 (DBQ 25%, Long Essay 15%) | exam | AP Central | `:48,54` |
+| `french-language-and-culture` | 5 (20 / 15 / 15 / 25 / 25) | exam | AP Central + AP Students | `:46,49,52,57,59` |
+| `german-language-and-culture` | 5 (20 / 15 / 15 / 25 / 25) | exam | AP Central + AP Students | `:46,49,52,57,59` |
+| `italian-language-and-culture` | 5 (20 / 15 / 15 / 25 / 25) | exam | AP Central + AP Students | `:47,50,53,58,60` |
+| `japanese-language-and-culture` | 6 (20 / 15 / 7.5 / 7.5 / 25 / 25) | exam | AP Central + AP Students | `:46,49,52,55,61,63` |
+| `macroeconomics` | 2 | **section** | AP Central + AP Students | `:35,36` / `:116,118` |
+| `microeconomics` | 2 | **section** | AP Central + AP Students | `:35,36` / `:116,118` |
+| `precalculus` | 4 (43.75 / 18.75 / 18.75 / 18.75) | exam | AP Central (see rounding conflict below) | `:36,37,41,46` |
+| `seminar` | 7 | **nested** | AP Central "Assessment Format" table | `:42,45,52,55,58,65,68` |
+| `spanish-language-and-culture` | 5 (20 / 15 / 15 / 25 / 25) | exam | AP Central + AP Students | `:46,49,52,57,59` |
+| `united-states-history` | 2 (DBQ 25%, Long Essay 15%) | exam | AP Central | `:48,54` |
+| `world-history-modern` | 2 (DBQ 25%, Long Essay 15%) | exam | AP Central | `:48,54` |
+
+The 13 weights that had been living in `note` free text (`"20% of Score"`,
+`"4 pre-recorded questions; 15% of Score"`, `"7.5% of Score; Questions 3 & 4
+combined 30 minutes"`) moved into the fields; each note kept only its
+non-weight content, verbatim.
+
+**21 subjects publish no per-part weight at all** and their part rows keep the
+dash. AP Art History is the one worth naming: its Section II is 50% of the
+exam across six essay questions and the capture prints **no** per-question
+weight anywhere, so the 50% is never divided by six. That is the ticket's own
+limit — Art History reaches structural parity with Calculus BC (printed
+`Section I:` / `Section II:` titles, question rows under Section II) but not
+content parity, because one exam publishes per-part weights and the other
+does not.
+
+Art History's six question titles come from the **AP Students** block, not AP
+Central. AP Central splits each label across two lines mid-sentence
+(`art-history.txt:38-39`: `Question 1` / `: Comparison is a long essay question
+that…`), which is not a usable printed heading. The AP Students block prints
+each one whole on a single line (`art-history.txt:115-120`: `Question 1: Long
+Essay–Comparison will ask you to compare…`), and the label is the text up to
+`will ask you to` — including the long/short distinction the old aggregate note
+("6 essay questions (2 long, 4 short)") carried, which is why that note could
+be dropped without losing information. Same rule as everywhere: a value ships
+only when a page prints it in a form we can quote.
+
+### Decision **D3** — merged question rows: un-merged, not summed
+
+AP Chinese modelled Questions 3 and 4 as two 7.5% rows; AP Japanese merged the
+same two published questions into one row carrying no weight. The two
+resolutions the ticket allowed were (a) keep the merge and store the summed
+15%, or (b) un-merge Japanese to match Chinese. **We un-merged.** College
+Board prints Q3 and Q4 separately at 7.5% each on both subjects
+(`japanese-language-and-culture.txt:51-56`), so option (b) needs no arithmetic
+at all, while (a) would have required a named exception to the never-sum rule.
+Both subjects now carry four identically-shaped question rows, with the joint
+`"Questions 3 & 4 combined 30 minutes"` in each writing row's note and
+`minutes: "pending"` on both — the printed 30 minutes covers the pair and is
+never split 15/15.
+
+### AP Seminar — the seven printed components
+
+AP Seminar shipped two sections whose weights (13.5% and 31.5%) were the
+printed `30% of 45%` and `70% of 45%` **multiplied out** — a back-computation
+that predates #73. The dataset now mirrors College Board's own "Assessment
+Format" table: three components at the weights the page prints (Performance
+Task 1 at 20%, Performance Task 2 at 35%, End-of-Course Exam at 45%) with
+their seven scored components as part rows carrying the nested weights
+verbatim. `portfolio` is unchanged and is a different fact — the AP Digital
+Portfolio **submission deadline** for the two through-course tasks, not their
+score share.
+
+### `precalculus` — AP Central and AP Students disagree on rounding
+
+| Page | Section I Part A | Section I Part B | Section II Parts A/B |
+|---|---|---|---|
+| AP Central (`precalculus.txt:36,37,41,46`) | `43.75% of exam score` | `18.75% of exam score` | `18.75% of exam score` |
+| AP Students (`precalculus.txt:119,121,127,129`) | `approximately 44% of score` | `approximately 19% of score` | `approximately 19% of score` |
+
+The exact figures ship. AP Central is this repo's structure source, the exact
+values sum to the published section weights (43.75 + 18.75 = 62.5;
+18.75 + 18.75 = 37.5) and the AP Students page labels its own numbers
+"approximately". The rounded pair is recorded here and nowhere else.
+
+### Captures that are not 2027-dated
+
+`art-history.txt:23` shows `Thu, May 14, 2026` — the AP Central page was still
+serving the 2026 exam date when the 2027 swap captured it, and its format
+block was carried forward into the 2027 dataset unchanged. Nothing in the Art
+History rows added by #73 depends on the date (they are question titles with
+no weight and no length), but the flag belongs on the record rather than being
+silently treated as 2027-published.
+
+### Known gap not closed here
+
+`latin.txt:57` prints a third component — `Course Project—In-Class Checkpoints
+| 2% of Exam Score` — that the dataset does not carry; its two sections are
+50% + 50%, so adding the 2% row would make the printed weights sum to 102%.
+That is College Board's own arithmetic, not ours, but reconciling it needs a
+decision this ticket did not take. Recorded here; not invented, not silently
+absorbed.
 
 ### `"pending"` inventory (re-checked against the live pages 2026-07-24)
 

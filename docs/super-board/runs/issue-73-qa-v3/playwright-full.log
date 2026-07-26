@@ -1,0 +1,60 @@
+    +         <HTTPAccessFallbackErrorBoundary pathname=\"/\" notFound={{...}} forbidden={undefined} unauthorized={undefined} ...>
+    +           <RedirectBoundary>
+    +             <RedirectErrorBoundary router={{...}}>
+    +               <InnerLayoutRouter url=\"/\" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+    +                 <SegmentViewNode type=\"page\" pagePath=\"page.tsx\">
+    +                   <SegmentTrieNode>
+    +                   <Home>
+    +                     <div data-scroll-lock-anchor={true} className=\"mx-auto fl...\">
+    +                       <Sidebar>
+    +                       <main className=\"flex min-w...\" aria-label=\"Exam planner\">
+    +                         <CatalogGrid>
+    +                           <section aria-label=\"Subject ca...\" className=\"flex flex-...\">
+    +                             <div className=\"flex flex-...\">
+    +                               <div className=\"flex flex-...\">
+    +                                 <label>
+    +                                 <input
+    +                                   id=\"subject-search\"
+    +                                   type=\"search\"
+    +                                   value=\"\"
+    +                                   onChange={function onChange}
+    +                                   placeholder=\"e.g. bio\"
+    +                                   autoComplete=\"off\"
+    +                                   className=\"min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 tex...\"
+    + -                                 style={{caret-color:\"transparent\"}}
+    +                                 >
+    +                               ...
+    +                             ...
+    +                         ...
+    +                 ...
+    +               ...
+    + ",
+    + ]
+
+      63 |       meaningfulErrors,
+      64 |       `Unexpected console errors: ${meaningfulErrors.join(", ")}`,
+    > 65 |     ).toEqual([]);
+         |       ^
+      66 |   });
+      67 | }
+      68 |
+        at C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-73-qa\e2e\qa-evidence.spec.ts:65:7
+
+    Error Context: test-results\qa-evidence-AC2-—-renders--0669e-e-errors-desktop-1920x1080--chromium\error-context.md
+
+  14 failed
+    [chromium] › e2e\issue-41-theme-toggle.spec.ts:190:5 › AC: an explicit choice stops following the OS 
+    [chromium] › e2e\issue-49-qa.spec.ts:350:5 › AC8 — mobile 375: catalog (light) + dialog open (dark), no horizontal overflow either way 
+    [chromium] › e2e\issue-60-bounce1-meta-row.spec.ts:69:7 › bounce1 — mobile: the support pair renders as a quiet meta row below the attribution, with no rule and the footer's own muted type 
+    [chromium] › e2e\issue-60-bounce1-meta-row.spec.ts:69:7 › bounce1 — tablet: the support pair renders as a quiet meta row below the attribution, with no rule and the footer's own muted type 
+    [chromium] › e2e\issue-60-qa.spec.ts:147:5 › AC2 — desktop (tall content): the sections region scrolls internally, the support row stays pinned to the bottom, and nothing shifts the page 
+    [chromium] › e2e\issue-60-qa.spec.ts:337:7 › AC4 — mobile (375px): the sidebar card ends after RESOURCES; the pair renders inside the site footer with ≥44px touch targets 
+    [chromium] › e2e\issue-60-qa.spec.ts:337:7 › AC4 — tablet (768px): the sidebar card ends after RESOURCES; the pair renders inside the site footer with ≥44px touch targets 
+    [chromium] › e2e\issue-71-exam-note.spec.ts:176:9 › issue #71 AC6 — published exam qualifier on the schedule surfaces › evidence — List and Calendar qualifier at desktop 1920x1080 with no horizontal overflow 
+    [chromium] › e2e\issue-71-exam-note.spec.ts:176:9 › issue #71 AC6 — published exam qualifier on the schedule surfaces › evidence — List and Calendar qualifier at tablet 1024x768 with no horizontal overflow 
+    [chromium] › e2e\issue-71-exam-note.spec.ts:176:9 › issue #71 AC6 — published exam qualifier on the schedule surfaces › evidence — List and Calendar qualifier at mobile 375x667 with no horizontal overflow 
+    [chromium] › e2e\issue-71-qa.spec.ts:471:9 › issue #71 QA — published qualifier on every schedule surface › evidence — qualifier on List + Calendar at desktop 1920x1080 
+    [chromium] › e2e\issue-71-qa.spec.ts:471:9 › issue #71 QA — published qualifier on every schedule surface › evidence — qualifier on List + Calendar at tablet 1024x768 
+    [chromium] › e2e\issue-71-qa.spec.ts:471:9 › issue #71 QA — published qualifier on every schedule surface › evidence — qualifier on List + Calendar at mobile 375x667 
+    [chromium] › e2e\qa-evidence.spec.ts:23:7 › AC2 — / renders header + populated main with no console errors (desktop 1920x1080) 
+  534 passed (4.3m)

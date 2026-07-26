@@ -33,16 +33,24 @@
             "weightPercent": 1.5
           },
           {
-            "name": "Section II: Short-Answer Questions",
-            "questionCount": 3,
-            "minutes": 40,
-            "weightPercent": 18
-          },
-          {
-            "name": "Section II: Document-Based Question",
-            "questionCount": 1,
-            "minutes": 45,
-            "weightPercent": 12
+            "name": "Section II: Free Response",
+            "questionCount": 4,
+            "minutes": 85,
+            "weightPercent": 30,
+            "parts": [
+              {
+                "name": "Short-Answer Questions",
+                "questionCount": 3,
+                "minutes": 40,
+                "weightPercent": 18
+              },
+              {
+                "name": "Document-Based Question",
+                "questionCount": 1,
+                "minutes": 45,
+                "weightPercent": 12
+              }
+            ]
           },
           {
             "name": "Individual Student Project",
@@ -72,17 +80,42 @@
       "format": {
         "sections": [
           {
-            "name": "Multiple Choice",
+            "name": "Section I: Multiple Choice",
             "questionCount": 80,
             "minutes": 60,
             "weightPercent": 50
           },
           {
-            "name": "Free Response",
+            "name": "Section II: Free Response",
             "questionCount": 6,
             "minutes": 120,
             "weightPercent": 50,
-            "note": "6 essay questions (2 long, 4 short)"
+            "parts": [
+              {
+                "name": "Question 1: Long Essay–Comparison",
+                "questionCount": 1
+              },
+              {
+                "name": "Question 2: Long Essay–Visual/Contextual Analysis",
+                "questionCount": 1
+              },
+              {
+                "name": "Question 3: Short Essay–Visual Analysis",
+                "questionCount": 1
+              },
+              {
+                "name": "Question 4: Short Essay–Contextual Analysis",
+                "questionCount": 1
+              },
+              {
+                "name": "Question 5: Short Essay–Attribution",
+                "questionCount": 1
+              },
+              {
+                "name": "Question 6: Short Essay–Continuity and Change",
+                "questionCount": 1
+              }
+            ]
           }
         ],
         "totalMinutes": 180,
@@ -107,13 +140,13 @@
       "format": {
         "sections": [
           {
-            "name": "Multiple Choice",
+            "name": "Section I: Multiple Choice",
             "questionCount": 60,
             "minutes": 90,
             "weightPercent": 50
           },
           {
-            "name": "Free Response",
+            "name": "Section II: Free Response",
             "questionCount": 6,
             "minutes": 90,
             "weightPercent": 50,
@@ -148,16 +181,30 @@
             "weightPercent": 60
           },
           {
-            "name": "Section II, Part A: Free-Response Question 1 (Business Canvas Project Exam-Day Validation)",
+            "name": "Section II, Part A: Free-Response Question 1: Business Canvas Project Exam-Day Validation",
             "questionCount": 1,
             "minutes": 25,
             "weightPercent": 15
           },
           {
-            "name": "Section II, Part B: Free-Response Questions 2-4",
+            "name": "Section II, Part B: Free-Response Questions 2–4",
             "questionCount": 3,
             "minutes": 65,
-            "weightPercent": 25
+            "weightPercent": 25,
+            "parts": [
+              {
+                "name": "Free-Response Question 2: Personal Finance",
+                "questionCount": 1
+              },
+              {
+                "name": "Free-Response Question 3: Business Concept Application",
+                "questionCount": 1
+              },
+              {
+                "name": "Free-Response Question 4: Business Decision",
+                "questionCount": 1
+              }
+            ]
           }
         ],
         "totalMinutes": 160,
@@ -182,7 +229,7 @@
       "format": {
         "sections": [
           {
-            "name": "Multiple Choice",
+            "name": "Section I: Multiple Choice",
             "questionCount": 42,
             "minutes": 100,
             "weightPercent": 50,
@@ -191,18 +238,20 @@
                 "name": "Part A",
                 "questionCount": 29,
                 "minutes": 62,
+                "weightPercent": 35,
                 "note": "calculator not permitted"
               },
               {
                 "name": "Part B",
                 "questionCount": 13,
                 "minutes": 38,
+                "weightPercent": 15,
                 "note": "graphing calculator required"
               }
             ]
           },
           {
-            "name": "Free Response",
+            "name": "Section II: Free Response",
             "questionCount": 6,
             "minutes": 90,
             "weightPercent": 50,
@@ -211,12 +260,14 @@
                 "name": "Part A",
                 "questionCount": 2,
                 "minutes": 30,
+                "weightPercent": 16.7,
                 "note": "graphing calculator required"
               },
               {
                 "name": "Part B",
                 "questionCount": 4,
                 "minutes": 60,
+                "weightPercent": 33.3,
                 "note": "calculator not permitted"
               }
             ]
@@ -244,7 +295,7 @@
       "format": {
         "sections": [
           {
-            "name": "Multiple Choice",
+            "name": "Section I: Multiple Choice",
             "questionCount": 42,
             "minutes": 100,
             "weightPercent": 50,
@@ -253,18 +304,20 @@
                 "name": "Part A",
                 "questionCount": 29,
                 "minutes": 62,
+                "weightPercent": 35,
                 "note": "calculator not permitted"
               },
               {
                 "name": "Part B",
                 "questionCount": 13,
                 "minutes": 38,
+                "weightPercent": 15,
                 "note": "graphing calculator required"
               }
             ]
           },
           {
-            "name": "Free Response",
+            "name": "Section II: Free Response",
             "questionCount": 6,
             "minutes": 90,
             "weightPercent": 50,
@@ -273,12 +326,14 @@
                 "name": "Part A",
                 "questionCount": 2,
                 "minutes": 30,
+                "weightPercent": 16.7,
                 "note": "graphing calculator required"
               },
               {
                 "name": "Part B",
                 "questionCount": 4,
                 "minutes": 60,
+                "weightPercent": 33.3,
                 "note": "calculator not permitted"
               }
             ]
@@ -306,13 +361,13 @@
       "format": {
         "sections": [
           {
-            "name": "Multiple Choice",
+            "name": "Section I: Multiple Choice",
             "questionCount": 60,
             "minutes": 90,
             "weightPercent": 50
           },
           {
-            "name": "Free Response",
+            "name": "Section II: Free Response",
             "questionCount": 7,
             "minutes": 105,
             "weightPercent": 50,
@@ -350,25 +405,29 @@
                 "name": "Question 1: Project Presentation",
                 "questionCount": 1,
                 "minutes": "pending",
-                "note": "20% of Score; 3 minutes prep, 3 minutes presentation"
+                "weightPercent": 20,
+                "note": "3 minutes to prepare; 3 minutes to present"
               },
               {
                 "name": "Question 2: Project Q&A",
                 "questionCount": 1,
                 "minutes": "pending",
-                "note": "15% of Score; respond to 4 pre-recorded questions, 40 seconds per response"
+                "weightPercent": 15,
+                "note": "4 pre-recorded questions; 40 seconds for each response"
               },
               {
                 "name": "Question 3: Story Narration",
                 "questionCount": 1,
                 "minutes": "pending",
-                "note": "7.5% of Score; Questions 3 & 4 combined 30 minutes"
+                "weightPercent": 7.5,
+                "note": "Questions 3 & 4 combined 30 minutes"
               },
               {
                 "name": "Question 4: Email Response",
                 "questionCount": 1,
                 "minutes": "pending",
-                "note": "7.5% of Score; Questions 3 & 4 combined 30 minutes"
+                "weightPercent": 7.5,
+                "note": "Questions 3 & 4 combined 30 minutes"
               }
             ]
           },
@@ -382,13 +441,13 @@
                 "name": "Part A: Listening",
                 "questionCount": 25,
                 "minutes": 25,
-                "note": "25% of Score"
+                "weightPercent": 25
               },
               {
                 "name": "Part B: Reading",
                 "questionCount": 30,
                 "minutes": 40,
-                "note": "25% of Score"
+                "weightPercent": 25
               }
             ]
           }
@@ -419,13 +478,13 @@
       "format": {
         "sections": [
           {
-            "name": "Multiple Choice",
+            "name": "Section I: Multiple Choice",
             "questionCount": 55,
             "minutes": 60,
             "weightPercent": 50
           },
           {
-            "name": "Free Response",
+            "name": "Section II: Free Response",
             "questionCount": 4,
             "minutes": 90,
             "weightPercent": 50,
@@ -454,13 +513,13 @@
       "format": {
         "sections": [
           {
-            "name": "Multiple Choice",
+            "name": "Section I: Multiple Choice",
             "questionCount": 42,
             "minutes": 90,
             "weightPercent": 55
           },
           {
-            "name": "Free Response",
+            "name": "Section II: Free Response",
             "questionCount": 4,
             "minutes": 90,
             "weightPercent": 45,
@@ -489,13 +548,13 @@
       "format": {
         "sections": [
           {
-            "name": "Multiple Choice",
+            "name": "Section I: End-of-Course Multiple-Choice Exam",
             "questionCount": 70,
             "minutes": 120,
             "weightPercent": 70
           },
           {
-            "name": "Written Response",
+            "name": "Section II: Create Performance Task and Written Response",
             "questionCount": 2,
             "minutes": 60,
             "weightPercent": 30,
@@ -528,13 +587,13 @@
       "format": {
         "sections": [
           {
-            "name": "Multiple Choice",
+            "name": "Section I: Multiple Choice",
             "questionCount": 60,
             "minutes": 80,
             "weightPercent": 70
           },
           {
-            "name": "Free Response",
+            "name": "Section II: Free Response",
             "questionCount": 1,
             "minutes": 50,
             "weightPercent": 30,
@@ -563,13 +622,13 @@
       "format": {
         "sections": [
           {
-            "name": "Multiple Choice",
+            "name": "Section I: Multiple Choice",
             "questionCount": 45,
             "minutes": 60,
             "weightPercent": 45
           },
           {
-            "name": "Free Response",
+            "name": "Section II: Free Response",
             "questionCount": 3,
             "minutes": 135,
             "weightPercent": 55,
@@ -633,13 +692,13 @@
       "format": {
         "sections": [
           {
-            "name": "Multiple Choice",
+            "name": "Section I: Multiple Choice",
             "questionCount": 80,
             "minutes": 90,
             "weightPercent": 60
           },
           {
-            "name": "Free Response",
+            "name": "Section II: Free Response",
             "questionCount": 3,
             "minutes": 70,
             "weightPercent": 40,
@@ -689,12 +748,14 @@
                 "name": "Document-Based Question (DBQ)",
                 "questionCount": 1,
                 "minutes": 60,
+                "weightPercent": 25,
                 "note": "includes 15-minute reading period"
               },
               {
                 "name": "Long Essay",
                 "questionCount": 1,
                 "minutes": 40,
+                "weightPercent": 15,
                 "note": "student chooses from 3 options"
               }
             ]
@@ -730,17 +791,22 @@
               {
                 "name": "Question 1: Project Presentation",
                 "questionCount": 1,
-                "minutes": "pending"
+                "minutes": "pending",
+                "weightPercent": 20,
+                "note": "3 minutes to prepare; 3 minutes to present"
               },
               {
                 "name": "Question 2: Project Q&A",
                 "questionCount": 1,
-                "minutes": "pending"
+                "minutes": "pending",
+                "weightPercent": 15,
+                "note": "4 pre-recorded questions; 40 seconds for each response"
               },
               {
                 "name": "Question 3: Argumentative Essay",
                 "questionCount": 1,
                 "minutes": 55,
+                "weightPercent": 15,
                 "note": "including 2 opportunities to listen to audio"
               }
             ]
@@ -754,12 +820,14 @@
               {
                 "name": "Part A: Listening",
                 "questionCount": 25,
-                "minutes": 40
+                "minutes": 40,
+                "weightPercent": 25
               },
               {
                 "name": "Part B: Reading",
                 "questionCount": 30,
-                "minutes": 40
+                "minutes": 40,
+                "weightPercent": 25
               }
             ]
           }
@@ -799,18 +867,22 @@
                 "name": "Question 1: Project Presentation",
                 "questionCount": 1,
                 "minutes": "pending",
-                "note": "20% of Score"
+                "weightPercent": 20,
+                "note": "3 minutes to prepare; 3 minutes to present"
               },
               {
                 "name": "Question 2: Project Q&A",
+                "questionCount": 1,
                 "minutes": "pending",
-                "note": "4 pre-recorded questions; 15% of Score"
+                "weightPercent": 15,
+                "note": "4 pre-recorded questions; 40 seconds for each response"
               },
               {
                 "name": "Question 3: Argumentative Essay",
                 "questionCount": 1,
                 "minutes": 55,
-                "note": "15% of Score"
+                "weightPercent": 15,
+                "note": "including 2 opportunities to listen to audio"
               }
             ]
           },
@@ -823,12 +895,14 @@
               {
                 "name": "Part A: Listening",
                 "questionCount": 25,
-                "minutes": 40
+                "minutes": 40,
+                "weightPercent": 25
               },
               {
                 "name": "Part B: Reading",
                 "questionCount": 30,
-                "minutes": 40
+                "minutes": 40,
+                "weightPercent": 25
               }
             ]
           }
@@ -859,13 +933,13 @@
       "format": {
         "sections": [
           {
-            "name": "Multiple Choice",
+            "name": "Section I: Multiple Choice",
             "questionCount": 60,
             "minutes": 60,
             "weightPercent": 50
           },
           {
-            "name": "Free Response",
+            "name": "Section II: Free Response",
             "questionCount": 3,
             "minutes": 75,
             "weightPercent": 50,
@@ -900,21 +974,24 @@
             "weightPercent": 50,
             "parts": [
               {
-                "name": "Project Presentation",
+                "name": "Question 1: Project Presentation",
                 "questionCount": 1,
                 "minutes": "pending",
+                "weightPercent": 20,
                 "note": "3 minutes to prepare; 3 minutes to present"
               },
               {
-                "name": "Project Q&A",
-                "questionCount": 4,
+                "name": "Question 2: Project Q&A",
+                "questionCount": 1,
                 "minutes": "pending",
+                "weightPercent": 15,
                 "note": "4 pre-recorded questions; 40 seconds for each response"
               },
               {
-                "name": "Argumentative Essay",
+                "name": "Question 3: Argumentative Essay",
                 "questionCount": 1,
                 "minutes": 55,
+                "weightPercent": 15,
                 "note": "including 2 opportunities to listen to audio"
               }
             ]
@@ -928,12 +1005,14 @@
               {
                 "name": "Part A: Listening",
                 "questionCount": 25,
-                "minutes": 40
+                "minutes": 40,
+                "weightPercent": 25
               },
               {
                 "name": "Part B: Reading",
                 "questionCount": 30,
-                "minutes": 40
+                "minutes": 40,
+                "weightPercent": 25
               }
             ]
           }
@@ -964,7 +1043,7 @@
       "format": {
         "sections": [
           {
-            "name": "Section I: Free Response",
+            "name": "Section I: Free-Response",
             "questionCount": 4,
             "minutes": "40–45",
             "weightPercent": 50,
@@ -973,23 +1052,34 @@
                 "name": "Question 1: Project Presentation",
                 "questionCount": 1,
                 "minutes": "pending",
+                "weightPercent": 20,
                 "note": "3 minutes to prepare; 3 minutes to present"
               },
               {
                 "name": "Question 2: Project Q&A",
+                "questionCount": 1,
                 "minutes": "pending",
+                "weightPercent": 15,
                 "note": "4 pre-recorded questions; 40 seconds for each response"
               },
               {
-                "name": "Question 3: Story Narration + Question 4: Email Response (Writing)",
-                "questionCount": 2,
-                "minutes": 30,
-                "note": "combined time for both writing tasks"
+                "name": "Question 3: Story Narration",
+                "questionCount": 1,
+                "minutes": "pending",
+                "weightPercent": 7.5,
+                "note": "Questions 3 & 4 combined 30 minutes"
+              },
+              {
+                "name": "Question 4: Email Response",
+                "questionCount": 1,
+                "minutes": "pending",
+                "weightPercent": 7.5,
+                "note": "Questions 3 & 4 combined 30 minutes"
               }
             ]
           },
           {
-            "name": "Section II: Multiple Choice",
+            "name": "Section II: Multiple-Choice",
             "questionCount": 55,
             "minutes": 65,
             "weightPercent": 50,
@@ -998,13 +1088,13 @@
                 "name": "Part A: Listening",
                 "questionCount": 25,
                 "minutes": 25,
-                "note": "25% of Score"
+                "weightPercent": 25
               },
               {
                 "name": "Part B: Reading",
                 "questionCount": 30,
                 "minutes": 40,
-                "note": "25% of Score"
+                "weightPercent": 25
               }
             ]
           }
@@ -1035,13 +1125,13 @@
       "format": {
         "sections": [
           {
-            "name": "Multiple Choice",
+            "name": "Section I: Multiple Choice",
             "questionCount": 52,
             "minutes": 65,
             "weightPercent": 50
           },
           {
-            "name": "Free Response",
+            "name": "Section II: Free Response",
             "questionCount": 5,
             "minutes": 115,
             "weightPercent": 50,
@@ -1070,17 +1160,28 @@
       "format": {
         "sections": [
           {
-            "name": "Multiple Choice",
+            "name": "Section I: Multiple Choice",
             "questionCount": 60,
             "minutes": 70,
             "weightPercent": 66
           },
           {
-            "name": "Free Response",
+            "name": "Section II: Free Response",
             "questionCount": 3,
             "minutes": 60,
             "weightPercent": 33,
-            "note": "3 free-response questions (1 long, 2 short)"
+            "parts": [
+              {
+                "name": "Long free-response question",
+                "questionCount": 1,
+                "weightPrinted": "50% of section score"
+              },
+              {
+                "name": "Short free-response questions",
+                "questionCount": 2,
+                "weightPrinted": "each worth 25% of section score"
+              }
+            ]
           }
         ],
         "totalMinutes": 130,
@@ -1105,17 +1206,28 @@
       "format": {
         "sections": [
           {
-            "name": "Multiple Choice",
+            "name": "Section I: Multiple Choice",
             "questionCount": 60,
             "minutes": 70,
             "weightPercent": 66
           },
           {
-            "name": "Free Response",
+            "name": "Section II: Free Response",
             "questionCount": 3,
             "minutes": 60,
             "weightPercent": 33,
-            "note": "3 free-response questions (1 long, 2 short)"
+            "parts": [
+              {
+                "name": "Long free-response question",
+                "questionCount": 1,
+                "weightPrinted": "50% of section score"
+              },
+              {
+                "name": "Short free-response questions",
+                "questionCount": 2,
+                "weightPrinted": "each worth 25% of section score"
+              }
+            ]
           }
         ],
         "totalMinutes": 130,
@@ -1202,13 +1314,13 @@
       "format": {
         "sections": [
           {
-            "name": "Multiple Choice",
+            "name": "Section I: Multiple Choice",
             "questionCount": 42,
             "minutes": 85,
             "weightPercent": 50
           },
           {
-            "name": "Free Response",
+            "name": "Section II: Free Response",
             "questionCount": 4,
             "minutes": 95,
             "weightPercent": 50,
@@ -1237,13 +1349,13 @@
       "format": {
         "sections": [
           {
-            "name": "Multiple Choice",
+            "name": "Section I: Multiple Choice",
             "questionCount": 42,
             "minutes": 85,
             "weightPercent": 50
           },
           {
-            "name": "Free Response",
+            "name": "Section II: Free Response",
             "questionCount": 4,
             "minutes": 95,
             "weightPercent": 50,
@@ -1272,13 +1384,13 @@
       "format": {
         "sections": [
           {
-            "name": "Multiple Choice",
+            "name": "Section I: Multiple Choice",
             "questionCount": 42,
             "minutes": 85,
             "weightPercent": 50
           },
           {
-            "name": "Free Response",
+            "name": "Section II: Free Response",
             "questionCount": 4,
             "minutes": 95,
             "weightPercent": 50,
@@ -1342,7 +1454,7 @@
       "format": {
         "sections": [
           {
-            "name": "Multiple Choice",
+            "name": "Section I: Multiple Choice",
             "questionCount": 42,
             "minutes": 105,
             "weightPercent": 62.5,
@@ -1351,18 +1463,20 @@
                 "name": "Part A",
                 "questionCount": 29,
                 "minutes": 65,
+                "weightPercent": 43.75,
                 "note": "calculator not permitted"
               },
               {
                 "name": "Part B",
                 "questionCount": 13,
                 "minutes": 40,
+                "weightPercent": 18.75,
                 "note": "graphing calculator required"
               }
             ]
           },
           {
-            "name": "Free Response",
+            "name": "Section II: Free Response",
             "questionCount": 4,
             "minutes": 70,
             "weightPercent": 37.5,
@@ -1371,12 +1485,14 @@
                 "name": "Part A",
                 "questionCount": 2,
                 "minutes": 35,
+                "weightPercent": 18.75,
                 "note": "graphing calculator required"
               },
               {
                 "name": "Part B",
                 "questionCount": 2,
                 "minutes": 35,
+                "weightPercent": 18.75,
                 "note": "calculator not permitted"
               }
             ]
@@ -1404,24 +1520,24 @@
       "format": {
         "sections": [
           {
-            "name": "Multiple Choice",
+            "name": "Section I: Multiple Choice",
             "questionCount": 75,
             "minutes": 90,
             "weightPercent": 66.7
           },
           {
-            "name": "Free Response",
+            "name": "Section II: Free Response",
             "questionCount": 2,
             "minutes": 70,
             "weightPercent": 33.3,
             "parts": [
               {
-                "name": "Part A - Article Analysis Question (AAQ)",
+                "name": "Free-Response Question 1: Article Analysis Question (AAQ)",
                 "questionCount": 1,
                 "minutes": "pending"
               },
               {
-                "name": "Part B - Evidence-Based Question (EBQ)",
+                "name": "Free-Response Question 2: Evidence-Based Question (EBQ)",
                 "questionCount": 1,
                 "minutes": "pending"
               }
@@ -1469,16 +1585,65 @@
       "format": {
         "sections": [
           {
-            "name": "End-of-Course Exam – Short-Answer Section",
-            "questionCount": 3,
-            "minutes": 30,
-            "weightPercent": 13.5
+            "name": "Performance Task 1: Team Project and Presentation",
+            "minutes": "pending",
+            "weightPercent": 20,
+            "parts": [
+              {
+                "name": "Individual research report (1,200 words)",
+                "weightPrinted": "50% of 20%",
+                "note": "College Board scored"
+              },
+              {
+                "name": "Team multimedia presentation and defense (8–10 minutes, plus defense questions)",
+                "weightPrinted": "50% of 20%",
+                "note": "Teacher scored (group score)"
+              }
+            ]
           },
           {
-            "name": "End-of-Course Exam – Essay Section",
-            "questionCount": 1,
-            "minutes": 90,
-            "weightPercent": 31.5
+            "name": "Performance Task 2: Individual Research-Based Essay and Presentation",
+            "minutes": "pending",
+            "weightPercent": 35,
+            "parts": [
+              {
+                "name": "Individual written argument (2,000 words)",
+                "weightPrinted": "70% of 35%",
+                "note": "College Board scored"
+              },
+              {
+                "name": "Individual multimedia presentation (6–8 minutes)",
+                "weightPrinted": "20% of 35%",
+                "note": "Teacher scored"
+              },
+              {
+                "name": "Oral defense (2 questions from the teacher)",
+                "weightPrinted": "10% of 35%",
+                "note": "Teacher scored"
+              }
+            ]
+          },
+          {
+            "name": "End-of-Course Exam",
+            "questionCount": 4,
+            "minutes": 120,
+            "weightPercent": 45,
+            "parts": [
+              {
+                "name": "Understanding and analyzing an argument (3 short-answer questions)",
+                "questionCount": 3,
+                "minutes": 30,
+                "weightPrinted": "30% of 45%",
+                "note": "suggested time; College Board scored"
+              },
+              {
+                "name": "Evidence-Based argument essay (1 long essay)",
+                "questionCount": 1,
+                "minutes": 90,
+                "weightPrinted": "70% of 45%",
+                "note": "suggested time; College Board scored"
+              }
+            ]
           }
         ],
         "totalMinutes": 120,
@@ -1516,19 +1681,22 @@
                 "name": "Question 1: Project Presentation",
                 "questionCount": 1,
                 "minutes": "pending",
+                "weightPercent": 20,
                 "note": "3 minutes to prepare; 3 minutes to present"
               },
               {
                 "name": "Question 2: Project Q&A",
                 "questionCount": 1,
                 "minutes": "pending",
-                "note": "responding to 4 pre-recorded questions, 40 seconds per response"
+                "weightPercent": 15,
+                "note": "4 pre-recorded questions; 40 seconds for each response"
               },
               {
                 "name": "Question 3: Argumentative Essay",
                 "questionCount": 1,
                 "minutes": 55,
-                "note": "55 minutes, including 2 opportunities to listen to audio"
+                "weightPercent": 15,
+                "note": "including 2 opportunities to listen to audio"
               }
             ]
           },
@@ -1542,13 +1710,13 @@
                 "name": "Part A: Listening",
                 "questionCount": 25,
                 "minutes": 40,
-                "note": "25% of Score"
+                "weightPercent": 25
               },
               {
                 "name": "Part B: Reading",
                 "questionCount": 30,
                 "minutes": 40,
-                "note": "25% of Score"
+                "weightPercent": 25
               }
             ]
           }
@@ -1631,13 +1799,13 @@
       "format": {
         "sections": [
           {
-            "name": "Multiple Choice",
+            "name": "Section I: Multiple Choice",
             "questionCount": 42,
             "minutes": 90,
             "weightPercent": 50
           },
           {
-            "name": "Free Response",
+            "name": "Section II: Free Response",
             "questionCount": 4,
             "minutes": 90,
             "weightPercent": 50,
@@ -1666,13 +1834,13 @@
       "format": {
         "sections": [
           {
-            "name": "Multiple Choice",
+            "name": "Section I: Multiple Choice",
             "questionCount": 55,
             "minutes": 80,
             "weightPercent": 50
           },
           {
-            "name": "Free Response",
+            "name": "Section II: Free Response",
             "questionCount": 4,
             "minutes": 100,
             "weightPercent": 50,
@@ -1713,7 +1881,7 @@
             "weightPercent": 20
           },
           {
-            "name": "Section II: Free Response (Document-Based Question and Long Essay)",
+            "name": "Section II: Document-Based Question and Long Essay",
             "questionCount": 2,
             "minutes": 100,
             "weightPercent": 40,
@@ -1722,12 +1890,14 @@
                 "name": "Document-Based Question (DBQ)",
                 "questionCount": 1,
                 "minutes": 60,
+                "weightPercent": 25,
                 "note": "Recommended Time: 1 Hour (includes 15-minute reading period)"
               },
               {
                 "name": "Long Essay",
                 "questionCount": 1,
                 "minutes": 40,
+                "weightPercent": 15,
                 "note": "Recommended time; student chooses from 3 options"
               }
             ]
@@ -1755,19 +1925,19 @@
       "format": {
         "sections": [
           {
-            "name": "Section IA: Multiple Choice",
+            "name": "Section I, Part A: Multiple Choice",
             "questionCount": 55,
             "minutes": 55,
             "weightPercent": 40
           },
           {
-            "name": "Section IB: Short Answer",
+            "name": "Section I, Part B: Short Answer",
             "questionCount": 3,
             "minutes": 40,
             "weightPercent": 20
           },
           {
-            "name": "Section II: Free Response",
+            "name": "Section II: Document-Based Question and Long Essay",
             "questionCount": 2,
             "minutes": 100,
             "weightPercent": 40,
@@ -1776,12 +1946,14 @@
                 "name": "Document-Based Question",
                 "questionCount": 1,
                 "minutes": 60,
+                "weightPercent": 25,
                 "note": "Recommended Time: 60 Minutes (includes 15-minute reading period)"
               },
               {
                 "name": "Long Essay Question",
                 "questionCount": 1,
-                "minutes": 40
+                "minutes": 40,
+                "weightPercent": 15
               }
             ]
           }

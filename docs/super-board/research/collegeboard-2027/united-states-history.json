@@ -26,7 +26,7 @@
    "quote": "3 Questions | 40 Minutes | 20% of Exam Score"
   },
   {
-   "name": "Section II: Free Response (Document-Based Question and Long Essay)",
+   "name": "Section II: Document-Based Question and Long Essay",
    "questionCount": "2",
    "minutes": 100,
    "weightPercent": 40,
@@ -36,15 +36,17 @@
      "name": "Document-Based Question (DBQ)",
      "questionCount": "1",
      "minutes": 60,
+     "weightPercent": 25,
      "toolNote": "Recommended Time: 1 Hour (includes 15-minute reading period)",
-     "quote": "Recommended Time: 1 Hour (includes 15-minute reading period) | 25% of Exam Score"
+     "quote": "Document-Based Question (DBQ): Recommended Time: 1 Hour (includes 15-minute reading period) | 25% of Exam Score"
     },
     {
      "name": "Long Essay",
      "questionCount": "1",
      "minutes": 40,
+     "weightPercent": 15,
      "toolNote": "Recommended time; student chooses from 3 options",
-     "quote": "Recommended time: 40 Minutes | 15% of Exam Score"
+     "quote": "Long Essay: Recommended time: 40 Minutes | 15% of Exam Score"
     }
    ]
   }
