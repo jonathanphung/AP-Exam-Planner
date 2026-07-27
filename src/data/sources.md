@@ -3,7 +3,10 @@
 Every value in `ap-2027.json` was taken from a College Board page fetched on
 **2026-07-24** (the file's `lastVerified` date) during the annual dataset swap
 (issue #37). Nothing is estimated; any value College Board has not published is
-the literal string `"pending"` (PRD §7.5/§8/§11).
+**omitted**, and the surfaces render it as the not-published dash
+(PRD §7.5/§8/§11). Until issue #84 (2026-07-25) unpublished values could also
+be the literal string `"pending"`; see "Issue #84" below for the re-verification
+that retired that state and for the per-value citations.
 
 **No value was carried over from `ap-2026.json` unverified.** Every subject's
 AP Central exam page and AP Students assessment page was re-fetched and diffed
@@ -54,8 +57,8 @@ No 2027 administration has happened, so the most recent published distributions
 are still the **2026 administration** tables — the same source the 2026 dataset
 used. Every `passRate` was re-read from the live tables on 2026-07-24 and
 matched the shipped value for all 40 subjects with a published distribution.
-The three Career Kickstart courses have no administrations yet and are
-`"pending"`.
+The three Career Kickstart courses have no administrations yet, so their
+`passRate` is omitted and each carries a sourced `passRateNote` (issue #84).
 
 ## Session start times
 
@@ -94,7 +97,8 @@ under, and guessing one would be an invented time.
   testing Mon May 17 Session 1. No AP Central exam page and no AP Students
   assessment page exists for it yet (both 404 on 2026-07-24) — the course is in
   its third and final pilot in 2026-27 and launches in fall 2027 — so its whole
-  `format` block is `"pending"` and `examNote` carries the published pilot-only
+  `format` block is omitted (re-checked live 2026-07-25: `/exam` still 404s) and
+  `examNote` carries the published pilot-only
   restriction. Its official page is the adoption page,
   <https://apcentral.collegeboard.org/courses/ap-networking/adopt>.
 - **No course was removed or renamed.** The other 42 ids are unchanged, so no
@@ -153,7 +157,8 @@ other subject's policy changed.
 - **New:** `chinese-`, `french-`, `german-`, `italian-`,
   `japanese-language-and-culture`, and `spanish-language-and-culture` now carry
   a portfolio entry for the **Personalized Project Reference (PPR)**, due
-  **2027-04-30**, 11:59 p.m. ET. `weightPct` is `"pending"`: College Board
+  **2027-04-30**, 11:59 p.m. ET. `weightPct` is **omitted** (issue #84;
+  `"pending"` until then): College Board
   publishes no separate score weight for the PPR itself (it is the reference
   students use during the Project Presentation and Project Q&A questions, which
   are weighted as part of the exam). The deadline is printed on each of those
@@ -215,7 +220,7 @@ each subject below cites its file. The one exception to "exam page" is AP
 Networking — no AP Central exam page and no AP Students assessment page exists
 for it yet, so its capture is the adoption page
 (<https://apcentral.collegeboard.org/courses/ap-networking/adopt>) and its whole
-`format` block is `"pending"`.
+`format` block is omitted.
 
 | subject | field | was | now | verbatim source quote |
 |---|---|---|---|---|
@@ -389,16 +394,17 @@ fails CI.
   Section I in fetch order; the dataset restores the printed Section I/II
   order (sorting applies only when every section name carries a parseable
   "Section <roman>" prefix).
-- **`questionCount`**: numeric string → number; `"pending"` stays literal;
-  `"n/a"` → the field is **omitted** (the page prints no count — a project is
-  not a question set); descriptive text (`"4 pre-recorded questions"`) → field
-  omitted, text carried into the row's `note`. Omission ≠ "pending": omission
-  means the concept does not apply, "pending" means unpublished.
+- **`questionCount`**: numeric string → number; `"n/a"` or `null` → the field
+  is **omitted** (the page prints no count — a project is not a question set);
+  descriptive text (`"4 pre-recorded questions"`) → field omitted, text carried
+  into the row's `note`. A `"pending"` in a provenance record now THROWS
+  (issue #84): the state is retired, so re-introducing one has to be a loud
+  failure rather than a silent fourth case.
 - **`minutes`**: numbers verbatim; hyphenated published ranges normalized to
-  the en-dash form the popup renders verbatim (`"40-45"` → `"40–45"`);
-  `"pending"` stays literal. **Never back-computed** — AP Japanese's section
-  totals stay `"pending"` even though its part times (25 + 40) are published,
-  because the page prints no section total.
+  the en-dash form the popup renders verbatim (`"40-45"` → `"40–45"`); `null`
+  or absent → the field is **omitted**. **Never back-computed** — AP Japanese's
+  section totals stay omitted even though its part times (25 + 40) are
+  published, because the page prints no section total.
 - **`weightPercent`** (section level): verbatim printed numbers, always the
   share of the **exam** score. (Until issue #73 AP Seminar shipped 13.5/31.5
   here — the printed "30% of 45%" / "70% of 45%" multiplied out. Those were
@@ -411,11 +417,12 @@ fails CI.
   change.)
 - **`parts[]`**: present only where the page publishes a split or a printed
   per-question breakdown; `toolNote` carried verbatim into `note`
-  (`"n/a"`/`"none"`/`null` → omitted). A part's `minutes` is **omitted** where
-  the page prints no length for it at all (AP Art History's six essay
-  questions, AP Seminar's research report) and `"pending"` where a length
-  exists but is unpublished (AP Psychology's AAQ/EBQ halves of a printed
-  70-minute section) — the same omission-vs-pending rule `questionCount` uses.
+  (`"n/a"`/`"none"`/`null` → omitted). A part's `minutes` is **omitted**
+  wherever the page prints no length for it — AP Art History's six essay
+  questions, AP Seminar's research report, and (since issue #84 re-verified
+  them) AP Psychology's AAQ/EBQ halves and the world-language project speaking
+  questions, whose printed prep/response phrasing lives in the row's `note`
+  instead.
 - **No fabricated aggregates**: sub-parts are never summed into a parent the
   page does not print. AP Music Theory stays 7 + 2 in separate sections ("9"
   appears nowhere); AP African American Studies' project component is never
@@ -599,9 +606,9 @@ Board prints Q3 and Q4 separately at 7.5% each on both subjects
 (`japanese-language-and-culture.txt:51-56`), so option (b) needs no arithmetic
 at all, while (a) would have required a named exception to the never-sum rule.
 Both subjects now carry four identically-shaped question rows, with the joint
-`"Questions 3 & 4 combined 30 minutes"` in each writing row's note and
-`minutes: "pending"` on both — the printed 30 minutes covers the pair and is
-never split 15/15.
+`"Questions 3 & 4 combined 30 minutes"` in each writing row's note and no
+`minutes` on either (issue #84; `"pending"` until then) — the printed 30
+minutes covers the pair and is never split 15/15.
 
 ### AP Seminar — the seven printed components
 
@@ -652,30 +659,71 @@ That is College Board's own arithmetic, not ours, but reconciling it needs a
 decision this ticket did not take. Recorded here; not invented, not silently
 absorbed.
 
-### `"pending"` inventory (re-checked against the live pages 2026-07-24)
+## Issue #84 — the 33 `"pending"` values, resolved (live re-verification 2026-07-25)
 
-Genuinely unpublished values — each was hunted for a "false pending" by an
-independent refute-skeptic and survived, then re-verified by the builder
-against the live page's raw HTML:
+`"pending"` used to be this dataset's third state: not "College Board prints
+nothing" (that is omission, rendered as the not-published dash) but "College
+Board prints a figure this capture does not have". It was an accusation against
+the capture, and #73 was explicit that it must never be conflated with
+omission.
 
-| Subject | Field | URL checked |
-|---|---|---|
-| `african-american-studies` | "Individual Student Project" section `minutes` (its `questionCount` is omitted — the page prints none; the project is completed during the course) | <https://apcentral.collegeboard.org/courses/ap-african-american-studies/exam> |
-| `italian-language-and-culture` | Project Presentation / Project Q&A part `minutes` (the section's 65–70 and the Argumentative Essay's 55 ARE published — see spot-check above) | <https://apcentral.collegeboard.org/courses/ap-italian-language-and-culture/exam> |
-| `japanese-language-and-culture` | Section I Questions 1–2 part `minutes` (the page prints prep/response descriptors — "3 minutes to prepare; 3 minutes to present", "40 seconds for each response" — not single per-part figures; the printed combined 30-minute writing figure IS captured on the merged writing part) | <https://apcentral.collegeboard.org/courses/ap-japanese-language-and-culture/exam> |
-| `chinese-language-and-culture` | Section I parts (Questions 1–4) `minutes` (same prep/response descriptors; the printed "30 minutes to complete both writing tasks (Questions 3 and 4)" is a combined figure carried in those parts' notes, never split 15/15) | <https://apcentral.collegeboard.org/courses/ap-chinese-language-and-culture/exam> |
-| `french-language-and-culture` | Section I Questions 1–2 part `minutes` (Question 3 is published: 55 — see spot-check above) | <https://apcentral.collegeboard.org/courses/ap-french-language-and-culture/exam> |
-| `german-language-and-culture` | Section I Questions 1–2 part `minutes` (Question 3 is published: 55) | <https://apcentral.collegeboard.org/courses/ap-german-language-and-culture/exam> |
-| `spanish-language-and-culture` | Section I Questions 1–2 part `minutes` (Question 3 is published: 55) | <https://apcentral.collegeboard.org/courses/ap-spanish-language-and-culture/exam> |
-| `psychology` | Free Response parts (AAQ / EBQ) `minutes` (only the section's 70 is printed; it is never divided between the two questions) | <https://apcentral.collegeboard.org/courses/ap-psychology/exam> |
-| `networking` | the ENTIRE `format` block — `sections: []`, `totalMinutes`, `calculator`, `delivery` — plus `passRate` | <https://apcentral.collegeboard.org/courses/ap-networking/adopt> (no `/exam` page and no AP Students assessment page exists; both 404 on 2026-07-24) |
-| `business-with-personal-finance`, `cybersecurity`, `networking` | `passRate` | no administration has happened, so no score distribution exists |
-| the six world-language courses with a PPR | `portfolio.weightPct` | the PPR deadline is published; no separate score weight for it is |
+Issue #84 re-fetched the live page behind **every one of the 33** on
+**2026-07-25** — not the committed capture, which is what produced the state in
+the first place — and asked the only question that matters: does College Board
+print this figure anywhere? For all 33 the answer was no. So each is now an
+omitted field rendering the dash, the `"pending"` state is gone from the schema
+and from every surface, and `ap-2027.test.ts` fails if the string reappears
+anywhere in the JSON.
+
+**Split: 0 filled, 33 unpublished.** That is a suspicious-looking result and it
+is meant to be checkable rather than taken on trust — the URL, the finding, and
+the reason it is not a fill are per row below, and each affected provenance
+record carries the same finding in a `pendingResolved2026_07_25` field.
+
+| Subject | Field(s) | Count | What the live page prints | Why not a fill |
+|---|---|---|---|---|
+| `chinese-language-and-culture` | Section I Questions 1–4 `minutes` | 4 | "(3 minutes to prepare; 3 minutes to present.)", "(40 seconds for each response.)", "Students have 30 minutes to complete both writing tasks (Questions 3 and 4)" | No per-question duration exists. 3 + 3, 4 × 40 s, and 30 ÷ 2 are all sums or splits the never-back-compute rule forbids; each printed phrase already ships verbatim in that row's `note`. <https://apcentral.collegeboard.org/courses/ap-chinese-language-and-culture/exam> |
+| `japanese-language-and-culture` | Section I Questions 1–4 `minutes` | 4 | identical to Chinese | same |
+| `french-`, `german-`, `italian-`, `spanish-language-and-culture` | Section I Questions 1–2 `minutes` | 2 each (8) | the same two parentheticals; Question 3 (Argumentative Essay) prints 55 and is already stored | Questions 1–2 print no duration. The published 55 was never pending. |
+| the six world-language courses | `portfolio.weightPct` | 6 | the PPR deadline ("Fri, Apr 30, 2027 — 11:59 PM ET") and nothing about scoring | College Board publishes no weight for the Personalized Project Reference: it is the reference students use during the Project Presentation and Project Q&A, which are weighted inside the exam. The row's `note` says exactly that. |
+| `african-american-studies` | "Individual Student Project" section `minutes` | 1 | "Individual Student Project \| 8.5% of Exam Score" plus "Students complete a 3-week project…" | The Exam Format block times Multiple Choice (70), the Validation Question (10), the SAQs (40) and the DBQ (45). The project itself has no exam-day time allocation. <https://apcentral.collegeboard.org/courses/ap-african-american-studies/exam> |
+| `psychology` | Free-Response AAQ / EBQ part `minutes` | 2 | "2 Questions \| 70 Minutes \| 33.3% of Exam Score" and no per-question time | The 70 minutes belongs to the section and is never divided between the two questions. <https://apcentral.collegeboard.org/courses/ap-psychology/exam> |
+| `seminar` | Performance Task 1 and 2 section `minutes` | 2 | an Assessment Format table with columns Component \| Scoring Method \| Weight — no duration column | Both are through-course tasks with no exam-day allocation. The "8–10 minutes" / "6–8 minutes" presentation lengths are part of the component NAMES and already ship verbatim. <https://apcentral.collegeboard.org/courses/ap-seminar/exam> |
+| `networking` | `format.totalMinutes`, `format.calculator`, `format.delivery` | 3 | nothing — `/courses/ap-networking/exam` returned **HTTP 404** on 2026-07-25, as it did on 2026-07-24 | There is no exam page to read. The `examNote` carries the published pilot-only restriction. |
+| `business-with-personal-finance`, `cybersecurity`, `networking` | `passRate` | 3 | the 2026 score-distribution tables list ~50 exams and none of these three | No administration has happened. See the pass-rate decision below. <https://apstudents.collegeboard.org/about-ap-scores/score-distributions> |
 
 Slug exception (as everywhere): AP Business with Personal Finance lives at
 `ap-business-personal-finance`.
 
-A **nonexistent** section is never `"pending"`: AP Seminar simply has no
+### The pass-rate decision (issue #84 AC4)
+
+A dash means "College Board publishes nothing here". For a course that has
+never been administered that is true today and will be false the first time
+scores are released, so the ticket asked for an explicit choice between three
+options: (1) dash them like everything else, (2) keep a distinct state for "not
+yet administered", (3) drop the Pass rate row for those subjects.
+
+**Chosen: (1), plus a sourced reason.** The row stays, the cell shows the same
+dash every other unpublished cell shows, and the subject carries a
+`passRateNote` saying why nothing is published — sourced from the AP Career
+Kickstart timeline ("FALL 2026 · AP Business with Personal Finance launches",
+"MAY 2027 · AP Business with Personal Finance, AP Cybersecurity Exams
+administered", "MAY 2028 · AP Networking Exam administered",
+<https://apcentral.collegeboard.org/courses/ap-career-kickstart>, re-read
+2026-07-25).
+
+Why not (3): the ticket's own constraint forbids it — "do not delete a row to
+make a value disappear; the row stays and the cell says what is true" (PRD
+§7.5). Why not (2): it keeps a second badge, which is the thing this card
+removes. The objection to (1) — that it goes stale when scores publish — is
+true of every dash in an annual dataset and is handled by the swap, which now
+also has a test that fails if `"pending"` reappears. The note is what stops a
+dash on a brand-new course reading as a bug in this app rather than a fact
+about College Board. `passRateNote` is only valid with an ABSENT `passRate`;
+the schema rejects the pair, so it can never become a place to editorialize
+about a published number.
+
+A **nonexistent** section is never an unpublished one: AP Seminar simply has no
 multiple-choice section, and the four portfolio-only subjects (AP Drawing,
 2-D/3-D Art and Design, AP Research) have `sections: []` — the popup shows
 their portfolio information instead of an empty or zeroed table.
@@ -701,8 +749,9 @@ Cybersecurity Exams administered" — and puts AP Networking's own launch in fal
 the 2027 AP Networking administration is pilot-only and why no exam page for it
 exists yet.
 
-None of the three has a score distribution, so all three keep
-`passRate: "pending"`. No subject carries a `noExamReason` in this cycle.
+None of the three has a score distribution, so all three omit `passRate` and
+carry a sourced `passRateNote` instead (issue #84 — see the pass-rate decision
+above). No subject carries a `noExamReason` in this cycle.
 
 ## Official course/exam pages (issue #22 — Tier 3 links)
 

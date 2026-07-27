@@ -38,8 +38,8 @@ type Subject = {
   lateTesting: Slot;
   portfolio: { deadline: string } | null;
   examNote?: string;
-  passRate: number | "pending";
-  format: { totalMinutes: number | "pending"; sections: unknown[] };
+  passRate?: number;
+  format: { totalMinutes?: number; sections: unknown[] };
 };
 const DATASET = apData as unknown as {
   cycle: string;
@@ -56,8 +56,8 @@ const DATED = SUBJECTS.find(
   (s) => s.exam !== null && typeof s.passRate === "number",
 )!;
 /** A subject College Board schedules but publishes no exam format for. */
-const PENDING_FORMAT = SUBJECTS.find(
-  (s) => s.exam !== null && s.format.totalMinutes === "pending",
+const NO_PUBLISHED_FORMAT = SUBJECTS.find(
+  (s) => s.exam !== null && s.format.totalMinutes === undefined,
 );
 
 const SELECTION_KEY = "apx.selection.v1";
@@ -254,12 +254,12 @@ test.describe("issue #37 — annual dataset swap to the May 2027 cycle", () => {
     }
   });
 
-  test("AC1/AC4 — an unpublished value renders as a visible pending badge, never a fabricated one", async ({
+  test("AC1/AC4 — an unpublished value renders as a visible dash, never a fabricated number", async ({
     page,
   }) => {
     test.skip(
-      !PENDING_FORMAT,
-      "no scheduled subject ships a fully pending format this cycle",
+      !NO_PUBLISHED_FORMAT,
+      "no scheduled subject ships an entirely unpublished format this cycle",
     );
     await page.goto("/");
 
@@ -272,18 +272,21 @@ test.describe("issue #37 — annual dataset swap to the May 2027 cycle", () => {
     await expect(dialog).toContainText(`${DATED.passRate as number}%`);
     await page.keyboard.press("Escape");
 
-    // Unpublished format renders as pending, with no invented numbers.
-    await expandChip(page, PENDING_FORMAT!);
+    // An unpublished value renders as the dash + its sr-only text, with no
+    // invented numbers and — since issue #84 — no "pending" badge anywhere.
+    await expandChip(page, NO_PUBLISHED_FORMAT!);
     await page
       .getByRole("button", {
-        name: `View exam details for ${PENDING_FORMAT!.name}`,
+        name: `View exam details for ${NO_PUBLISHED_FORMAT!.name}`,
       })
       .click();
     dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
-    await expect(dialog.getByText(/pending/i).first()).toBeVisible();
+    await expect(dialog.getByText("none published").first()).toHaveCount(1);
+    await expect(dialog.getByText("pending", { exact: true })).toHaveCount(0);
+    await expect(dialog).not.toContainText("%");
     // No section table can appear for an exam with no published sections.
-    expect(PENDING_FORMAT!.format.sections).toHaveLength(0);
+    expect(NO_PUBLISHED_FORMAT!.format.sections).toHaveLength(0);
   });
 
   test("AC6 — the ICS export is named for the new cycle and its dates land in the published 2027 windows", async ({

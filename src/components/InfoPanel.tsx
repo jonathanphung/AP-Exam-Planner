@@ -25,9 +25,8 @@ import { ArrowUpRightIcon } from "@/components/ArrowUpRightIcon";
  * Sections render exactly what College Board publishes (issue #44): an exam
  * that lacks a section omits it (AP Seminar shows no multiple-choice row),
  * and a portfolio-only subject renders NO section table at all — its
- * portfolio block carries the story instead. Omission and "not yet
- * published" are different states: only genuinely unpublished values show
- * the "pending" badge.
+ * portfolio block carries the story instead. Any cell College Board publishes
+ * no value for renders {@link NotPublishedDash}.
  *
  * ONE presentation for every exam (Jon's #73 bounce, 2026-07-25). Every
  * subject with at least one published section renders {@link SectionsTable};
@@ -50,22 +49,28 @@ import { ArrowUpRightIcon } from "@/components/ArrowUpRightIcon";
  *   - restores focus to the invoking element on close,
  *   - locks background scroll while open.
  *
- * Data rule (PROJECT.md / PRD §7.5): any `"pending"` value renders as a visible
- * muted badge — never blank, never a fabricated number.
+ * Data rule (PROJECT.md / PRD §7.5): a value College Board does not publish
+ * renders as {@link NotPublishedDash} — never blank, never a fabricated
+ * number, and never a deleted row.
+ *
+ * ## Issue #84 (2026-07-25) — one unpublished state, not two
+ *
+ * This panel used to have a second affordance: a muted `pending` pill, for a
+ * value College Board publishes that our capture had missed. The two said
+ * genuinely different things — the dash accuses College Board of printing
+ * nothing, the pill accused US of missing something — and #73 was right to
+ * keep them apart. What changed is the evidence, not the principle: all 33
+ * pill-wearing values were re-checked against the live College Board pages on
+ * 2026-07-25 and every one of them turned out to be unpublished, so the pill
+ * had no members and its component is gone with them. The reasoning is kept
+ * here because the NEXT capture will hit the same fork, and the answer is now
+ * "verify the page, then either fill the number or dash it" — not "add the
+ * badge back".
  */
 
 interface InfoPanelProps {
   subject: ApSubject;
   onClose: () => void;
-}
-
-/** Muted badge for any value College Board has not yet published. */
-function PendingBadge() {
-  return (
-    <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400">
-      pending
-    </span>
-  );
 }
 
 /** One label/value row inside the format description list. */
@@ -129,14 +134,8 @@ function formatDeadline(iso: string): string {
   }).format(new Date(year, month - 1, day));
 }
 
-/** A count that may be an exact number, a published range, or "pending". */
-function CountValue({ value }: { value: number | string }) {
-  return value === "pending" ? <PendingBadge /> : <>{value}</>;
-}
-
-/** A duration in whole minutes, a published range (verbatim), or "pending". */
+/** A duration in whole minutes, or a published range (verbatim). */
 function MinutesValue({ value }: { value: number | string }) {
-  if (value === "pending") return <PendingBadge />;
   if (typeof value === "number")
     return <NoBreakGroups groups={minuteGroups(value)} />;
   // Published range, e.g. "65–70" — rendered verbatim, never averaged. The
@@ -146,9 +145,13 @@ function MinutesValue({ value }: { value: number | string }) {
 }
 
 /**
- * College Board prints no value here (e.g. no question count for a
- * project-style component) — distinct from "pending", which means a value
- * exists but is not yet published.
+ * College Board prints no value here — no question count for a project-style
+ * component, no per-question duration for the world-language project speaking
+ * tasks, no score distribution for a course that has never been administered.
+ * Since issue #84 this is the ONLY unpublished affordance in the panel, and
+ * every surface reuses this one component so a second dash style cannot drift
+ * in. The `sr-only` text travels with the glyph: an em dash alone is silence
+ * to a screen reader.
  */
 function NotPublishedDash() {
   return (
@@ -229,8 +232,6 @@ function PartWeightValue({
           {weight.text}
         </span>
       );
-    case "pending":
-      return <PendingBadge />;
     case "unpublished":
       return <NotPublishedDash />;
   }
@@ -265,15 +266,27 @@ const sectionsTableNumCell = `py-2.5 ${sectionsTableGutter} text-right align-bas
  * all (AP Human Geography, AP Music Theory, …) reach this table with the
  * same markup the 20 part-carrying subjects already used.
  *
- * Honest degradation (PRD §7.5) is per CELL, and the three states stay
- * distinct in every column:
- *   - `"pending"` → the {@link PendingBadge} inline in its own cell. Never a
- *     blank cell, never a dropped row.
+ * Honest degradation (PRD §7.5) is per CELL, and the states stay distinct in
+ * every column:
+ *   - a published number → as printed.
  *   - a published range ("55–75", "65–70") → verbatim, never averaged.
  *   - a value College Board does not print at all → {@link NotPublishedDash}.
- *     Omission ≠ pending: `undefined` means the concept does not apply (the
- *     AAS Individual Student Project is a project, not a question set),
- *     `"pending"` means CB publishes a number this capture does not have.
+ *     Never a blank cell, never a dropped row.
+ *
+ * There were THREE states until issue #84. `"pending"` was the third —
+ * "College Board publishes a number this capture does not have", as opposed to
+ * `undefined`, "the concept does not apply (the AAS Individual Student Project
+ * is a project, not a question set)". That distinction was deliberate (#73)
+ * and it was the right shape for a capture that might be incomplete; it is
+ * recorded here rather than deleted because it is the reasoning a future
+ * capture will need. What retired it was evidence: re-verified against the
+ * live pages on 2026-07-25, all 33 `"pending"` cells were things College Board
+ * does not publish, so they are now `undefined` and read as the dash. What
+ * College Board DOES print about those rows (an untimed 3-week project, "3
+ * minutes to prepare; 3 minutes to present", "Questions 3 & 4 combined 30
+ * minutes") is in the row's note, one column to the left — the dash is
+ * specifically about the Length figure, and no published fact was dropped
+ * to produce it.
  *
  * ## Column budget (Jon's second #73 bounce, 2026-07-25)
  *
@@ -305,8 +318,15 @@ const sectionsTableNumCell = `py-2.5 ${sectionsTableGutter} text-right align-bas
  * honored, hence the breakpoint.
  *
  * The floors are measured, not guessed: "Questions" is the widest thing its
- * own column ever holds (54px at `text-xs`), the pending pill is 61px and
- * cannot wrap, and "43.75%" is 45px.
+ * own column ever holds (54px at `text-xs`), the pending pill was 61px and
+ * could not wrap, and "43.75%" is 45px.
+ *
+ * Issue #84 removed that pill, and the budget is deliberately UNCHANGED. The
+ * Length column's widest remaining content is a published range ("65–70 min"),
+ * which still wants the room; narrowing a column is an overflow change, and
+ * overflow on this table has already been re-cut twice on measured evidence
+ * (#74, #80). Re-tuning it belongs in a card that captures that evidence, not
+ * in the one that deleted a badge.
  *
  * This is a property of the shared table, so it holds for every subject that
  * has sections — no per-subject width, no special case for the observed one.
@@ -316,8 +336,9 @@ const sectionsTableNumCell = `py-2.5 ${sectionsTableGutter} text-right align-bas
  * short percentage plus a per-question `each` on its own line, where before it
  * was the full "each worth 25% of section score" phrase; the budget did not
  * change, the pressure on it dropped). The Length column is the widest share
- * because it is the only one that can hold a {@link PendingBadge} (AAS's
- * Individual Student Project), which is a fixed ~61px pill that cannot wrap.
+ * because it was the only one that could hold the pending pill (AAS's
+ * Individual Student Project), a fixed ~61px element that could not wrap; with
+ * the pill gone its widest content is a published range plus its unit.
  */
 function SectionsTable({ sections }: { sections: readonly ExamSection[] }) {
   return (
@@ -332,8 +353,9 @@ function SectionsTable({ sections }: { sections: readonly ExamSection[] }) {
         {/* A count, a published range ("55–75"), or a dash. Its widest
             content is the "Questions" column header itself (54px). */}
         <col className="w-[24%] min-[400px]:w-[4.5rem]" />
-        {/* "1 h 30 min", "65–70 min", or the pending badge (61px, unwrappable
-            — the widest single thing in any numeric column). */}
+        {/* "1 h 30 min", "65–70 min", or a dash. Budgeted around the 61px
+            pending badge issue #84 removed; see the doc above for why the
+            width is deliberately left alone. */}
         <col className="w-[27%] min-[400px]:w-[5.5rem]" />
         {/* "43.75%", a dash, or a printed phrase that wraps. */}
         <col className="w-[21%] min-[400px]:w-[5rem]" />
@@ -385,18 +407,18 @@ function SectionsTable({ sections }: { sections: readonly ExamSection[] }) {
                 {section.questionCount === undefined ? (
                   <NotPublishedDash />
                 ) : (
-                  <CountValue value={section.questionCount} />
+                  section.questionCount
                 )}
               </td>
               <td className={`${sectionsTableNumCell} text-sm text-slate-900 dark:text-slate-100`}>
-                <MinutesValue value={section.minutes} />
+                {section.minutes === undefined ? (
+                  <NotPublishedDash />
+                ) : (
+                  <MinutesValue value={section.minutes} />
+                )}
               </td>
               <td className={`${sectionsTableNumCell} text-sm whitespace-nowrap text-slate-900 dark:text-slate-100`}>
-                {section.weightPercent === "pending" ? (
-                  <PendingBadge />
-                ) : (
-                  `${section.weightPercent}%`
-                )}
+                {section.weightPercent}%
               </td>
             </tr>
             {section.parts?.map((part, partIndex) => (
@@ -420,7 +442,7 @@ function SectionsTable({ sections }: { sections: readonly ExamSection[] }) {
                   {part.questionCount === undefined ? (
                     <NotPublishedDash />
                   ) : (
-                    <CountValue value={part.questionCount} />
+                    part.questionCount
                   )}
                 </td>
                 <td className={`${sectionsTableNumCell} text-sm text-slate-600 dark:text-slate-300`}>
@@ -465,7 +487,7 @@ export function InfoPanel({ subject, onClose }: InfoPanelProps) {
 
   // Issue #44: an empty sections array means "no sit-down exam" (the four
   // portfolio-only subjects) — the exam-format rows are omitted entirely,
-  // never rendered as zeroed or "pending" placeholders.
+  // never rendered as zeroed or placeholder rows.
   const hasSections = format.sections.length > 0;
 
   // Tier 3 (issue #22): verified official College Board page — `null` (link
@@ -553,16 +575,16 @@ export function InfoPanel({ subject, onClose }: InfoPanelProps) {
             {hasSections && (
               <>
                 <Row label="Exam length">
-                  {format.totalMinutes === "pending" ? (
-                    <PendingBadge />
+                  {format.totalMinutes === undefined ? (
+                    <NotPublishedDash />
                   ) : (
                     formatMinutes(format.totalMinutes)
                   )}
                 </Row>
 
                 <Row label="Calculator">
-                  {format.calculator === "pending" ? (
-                    <PendingBadge />
+                  {format.calculator === undefined ? (
+                    <NotPublishedDash />
                   ) : format.calculator ? (
                     "Permitted"
                   ) : (
@@ -571,8 +593,8 @@ export function InfoPanel({ subject, onClose }: InfoPanelProps) {
                 </Row>
 
                 <Row label="Delivery">
-                  {format.delivery === "pending" ? (
-                    <PendingBadge />
+                  {format.delivery === undefined ? (
+                    <NotPublishedDash />
                   ) : (
                     DELIVERY_LABELS[format.delivery]
                   )}
@@ -580,16 +602,27 @@ export function InfoPanel({ subject, onClose }: InfoPanelProps) {
               </>
             )}
 
+            {/* The row is never deleted to make an unpublished figure go away
+                (PRD §7.5, and issue #84's explicit call): it stays, the cell
+                says what is true, and — for the three AP Career Kickstart
+                courses that have never been administered — `passRateNote`
+                says why College Board has published nothing yet, so the dash
+                does not read as a bug in this app. */}
             <Row label="Pass rate">
               <span className="inline-flex flex-wrap items-baseline justify-end gap-x-1.5">
-                {subject.passRate === "pending" ? (
-                  <PendingBadge />
+                {subject.passRate === undefined ? (
+                  <NotPublishedDash />
                 ) : (
                   <span className="font-semibold">{subject.passRate}%</span>
                 )}
                 <span className="text-xs text-slate-500 dark:text-slate-400">
                   scored 3 or higher
                 </span>
+                {subject.passRateNote && (
+                  <span className="block w-full text-xs leading-snug text-slate-500 sm:text-right dark:text-slate-400">
+                    {subject.passRateNote}
+                  </span>
+                )}
               </span>
             </Row>
           </dl>
@@ -601,8 +634,8 @@ export function InfoPanel({ subject, onClose }: InfoPanelProps) {
               </h3>
               <dl className="mt-2">
                 <Row label="Weight">
-                  {portfolio.weightPct === "pending" ? (
-                    <PendingBadge />
+                  {portfolio.weightPct === undefined ? (
+                    <NotPublishedDash />
                   ) : (
                     <span className="font-semibold">
                       {portfolio.weightPct}%{" "}

@@ -106,10 +106,12 @@ describe("QA AC1 — full course list with the specified entry shape", () => {
     }
   });
 
-  it("the three Career Kickstart courses sit their first published exam in May 2027 with a pending pass rate", () => {
+  it("the three Career Kickstart courses sit their first published exam in May 2027 with no published pass rate", () => {
     // In May 2026 the two launched Career Kickstart courses had no exam at all.
     // The 2027 schedule lists all three — and no administration has happened,
-    // so no score distribution exists for any of them.
+    // so no score distribution exists for any of them. Issue #84 replaced the
+    // "pending" badge with omission + the not-published dash, and each carries
+    // a sourced `passRateNote` saying why.
     for (const id of [
       "business-with-personal-finance",
       "cybersecurity",
@@ -120,7 +122,8 @@ describe("QA AC1 — full course list with the specified entry shape", () => {
       expect(s?.exam, id).not.toBeNull();
       expect(s?.lateTesting, id).not.toBeNull();
       expect(s?.noExamReason, id).toBeUndefined();
-      expect(s?.passRate, id).toBe("pending");
+      expect(s?.passRate, id).toBeUndefined();
+      expect(s?.passRateNote, id).toBeTruthy();
     }
   });
 });
@@ -146,8 +149,12 @@ describe("QA AC2 — sourcing discipline (sources.md + no estimated values)", ()
     }
   });
 
-  it("no estimated/placeholder value anywhere — unpublished fields are the literal 'pending'", () => {
-    const forbidden = /"(TBD|TBA|N\/A|unknown|estimated|\?\?\?)"/i;
+  it("no estimated/placeholder value anywhere — unpublished fields are OMITTED", () => {
+    // "pending" joined this list in issue #84: it was the last placeholder
+    // string in the file, and it is now as forbidden as "TBD". The positive
+    // form of the rule (33 values omitted, 0 filled from an unsourced number)
+    // is pinned in ap-2027.test.ts.
+    const forbidden = /"(TBD|TBA|N\/A|unknown|estimated|pending|\?\?\?)"/i;
     expect(readFileSync(join(__dirname, "ap-2027.json"), "utf-8")).not.toMatch(
       forbidden,
     );

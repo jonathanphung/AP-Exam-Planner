@@ -175,7 +175,7 @@ test.describe("issue #73 bounce — one presentation for every exam", () => {
     }
   });
 
-  test("honest degradation survives the port per cell: a published range renders verbatim, 'pending' shows the badge, and an omitted value shows the not-published dash — three distinct states, none collapsed", async ({
+  test("honest degradation survives the port per cell: a published range renders verbatim and an unpublished value shows the not-published dash — never collapsed into a blank", async ({
     page,
   }) => {
     await page.goto("/");
@@ -187,18 +187,19 @@ test.describe("issue #73 bounce — one presentation for every exam", () => {
     ).toHaveText("40–45 min");
     await closeInfo(page);
 
-    // PENDING vs OMISSION in one row — AAS's Individual Student Project:
+    // UNPUBLISHED vs PUBLISHED in one row — AAS's Individual Student Project:
     // College Board prints no question count (a project, not a question set)
-    // but does publish a duration this capture doesn't have.
+    // and, as issue #84 confirmed against the live page, no time allocation
+    // either. Both cells dash; the published 8.5% is untouched beside them.
     await openInfo(page, "AP African American Studies");
     const isp = row(page, /^Individual Student Project$/);
     const cells = isp.getByRole("cell");
     await expect(cells.nth(0)).toContainText("—");
-    await expect(cells.nth(0).getByText("pending", { exact: true })).toHaveCount(
-      0,
-    );
-    await expect(cells.nth(1).getByText("pending", { exact: true })).toBeVisible();
+    await expect(cells.nth(1)).toContainText("—");
     await expect(cells.nth(2)).toHaveText("8.5%");
+    await expect(
+      dialog(page).getByText("pending", { exact: true }),
+    ).toHaveCount(0);
     await closeInfo(page);
   });
 });

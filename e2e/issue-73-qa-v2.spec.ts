@@ -235,7 +235,7 @@ test.describe("issue #73 bounce (QA v2) — one presentation, honestly degraded"
     expect(blanks, "blank cells in the sections table").toEqual([]);
   });
 
-  test("bounce AC3 — omission and pending stay two states in AT output, not one blank: AAS Individual Student Project reads 'none published' for questions and a pending badge for length", async ({
+  test("bounce AC3 — no unpublished cell is a bare glyph or a blank in AT output: AAS Individual Student Project reads 'none published' for both its questions and its length", async ({
     page,
   }) => {
     await page.goto("/");
@@ -244,29 +244,31 @@ test.describe("issue #73 bounce (QA v2) — one presentation, honestly degraded"
     const isp = row(page, /^Individual Student Project$/);
     const cells = isp.getByRole("cell");
 
-    // Questions: College Board prints none — an OMISSION.
+    // Questions: College Board prints none. The sr-only label is what AT
+    // reads; the glyph beside it is decorative.
     await expect(cells.nth(0).getByText(NONE_PUBLISHED)).toHaveAttribute(
       "class",
       /sr-only/,
     );
-    await expect(cells.nth(0).getByText("pending", { exact: true })).toHaveCount(
-      0,
-    );
-    // The glyph itself is decorative — the label is what AT reads.
     await expect(cells.nth(0).locator("[aria-hidden='true']")).toHaveText("—");
 
-    // Length: CB publishes a duration this capture does not have — PENDING,
-    // a visible badge, never the omission label and never blank.
-    const pendingBadge = cells.nth(1).getByText("pending", { exact: true });
-    await expect(pendingBadge).toBeVisible();
-    await expect(cells.nth(1).getByText(NONE_PUBLISHED)).toHaveCount(0);
+    // Length: issue #84 re-verified this against the live page — the project
+    // has no exam-day time allocation, so it takes the SAME affordance, with
+    // the same sr-only label. One dash style, never a bare glyph.
+    await expect(cells.nth(1).getByText(NONE_PUBLISHED)).toHaveAttribute(
+      "class",
+      /sr-only/,
+    );
+    await expect(cells.nth(1).locator("[aria-hidden='true']")).toHaveText("—");
 
-    // Weight: published — neither affordance.
+    // Weight: published — no unpublished affordance at all.
     await expect(cells.nth(2)).toHaveText("8.5%");
     await expect(cells.nth(2).getByText(NONE_PUBLISHED)).toHaveCount(0);
-    await expect(cells.nth(2).getByText("pending", { exact: true })).toHaveCount(
-      0,
-    );
+
+    // The badge this row used to carry is gone from the dialog entirely.
+    await expect(
+      dialog(page).getByText("pending", { exact: true }),
+    ).toHaveCount(0);
   });
 
   test("bounce AC4 — the a11y contract the dt/dd pairing used to give the newly-tabled subjects: same caption, four column headers, a scoped row header on every row, and the sr-only section prefix still scoping part rows", async ({

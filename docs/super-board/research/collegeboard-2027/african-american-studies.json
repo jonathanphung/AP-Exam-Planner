@@ -53,7 +53,7 @@
   {
    "name": "Individual Student Project",
    "questionCount": "n/a",
-   "minutes": "pending",
+   "minutes": null,
    "weightPercent": 8.5,
    "quote": "Individual Student Project | 8.5% of Exam Score (three-week independent research project with oral defense, scored by teacher rubric; no exam-day time allocation)"
   }
@@ -65,5 +65,6 @@
    "page": "40 (Short-Answer) + 45 (Document-Based) + 10 (Validation Question) as separate published sections; no combined FRQ total printed",
    "quote": "Section II: Short-Answer Questions — 3 Questions | 40 Minutes; Section II: Document-Based Question — 1 Question | 45 Minutes"
   }
- ]
+ ],
+ "pendingResolved2026_07_25": "Section \"Individual Student Project\": re-fetched https://apcentral.collegeboard.org/courses/ap-african-american-studies/exam on 2026-07-25. The Exam Format block prints a weight (8.5% of Exam Score) and a description (\"Students complete a 3-week project...\") but NO time allocation for the component; the timed rows are Multiple Choice 70, Validation Question 10, Short-Answer 40, DBQ 45. \"pending\" -> null (College Board publishes no length)."
 }

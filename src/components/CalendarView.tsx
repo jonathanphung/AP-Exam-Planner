@@ -81,7 +81,7 @@ import { useModalDialog } from "@/lib/modal";
  * `format.totalMinutes`, plus a visually distinct {@link SETUP_BUFFER_MINUTES}
  * setup-buffer segment (second design bounce; see `src/lib/calendar.ts` for
  * the documented height rules, including the marked-approximate fallback for
- * "pending" lengths). Portfolio deadlines and undated subjects are LISTED
+ * unpublished lengths). Portfolio deadlines and undated subjects are LISTED
  * beside the grid — never positioned at an invented time (PRD §7.5).
  *
  * Blocks are interactive (second bounce, item C):

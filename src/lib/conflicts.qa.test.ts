@@ -46,7 +46,7 @@ function subject(
     exam,
     lateTesting,
     format: { ...FORMAT },
-    passRate: "pending",
+    passRate: undefined,
     portfolio: null,
   } as ApSubject;
 }

@@ -25,7 +25,7 @@ import type { Schedule, ScheduleEntry, UndatedSubject } from "./schedule";
  * the block's label shows only the true exam span; the visual block extends
  * the extra 30 minutes as a visibly distinct segment, keeping the distinction
  * inspectable rather than silently inflating published durations. Subjects
- * whose `totalMinutes` is `"pending"` (or unusable, e.g. 0) fall back to a
+ * whose `totalMinutes` is unpublished (or unusable, e.g. 0) fall back to a
  * fixed {@link NOMINAL_EXAM_MINUTES} block marked `approximate` — never a
  * per-subject invented duration, and no end time is shown for them.
  *
@@ -46,7 +46,7 @@ export const SETUP_BUFFER_MINUTES = 30;
 
 /**
  * Documented nominal length used ONLY when a subject's published
- * `format.totalMinutes` is `"pending"` (or unusable): the block renders at
+ * `format.totalMinutes` is unpublished (or unusable): the block renders at
  * this fixed height and is flagged `approximate` so the view can mark it
  * visually. One shared constant — never a per-subject guess (PRD §7.5).
  */
@@ -74,7 +74,7 @@ export interface CalendarBlock {
   startHour: number;
   /**
    * The subject's published exam length in minutes, or `null` when the
-   * dataset says `"pending"` / has no usable value (the block then renders at
+   * dataset publishes no length / has no usable value (the block then renders at
    * {@link NOMINAL_EXAM_MINUTES} and `approximate` is true).
    */
   examMinutes: number | null;
@@ -115,8 +115,12 @@ export interface CalendarBlock {
  */
 export interface SubjectCalendarInfo {
   category: Category;
-  /** The dataset's `format.totalMinutes` — a published number or "pending". */
-  totalMinutes: number | "pending";
+  /**
+   * The dataset's `format.totalMinutes` — a published number, or
+   * `undefined` where College Board publishes no exam length (issue #84
+   * replaced the literal `"pending"` this used to also accept).
+   */
+  totalMinutes: number | undefined;
 }
 
 export interface CalendarDay {
@@ -255,8 +259,8 @@ export function buildCalendarLayout(
         continue;
       }
       const info = subjectInfoById.get(entry.subjectId);
-      // Only a positive published number is a usable length; "pending" (or a
-      // missing/zero value) falls back to the documented nominal block and is
+      // Only a positive published number is a usable length; an unpublished
+      // (or missing/zero) value falls back to the documented nominal block and is
       // flagged approximate — never a per-subject invention (PRD §7.5).
       const examMinutes =
         info && typeof info.totalMinutes === "number" && info.totalMinutes > 0

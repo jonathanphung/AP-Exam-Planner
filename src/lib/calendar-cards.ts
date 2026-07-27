@@ -26,7 +26,7 @@ import { nearestWeekIndex, weekCardMeta } from "./week-cards";
  *   `CalendarWeekLayout` the on-site calendar view uses — there is no second
  *   grid or timing implementation. Blocks anchor at parsed session-start hours
  *   and span the PUBLISHED `format.totalMinutes` (or the documented nominal
- *   fallback, flagged `approximate`, when a length is `"pending"`); nothing is
+ *   fallback, flagged `approximate`, when no length is published); nothing is
  *   guessed onto the grid (hard data rule, PRD §7.5/§8/§11).
  * - Weeks are partitioned by the SAME `calendarWeeks()` window model as the
  *   list variant, and their identity (`Week 1` / `Late Testing` / range) comes

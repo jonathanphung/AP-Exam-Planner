@@ -129,7 +129,8 @@ describe("buildJsonExport", () => {
       SELECTED,
     );
     // Each record is the dataset record VERBATIM (deep equality), so every
-    // field — including literal "pending" values — survives untouched.
+    // field survives untouched — and every field the dataset OMITS stays
+    // omitted (issue #84: omission is now the only unpublished state).
     const byId = new Map(SUBJECTS.map((subject) => [subject.id, subject]));
     for (const exported of doc.schedule.subjects) {
       expect(exported).toEqual(byId.get(exported.id));
@@ -140,15 +141,23 @@ describe("buildJsonExport", () => {
     }
   });
 
-  it('hard data rule: a "pending" value exports as the literal string "pending"', () => {
+  it("hard data rule: an unpublished value stays ABSENT — never back-filled, never 'pending'", () => {
     const doc = parse();
     const aas = doc.schedule.subjects.find(
       (subject) => subject.id === "african-american-studies",
     );
     expect(aas).toBeDefined();
-    // The shipped record carries at least one literal "pending"; it must
-    // appear in the export verbatim — never dropped, never fabricated.
-    expect(JSON.stringify(aas)).toContain('"pending"');
+    // The shipped record omits the Individual Student Project's duration
+    // (College Board publishes none). The export must neither invent a number
+    // for it nor resurrect the "pending" placeholder issue #84 removed.
+    const sections = (aas!.format as { sections: Array<Record<string, unknown>> })
+      .sections;
+    const project = sections.find(
+      (section) => section.name === "Individual Student Project",
+    );
+    expect(project).toBeDefined();
+    expect(Object.hasOwn(project!, "minutes")).toBe(false);
+    expect(JSON.stringify(aas)).not.toContain("pending");
   });
 
   it("carries the stored resolutions verbatim", () => {

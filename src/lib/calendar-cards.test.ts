@@ -131,7 +131,7 @@ describe("buildCalendarCards — exact set of emitted weeks by span (AC)", () =>
   });
 });
 
-describe("buildCalendarCards — hard data rule (pending length → approximate block)", () => {
+describe("buildCalendarCards — hard data rule (unpublished length → approximate block)", () => {
   const PENDING_SUBJECT = {
     id: "pending-exam",
     name: "AP Pending Length",
@@ -140,11 +140,11 @@ describe("buildCalendarCards — hard data rule (pending length → approximate 
     lateTesting: { date: "2027-05-18", session: "AM" },
     format: {
       sections: [],
-      totalMinutes: "pending",
-      calculator: "pending",
-      delivery: "pending",
+      totalMinutes: undefined,
+      calculator: undefined,
+      delivery: undefined,
     },
-    passRate: "pending",
+    passRate: undefined,
     portfolio: null,
   } as unknown as ApSubject;
 

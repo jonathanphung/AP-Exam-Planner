@@ -123,11 +123,13 @@ describe(`published exam qualifier reaches every schedule surface (${EXAM_NOTE_L
     // Verbatim, with only RFC 5545 TEXT escaping applied.
     const escaped = NOTED.examNote!.replace(/,/g, "\\,").replace(/;/g, "\\;");
     expect(description).toContain(escaped);
-    // It LEADS: the qualifier sits before the first section row.
-    const noteAt = description.indexOf(EXAM_NOTE_LABEL);
-    const totalAt = description.indexOf("Total Length:");
-    expect(noteAt).toBeGreaterThan(-1);
-    expect(noteAt).toBeLessThan(totalAt);
+    // It LEADS: the qualifier is the first thing in the DESCRIPTION, before
+    // any section or total row. Anchored on the DESCRIPTION's own start rather
+    // than on the total row, because the noted subject (AP Networking) has no
+    // published length and therefore no Total Length row since issue #84 —
+    // the previous "before Total Length:" form silently passed on -1.
+    const body = description.slice("DESCRIPTION:".length);
+    expect(body.startsWith(`${EXAM_NOTE_LABEL}: `)).toBe(true);
   });
 
   it("the .txt export appends the verbatim note as a trailing column on the exam line", () => {

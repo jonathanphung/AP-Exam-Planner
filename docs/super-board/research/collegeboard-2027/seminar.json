@@ -14,7 +14,7 @@
   {
    "name": "Performance Task 1: Team Project and Presentation",
    "questionCount": "n/a",
-   "minutes": "pending",
+   "minutes": null,
    "weightPercent": 20,
    "quote": "Performance Task 1: Team Project and Presentation—20% of AP Seminar Score",
    "parts": [
@@ -35,7 +35,7 @@
   {
    "name": "Performance Task 2: Individual Research-Based Essay and Presentation",
    "questionCount": "n/a",
-   "minutes": "pending",
+   "minutes": null,
    "weightPercent": 35,
    "quote": "Performance Task 2: Individual Research-Based Essay and Presentation—35% of AP Seminar Score",
    "parts": [
@@ -92,5 +92,6 @@
    "page": "30 + 90 suggested (2 Hours Total)",
    "quote": "End-of-Course Exam (45% of Score, 2 Hours Total); Short-Answer suggested 30 minutes; Essay suggested 90 minutes"
   }
- ]
+ ],
+ "pendingResolved2026_07_25": "Performance Task 1 / 2 minutes: re-fetched https://apcentral.collegeboard.org/courses/ap-seminar/exam on 2026-07-25. The Assessment Format table for both performance tasks has columns Component | Scoring Method | Weight and no duration column — they are through-course tasks with no exam-day time allocation. The \"8-10 minutes\" / \"6-8 minutes\" figures are part of the component NAMES and already ship verbatim in the part rows. \"pending\" -> null (College Board publishes no task length)."
 }

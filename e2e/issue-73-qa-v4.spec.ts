@@ -88,8 +88,14 @@ const NO_NOTE = byId("calculus-bc");
 const PART_WEIGHT = byId("macroeconomics");
 /** Carries the dataset's longest section/part name — the Section column's worst case. */
 const LONGEST_NAME = byId("business-with-personal-finance");
-/** Puts an unwrappable `pending` pill next to an omission dash (AC6). */
-const PENDING_PILL = byId("african-american-studies");
+/**
+ * The row with two unpublished cells side by side — the Questions count and
+ * (since issue #84 re-verified it against the live page) the Length. Until #84
+ * the Length cell held an unwrappable `pending` pill, which is what the column
+ * budget was measured against; the budget is unchanged, so this row is still
+ * the worst case worth sweeping even though what it holds got smaller.
+ */
+const TWO_UNPUBLISHED_CELLS = byId("african-american-studies");
 /** Publishes a verbatim minute range (AC6). */
 const RANGE = byId("french-language-and-culture");
 
@@ -437,7 +443,7 @@ test.describe("issue #73 second bounce — QA v4: the column budget holds", () =
     await closeInfo(page);
   });
 
-  test("AC6 — no cell is blank, and pending / verbatim / not-published stay three distinguishable states under the budget", async ({
+  test("AC6 — no cell is blank, and verbatim / not-published stay distinguishable under the budget", async ({
     page,
   }) => {
     test.slow();
@@ -460,8 +466,8 @@ test.describe("issue #73 second bounce — QA v4: the column budget holds", () =
     }
     expect(blanks, "blank cells").toEqual([]);
 
-    // The one row carrying an omission and a pending side by side.
-    await openInfo(page, PENDING_PILL.name);
+    // The one row carrying two unpublished cells side by side.
+    await openInfo(page, TWO_UNPUBLISHED_CELLS.name);
     const project = dialog(page)
       .getByRole("row")
       .filter({
@@ -471,19 +477,18 @@ test.describe("issue #73 second bounce — QA v4: the column budget holds", () =
         }),
       });
     await expect(project.getByRole("cell").nth(0)).toContainText(NONE_PUBLISHED);
-    await expect(project.getByRole("cell").nth(1)).toHaveText("pending");
-    await expect(project.getByRole("cell").nth(1)).not.toContainText(NONE_PUBLISHED);
-    // The pill cannot wrap; the column it lives in has to actually hold it.
-    const pill = await project
+    await expect(project.getByRole("cell").nth(1)).toContainText(NONE_PUBLISHED);
+    // The dash cannot wrap either; the column it lives in has to hold it.
+    const dash = await project
       .getByRole("cell")
       .nth(1)
-      .locator("span")
+      .locator("[aria-hidden='true']")
       .first()
       .evaluate((el) => {
         const cell = el.closest("td")!;
         const style = getComputedStyle(cell);
         return {
-          pillWidth: el.getBoundingClientRect().width,
+          glyphWidth: el.getBoundingClientRect().width,
           content:
             cell.clientWidth -
             parseFloat(style.paddingLeft) -
@@ -491,10 +496,10 @@ test.describe("issue #73 second bounce — QA v4: the column budget holds", () =
         };
       });
     expect(
-      pill.pillWidth,
-      `the pending pill (${pill.pillWidth}px) does not fit its budgeted column (${pill.content}px of content box)`,
-    ).toBeLessThanOrEqual(pill.content + 1);
-    expect(await clippedCells(page), "clipped cells (pending pill)").toEqual([]);
+      dash.glyphWidth,
+      `the not-published dash (${dash.glyphWidth}px) does not fit its budgeted column (${dash.content}px of content box)`,
+    ).toBeLessThanOrEqual(dash.content + 1);
+    expect(await clippedCells(page), "clipped cells (dashed row)").toEqual([]);
     await closeInfo(page);
 
     // A published range is verbatim and unsplittable — "65–" over "70 min"
@@ -527,7 +532,7 @@ test.describe("issue #73 second bounce — QA v4: the column budget holds", () =
     // where the dialog stops growing, is where a mis-tuned budget shows up —
     // and none of these widths is in the builder's sweep.
     const problems: string[] = [];
-    const subjects = [REPORTED, PART_WEIGHT, LONGEST_NAME, PENDING_PILL];
+    const subjects = [REPORTED, PART_WEIGHT, LONGEST_NAME, TWO_UNPUBLISHED_CELLS];
     for (const width of [399, 400, 401, 639, 640, 641]) {
       const floor = declaredGutter(width) - 0.5;
       await page.setViewportSize({ width, height: 900 });
@@ -587,7 +592,7 @@ test.describe("issue #73 second bounce — QA v4: the column budget holds", () =
     await page.setViewportSize({ width: 375, height: 800 });
     await page.goto("/");
 
-    for (const subject of [REPORTED, PART_WEIGHT, PENDING_PILL]) {
+    for (const subject of [REPORTED, PART_WEIGHT, TWO_UNPUBLISHED_CELLS]) {
       await openInfo(page, subject.name);
       const structure = await dialog(page).evaluate((el) => {
         const rows = [...el.querySelectorAll("table tbody tr")];

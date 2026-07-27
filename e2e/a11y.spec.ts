@@ -826,12 +826,21 @@ test.describe("AC5 — landmarks and labels", () => {
 
     // Moved exam: a text badge, not just a color shift.
     await expect(page.getByText("Moved to late testing")).toBeVisible();
-    // Pending data: rendered as the literal text badge (issue #6 contract).
+    // Unpublished data: rendered as a visible dash carrying its own sr-only
+    // text, never a bare glyph and never a blank cell (issue #6 contract,
+    // re-stated by #84 — the "pending" badge this used to assert is gone;
+    // AP Cybersecurity's pass rate is the unpublished value now).
     // Issues #22/#24: reveal the Tier-1 panel to reach the details button.
     await expandButton(page, "AP Cybersecurity").click();
     await infoButton(page, "AP Cybersecurity").click();
+    const passRateValue = dialog(page)
+      .locator("dd")
+      .filter({ hasText: "scored 3 or higher" })
+      .first();
+    await expect(passRateValue).toContainText("—");
+    await expect(passRateValue.getByText("none published")).toHaveCount(1);
     await expect(
       dialog(page).getByText("pending", { exact: true }),
-    ).toBeVisible();
+    ).toHaveCount(0);
   });
 });

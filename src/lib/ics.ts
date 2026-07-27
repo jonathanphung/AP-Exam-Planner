@@ -219,20 +219,27 @@ function questionSegment(
   count: ExamSection["questionCount"],
 ): string | undefined {
   if (count === undefined) return undefined;
-  if (count === "pending") return "Questions pending";
   return count === 1 ? "1 Question" : `${count} Questions`;
 }
 
 /**
  * `"90 Minutes"` / `"40–45 Minutes"` (published ranges verbatim, never
- * averaged) / `"Duration pending"` for a section that exists but whose length
- * College Board has not published. Never an invented number (PRD §7.5).
+ * averaged), or nothing at all where College Board publishes no length.
+ * Never an invented number (PRD §7.5).
+ *
+ * Before issue #84 an unpublished length printed `"Duration pending"` here.
+ * The plain-text row has no column grid to leave a hole in — unlike the info
+ * panel's table, where a missing value has to become a visible dash — so an
+ * unpublished segment is simply absent, exactly as an omitted question count
+ * already was. AP Seminar's two performance-task rows now read
+ * `Performance Task 1: …: 20% of Score` rather than claiming a duration is
+ * on its way.
  */
 function minutesSegment(
   minutes: ExamSection["minutes"] | undefined,
 ): string | undefined {
   if (minutes === undefined) return undefined;
-  return minutes === "pending" ? "Duration pending" : `${minutes} Minutes`;
+  return `${minutes} Minutes`;
 }
 
 /**
@@ -264,8 +271,6 @@ function partWeightSegment(
       return `${weight.value}% of Score${weight.each ? " each" : ""}`;
     case "printed":
       return weight.text;
-    case "pending":
-      return "Weight pending";
     case "unpublished":
       return undefined;
   }
@@ -305,10 +310,11 @@ function partRow(
  *    mold). An exam that lacks a section simply has no row for it (AP Seminar
  *    prints no multiple-choice row) — omission is structural, never a "0" row.
  *  - Row shape mirrors College Board's printed format (and the #44 info
- *    panel): `questions | minutes | weight`. An omitted question count drops
- *    that segment; a genuinely unpublished value renders as
- *    "Questions pending" / "Duration pending" / "Weight pending" — pending is
- *    never blank and never estimated (PRD §7.5).
+ *    panel): `questions | minutes | weight`. Any segment College Board
+ *    publishes no value for is dropped — never estimated, never a "0" (PRD
+ *    §7.5). Until issue #84 an unpublished value could also print
+ *    "Questions pending" / "Duration pending" / "Weight pending"; those
+ *    strings are gone with the dataset state that produced them.
  *  - Published Part A/B rows nest under their section as `- `-prefixed lines,
  *    carrying the page's note (calculator rule etc.) as a parenthetical.
  *    Design call (issue #38): part notes ARE included (they distinguish the
@@ -340,14 +346,10 @@ function buildExamDescription(
   if (examNote) rows.push(`${EXAM_NOTE_LABEL}: ${examNote}`, "");
 
   for (const section of format.sections) {
-    const weight =
-      section.weightPercent === "pending"
-        ? "Weight pending"
-        : `${section.weightPercent}% of Score`;
     const segments = [
       questionSegment(section.questionCount),
       minutesSegment(section.minutes),
-      weight,
+      `${section.weightPercent}% of Score`,
     ]
       .filter((s): s is string => s !== undefined)
       .join(" | ");
@@ -357,15 +359,17 @@ function buildExamDescription(
     }
   }
 
-  const total =
-    typeof format.totalMinutes === "number"
-      ? formatDurationHM(format.totalMinutes)
-      : "Duration pending";
   // Part B: the setup allowance is merged into the total row as a parenthetical,
   // kept distinct from the published length so it never reads as College Board's.
-  rows.push(
-    `Total Length: ${total} (+ ${SETUP_BUFFER_MINUTES} minutes for exam setup time)`,
-  );
+  // A subject College Board publishes no length for (AP Networking, whose exam
+  // page does not exist yet) gets NO total row at all — issue #84: there is no
+  // published length for the allowance to be added to, and "+ 30 minutes for
+  // exam setup time" hanging off a non-value is worse than silence.
+  if (typeof format.totalMinutes === "number") {
+    rows.push(
+      `Total Length: ${formatDurationHM(format.totalMinutes)} (+ ${SETUP_BUFFER_MINUTES} minutes for exam setup time)`,
+    );
+  }
 
   return rows.join("\n");
 }

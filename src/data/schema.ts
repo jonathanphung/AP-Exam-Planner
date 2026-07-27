@@ -8,7 +8,38 @@ import { z } from "zod";
  * window constants below are the only schema edits normally required.
  *
  * Data rule (PRD §7.5/§8/§11): no value is estimated. Anything College Board
- * has not published is the literal string "pending".
+ * has not published is OMITTED, and the surfaces render it as the
+ * not-published dash.
+ *
+ * ## Issue #84 (2026-07-25) — "pending" is gone, and the old reasoning is
+ * kept here because it explains what replaced it
+ *
+ * Until this issue the schema had a third state: the literal string
+ * `"pending"`, meaning "College Board publishes a number this capture does not
+ * have". It was a real distinction — an accusation against OUR capture, not
+ * against College Board — and #73 was explicit that it must not be conflated
+ * with omission ("`undefined` means the concept does not apply, `"pending"`
+ * means CB publishes a number this capture does not have").
+ *
+ * The distinction was sound; the 33 values wearing the badge were not. Each of
+ * them was re-verified against the live College Board page on 2026-07-25 (the
+ * per-value citations are in `src/data/sources.md` §"Issue #84"), and every
+ * single one turned out to be something College Board does not publish at all:
+ * no per-question duration for the world-language project speaking tasks, no
+ * PPR score weight, no time allocation for AP Seminar's through-course
+ * performance tasks or the AAS Individual Student Project, no AP Networking
+ * exam page, no score distribution for three courses that have never been
+ * administered. Nothing was a capture gap. So the state had no members left,
+ * and an unreachable state is a trap for the next capture.
+ *
+ * What this means for a future annual swap: there is now ONE unpublished
+ * state. If College Board prints a figure, it goes in the field with its
+ * provenance; if it prints nothing, the field is omitted and the surfaces say
+ * so. A capture that genuinely cannot reach a page must not invent a third
+ * state to hide in — it must fail loudly (see the empty-format branch below,
+ * which is self-describing rather than flag-driven) or block the swap.
+ * `ap-2027.test.ts` asserts the shipped JSON contains no `"pending"` anywhere,
+ * so re-introducing one is a red test, not a silent regression.
  */
 
 /**
@@ -37,8 +68,6 @@ export const CATEGORIES = [
   "Career Kickstart",
 ] as const;
 
-const pending = z.literal("pending");
-
 /** Calendar date as an ISO-8601 string; compared lexicographically. */
 const isoDate = z
   .string()
@@ -55,24 +84,23 @@ const examSlotSchema = z.strictObject({
 });
 
 /**
- * Question counts: an exact published number, a published range (College
- * Board publishes e.g. "55–75" for AP Chinese MCQs), or "pending".
+ * Question counts: an exact published number, or a published range (College
+ * Board publishes e.g. "55–75" for AP Chinese MCQs). Omitted where the page
+ * prints no count.
  */
 const questionCount = z.union([
   z.number().int().min(0),
   z.string().regex(/^\d+–\d+$/, 'ranges use an en dash, e.g. "55–75"'),
-  pending,
 ]);
 
 /**
- * Published durations: exact minutes, a published range (College Board prints
- * "65–70 Minutes" for the language exams' free-response sections), or
- * "pending" when the page prints no duration for a section that has one.
+ * Published durations: exact minutes, or a published range (College Board
+ * prints "65–70 Minutes" for the language exams' free-response sections).
+ * Omitted where the page prints no duration — see the issue #84 note above.
  */
 const minutesValue = z.union([
   z.number().int().min(0),
   z.string().regex(/^\d+–\d+$/, 'ranges use an en dash, e.g. "65–70"'),
-  pending,
 ]);
 
 /**
@@ -80,15 +108,17 @@ const minutesValue = z.union([
  * no-calculator vs. graphing-calculator halves, or the language exams'
  * Listening vs. Reading parts.
  *
- * `questionCount` is OMITTED (not "pending") when College Board prints no
- * count for the part — omission means the concept does not apply; "pending"
- * means a count exists but is not yet published. `minutes` follows the same
- * three-state rule (issue #73): omitted where the page prints no length for
- * the part at all (AP Art History's six free-response questions, AP Seminar's
- * research report), "pending" where a length exists but the capture does not
- * print it (AP Psychology's AAQ/EBQ halves of a 70-minute section). `note`
- * carries the page's calculator/tool rule or other printed descriptor,
- * verbatim.
+ * `questionCount` is OMITTED when College Board prints no count for the part,
+ * and `minutes` is omitted when it prints no length for the part. #73 had a
+ * third state here — `"pending"` — for "a length exists but this capture does
+ * not have it" (it named AP Psychology's AAQ/EBQ halves as the example);
+ * issue #84 re-verified every such value against the live page, found none of
+ * them published anywhere, and removed the state. AP Psychology prints only
+ * Section II's 70 minutes and never divides it; that is omission, and it now
+ * says so. `note` carries the page's calculator/tool rule or other printed
+ * descriptor, verbatim — including the timings College Board prints as prose
+ * rather than as a duration ("3 minutes to prepare; 3 minutes to present"),
+ * which is why dashing the Length cell loses no published fact.
  *
  * PER-PART WEIGHTS (issue #73, storage rule unchanged) — the printed
  * denominator is part of the datum. College Board prints per-part weights
@@ -224,7 +254,7 @@ export const sectionPartSchema = z
     name: z.string().min(1),
     questionCount: questionCount.optional(),
     minutes: minutesValue.optional(),
-    weightPercent: z.union([z.number().min(0).max(100), pending]).optional(),
+    weightPercent: z.number().min(0).max(100).optional(),
     weightPrinted: z.string().min(1).optional(),
     note: z.string().min(1).optional(),
   })
@@ -267,8 +297,14 @@ export const examSectionSchema = z
   .strictObject({
     name: z.string().min(1),
     questionCount: questionCount.optional(),
-    minutes: minutesValue,
-    weightPercent: z.union([z.number().min(0).max(100), pending]),
+    /**
+     * Omitted where College Board prints no length for the section at all —
+     * AP Seminar's two through-course performance tasks and the AP African
+     * American Studies Individual Student Project, none of which has an
+     * exam-day time allocation (issue #84).
+     */
+    minutes: minutesValue.optional(),
+    weightPercent: z.number().min(0).max(100),
     note: z.string().min(1).optional(),
     parts: z.array(sectionPartSchema).min(2).optional(),
   })
@@ -292,7 +328,6 @@ export const examSectionSchema = z
       }
       if (
         parsed.base.of === "nested" &&
-        typeof section.weightPercent === "number" &&
         parsed.base.percent !== section.weightPercent
       ) {
         ctx.addIssue({
@@ -320,14 +355,26 @@ export const formatSchema = z.strictObject({
    * sections at all — an empty array, never zeroed rows.
    */
   sections: z.array(examSectionSchema),
-  totalMinutes: z.union([z.number().int().min(0), pending]),
-  calculator: z.union([z.boolean(), pending]),
-  delivery: z.union([z.enum(["digital", "paper", "hybrid"]), pending]),
+  /**
+   * All three are omitted together, and only when College Board publishes no
+   * exam format for the subject at all — the AP Networking case below. There
+   * is no partial state: a subject either has a published format or has none.
+   */
+  totalMinutes: z.number().int().min(0).optional(),
+  calculator: z.boolean().optional(),
+  delivery: z.enum(["digital", "paper", "hybrid"]).optional(),
 });
 
 export const portfolioSchema = z.strictObject({
   deadline: isoDate,
-  weightPct: z.union([z.number().min(0).max(100), pending]),
+  /**
+   * Omitted where College Board publishes no separate score weight for the
+   * portfolio component. True of all six world-language Personalized Project
+   * Reference deadlines (issue #84): the PPR is the reference students use
+   * for the two project speaking questions, which are scored inside the exam,
+   * and no page prints a weight for the reference itself. `note` says so.
+   */
+  weightPct: z.number().min(0).max(100).optional(),
   note: z.string().min(1),
 });
 
@@ -341,7 +388,27 @@ export const subjectSchema = z
     exam: examSlotSchema.nullable(),
     lateTesting: examSlotSchema.nullable(),
     format: formatSchema,
-    passRate: z.union([z.number().min(0).max(100), pending]),
+    /**
+     * Percent scoring 3 or higher in the most recent published administration.
+     * Omitted where College Board publishes no score distribution for the
+     * subject.
+     */
+    passRate: z.number().min(0).max(100).optional(),
+    /**
+     * Why no score distribution is published (issue #84, AC4).
+     *
+     * The Pass rate ROW stays for every subject — deleting it to make a gap
+     * disappear is what PRD §7.5's honest degradation forbids — and its cell
+     * shows the not-published dash. On a course nobody has ever sat, though, a
+     * bare dash reads as a bug in this app rather than as a fact about College
+     * Board, so the three AP Career Kickstart courses carry the published
+     * reason with them. Sourced from the AP Career Kickstart timeline
+     * (docs/super-board/research/collegeboard-2027/pages/ap-career-kickstart.txt),
+     * never editorial, and only ever allowed WITH an absent `passRate` — the
+     * superRefine below refuses it next to a published number, so it can never
+     * become a place to editorialize about a real figure.
+     */
+    passRateNote: z.string().min(1).optional(),
     portfolio: portfolioSchema.nullable(),
     /**
      * Only present when a listed course has no published exam in this cycle
@@ -402,9 +469,18 @@ export const subjectSchema = z
       });
     }
 
+    if (subject.passRateNote !== undefined && subject.passRate !== undefined) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["passRateNote"],
+        message:
+          "passRateNote explains an ABSENT pass rate; a subject with a published passRate must not carry one",
+      });
+    }
+
     // Issue #44: omission and "not yet published" are different states.
     // A portfolio-only subject has no sit-down exam, so it has no sections —
-    // never an empty/zeroed section table, and never "pending" rows.
+    // never an empty/zeroed section table.
     const portfolioOnly = subject.exam === null && subject.portfolio !== null;
     if (portfolioOnly && subject.format.sections.length > 0) {
       ctx.addIssue({
@@ -417,14 +493,15 @@ export const subjectSchema = z
     // A subject that sits an exam carries its published section structure —
     // UNLESS College Board publishes no exam format for it at all. That state
     // is self-describing rather than a new flag: every other format field is
-    // "pending" too (AP Networking's May 2027 pilot administration, whose
-    // course page does not exist yet). A partially-filled format can never
-    // reach the empty-sections branch, so "we have some data but no rows"
-    // stays an error.
+    // absent too (AP Networking's May 2027 pilot administration, whose course
+    // page does not exist yet — /courses/ap-networking/exam still 404s, live
+    // re-checked 2026-07-25 for issue #84). A partially-filled format can
+    // never reach the empty-sections branch, so "we have some data but no
+    // rows" stays an error.
     const noPublishedFormat =
-      subject.format.totalMinutes === "pending" &&
-      subject.format.delivery === "pending" &&
-      subject.format.calculator === "pending";
+      subject.format.totalMinutes === undefined &&
+      subject.format.delivery === undefined &&
+      subject.format.calculator === undefined;
     if (
       subject.exam !== null &&
       subject.format.sections.length === 0 &&
@@ -434,7 +511,7 @@ export const subjectSchema = z
         code: "custom",
         path: ["format", "sections"],
         message:
-          "subjects with a sit-down exam must carry at least one published section, unless College Board publishes no exam format at all (then every format field is \"pending\")",
+          "subjects with a sit-down exam must carry at least one published section, unless College Board publishes no exam format at all (then every format field is omitted)",
       });
     }
   });

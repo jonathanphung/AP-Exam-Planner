@@ -30,14 +30,14 @@
     {
      "name": "Free-Response Question 1: Article Analysis Question (AAQ)",
      "questionCount": "1",
-     "minutes": "pending",
+     "minutes": null,
      "toolNote": "n/a",
      "quote": "Article Analysis Question (AAQ)"
     },
     {
      "name": "Free-Response Question 2: Evidence-Based Question (EBQ)",
      "questionCount": "1",
-     "minutes": "pending",
+     "minutes": null,
      "toolNote": "n/a",
      "quote": "Evidence-Based Question (EBQ)"
     }
@@ -51,5 +51,6 @@
    "page": "pending",
    "quote": "The page does not state a combined total exam duration."
   }
- ]
+ ],
+ "pendingResolved2026_07_25": "AAQ/EBQ part minutes: re-fetched https://apcentral.collegeboard.org/courses/ap-psychology/exam on 2026-07-25. The page prints only \"2 Questions | 70 Minutes | 33.3% of Exam Score\" for Section II and gives no per-question time allocation. \"pending\" -> null (College Board publishes no per-part length; the 70 minutes is never divided)."
 }

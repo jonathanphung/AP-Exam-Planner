@@ -327,25 +327,27 @@ test.describe("issue #73 second bounce — the sections table budgets its column
     await closeInfo(page);
   });
 
-  test("AC6 — the budget did not flatten the honest-degradation states: the pending pill, the not-published dash and a verbatim range stay three distinct things", async ({
+  test("AC6 — the budget did not flatten the honest-degradation states: the not-published dash and a verbatim range stay distinct, and no cell is squeezed to blank", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 375, height: 800 });
     await page.goto("/");
 
-    // AAS's Individual Student Project carries an omission and a pending side
-    // by side — the row most at risk from a column that got too narrow to
-    // hold the pill.
+    // AAS's Individual Student Project is the row most at risk from a column
+    // that got too narrow: two unpublished cells side by side, either of which
+    // could be squeezed to nothing. Issue #84 made both of them the dash (the
+    // live page prints no duration for the project either), so what the budget
+    // has to hold here is smaller than the pill it was tuned for — the check
+    // that matters is that neither cell is blank and neither clips.
     await openInfo(page, byId("african-american-studies").name);
     const project = dialog(page)
       .getByRole("row")
       .filter({ has: page.getByRole("rowheader", { name: "Individual Student Project", exact: true }) });
     await expect(project.getByRole("cell").nth(0)).toContainText("none published");
-    await expect(project.getByRole("cell").nth(1)).toHaveText("pending");
-    await expect(project.getByRole("cell").nth(1)).not.toContainText(
-      "none published",
-    );
-    expect(await clippedCells(page), "clipped cells (pending pill)").toEqual([]);
+    await expect(project.getByRole("cell").nth(1)).toContainText("none published");
+    await expect(project.getByRole("cell").nth(1)).toContainText("—");
+    await expect(project.getByRole("cell").nth(2)).toHaveText("8.5%");
+    expect(await clippedCells(page), "clipped cells (dashed row)").toEqual([]);
     await closeInfo(page);
 
     // A published range is verbatim AND unsplittable — "65–" on one line and

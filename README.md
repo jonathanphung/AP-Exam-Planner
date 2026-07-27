@@ -19,7 +19,7 @@ The catalog carries every AP course College Board lists for the cycle, grouped i
 Every course chip expands in place through three tiers of detail:
 
 1. **Timing**: the regular exam date and AM/PM session (with the published session start time), the official late-testing slot, and any portfolio deadline. A subject with no exam in the cycle (none in May 2027 — every listed course is scheduled) shows the sourced reason instead of an invented date.
-2. **Full exam details**: a dialog with the multiple-choice and free-response section breakdown (question counts, timing, weight), total length, calculator policy, delivery mode (paper / digital / hybrid), and the published "scored 3 or higher" pass rate. Anything College Board hasn't published shows as a muted **pending** badge instead of a guess.
+2. **Full exam details**: a dialog with the multiple-choice and free-response section breakdown (question counts, timing, weight), total length, calculator policy, delivery mode (paper / digital / hybrid), and the published "scored 3 or higher" pass rate. Anything College Board hasn't published shows as a dash — "none published" to a screen reader — instead of a guess.
 3. **Official College Board page**: a link straight to that subject's exam page on College Board.
 
 ![The AP Biology exam details dialog: multiple-choice and free-response section breakdown, exam length, calculator policy, delivery mode, a 71 percent pass rate, and a link to the official College Board page](docs/screenshots/subject-details.png)
@@ -52,7 +52,7 @@ Keep several draft plans (a full load, a STEM-only shortlist, a backup) and swit
 
 ## Data and the annual swap
 
-All dates, deadlines, and pass rates reflect the **May 2027 AP exam cycle** and come from College Board's published pages. [`src/data/sources.md`](src/data/sources.md) lists the exact URL behind every field. Anything College Board hasn't published is stored as the literal string `"pending"` and renders as a pending badge rather than a guess.
+All dates, deadlines, and pass rates reflect the **May 2027 AP exam cycle** and come from College Board's published pages. [`src/data/sources.md`](src/data/sources.md) lists the exact URL behind every field — including, for each value College Board publishes nothing for, the live page checked and what it printed instead. An unpublished value is omitted from the dataset and renders as a dash rather than a guess.
 
 The dataset lives in a single file, **`src/data/ap-2027.json`**. That's the one swap point for next year: when College Board posts the May 2028 calendar, drop in an `ap-2028.json`, re-point [`src/data/cycle.ts`](src/data/cycle.ts), and update the testing-window constants in [`src/data/schema.ts`](src/data/schema.ts). No component changes required. Every user-visible cycle label — schedule banner, footer attribution, empty states, page description, export filenames — is read from the dataset, so it all re-labels itself automatically.
 
