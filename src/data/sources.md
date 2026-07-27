@@ -99,7 +99,14 @@ under, and guessing one would be an invented time.
   its third and final pilot in 2026-27 and launches in fall 2027 — so its whole
   `format` block is omitted (re-checked live 2026-07-25: `/exam` still 404s) and
   `examNote` carries the published pilot-only
-  restriction. Its official page is the adoption page,
+  restriction. Issue #87 (2026-07-26) split the two claims that note used to
+  make into the two fields that render them: `examNote` keeps the restriction
+  on the DATE ("2026-27 pilot schools only"), and the new `formatNote` carries
+  the pilot/launch timeline and the resulting absence of an exam page, section
+  structure, duration, delivery mode and calculator policy. No fact was added,
+  dropped or reworded in substance — only relocated to the surface it explains
+  (the details dialog, where those rows now render the not-published dash
+  instead of being omitted). Its official page is the adoption page,
   <https://apcentral.collegeboard.org/courses/ap-networking/adopt>.
 - **No course was removed or renamed.** The other 42 ids are unchanged, so no
   saved selection loses a subject in this swap.
@@ -689,7 +696,7 @@ record carries the same finding in a `pendingResolved2026_07_25` field.
 | `african-american-studies` | "Individual Student Project" section `minutes` | 1 | "Individual Student Project \| 8.5% of Exam Score" plus "Students complete a 3-week project…" | The Exam Format block times Multiple Choice (70), the Validation Question (10), the SAQs (40) and the DBQ (45). The project itself has no exam-day time allocation. <https://apcentral.collegeboard.org/courses/ap-african-american-studies/exam> |
 | `psychology` | Free-Response AAQ / EBQ part `minutes` | 2 | "2 Questions \| 70 Minutes \| 33.3% of Exam Score" and no per-question time | The 70 minutes belongs to the section and is never divided between the two questions. <https://apcentral.collegeboard.org/courses/ap-psychology/exam> |
 | `seminar` | Performance Task 1 and 2 section `minutes` | 2 | an Assessment Format table with columns Component \| Scoring Method \| Weight — no duration column | Both are through-course tasks with no exam-day allocation. The "8–10 minutes" / "6–8 minutes" presentation lengths are part of the component NAMES and already ship verbatim. <https://apcentral.collegeboard.org/courses/ap-seminar/exam> |
-| `networking` | `format.totalMinutes`, `format.calculator`, `format.delivery` | 3 | nothing — `/courses/ap-networking/exam` returned **HTTP 404** on 2026-07-25, as it did on 2026-07-24 | There is no exam page to read. The `examNote` carries the published pilot-only restriction. |
+| `networking` | `format.totalMinutes`, `format.calculator`, `format.delivery` | 3 | nothing — `/courses/ap-networking/exam` returned **HTTP 404** on 2026-07-25, as it did on 2026-07-24 | There is no exam page to read. The `examNote` carries the published pilot-only restriction on the date; since issue #87 the `formatNote` carries why the format itself is unpublished, and the three rows render the not-published dash rather than being dropped. |
 | `business-with-personal-finance`, `cybersecurity`, `networking` | `passRate` | 3 | the 2026 score-distribution tables list ~50 exams and none of these three | No administration has happened. See the pass-rate decision below. <https://apstudents.collegeboard.org/about-ap-scores/score-distributions> |
 
 Slug exception (as everywhere): AP Business with Personal Finance lives at

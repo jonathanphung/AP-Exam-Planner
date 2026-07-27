@@ -162,6 +162,10 @@ describe("ap-2027.json dataset", () => {
       session: "AM",
     });
     expect(networking?.examNote).toMatch(/pilot schools only/i);
+    // Issue #87 split the qualifier in two: `examNote` restricts the DATE,
+    // `formatNote` says why the format is unpublished. Both facts still ship;
+    // src/data/unpublished-format.test.ts holds the full fact-for-fact check.
+    expect(networking?.formatNote).toMatch(/no exam page/i);
     expect(networking?.format.sections).toEqual([]);
     // /courses/ap-networking/exam still 404s (re-checked live 2026-07-25,
     // issue #84), so the whole format block is absent rather than guessed.

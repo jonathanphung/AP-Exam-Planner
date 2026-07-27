@@ -1,0 +1,38 @@
+# e2e-full-baseline - condensed
+# Full Playwright reporter output was 960 lines. The per-test 'ok N ...'
+# lines are dropped; the run summary, every failure headline and the
+# verbatim failure detail are kept.
+
+  x  292 [chromium] › e2e\issue-44-qa.spec.ts:468:7 › issue #44 — per-section exam details › AC16 — real table semantics (caption + scoped headers) and zero serious/critical axe violations with the dialog open (30.1s)
+  1 failed
+    [chromium] › e2e\issue-44-qa.spec.ts:468:7 › issue #44 — per-section exam details › AC16 — real table semantics (caption + scoped headers) and zero serious/critical axe violations with the dialog open 
+  651 passed (6.2m)
+EXIT=1
+
+----- failure detail (verbatim) -----
+
+  1) [chromium] › e2e\issue-44-qa.spec.ts:468:7 › issue #44 — per-section exam details › AC16 — real table semantics (caption + scoped headers) and zero serious/critical axe violations with the dialog open 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'View exam details for AP Calculus AB' })
+
+
+      63 | async function openInfo(page: Page, name: string) {
+      64 |   await expandButton(page, name).click();
+    > 65 |   await infoButton(page, name).click();
+         |                                ^
+      66 |   await expect(dialog(page)).toBeVisible();
+      67 | }
+      68 |
+        at openInfo (C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-87-qa\e2e\issue-44-qa.spec.ts:65:32)
+        at C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-87-qa\e2e\issue-44-qa.spec.ts:472:5
+
+    Error Context: test-results\issue-44-qa-issue-44-—-per-71be1-ations-with-the-dialog-open-chromium\error-context.md
+
+  1 failed
+    [chromium] › e2e\issue-44-qa.spec.ts:468:7 › issue #44 — per-section exam details › AC16 — real table semantics (caption + scoped headers) and zero serious/critical axe violations with the dialog open 
+  651 passed (6.2m)
+EXIT=1

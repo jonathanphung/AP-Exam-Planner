@@ -63,14 +63,42 @@ function formatDeadlineDate(iso: string): string {
   }).format(new Date(year, month - 1, day));
 }
 
-/** One label/value line inside the Tier-1 timing block. */
-function TimingRow({ label, value }: { label: string; value: string }) {
+/**
+ * One label/value line inside the Tier-1 timing block.
+ *
+ * `note` is a published qualifier ON that slot, rendered as a smaller muted
+ * line inside the same `<dd>` (issue #87). Putting it in the value — rather
+ * than in a paragraph at the foot of the panel, where AP Networking's
+ * qualifier used to sit — is what makes it read as "…and that date is
+ * restricted" instead of as a second, unrelated block of prose: it is one
+ * value with a caveat, so it is one `<dd>`, and assistive tech reads the
+ * caveat as part of the Exam row rather than as loose text after the list.
+ */
+function TimingRow({
+  label,
+  value,
+  note,
+}: {
+  label: string;
+  value: string;
+  note?: string;
+}) {
   return (
     <div className="flex flex-col gap-0.5">
       <dt className="text-xs font-medium tracking-wide text-slate-600 uppercase dark:text-slate-400">
         {label}
       </dt>
-      <dd className="text-sm text-slate-900 dark:text-slate-100">{value}</dd>
+      <dd className="text-sm text-slate-900 dark:text-slate-100">
+        {value}
+        {note && (
+          <span
+            data-testid="chip-exam-note"
+            className="mt-0.5 block text-xs leading-snug break-words text-slate-600 dark:text-slate-400"
+          >
+            {note}
+          </span>
+        )}
+      </dd>
     </div>
   );
 }
@@ -202,7 +230,21 @@ export function SubjectChip({
         >
           <dl className="flex flex-col gap-2.5">
             {subject.exam && (
-              <TimingRow label="Exam" value={slotLabel(subject.exam)} />
+              <TimingRow
+                label="Exam"
+                value={slotLabel(subject.exam)}
+                // A published qualifier on the exam itself (AP Networking's
+                // May 2027 date is "2026-27 pilot schools only"). Shown for
+                // the same reason `noExamReason` is: a date without its
+                // published restriction would read as an exam the student can
+                // sit. Issue #87 attached it to the date it qualifies — it
+                // was a paragraph below the whole list, which is also where
+                // the 297-character version of this note earned its "text
+                // dump" reputation. The schema guarantees an `examNote` only
+                // ever accompanies a non-null `exam`, so this row is the
+                // note's only home and nothing can fall off the card.
+                note={subject.examNote}
+              />
             )}
             {subject.lateTesting && (
               <TimingRow
@@ -224,17 +266,14 @@ export function SubjectChip({
               {subject.noExamReason}
             </p>
           )}
-          {/* A published qualifier on the exam itself (AP Networking's May 2027
-              date is "2026-27 pilot schools only"). Shown for the same reason
-              `noExamReason` is: a date without its published restriction would
-              read as an exam the student can sit. */}
-          {subject.examNote && (
-            <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-              {subject.examNote}
-            </p>
-          )}
-
-          {/* Tier 2 — full exam details via the shared InfoPanel dialog. */}
+          {/* Tier 2 — full exam details via the shared InfoPanel dialog.
+              Why the format story is NOT on this card (issue #87): the note
+              that used to sit here ended with three sentences explaining why
+              the exam's section structure, duration, delivery and calculator
+              policy are unpublished — an explanation of a surface this card
+              does not show, on the only card in the catalog carrying free
+              prose. It moved behind this button, next to the rows it is
+              about (`formatNote`, InfoPanel). */}
           <button
             type="button"
             onClick={() => onShowDetails(subject)}

@@ -1,0 +1,51 @@
+=== tsc --noEmit ===
+exit=0
+=== lint ===
+
+> ap-exam-planner@0.1.0 lint C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-87-qa
+> eslint
+
+
+C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-87-qa\docs\super-board\runs\issue-39-sweep-v1\specs\11-misc-features.spec.ts
+  10:3  warning  'chipFor' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-87-qa\e2e\issue-51-qa.spec.ts
+  3:10  warning  'pressViewChip' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-87-qa\e2e\issue-84-qa.spec.ts
+  66:7  warning  'QUESTIONS' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  68:7  warning  'WEIGHT' is assigned a value but never used     @typescript-eslint/no-unused-vars
+
+✖ 4 problems (0 errors, 4 warnings)
+
+exit=0
+=== test:data ===
+
+> ap-exam-planner@0.1.0 test:data C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-87-qa
+> vitest run src/data
+
+
+ RUN  v4.1.9 C:/Users/jonat/repos/AP-Exam-Planner/AP-Exam-Planner/.worktrees/issue-87-qa
+
+
+ Test Files  7 passed (7)
+      Tests  110 passed (110)
+   Start at  00:19:02
+   Duration  940ms (transform 1.19s, setup 0ms, import 2.84s, tests 360ms, environment 1ms)
+
+exit=0
+=== test:unit ===
+
+> ap-exam-planner@0.1.0 test:unit C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-87-qa
+> vitest run src/lib
+
+
+ RUN  v4.1.9 C:/Users/jonat/repos/AP-Exam-Planner/AP-Exam-Planner/.worktrees/issue-87-qa
+
+
+ Test Files  19 passed (19)
+      Tests  251 passed (251)
+   Start at  00:19:04
+   Duration  1.81s (transform 2.36s, setup 0ms, import 6.00s, tests 637ms, environment 4ms)
+
+exit=0

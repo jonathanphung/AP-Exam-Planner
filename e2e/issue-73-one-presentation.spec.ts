@@ -36,11 +36,23 @@ type Subject = {
   id: string;
   name: string;
   format: { sections: Section[] };
+  portfolio: unknown | null;
 };
 
 const SUBJECTS = apData.subjects as unknown as Subject[];
 const WITH_SECTIONS = SUBJECTS.filter((s) => s.format.sections.length > 0);
 const WITHOUT_SECTIONS = SUBJECTS.filter((s) => s.format.sections.length === 0);
+/**
+ * Issue #87 split `WITHOUT_SECTIONS` in two. All 5 members still render no
+ * table — that part of #73's rule is untouched — but only the 4 portfolio-only
+ * ones render no exam-format ROWS. AP Networking is in the set for the
+ * opposite reason (a real exam whose format College Board has not published),
+ * so its Exam length / Calculator / Delivery rows show the not-published dash;
+ * omitting them was #87's bug, not #73's rule. `portfolio !== null` is the
+ * discriminator here rather than a repeat of the schema's predicate, because
+ * this spec's job is to check the rendering against the data independently.
+ */
+const PORTFOLIO_ONLY = WITHOUT_SECTIONS.filter((s) => s.portfolio !== null);
 
 /** Subjects whose sections publish NO parts — the 18 Jon's bounce lists. */
 const PARTLESS = WITH_SECTIONS.filter(
@@ -80,6 +92,7 @@ test.describe("issue #73 bounce — one presentation for every exam", () => {
       PARTLESS.filter((s) => s.format.sections.length !== 2).map((s) => s.id),
     ).toEqual(["music-theory"]);
     expect(WITHOUT_SECTIONS).toHaveLength(5);
+    expect(PORTFOLIO_ONLY).toHaveLength(4);
     expect(WITH_SECTIONS).toHaveLength(38);
   });
 
@@ -132,8 +145,15 @@ test.describe("issue #73 bounce — one presentation for every exam", () => {
         sectionsTable(page),
         `${subject.id} must render no sections table`,
       ).toHaveCount(0);
-      // …and no zeroed exam-format rows either (issue #44 AC2).
-      await expect(dialog(page).getByText("Exam length")).toHaveCount(0);
+      // …and, for the four with no sit-down exam, no zeroed exam-format rows
+      // either (issue #44 AC2). Issue #87 scoped this half to them: the fifth
+      // member has an exam whose format is unpublished, and dropping its rows
+      // is what that issue fixed. Both directions are asserted subject by
+      // subject in e2e/issue-87-unpublished-format.spec.ts.
+      await expect(
+        dialog(page).getByText("Exam length"),
+        `${subject.id} exam-format rows`,
+      ).toHaveCount(subject.portfolio !== null ? 0 : 1);
       await closeInfo(page);
     }
   });

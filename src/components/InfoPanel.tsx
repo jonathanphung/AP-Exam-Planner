@@ -1,10 +1,11 @@
 "use client";
 
 import { Fragment, type ReactNode, useId, useRef } from "react";
-import type {
-  ApSubject,
-  ExamSection,
-  ExamSectionPart,
+import {
+  hasUnpublishedFormat,
+  type ApSubject,
+  type ExamSection,
+  type ExamSectionPart,
 } from "@/data/schema";
 import { CYCLE } from "@/data/cycle";
 import { useModalDialog } from "@/lib/modal";
@@ -27,6 +28,30 @@ import { ArrowUpRightIcon } from "@/components/ArrowUpRightIcon";
  * and a portfolio-only subject renders NO section table at all — its
  * portfolio block carries the story instead. Any cell College Board publishes
  * no value for renders {@link NotPublishedDash}.
+ *
+ * ## Issue #87 (2026-07-26) — an empty `sections` means two different things
+ *
+ * The paragraph above, and the `hasSections` boolean that implemented it, read
+ * an empty `format.sections` as ONE thing: "no sit-down exam, so the portfolio
+ * block below tells the story". That was true of every member of the set when
+ * issue #44 wrote it — `research`, `2-d-art-and-design`, `3-d-art-and-design`,
+ * `drawing`. The 2027 swap added a second, opposite member: AP Networking sits
+ * a real May 7 exam and has no sections because College Board has published no
+ * exam page for the course yet.
+ *
+ * Gating on that one boolean therefore dropped Networking's Exam length,
+ * Calculator and Delivery rows — three unpublished values rendering as nothing
+ * at all, which is precisely what the data rule below forbids — and, since
+ * `portfolio` is `null`, no portfolio block came to replace them. The dialog
+ * collapsed to a Pass rate row.
+ *
+ * So the branch is now on {@link hasUnpublishedFormat}, which lives in the
+ * schema next to the superRefine that makes this state legal in the first
+ * place. Three states, one shared presentation each, no per-subject variant
+ * (issue #73's rule): sections → the table; unpublished format → the shared
+ * {@link UnpublishedFormatNote} where the table would be, with the three rows
+ * beneath it showing the dash they always should have; portfolio-only →
+ * neither, exactly as before.
  *
  * ONE presentation for every exam (Jon's #73 bounce, 2026-07-25). Every
  * subject with at least one published section renders {@link SectionsTable};
@@ -467,6 +492,42 @@ function SectionsTable({ sections }: { sections: readonly ExamSection[] }) {
   );
 }
 
+/**
+ * What stands where the section table would be when College Board publishes no
+ * exam format at all (issue #87).
+ *
+ * The three rows below this block render {@link NotPublishedDash} on their own
+ * — that is what the dash is for, and it needs no help. What the dash cannot
+ * say is that the gap is a fact about College Board rather than a hole in this
+ * app: an exam-details dialog whose entire body is four dashes reads as broken.
+ * So the state gets one heading (shared, identical for every subject that ever
+ * reaches it) plus the subject's own sourced reason from `formatNote`.
+ *
+ * Deliberately NOT a table: no zeroed rows, no placeholder sections, nothing
+ * shaped like data. It is prose because there is no data — and it is ONE
+ * shared treatment, not a Networking-shaped layout variant, which is the whole
+ * point of issue #73's "one presentation per state" rule. Styled as the
+ * dialog's existing note block (the `examNote` / `noExamReason` boxes at the
+ * foot) so it reads as commentary rather than as a fifth section row.
+ */
+function UnpublishedFormatNote({ note }: { note: string | undefined }) {
+  return (
+    <div
+      data-testid="unpublished-format-note"
+      className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/40"
+    >
+      <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+        Exam format not published yet
+      </h3>
+      {note && (
+        <p className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+          {note}
+        </p>
+      )}
+    </div>
+  );
+}
+
 const DELIVERY_LABELS: Record<"digital" | "paper" | "hybrid", string> = {
   digital: "Digital",
   paper: "Paper",
@@ -488,7 +549,15 @@ export function InfoPanel({ subject, onClose }: InfoPanelProps) {
   // Issue #44: an empty sections array means "no sit-down exam" (the four
   // portfolio-only subjects) — the exam-format rows are omitted entirely,
   // never rendered as zeroed or placeholder rows.
+  //
+  // Issue #87: …unless there IS an exam and College Board has published no
+  // format for it (AP Networking). Same empty array, opposite meaning — see
+  // the module doc. That subject keeps the three rows, each showing the dash,
+  // because a value nobody has published is exactly what the dash is for; what
+  // it does not get is a table, because there are no sections to put in one.
   const hasSections = format.sections.length > 0;
+  const formatUnpublished = hasUnpublishedFormat(subject);
+  const hasFormatRows = hasSections || formatUnpublished;
 
   // Tier 3 (issue #22): verified official College Board page — `null` (link
   // omitted) for any subject without an individually verified URL.
@@ -571,8 +640,15 @@ export function InfoPanel({ subject, onClose }: InfoPanelProps) {
               rows; its portfolio block below tells the real story. */}
           {hasSections && <SectionsTable sections={format.sections} />}
 
-          <dl className={hasSections ? "mt-2" : undefined}>
-            {hasSections && (
+          {/* The third state (issue #87): an exam exists, its format does not
+              yet. Prose where the table would be — never a fabricated table,
+              never zeroed rows. */}
+          {formatUnpublished && (
+            <UnpublishedFormatNote note={subject.formatNote} />
+          )}
+
+          <dl className={hasFormatRows ? "mt-2" : undefined}>
+            {hasFormatRows && (
               <>
                 <Row label="Exam length">
                   {format.totalMinutes === undefined ? (

@@ -365,6 +365,61 @@ export const formatSchema = z.strictObject({
   delivery: z.enum(["digital", "paper", "hybrid"]).optional(),
 });
 
+/**
+ * The THIRD format state (issue #87): a real exam whose format College Board
+ * has not published at all.
+ *
+ * `format.sections.length === 0` was read as one thing until this issue —
+ * "no sit-down exam", i.e. the four portfolio-only subjects — because those
+ * four were the only members of the set when issue #44 wrote the rule. The
+ * 2027 swap added AP Networking, which has a published May 7 date and an
+ * empty `sections` for the opposite reason: `/courses/ap-networking/exam`
+ * 404s, so there is nothing to publish yet. One boolean over `sections` cannot
+ * tell those apart, and reading it as "portfolio-only" made the details dialog
+ * drop the Exam length / Calculator / Delivery rows for a subject that has no
+ * portfolio block to tell the story instead — three unpublished values
+ * rendering as nothing at all, which is exactly what PRD §7.5 forbids.
+ *
+ * The discriminator is the data, not the id: this is the same condition the
+ * superRefine below already enforced as the ONLY legal shape for an empty
+ * `sections` under a non-null `exam`, lifted out so the schema rule and every
+ * renderer read it from one place. A Networking-shaped `subject.id === "…"`
+ * special case would have to be re-cut for each Career Kickstart course that
+ * arrives in this state (the third pilot ends in 2026-27), and would silently
+ * do the wrong thing for the one after that.
+ *
+ * Deliberately NOT `portfolio === null`: that reads the absence of one thing
+ * as the presence of another. A subject can be exam-less and portfolio-less
+ * (a listed course with a sourced `noExamReason`), and that subject has no
+ * format rows to render either — `exam !== null` is what says "there is an
+ * exam day to describe, and we cannot describe it".
+ */
+/**
+ * The shape {@link hasUnpublishedFormat} reads, spelled out structurally
+ * rather than as `Pick<ApSubject, "exam" | "format">`: `ApSubject` is inferred
+ * FROM `subjectSchema`, whose own `superRefine` calls this function, so naming
+ * it here would make the type circular.
+ */
+interface UnpublishedFormatProbe {
+  exam: unknown;
+  format: {
+    sections: readonly unknown[];
+    totalMinutes?: unknown;
+    calculator?: unknown;
+    delivery?: unknown;
+  };
+}
+export function hasUnpublishedFormat(subject: UnpublishedFormatProbe): boolean {
+  const { format } = subject;
+  return (
+    subject.exam !== null &&
+    format.sections.length === 0 &&
+    format.totalMinutes === undefined &&
+    format.calculator === undefined &&
+    format.delivery === undefined
+  );
+}
+
 export const portfolioSchema = z.strictObject({
   deadline: isoDate,
   /**
@@ -422,8 +477,30 @@ export const subjectSchema = z
      * that has no other home in the schema — e.g. AP Networking's May 2027
      * exam, which the published schedule restricts to "2026-27 pilot schools
      * only". Verbatim-sourced, never editorial.
+     *
+     * Scope narrowed by issue #87: this field qualifies the DATE and nothing
+     * else. It used to carry two more sentences explaining why AP Networking's
+     * exam FORMAT is unpublished, which made the one note in the whole dataset
+     * a 297-character paragraph on a catalog card — and put the explanation of
+     * the details dialog's empty rows on a surface that shows no format at
+     * all. That half moved to {@link subjectSchema.shape.formatNote}; the
+     * superRefine below keeps this one tied to a real exam, because every
+     * surface renders it against a printed date (the chip's Exam row, the
+     * schedule row, the calendar block, the `.ics` DESCRIPTION).
      */
     examNote: z.string().min(1).optional(),
+    /**
+     * Why College Board publishes no exam format for this subject at all
+     * (issue #87) — the sourced counterpart to {@link hasUnpublishedFormat}.
+     *
+     * Only meaningful in that state, and REQUIRED in it: the details dialog
+     * renders this line where the section table would be, so without it the
+     * dialog would present a bare "Exam format not published yet" heading over
+     * three dashes and leave the reader to guess whether that is a fact about
+     * College Board or a bug in this app. Same contract as `passRateNote` one
+     * field up, and the superRefine below enforces both directions.
+     */
+    formatNote: z.string().min(1).optional(),
   })
   .superRefine((subject, ctx) => {
     const inWindow = (
@@ -497,21 +574,51 @@ export const subjectSchema = z
     // page does not exist yet — /courses/ap-networking/exam still 404s, live
     // re-checked 2026-07-25 for issue #84). A partially-filled format can
     // never reach the empty-sections branch, so "we have some data but no
-    // rows" stays an error.
-    const noPublishedFormat =
-      subject.format.totalMinutes === undefined &&
-      subject.format.delivery === undefined &&
-      subject.format.calculator === undefined;
+    // rows" stays an error. Issue #87 lifted the condition itself into
+    // {@link hasUnpublishedFormat} so the surfaces branch on the same rule
+    // this check enforces, instead of re-deriving it from `sections` alone.
+    const formatUnpublished = hasUnpublishedFormat(subject);
     if (
       subject.exam !== null &&
       subject.format.sections.length === 0 &&
-      !noPublishedFormat
+      !formatUnpublished
     ) {
       ctx.addIssue({
         code: "custom",
         path: ["format", "sections"],
         message:
           "subjects with a sit-down exam must carry at least one published section, unless College Board publishes no exam format at all (then every format field is omitted)",
+      });
+    }
+
+    // Issue #87 — the unpublished-format state must say why, and only it may.
+    if (formatUnpublished && subject.formatNote === undefined) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["formatNote"],
+        message:
+          "a subject whose exam format is entirely unpublished must carry a sourced formatNote — the details dialog renders it where the section table would be, and without it the dialog shows three dashes and no reason",
+      });
+    }
+    if (subject.formatNote !== undefined && !formatUnpublished) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["formatNote"],
+        message:
+          "formatNote explains an ENTIRELY unpublished exam format; a subject with published sections or format fields must not carry one",
+      });
+    }
+
+    // Issue #87 — examNote qualifies a printed exam date. Every surface that
+    // renders it (chip Exam row, schedule row, calendar block, .ics) hangs it
+    // off that date, so a note on an exam-less subject would silently vanish;
+    // that subject explains itself with noExamReason instead.
+    if (subject.examNote !== undefined && subject.exam === null) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["examNote"],
+        message:
+          "examNote qualifies a published exam date; a subject with no exam in this cycle uses noExamReason",
       });
     }
   });

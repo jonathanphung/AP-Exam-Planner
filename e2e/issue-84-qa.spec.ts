@@ -252,36 +252,47 @@ test.describe("issue #84 — the 33 resolved values, at the DOM", () => {
   test("AC3 — the no-published-format trio: AP Networking states the gap in prose, and renders no empty rows", async ({
     page,
   }) => {
-    // The one place the card's "every unpublished value renders the dash"
-    // does NOT hold literally, pinned here so it is a decision on the record
-    // rather than an unnoticed gap.
-    //
     // AP Networking has `sections: []` because `/courses/ap-networking/exam`
     // 404s. Issue #44 established that a subject with no published exam format
     // omits the whole Exam-length / Calculator / Delivery block rather than
     // rendering it — so those three of the 33 were never dashed cells before
-    // this change either, and this PR does not regress them. What makes the
-    // omission honest instead of a silent hole is the `examNote`, which names
-    // all three gaps in the page's own terms. That is the contract asserted
-    // here: if the note ever stops naming one of them, the app is hiding an
-    // unpublished value instead of declaring it.
+    // #84 either, and #84 did not regress them.
+    //
+    // ── SUPERSEDED BY ISSUE #87 (2026-07-26) ─────────────────────────────
+    // This test used to assert `dt` === ["Pass rate"], recording the omission
+    // as a deliberate exception to "every unpublished value renders the dash".
+    // It was not an exception, it was the bug: #44's rule keyed off
+    // `sections.length`, which for the four portfolio-only subjects means "no
+    // sit-down exam, the portfolio block tells the story" and for AP
+    // Networking means "there IS an exam and its format is unpublished". With
+    // `portfolio: null` no block came to tell any story, so the dialog dropped
+    // three unpublished values to a body of one row. The three now render the
+    // dash like the other 30, and the prose that makes the gap honest moved
+    // from `examNote` (which also rode four other surfaces) to `formatNote`,
+    // rendered where the section table would be. Everything below still holds:
+    // the gap is named in the page's own terms and nothing is fabricated.
     await page.goto("/");
     await openInfo(page, "AP Networking");
 
     // No dangling label with nothing after it, in either direction.
-    await expect(dialog(page).locator("dt")).toHaveText(["Pass rate"]);
+    await expect(dialog(page).locator("dt")).toHaveText([
+      "Exam length",
+      "Calculator",
+      "Delivery",
+      "Pass rate",
+    ]);
     await expect(dialog(page).locator("table")).toHaveCount(0);
 
     // …and the gap is stated, naming each of the three.
     const body = dialog(page);
     await expect(body).toContainText(/no exam page for it yet/i);
-    await expect(body, "examNote must name the missing duration").toContainText(
+    await expect(body, "formatNote must name the missing duration").toContainText(
       /duration/i,
     );
-    await expect(body, "examNote must name the missing delivery mode").toContainText(
+    await expect(body, "formatNote must name the missing delivery mode").toContainText(
       /delivery mode/i,
     );
-    await expect(body, "examNote must name the missing calculator policy").toContainText(
+    await expect(body, "formatNote must name the missing calculator policy").toContainText(
       /calculator policy/i,
     );
 
