@@ -101,12 +101,22 @@ export interface WeekCardRow {
   lengthPending: boolean;
   /** True when a conflict resolution moved this exam to its late-testing slot. */
   movedToLate: boolean;
-  /** Portfolio submission note (verbatim); null for exams. */
+  /**
+   * Portfolio submission note (verbatim); null for exams. Carried by the model
+   * as a faithful projection of the schedule entry, but the exported list card
+   * deliberately does NOT print it anywhere (Jon's product call on the #91
+   * bounce, 2026-07-27): the dated deadline row is schedule content, the
+   * submission-process prose is not. The text still lives in the dataset, the
+   * details dialog, and the `.txt`/`.json` exports.
+   */
   note: string | null;
   /**
    * The exam's published qualifier (verbatim `examNote`), or null (issue #71).
-   * A `.png` has no popup and no tooltip, so this text is PRINTED on the card
-   * under the subject name — the card is the whole disclosure surface.
+   * A `.png` has no popup and no tooltip, so this text is PRINTED on the card —
+   * the card is the whole disclosure surface. Issue #91 moved *where*: the row
+   * carries a short marker and the verbatim text moves to the card's notes
+   * strip (see {@link weekCardNotes}), so the text is never lost and never
+   * printed once per subject.
    */
   examNote: string | null;
 }
@@ -131,6 +141,82 @@ export interface WeekCardsResult {
   cards: WeekCard[];
   /** Selected subjects with no dated entry at all (never silently dropped). */
   undated: UndatedSubject[];
+}
+
+/**
+ * One de-duplicated published exam qualifier for a week card's notes strip:
+ * the verbatim text once, plus every subject on this card that carries it.
+ */
+export interface WeekCardNote {
+  /** The dataset `examNote` text, VERBATIM — never truncated, never summarised. */
+  text: string;
+  /** Subject names carrying this exact text, in row order, de-duplicated. */
+  subjectNames: string[];
+  /**
+   * The shared category when every subject in the group has the same one,
+   * else null — the strip tints its bullet with it and must not imply a
+   * category the group does not actually share.
+   */
+  category: Category | null;
+}
+
+/**
+ * The card's published exam qualifiers, de-duplicated by verbatim text —
+ * issue #91, amended by Jon's bounce (2026-07-27).
+ *
+ * Two-stage history, both recorded because each half is a deliberate call:
+ *
+ * 1. The original #91 fix grouped BOTH long verbatim strings — `row.note` (the
+ *    portfolio submission notes) and `row.examNote` — by (kind, text), so the
+ *    renderer painted "one note, many subjects" instead of six copies of the
+ *    byte-identical 310-character PPR paragraph.
+ * 2. Jon then bounced the card with the call that the portfolio submission
+ *    note should not be on the exported list card AT ALL — not inline, not in
+ *    the strip, not as a row marker. The dated deadline row is schedule
+ *    content; the submission-process prose is not. So `row.note` is now
+ *    deliberately IGNORED here, and only `examNote` reaches the strip. The
+ *    portfolio text still lives in the dataset, the details dialog, and the
+ *    `.txt`/`.json` exports — this is a list-`.png` presentation decision,
+ *    not a data change.
+ *
+ * The `examNote` treatment is unchanged from the approved #91 build: #71's
+ * requirement (a `.png` has no popup or tooltip, so the qualifier must be
+ * printed on the card) still holds, and grouping keeps it printed once per
+ * distinct text however many subjects carry it.
+ *
+ * Order is first appearance in row order (rows are already chronological), so
+ * the strip reads in the same sequence as the rows above it.
+ */
+export function weekCardNotes(
+  rows: readonly WeekCardRow[],
+): WeekCardNote[] {
+  const byText = new Map<string, WeekCardNote>();
+  // Tracks whether a group is still category-unanimous; a group that has seen
+  // two categories is pinned to null and never re-tinted.
+  const unanimous = new Map<string, boolean>();
+
+  for (const row of rows) {
+    const text = row.examNote;
+    if (!text) continue;
+    const existing = byText.get(text);
+    if (!existing) {
+      byText.set(text, {
+        text,
+        subjectNames: [row.subjectName],
+        category: row.category,
+      });
+      unanimous.set(text, true);
+      continue;
+    }
+    if (!existing.subjectNames.includes(row.subjectName)) {
+      existing.subjectNames.push(row.subjectName);
+    }
+    if (unanimous.get(text) && existing.category !== row.category) {
+      unanimous.set(text, false);
+      existing.category = null;
+    }
+  }
+  return [...byText.values()];
 }
 
 /** Position-derived identity for one testing week (label, slug, range). */

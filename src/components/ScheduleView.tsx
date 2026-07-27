@@ -41,19 +41,43 @@ const SUBJECTS_BY_ID: ReadonlyMap<string, ApSubject> = new Map(
 // The cycle banner moved up into ScheduleViews (issue #19 second bounce,
 // item B) so it is shared by the list and calendar views.
 
+/**
+ * One schedule entry.
+ *
+ * ## Portfolio rows are ordinary cards (Jon's bounce of #91, 2026-07-27)
+ *
+ * A portfolio row used to be a visually separate object: amber card chrome,
+ * the verbatim College Board submission note (168–310 chars), and a standing
+ * "schools set earlier internal deadlines" advisory. Three stacked blocks of
+ * prose against an exam row's single line — the same swamping this ticket
+ * removed from the exported `.png`, on the on-screen list.
+ *
+ * Jon's call, verbatim: *"in list view the portfolio card shouldnt even have
+ * the block of text either. it should look like another ordinary ap exam card
+ * but say 'Portfolio due' instead of 'PM/AM' as the pill."* So:
+ *
+ * - the card takes the same neutral treatment an exam row gets;
+ * - `entry.note` is NOT rendered here (it stays on the model — the `.ics`
+ *   DESCRIPTION and the week-card row model both still read it, and the
+ *   details dialog still prints it in full);
+ * - the internal-deadline advisory is gone from this row. It is not gone from
+ *   the product: `InfoPanel` carries an equivalent line in the subject's
+ *   details dialog.
+ *
+ * The pill keeps its amber palette on purpose — Jon's "but say 'Portfolio
+ * due' … as the pill" carves the pill out as the one place the kind is still
+ * signalled, so the colour cue lives there and nowhere else.
+ *
+ * Accepted consequence: the deadline's 11:59 p.m. ET time reached this list
+ * only inside `entry.note`, so the list now shows the deadline's date but not
+ * its time. The time remains in the details dialog and in the `.ics`.
+ */
 function ScheduleRow({ entry }: { entry: ScheduleEntry }) {
   const isPortfolio = entry.kind === "portfolio";
   const category = SUBJECTS_BY_ID.get(entry.subjectId)?.category;
 
   return (
-    <li
-      className={[
-        "flex flex-col gap-1.5 rounded-lg border p-3",
-        isPortfolio
-          ? "border-amber-300 bg-amber-50 dark:border-amber-500/40 dark:bg-amber-950/30"
-          : "border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900",
-      ].join(" ")}
-    >
+    <li className="flex flex-col gap-1.5 rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900">
       <div className="flex flex-wrap items-center gap-2">
         <span className="font-medium break-words">
           <SubjectName
@@ -99,21 +123,6 @@ function ScheduleRow({ entry }: { entry: ScheduleEntry }) {
           <span className="font-semibold">{EXAM_NOTE_LABEL}:</span>{" "}
           {entry.examNote}
         </p>
-      )}
-
-      {isPortfolio && (
-        <>
-          {entry.note && (
-            <p className="text-sm break-words text-amber-800 dark:text-amber-200/90">
-              {entry.note}
-            </p>
-          )}
-          <p className="text-xs italic break-words text-amber-700 dark:text-amber-300/80">
-            Heads up: schools and teachers often set an earlier internal deadline
-            than College Board&rsquo;s official one — confirm the date your class
-            has to meet.
-          </p>
-        </>
       )}
     </li>
   );

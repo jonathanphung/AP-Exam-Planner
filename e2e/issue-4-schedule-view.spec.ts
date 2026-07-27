@@ -103,7 +103,29 @@ test.describe("issue #4 — my schedule", () => {
     await expect(rows(page).nth(2).getByText("PM", { exact: true })).toBeVisible();
   });
 
-  test("AC2 — a subject with a portfolio renders a distinct 'Portfolio due' entry + internal-deadline note", async ({
+  /**
+   * AC2, rewritten for Jon's bounce of #91 (2026-07-27): *"in list view the
+   * portfolio card shouldnt even have the block of text either. it should look
+   * like another ordinary ap exam card but say 'Portfolio due' instead of
+   * 'PM/AM' as the pill."*
+   *
+   * The original AC2 pinned the OPPOSITE contract — an amber card body plus the
+   * "earlier internal deadline" advisory — so both of those assertions are
+   * retired here rather than deleted, and replaced by assertions on the new
+   * contract:
+   *
+   *   1. the row carries NO prose (neither the verbatim College Board
+   *      submission note nor the retired advisory);
+   *   2. the row's card chrome is byte-identical to an exam row's;
+   *   3. the "Portfolio due" pill is the SOLE differentiator — still present,
+   *      still visually distinct from the exam row's session pill.
+   *
+   * The advisory itself is not gone from the product: `InfoPanel` renders an
+   * equivalent line in the subject's details dialog, which is why removing it
+   * here loses no information. Note text likewise still ships in the dataset,
+   * the `.ics` DESCRIPTION, and the `.txt`/`.json` exports.
+   */
+  test("AC2 — a subject with a portfolio renders an ordinary card whose only tell is the 'Portfolio due' pill", async ({
     page,
   }) => {
     await page.goto("/");
@@ -122,7 +144,24 @@ test.describe("issue #4 — my schedule", () => {
     const portfolioRow = rows(page).nth(0);
     await expect(portfolioRow).toContainText("AP Seminar");
     await expect(portfolioRow.getByText("Portfolio due")).toBeVisible();
-    await expect(portfolioRow).toContainText(/earlier internal deadline/i);
+
+    // (1) No prose. The submission note is read from the dataset rather than
+    // pasted, so a dataset re-word cannot make this assertion vacuously pass.
+    const seminar = apData.subjects.find((s) => s.name === "AP Seminar") as
+      | { portfolio?: { note?: string } }
+      | undefined;
+    const seminarNote = seminar?.portfolio?.note;
+    expect(
+      seminarNote,
+      "fixture drift: AP Seminar has no portfolio note",
+    ).toBeTruthy();
+    await expect(portfolioRow).not.toContainText(seminarNote as string);
+    // The retired internal-deadline advisory (this row's other paragraph).
+    await expect(portfolioRow).not.toContainText(/earlier internal deadline/i);
+    // Nothing else crept in. Every block this row used to stack was a <p>;
+    // an ordinary card has none, so the count is the structural form of "no
+    // block of text" and survives any re-wording of what was removed.
+    await expect(portfolioRow.locator("p")).toHaveCount(0);
 
     // Row 1 — the sit-down exam entry, NOT tagged as portfolio.
     const examRow = rows(page).nth(1);
@@ -130,15 +169,25 @@ test.describe("issue #4 — my schedule", () => {
     await expect(examRow.getByText("PM", { exact: true })).toBeVisible();
     await expect(examRow.getByText("Portfolio due")).toHaveCount(0);
 
-    // Visually distinct: the portfolio row paints a different background than
-    // the exam row (amber accent vs neutral card).
-    const portfolioBg = await portfolioRow.evaluate(
-      (el) => getComputedStyle(el).backgroundColor,
+    // (2) Ordinary card: same background AND same border as the exam row. The
+    // amber body this test used to require is gone by product call.
+    const chrome = (el: HTMLElement) => {
+      const s = getComputedStyle(el);
+      return `${s.backgroundColor} | ${s.borderColor}`;
+    };
+    expect(await portfolioRow.evaluate(chrome)).toBe(
+      await examRow.evaluate(chrome),
     );
-    const examBg = await examRow.evaluate(
-      (el) => getComputedStyle(el).backgroundColor,
+
+    // (3) …and the pill still carries the distinction, so "ordinary card" did
+    // not flatten the two kinds into one another.
+    const portfolioPill = portfolioRow.getByText("Portfolio due");
+    const examPill = examRow.getByText("PM", { exact: true });
+    expect(
+      await portfolioPill.evaluate((el) => getComputedStyle(el).backgroundColor),
+    ).not.toBe(
+      await examPill.evaluate((el) => getComputedStyle(el).backgroundColor),
     );
-    expect(portfolioBg).not.toBe(examBg);
   });
 
   test("AC3 — a portfolio-only subject appears only as a deadline entry, never as an exam", async ({
