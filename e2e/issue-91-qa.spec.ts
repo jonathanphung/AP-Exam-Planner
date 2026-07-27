@@ -8,38 +8,49 @@ import { pressViewChip } from "./support/view-chip";
  * super-board QA (issue #91) — independent verification that the list-view
  * `.png` no longer prints multi-hundred-character notes inside its rows.
  *
+ * ## Amended by Jon's bounce (2026-07-27)
+ *
+ * The approved PR #96 relocated BOTH verbatim strings (portfolio submission
+ * notes + the published exam qualifier) into a de-duplicated strip. Jon then
+ * bounced the card: the portfolio note must not be on the exported list card
+ * AT ALL — not inline, not in the strip, not as a marker; only the dated
+ * deadline row stays. The `examNote` treatment stays as approved. Where the
+ * ticket's original ACs conflict with the bounce, the bounce supersedes: AC2
+ * ("every note still on the card") is voided for portfolio notes and holds for
+ * examNote; AC4 (dedup) now applies only to examNote; AC6 (same treatment for
+ * both kinds) is voided — the divergence is deliberate.
+ *
  * ## What the Builder already pinned, and why this is not a duplicate
  *
- * `src/lib/week-card-notes.test.ts` pins the MODEL (`weekCardNotes` groups by
- * `(kind, verbatim text)`). `e2e/issue-91-list-note-strip.spec.ts` measures the
- * rasterized card for ONE selection — the issue's worst case — and asserts the
- * single most-repeated note prints once.
+ * `src/lib/week-card-notes.test.ts` pins the MODEL (`weekCardNotes` emits only
+ * exam qualifiers). `e2e/issue-91-list-note-strip.spec.ts` measures the
+ * rasterized card for ONE selection — the issue's worst case.
  *
  * Three things neither of those can fail on, and all three are where the risk
  * sits:
  *
- * 1. **"Nothing is lost" is asserted for one note, not for the dataset.** The
- *    Builder's e2e checks the largest portfolio group + the one `examNote`. A
- *    renderer that dropped, say, the AP Research note (a group of one — the
- *    de-duplication path that never merges) would keep every existing
- *    assertion green. AC2 is a claim about EVERY note a row would have carried,
- *    so this suite selects all 12 note-bearing subjects plus AP Networking and
- *    sweeps every distinct dataset string across every emitted card.
+ * 1. **"Nowhere on the card" is asserted for one note group, not for the
+ *    dataset.** The Builder's e2e sweeps the largest portfolio group + the one
+ *    `examNote`. A renderer that still printed, say, the AP Research note (a
+ *    group of one) would keep every Builder assertion green. The amended
+ *    contract is a claim about EVERY portfolio note, so this suite selects all
+ *    12 note-bearing subjects plus AP Networking and sweeps every distinct
+ *    dataset string across every emitted card: portfolio texts absent
+ *    everywhere, the qualifier present exactly once on its card.
  *
  * 2. **AC5 is a claim about DOMINANCE, not about row height.** "The exam dates
  *    must remain the visually dominant content" can regress without any row
- *    growing: move the wall of text from the rows into the strip and the strip
- *    itself becomes the wall. So this suite measures the painted geometry —
- *    strip height vs. the height the rows occupy, and each region's share of
- *    the card — instead of only the per-row budget.
+ *    growing. So this suite measures the painted geometry — strip height vs.
+ *    the height the rows occupy, and each region's share of the card — instead
+ *    of only the per-row budget.
  *
  * 3. **AC8 ("the calendar `.png` is unchanged") is asserted by nobody.** The
  *    diff not touching `export-png-calendar.ts` is necessary, not sufficient:
- *    both variants now consume `WeekCardRow`/`week-cards.ts`, which this change
+ *    both variants consume `WeekCardRow`/`week-cards.ts`, which this change
  *    edited. This suite exports the calendar card in the same browser session
  *    and asserts its notes strip is still the `Published notes` construction
- *    with the verbatim qualifier, and that the list card's new
- *    `Portfolio note` label has not leaked into it.
+ *    with the verbatim qualifier, and that neither the retired `Portfolio
+ *    note` label nor any portfolio note text has leaked into it.
  *
  * Everything is dataset-derived — no note text, subject id or subject name is
  * hardcoded — so the next annual swap re-points the suite rather than going
@@ -53,8 +64,12 @@ const EVIDENCE_DIR = evidenceDir("issue-91-qa-v1");
 
 /** Mirrors `EXAM_NOTE_LABEL` in src/lib/schedule.ts. */
 const EXAM_NOTE_LABEL = "Published note";
-/** Mirrors `PORTFOLIO_NOTE_LABEL` in src/lib/export-png.ts. */
-const PORTFOLIO_NOTE_LABEL = "Portfolio note";
+/**
+ * The RETIRED portfolio marker label (was `PORTFOLIO_NOTE_LABEL` in
+ * src/lib/export-png.ts until Jon's bounce removed the portfolio note from the
+ * list card entirely). Asserted ABSENT from every export.
+ */
+const RETIRED_PORTFOLIO_LABEL = "Portfolio note";
 /** Mirrors `CARD_WIDTH` in src/lib/export-png.ts. */
 const CARD_WIDTH = 680;
 
@@ -178,7 +193,9 @@ async function probeExportCards(page: Page) {
             children.find((c) => {
               const style = getComputedStyle(c);
               if (style.borderTopStyle !== "dashed") return false;
-              return (c.firstElementChild?.textContent ?? "") === "Notes";
+              return (
+                (c.firstElementChild?.textContent ?? "") === "Published notes"
+              );
             }) ?? null;
           // The entry list is the strip's second child (heading, then list).
           const entryEls = stripEl
@@ -296,12 +313,12 @@ test.describe("issue #91 QA — the list card's note budget", () => {
     expect(NOTE_BEARERS.length).toBeGreaterThan(SHARED.subjects.length);
   });
 
-  test("AC2 — every note in the dataset survives the export, verbatim and exactly once per card", async ({
+  test("amended AC2 — portfolio notes appear NOWHERE; the exam qualifier survives, once per card", async ({
     page,
   }) => {
-    // The whole note-bearing selection, not just the worst case: a group of one
-    // (AP Research, AP Seminar, AP CSP) never exercises the merge path, so a
-    // renderer that lost it would keep the Builder's suite green.
+    // The whole note-bearing selection, not just the worst case: a renderer
+    // that still printed a group-of-one note (AP Research, AP Seminar, AP CSP)
+    // would keep the Builder's suite green.
     const { probes } = await exportCards(
       page,
       "Save as list view .png",
@@ -311,12 +328,40 @@ test.describe("issue #91 QA — the list card's note budget", () => {
     expect(probes.length).toBeGreaterThan(0);
 
     for (const note of DATASET_NOTES) {
+      if (note.kind === "portfolio") {
+        // Jon's bounce — the portfolio prose is not on ANY list card, in any
+        // region: not a row, not a strip entry, not a marker.
+        for (const probe of probes) {
+          expect(
+            probe.text,
+            `"${note.text.slice(0, 48)}…" (${note.subjects
+              .map((s) => s.name)
+              .join(", ")}) is still on an exported list card`,
+          ).not.toContain(note.text);
+        }
+        // …but its dated deadline ROW survives for every selected subject.
+        for (const subject of note.subjects) {
+          expect(
+            probes.some((p) =>
+              p.rows.some(
+                (r) =>
+                  r.text.includes(subject.name) &&
+                  r.text.includes("Portfolio deadline"),
+              ),
+            ),
+            `${subject.name} lost its portfolio deadline row`,
+          ).toBe(true);
+        }
+        continue;
+      }
+
+      // examNote — the approved treatment is untouched by the bounce.
       const carriers = probes.filter((p) => p.text.includes(note.text));
       expect(
         carriers.length,
         `"${note.text.slice(0, 48)}…" (${note.subjects
           .map((s) => s.name)
-          .join(", ")}) is on NO exported card — the note was dropped, not relocated`,
+          .join(", ")}) is on NO exported card — the qualifier was dropped, not deferred`,
       ).toBeGreaterThan(0);
 
       for (const carrier of carriers) {
@@ -325,20 +370,25 @@ test.describe("issue #91 QA — the list card's note budget", () => {
           occurrences(carrier.text, note.text),
           `printed ${occurrences(carrier.text, note.text)}× on one card`,
         ).toBe(1);
-        // AC2 — and it is in the strip, not back on a row.
+        // In the strip, not back on a row.
         expect(carrier.stripText, "the card has no notes strip").toBeTruthy();
         expect(carrier.stripText!).toContain(note.text);
         for (const row of carrier.rows) {
           expect(
             row.text,
-            `row "${row.text.slice(0, 40)}" inlines the note again`,
+            `row "${row.text.slice(0, 40)}" inlines the qualifier again`,
           ).not.toContain(note.text);
         }
       }
     }
+
+    // The retired marker label is gone from every card too.
+    for (const probe of probes) {
+      expect(probe.text).not.toContain(RETIRED_PORTFOLIO_LABEL);
+    }
   });
 
-  test("AC2/AC4 — the strip attributes each note to every subject on the card that carries it", async ({
+  test("amended AC2/AC4 — the strip attributes each qualifier to every subject on the card that carries it", async ({
     page,
   }) => {
     const { probes } = await exportCards(
@@ -347,7 +397,9 @@ test.describe("issue #91 QA — the list card's note budget", () => {
       NOTE_BEARERS,
       "light",
     );
-    for (const note of DATASET_NOTES) {
+    const examNotes = DATASET_NOTES.filter((n) => n.kind === "exam");
+    expect(examNotes.length, "no examNote in the dataset").toBeGreaterThan(0);
+    for (const note of examNotes) {
       const carriers = probes.filter((p) => p.text.includes(note.text));
       // Not `for (…of carriers)` alone: an empty list would make every
       // assertion below vacuous, which is exactly what a renderer that DROPPED
@@ -360,7 +412,7 @@ test.describe("issue #91 QA — the list card's note budget", () => {
         const entry = carrier.stripEntries.find((e) => e.includes(note.text));
         expect(
           entry,
-          `the note is on the card but not in a strip ENTRY (heading-only strip?)`,
+          `the qualifier is on the card but not in a strip ENTRY (heading-only strip?)`,
         ).toBeTruthy();
         // Only subjects whose rows are on THIS card should be attributed.
         const onThisCard = note.subjects.filter((s) =>
@@ -370,14 +422,12 @@ test.describe("issue #91 QA — the list card's note budget", () => {
         for (const subject of onThisCard) {
           expect(
             entry!,
-            `"${subject.name}" carries this note on this card but is not attributed`,
+            `"${subject.name}" carries this qualifier on this card but is not attributed`,
           ).toContain(subject.name);
         }
         // AC3 — the label sits inside the entry, contiguous with the verbatim
         // text, and the text is byte-identical to the dataset.
-        const label =
-          note.kind === "exam" ? EXAM_NOTE_LABEL : PORTFOLIO_NOTE_LABEL;
-        expect(entry!).toContain(`${label}: ${note.text}`);
+        expect(entry!).toContain(`${EXAM_NOTE_LABEL}: ${note.text}`);
       }
     }
   });
@@ -392,13 +442,21 @@ test.describe("issue #91 QA — the list card's note budget", () => {
         WORST_CASE,
         theme,
       );
-      const worst = probes.find((p) => p.text.includes(SHARED.text));
+      // The worst-case card: the one carrying the portfolio deadline rows.
+      // (It can no longer be found by the note text — the bounce removed the
+      // prose from the card; only the dated rows remain.)
+      const worst = probes.find((p) =>
+        p.rows.some((r) => r.text.includes("Portfolio deadline")),
+      );
       expect(
         worst,
-        "no exported card carried the shared portfolio note at all",
+        "no exported card carried the portfolio deadline rows at all",
       ).toBeTruthy();
 
       for (const probe of probes) {
+        // Jon's bounce — the shared portfolio prose is on NO card, any theme.
+        expect(probe.text).not.toContain(SHARED.text);
+
         // AC7 — the card is still exactly CARD_WIDTH and does not overflow.
         expect(probe.width).toBe(CARD_WIDTH);
         expect(probe.overflow).toBeLessThanOrEqual(0);
@@ -410,31 +468,27 @@ test.describe("issue #91 QA — the list card's note budget", () => {
             `row "${row.text.slice(0, 50)}" is ${row.height}px tall`,
           ).toBeLessThanOrEqual(ROW_HEIGHT_BUDGET_PX);
           // AC3 — a row's lead-in is a derived short LABEL, never a paraphrase
-          // and never a slice of the source text.
+          // and never a slice of the source text. Since the bounce the only
+          // permitted marker is the exam-qualifier label.
           for (const marker of row.markers) {
-            expect([
-              PORTFOLIO_NOTE_LABEL,
-              EXAM_NOTE_LABEL,
-              `${PORTFOLIO_NOTE_LABEL}  ·  ${EXAM_NOTE_LABEL}`,
-            ]).toContain(marker);
+            expect([EXAM_NOTE_LABEL]).toContain(marker);
           }
         }
       }
 
       // AC5 — the dates, not the prose, are the card's dominant content. Both
       // halves matter: the rows must out-measure the strip, and the strip must
-      // stay a minority of the card. Relocating the wall of text into the strip
-      // would satisfy the per-row budget above and still fail the issue.
+      // stay a minority of the card. (Since the bounce the strip carries only
+      // the exam qualifier, so on this card it is one short entry — or absent
+      // when AP Networking's exam lands on the other week's card.)
       const rowsHeight = worst!.rows.reduce((sum, r) => sum + r.height, 0);
       expect(worst!.rows.length).toBeGreaterThan(1);
       expect(
         worst!.stripHeight,
         `the notes strip (${worst!.stripHeight}px) out-measures all ${worst!.rows.length} rows (${rowsHeight}px)`,
       ).toBeLessThan(rowsHeight);
-      // Measured on this branch: 164px of a 1136px card = 14%. The 30% ceiling
-      // is ~2× headroom against font-metric drift, and tight enough that losing
-      // de-duplication (the strip printing the PPR text six times again) trips
-      // it at ~40% rather than sliding through on the per-row budget alone.
+      // Was 14% with the portfolio entries in the strip; the ceiling still
+      // guards against the strip regrowing into a wall of text.
       expect(
         worst!.stripHeight / worst!.height,
         `the notes strip is ${Math.round(
@@ -472,13 +526,18 @@ test.describe("issue #91 QA — the list card's note budget", () => {
       "the rasterized calendar card lost the published qualifier",
     ).toBeTruthy();
     // Still the calendar's own construction — "Published notes" (plural
-    // heading), and the list card's new label has NOT leaked into it.
+    // heading) — and neither the retired list-card label nor the portfolio
+    // prose has leaked into it.
     expect(carrier!.text).toContain(`${EXAM_NOTE_LABEL}s`);
     for (const probe of probes) {
       expect(
         probe.text,
-        "the list card's Portfolio note marker leaked into the calendar export",
-      ).not.toContain(PORTFOLIO_NOTE_LABEL);
+        "the retired Portfolio note marker leaked into the calendar export",
+      ).not.toContain(RETIRED_PORTFOLIO_LABEL);
+      expect(
+        probe.text,
+        "the portfolio prose leaked into the calendar export",
+      ).not.toContain(SHARED.text);
     }
     for (const download of downloads) {
       const buf = readFileSync(await download.path());
@@ -502,6 +561,9 @@ test.describe("issue #91 QA — the list card's note budget", () => {
     // The new decision, and why #71's requirement still holds.
     expect(source).toContain("#91");
     expect(source).toMatch(/#71/);
+    // The bounce amendment: the deliberate examNote/portfolio divergence is
+    // recorded as Jon's product call on the exported card, with its date.
+    expect(source).toContain("2026-07-27");
   });
 
   test("visual evidence — the on-screen list view + export menu at the standard viewports", async ({

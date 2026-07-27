@@ -41,16 +41,27 @@ export type { ExportTheme };
  * exam already appears on its own "Late Testing" week card, so its placement
  * there is the signal — no information is lost.
  *
- * Note budget (issue #91): a row is identity + timing + at most a one-line note
- * MARKER. The verbatim note text — the portfolio submission notes and the
- * published exam qualifier — lives in the card's "Notes" strip below the rows,
- * printed once per distinct note and attributed to every subject that carries
- * it. Before this, each row inlined both strings in full: the 310-character
- * PPR note is byte-identical across all six AP language subjects, so a
- * six-language card printed the same paragraph six times and the May dates the
- * card exists to communicate were the smallest thing on it. The calendar
- * variant reached the same shape from the other direction (#71's "Published
- * notes" strip), so the two exports now defer notes the same way.
+ * Note budget (issue #91; amended by Jon's bounce, 2026-07-27): a row is
+ * identity + timing + at most a one-line note MARKER. Before #91, each row
+ * inlined two unbounded verbatim strings in full: the portfolio submission
+ * note and the published exam qualifier. The 310-character PPR note is
+ * byte-identical across all six AP language subjects, so a six-language card
+ * printed the same paragraph six times and the May dates the card exists to
+ * communicate were the smallest thing on it.
+ *
+ * The two strings now get deliberately DIFFERENT treatments — Jon's product
+ * call on the exported card, superseding the ticket's original "one solution
+ * for both" criterion:
+ *
+ * - `examNote` (the published exam qualifier): marker on the row, verbatim
+ *   text once in the "Published notes" strip below the rows — the exact
+ *   construction the calendar variant has used since #71, so the two exports
+ *   now defer it identically.
+ * - `row.note` (the portfolio submission note): NOT printed anywhere on the
+ *   list card — not inline, not in the strip, not as a marker. The dated
+ *   deadline row stays (it is schedule content); the submission-process prose
+ *   goes. The text still ships in the dataset, the details dialog, and the
+ *   `.txt`/`.json` exports — this is presentation, not data.
  *
  * Rasterization mechanism (builder decision, issue #56) — an off-screen DOM
  * node + `html-to-image`, NOT a hand-drawn `<canvas>`: the card is authored in
@@ -80,22 +91,6 @@ export interface WeekCardRenderOptions {
 /** Fixed card width — a comfortable share/paste width (px, pre-pixelRatio). */
 const CARD_WIDTH = 680;
 
-/**
- * Row-marker / notes-strip label for a portfolio submission note (issue #91).
- *
- * The sibling of {@link EXAM_NOTE_LABEL}, and written to the same rule: the
- * label only NAMES what the text is, it never paraphrases or summarises it.
- * Export-local because the on-screen list view has room to print the note in
- * place and needs no marker — only the fixed-width rasterized card does.
- */
-export const PORTFOLIO_NOTE_LABEL = "Portfolio note";
-
-/** The printed label for each note kind — the only kind→copy mapping. */
-const NOTE_LABEL: Record<WeekCardNote["kind"], string> = {
-  portfolio: PORTFOLIO_NOTE_LABEL,
-  exam: EXAM_NOTE_LABEL,
-};
-
 /** The right-hand "when" descriptor for a row (day · session · clock). */
 function rowWhen(row: WeekCardRow): string {
   const parts: string[] = [`${row.weekday}, ${row.monthDay}`];
@@ -118,10 +113,10 @@ function rowWhen(row: WeekCardRow): string {
 
 /**
  * One decluttered row: a color accent bar + a leading category dot + the
- * subject name and any note MARKER (left), and the day / session / clock
- * descriptor (right). No category chip and no "Moved to late testing" pill
- * (Jon's bounce), and no verbatim note paragraph (issue #91 — see the marker
- * comment below).
+ * subject name and any exam-qualifier MARKER (left), and the day / session /
+ * clock descriptor (right). No category chip and no "Moved to late testing"
+ * pill (Jon's bounce), no verbatim note paragraph (issue #91), and no
+ * portfolio-note marker (Jon's #91 bounce — see the marker comment below).
  */
 function renderRow(
   row: WeekCardRow,
@@ -176,21 +171,20 @@ function renderRow(
   nameRow.append(dot, name);
   left.append(nameRow);
 
-  // Note MARKERS, not the notes (issue #91). Issue #71 printed the published
+  // A note MARKER, not the note (issue #91). Issue #71 printed the published
   // qualifier here in full, reasoning that "a PNG has no popup or tooltip to
   // defer it to". That requirement — the text is never lost on the one surface
   // with no interaction — still holds and is still met: the verbatim text now
   // sits in the card's notes strip a few centimetres below, printed ONCE per
-  // distinct note. What changed is that the row is no longer the place for it.
-  // Inline, the portfolio note (310 chars for all six AP language subjects,
-  // byte-identical) wrapped to five or six 12px lines PER ROW and buried the
-  // May dates the card was exported for. The marker is the same construction
-  // the calendar block face has used since #71 — a short derived label naming
-  // what the text IS, never a paraphrase of it.
-  const markers: string[] = [];
-  if (row.note) markers.push(PORTFOLIO_NOTE_LABEL);
-  if (row.examNote) markers.push(EXAM_NOTE_LABEL);
-  if (markers.length > 0) {
+  // distinct note. The marker is the same construction the calendar block face
+  // has used since #71 — a short derived label naming what the text IS, never
+  // a paraphrase of it.
+  //
+  // `row.note` (the portfolio submission note) gets NO marker and no strip
+  // entry: Jon's bounce of #91 (2026-07-27) removed the portfolio note from
+  // the exported list card entirely. The deadline row itself stays — see the
+  // module comment.
+  if (row.examNote) {
     left.append(
       el(
         "span",
@@ -204,7 +198,7 @@ function renderRow(
           overflow: "hidden",
           textOverflow: "ellipsis",
         },
-        markers.join("  ·  "),
+        EXAM_NOTE_LABEL,
       ),
     );
   }
@@ -229,20 +223,20 @@ function renderRow(
 }
 
 /**
- * "Notes" strip (issue #91) — the verbatim text every row above deferred, each
- * distinct note printed ONCE and attributed to every subject that carries it.
+ * "Published notes" strip (issue #91) — the verbatim exam qualifier every row
+ * above deferred, each distinct note printed ONCE and attributed to every
+ * subject that carries it.
  *
  * Construction: the card's own undated-footnote idiom (dashed rule + muted
  * 12px), holding the calendar card's "Published notes" content model
- * (`renderNotesStrip` in `export-png-calendar.ts`). The two variants deliberately
- * differ in ONE way: this strip also carries portfolio notes, because the list
- * card is where portfolio deadlines get a full row, whereas the calendar puts
- * them in its off-grid strip under a derived label. Hence the heading is the
- * honest superset "Notes" rather than the calendar's `Published notes` — the
- * per-entry label ({@link NOTE_LABEL}) says which kind each entry is.
+ * (`renderNotesStrip` in `export-png-calendar.ts`). PR #96 originally headed
+ * this strip "Notes" because it also carried portfolio submission notes; Jon's
+ * bounce (2026-07-27) removed those from the list card entirely, so the strip
+ * is now exactly the calendar's construction — only published exam qualifiers
+ * — and takes the calendar's heading, keeping the two variants aligned.
  *
- * Returns null when the card has no notes, so a card of plain exams gets no
- * empty strip.
+ * Returns null when the card carries no examNote, so a card without a
+ * qualified exam gets no strip and no empty dashed rule.
  */
 function renderNotesStrip(
   notes: readonly WeekCardNote[],
@@ -263,7 +257,7 @@ function renderNotesStrip(
     el(
       "div",
       { fontSize: "13px", fontWeight: "600", color: tokens.body },
-      "Notes",
+      `${EXAM_NOTE_LABEL}s`,
     ),
   );
 
@@ -308,7 +302,7 @@ function renderNotesStrip(
       el(
         "span",
         { fontWeight: "600", color: tokens.body },
-        `${NOTE_LABEL[note.kind]}: `,
+        `${EXAM_NOTE_LABEL}: `,
       ),
     );
     text.append(el("span", {}, note.text));
@@ -427,7 +421,9 @@ export function renderWeekCardNode(
     body.append(renderRow(row, tokens, options.theme));
   }
 
-  // Notes strip — the verbatim text the rows deferred, de-duplicated (#91).
+  // Published-notes strip — the verbatim exam qualifiers the rows deferred,
+  // de-duplicated (#91). Portfolio notes deliberately never reach it (Jon's
+  // bounce, 2026-07-27).
   const notesStrip = renderNotesStrip(
     weekCardNotes(card.rows),
     tokens,

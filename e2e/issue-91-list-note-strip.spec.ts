@@ -5,41 +5,56 @@ import { evidenceDir } from "./support/evidence";
 
 /**
  * Builder acceptance drive + evidence for issue #91 — the list card's note
- * budget.
+ * budget, as amended by Jon's bounce (2026-07-27).
+ *
+ * ## The amended contract this pins
+ *
+ * PR #96 first moved BOTH long verbatim strings (portfolio submission notes +
+ * the published exam qualifier) out of the rows into a de-duplicated strip.
+ * Jon bounced that with a product call: the portfolio note should not be on
+ * the exported list card AT ALL — not inline, not in the strip, not as a row
+ * marker. The dated deadline ROW stays; the prose goes. The `examNote`
+ * treatment (marker on the row, verbatim text once in the strip) stays exactly
+ * as approved. So this suite asserts:
+ *
+ * 1. The portfolio note text appears NOWHERE in the rasterized card DOM, and
+ *    neither does the retired `Portfolio note` marker label.
+ * 2. Every selected portfolio deadline still gets its dated row.
+ * 3. The exam qualifier survives verbatim — marker on the row, `Published
+ *    note: <text>` contiguous in the strip (issue #71's disclosure contract).
+ * 4. A card with no qualified exam gets no strip at all.
  *
  * ## What this observes that no other suite can
  *
- * `src/lib/week-card-notes.test.ts` pins the MODEL (`weekCardNotes` groups by
- * verbatim text). It cannot see pixels: there is no DOM in the vitest setup, so
- * "the row is no longer a wall of text" and "the strip really renders" are
- * unobservable there. This suite measures the ACTUAL node that becomes the PNG,
- * using the harness `e2e/issue-71-qa.spec.ts` established — `captureCardPng`
- * parks the finished card in a `left: -100000px` holder on `document.body`
- * before rasterizing, so a MutationObserver installed pre-navigation gets the
- * exact geometry and text the exporter hands to `html-to-image`.
+ * `src/lib/week-card-notes.test.ts` pins the MODEL (`weekCardNotes` emits only
+ * exam qualifiers). It cannot see pixels: "the portfolio text is not painted"
+ * and "the strip really renders" are unobservable there. This suite measures
+ * the ACTUAL node that becomes the PNG, using the harness
+ * `e2e/issue-71-qa.spec.ts` established — `captureCardPng` parks the finished
+ * card in a `left: -100000px` holder on `document.body` before rasterizing, so
+ * a MutationObserver installed pre-navigation gets the exact geometry and text
+ * the exporter hands to `html-to-image`.
  *
  * ## The scenario is the issue's own worst case
  *
  * Every subject sharing the most-repeated portfolio note (May 2027: the six AP
  * language subjects and the byte-identical 310-character PPR text) PLUS the
- * subject whose exam carries a published qualifier (AP Networking). Their
- * portfolio deadlines all land off-window and ride the nearest week, so one
- * card ends up carrying six copies of the same paragraph under the old
- * renderer — the exact card the issue was filed about.
+ * subject whose exam carries a published qualifier (AP Networking). Everything
+ * is dataset-derived so the next annual swap re-points the suite instead of
+ * asserting on stale strings.
  *
- * Everything is dataset-derived (largest identical-note group, the examNote
- * bearer, the note text itself) so the next annual swap re-points the suite
- * instead of asserting on stale strings.
- *
- * Evidence: `docs/super-board/runs/issue-91-build-v1/` (via QA_EVIDENCE_DIR).
+ * Evidence: `docs/super-board/runs/issue-91-build-v2/` (via QA_EVIDENCE_DIR).
  */
 
-const EVIDENCE_DIR = evidenceDir("issue-91-build-v1");
+const EVIDENCE_DIR = evidenceDir("issue-91-build-v2");
 
 /** Mirrors `EXAM_NOTE_LABEL` in src/lib/schedule.ts. */
 const EXAM_NOTE_LABEL = "Published note";
-/** Mirrors `PORTFOLIO_NOTE_LABEL` in src/lib/export-png.ts. */
-const PORTFOLIO_NOTE_LABEL = "Portfolio note";
+/**
+ * The RETIRED portfolio marker label (was `PORTFOLIO_NOTE_LABEL` in
+ * src/lib/export-png.ts until Jon's bounce). Asserted ABSENT.
+ */
+const RETIRED_PORTFOLIO_LABEL = "Portfolio note";
 /** Mirrors `CARD_WIDTH` in src/lib/export-png.ts. */
 const CARD_WIDTH = 680;
 
@@ -123,8 +138,10 @@ async function probeExportCards(page: Page) {
           const rows = children.filter(
             (c) => getComputedStyle(c).borderLeftWidth === "4px",
           );
+          // The strip heading is the calendar's "Published notes" since Jon's
+          // bounce aligned the two variants.
           const strip = children.find((c) =>
-            c.textContent?.startsWith("Notes"),
+            c.textContent?.startsWith("Published notes"),
           );
           probes.push({
             text: root.textContent ?? "",
@@ -193,69 +210,69 @@ async function exportListCards(page: Page, theme: "light" | "dark") {
   return { downloads, probes: await readProbes(page) };
 }
 
-test.describe("issue #91 — the list card's note budget", () => {
+test.describe("issue #91 — the list card's note budget (amended by Jon's bounce)", () => {
   test.skip(
     !SHARED || SHARED.subjects.length < 2,
-    "this cycle ships no portfolio note shared by 2+ subjects — nothing to de-duplicate",
+    "this cycle ships no portfolio note shared by 2+ subjects — the six-times-over defect is unreproducible",
   );
 
   test("fixture guard — the dataset still supplies the worst case", () => {
     expect(SHARED!.subjects.length).toBeGreaterThan(1);
     expect(
       SHARED!.note.length,
-      "the shared note is no longer long enough to swamp a row",
+      "the shared note is no longer long enough to have swamped a row",
     ).toBeGreaterThan(150);
     expect(NOTED, "no exam carries a published qualifier this cycle").toBeTruthy();
   });
 
   for (const theme of ["light", "dark"] as const) {
-    test(`AC1/AC4/AC7 — ${theme}: rows stay one line, the shared note prints once, no overflow`, async ({
+    test(`${theme}: the portfolio note is GONE from the card, its deadline rows stay, no overflow`, async ({
       page,
     }) => {
       const { downloads, probes } = await exportListCards(page, theme);
       expect(probes.length).toBeGreaterThan(0);
 
-      // The card that carries the repeated note — the issue's worst case.
-      const worst = probes.find((p) => p.text.includes(SHARED!.note))!;
-      expect(
-        worst,
-        "no exported card carried the shared portfolio note at all",
-      ).toBeTruthy();
-
-      // AC7 — still exactly CARD_WIDTH, still no horizontal overflow.
+      // Jon's bounce — the portfolio note text appears NOWHERE in the list
+      // card DOM: no row, no strip entry, no marker. Swept across EVERY
+      // emitted card, not just the worst one.
       for (const probe of probes) {
+        expect(
+          probe.text,
+          "the portfolio submission note is still on the exported card",
+        ).not.toContain(SHARED!.note);
+        expect(
+          probe.text,
+          "the retired Portfolio note marker is still on the exported card",
+        ).not.toContain(RETIRED_PORTFOLIO_LABEL);
+
+        // The card is still exactly CARD_WIDTH with no horizontal overflow.
         expect(probe.width).toBe(CARD_WIDTH);
         expect(probe.overflow).toBeLessThanOrEqual(0);
+
+        // No row is a paragraph.
+        probe.rowHeights.forEach((height, i) => {
+          expect(
+            height,
+            `row "${probe.rowTexts[i].slice(0, 60)}" is ${Math.round(height)}px tall`,
+          ).toBeLessThanOrEqual(ROW_HEIGHT_BUDGET_PX);
+        });
       }
 
-      // AC1 — no row is a paragraph any more.
-      worst.rowHeights.forEach((height, i) => {
-        expect(
-          height,
-          `row "${worst.rowTexts[i].slice(0, 60)}" is ${Math.round(height)}px tall`,
-        ).toBeLessThanOrEqual(ROW_HEIGHT_BUDGET_PX);
-      });
-      // …and no row prints the paragraph inline.
-      for (const rowText of worst.rowTexts) {
-        expect(rowText).not.toContain(SHARED!.note);
-        if (NOTED) expect(rowText).not.toContain(NOTED.examNote!);
-      }
-
-      // AC4 — the shared paragraph appears exactly ONCE on the card, however
-      // many of its subjects are selected.
-      const occurrences = worst.text.split(SHARED!.note).length - 1;
+      // The deadline ROWS survive the bounce — one dated row per selected
+      // portfolio subject. Only the prose was removed.
+      const deadlineRows = probes
+        .flatMap((p) => p.rowTexts)
+        .filter((t) => t.includes("Portfolio deadline"));
       expect(
-        occurrences,
-        `the shared note printed ${occurrences}× for ${SHARED!.subjects.length} subjects`,
-      ).toBe(1);
-
-      // AC2 — it is in the strip, attributed to every subject it covers.
-      expect(worst.stripText, "no notes strip on the card").toBeTruthy();
-      expect(worst.stripText!).toContain(SHARED!.note);
+        deadlineRows.length,
+        "removing the note also removed the deadline rows — the bounce kept those",
+      ).toBeGreaterThanOrEqual(SHARED!.subjects.length);
       for (const subject of SHARED!.subjects) {
-        expect(worst.stripText!).toContain(subject.name);
+        expect(
+          deadlineRows.some((t) => t.includes(subject.name)),
+          `${subject.name} lost its portfolio deadline row`,
+        ).toBe(true);
       }
-      expect(worst.stripText!).toContain(`${PORTFOLIO_NOTE_LABEL}: `);
 
       // Save the real exported images as evidence.
       for (const download of downloads) {
@@ -271,38 +288,48 @@ test.describe("issue #91 — the list card's note budget", () => {
     });
   }
 
-  test("AC2/AC6 — the exam qualifier is deferred the same way, verbatim and labelled", async ({
+  test("the exam qualifier keeps the approved treatment: marker on the row, verbatim in the strip", async ({
     page,
   }) => {
     test.skip(!NOTED, "this cycle publishes no examNote");
     const { probes } = await exportListCards(page, "light");
     const carrier = probes.find((p) => p.text.includes(NOTED!.examNote!))!;
-    expect(carrier, "no exported card carried the qualifier").toBeTruthy();
+    expect(
+      carrier,
+      "no exported card carried the qualifier — #71's disclosure was lost",
+    ).toBeTruthy();
 
-    // Marker on the row, verbatim text in the strip — the same treatment the
-    // portfolio note gets, on the same card.
+    // Marker on the row, never the paragraph.
     const row = carrier.rowTexts.find((t) => t.includes(NOTED!.name))!;
     expect(row).toContain(EXAM_NOTE_LABEL);
     expect(row).not.toContain(NOTED!.examNote!);
-    expect(carrier.stripText).toBeTruthy();
-    // Contiguous "<label>: <verbatim>" — issue #71's disclosure contract, which
-    // e2e/issue-71-qa.spec.ts asserts on the rasterized DOM.
+
+    // Verbatim text once, in the strip, attributed, contiguous with its label
+    // ("Published note: <text>" — issue #71's disclosure contract, which
+    // e2e/issue-71-qa.spec.ts asserts on the rasterized DOM).
+    expect(carrier.stripText, "no notes strip on the qualifier's card").toBeTruthy();
     expect(carrier.stripText!).toContain(
       `${EXAM_NOTE_LABEL}: ${NOTED!.examNote!}`,
     );
     expect(carrier.stripText!).toContain(NOTED!.name);
+    const occurrences = carrier.text.split(NOTED!.examNote!).length - 1;
+    expect(occurrences, "the qualifier printed more than once").toBe(1);
   });
 
-  test("AC1 — a card with no notes gets no strip (and no empty dashed rule)", async ({
+  test("a card with no qualified exam gets no strip (and no empty dashed rule)", async ({
     page,
   }) => {
     const { probes } = await exportListCards(page, "light");
-    const plain = probes.filter((p) => p.stripText === null);
-    // The language exams sit in weeks that carry no note at all; if a future
-    // cycle puts a note on every week this becomes vacuous rather than wrong.
-    for (const probe of plain) {
-      expect(probe.text).not.toContain(SHARED!.note);
-      expect(probe.text).not.toContain(PORTFOLIO_NOTE_LABEL);
+    expect(probes.length).toBeGreaterThan(0);
+    // Since the bounce, ONLY examNote reaches the strip: every card without
+    // the qualifier text must have no strip at all — including the cards that
+    // carry the six portfolio deadline rows.
+    for (const probe of probes) {
+      if (NOTED && probe.text.includes(NOTED.examNote!)) continue;
+      expect(
+        probe.stripText,
+        "a card without an examNote rendered a strip anyway",
+      ).toBeNull();
     }
   });
 });
