@@ -17,16 +17,14 @@ import { useResolutions } from "@/lib/resolutions";
 import { useSchedules } from "@/lib/schedules";
 import {
   buildIcsCalendar,
-  ICS_FILE_NAME,
   ICS_MIME_TYPE,
   type SessionStartTimes,
 } from "@/lib/ics";
 import {
   buildJsonExport,
   buildTxtExport,
-  JSON_FILE_NAME,
+  exportFileName,
   JSON_MIME_TYPE,
-  TXT_FILE_NAME,
   TXT_MIME_TYPE,
   weekPngFileName,
   type ExportView,
@@ -61,8 +59,10 @@ import {
  *                   hourly axis, positioned category-colored blocks, legend,
  *                   off-grid strip). Built from src/lib/calendar-cards.ts via
  *                   buildCalendarLayout, rendered by export-png-calendar.ts.
- *   .ics          — EXACTLY the pre-#51 calendar export: same buildIcsCalendar
- *                   call, same filename, same MIME; src/lib/ics.ts untouched
+ *   .ics          — the pre-#51 calendar export: same buildIcsCalendar call,
+ *                   same MIME, src/lib/ics.ts untouched — only the download
+ *                   FILENAME changed (issue #90): it now carries the active
+ *                   schedule's slug like every other format
  *   .json         — versioned machine-readable envelope (src/lib/exports.ts)
  *   .txt          — human-readable chronological schedule (src/lib/exports.ts)
  *
@@ -168,6 +168,7 @@ const PNG_DOWNLOAD_STAGGER_MS = 200;
  */
 async function downloadWeekPngs<Card extends { slug: string }>(
   cards: readonly Card[],
+  scheduleName: string,
   view: ExportView,
   render: (card: Card) => Promise<Blob>,
 ): Promise<void> {
@@ -175,7 +176,7 @@ async function downloadWeekPngs<Card extends { slug: string }>(
     const card = cards[i];
     try {
       const blob = await render(card);
-      downloadBlob(blob, weekPngFileName(card.slug, view));
+      downloadBlob(blob, weekPngFileName(scheduleName, card.slug, view));
     } catch (error: unknown) {
       console.error(`PNG export failed for ${view} ${card.slug}`, error);
     }
@@ -300,15 +301,20 @@ export function ExportButton() {
       if (selectedCount === 0) return;
       switch (format) {
         case "ics": {
-          // The one exception (issue #51 AC): EXACTLY today's ICS export —
-          // same builder, same filename, same MIME, byte-for-byte unchanged.
+          // The calendar BYTES are exactly the pre-#51 export — same builder,
+          // same MIME, src/lib/ics.ts untouched. Only the download filename
+          // differs (issue #90): it carries the active schedule's slug so two
+          // schedules' calendars don't collide in Downloads.
           const ics = buildIcsCalendar(
             SUBJECTS,
             selectedIds,
             resolutions,
             SESSION_START_TIMES,
           );
-          downloadBlob(new Blob([ics], { type: ICS_MIME_TYPE }), ICS_FILE_NAME);
+          downloadBlob(
+            new Blob([ics], { type: ICS_MIME_TYPE }),
+            exportFileName(active.name, "ics"),
+          );
           break;
         }
         case "json": {
@@ -320,7 +326,7 @@ export function ExportButton() {
           );
           downloadBlob(
             new Blob([json], { type: JSON_MIME_TYPE }),
-            JSON_FILE_NAME,
+            exportFileName(active.name, "json"),
           );
           break;
         }
@@ -332,7 +338,10 @@ export function ExportButton() {
             active.name,
             CYCLE,
           );
-          downloadBlob(new Blob([txt], { type: TXT_MIME_TYPE }), TXT_FILE_NAME);
+          downloadBlob(
+            new Blob([txt], { type: TXT_MIME_TYPE }),
+            exportFileName(active.name, "txt"),
+          );
           break;
         }
         case "png-list": {
@@ -355,7 +364,7 @@ export function ExportButton() {
             scheduleName: active.name,
             undatedNames: undated.map((subject) => subject.name),
           };
-          void downloadWeekPngs(cards, "list", (card) =>
+          void downloadWeekPngs(cards, active.name, "list", (card) =>
             captureWeekCardPng(card, options),
           );
           break;
@@ -380,7 +389,7 @@ export function ExportButton() {
             scheduleName: active.name,
             undatedNames: undated.map((subject) => subject.name),
           };
-          void downloadWeekPngs(cards, "calendar", (card) =>
+          void downloadWeekPngs(cards, active.name, "calendar", (card) =>
             captureCalendarCardPng(card, options),
           );
           break;

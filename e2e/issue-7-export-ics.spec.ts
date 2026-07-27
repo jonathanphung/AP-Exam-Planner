@@ -7,7 +7,8 @@ import { evidenceDir } from "./support/evidence";
  * super-board QA (issue #7) — export selected exams as an ICS calendar file.
  *
  * AC1 is the browser-observable acceptance criterion (button placement +
- * enabled/disabled state + client-side download of `ap-exams-2027.ics` with
+ * enabled/disabled state + client-side download of the schedule-named `.ics`
+ * (`schedule-1-ap-exams-2027.ics` for the default schedule since issue #90) with
  * zero network requests) and is verified here end-to-end through the real app
  * and the real dataset. AC2–AC5 (the RFC 5545 / ical.js generator contract) are
  * covered at the unit layer by `src/lib/ics.test.ts` and, against the shipped
@@ -31,8 +32,11 @@ const exportButton = (page: Page) => page.getByTestId("export-menu-button");
 /**
  * Issue #51 turned the one-shot button into an "Export" menu button. The ICS
  * download now lives behind the "Save as .ics" menu item — same builder, same
- * filename, same MIME, byte-for-byte unchanged — so this spec's download flow
- * opens the menu first and everything it asserts about the FILE stays as-is.
+ * MIME, calendar bytes unchanged — so this spec's download flow opens the
+ * menu first and everything it asserts about the FILE CONTENTS stays as-is.
+ * Issue #90 renamed the download to carry the active schedule's slug
+ * (`schedule-1-…` for the default schedule); only the filename assertions
+ * changed for that.
  */
 async function downloadIcsViaMenu(page: Page) {
   await exportButton(page).click();
@@ -102,7 +106,7 @@ test.describe("issue #7 — export to calendar", () => {
     await expect(btn).toBeDisabled();
   });
 
-  test("AC1 — clicking downloads ap-exams-2027.ics generated client-side (blob, zero network) with the selected exam + portfolio events", async ({
+  test("AC1 — clicking downloads schedule-1-ap-exams-2027.ics generated client-side (blob, zero network) with the selected exam + portfolio events", async ({
     page,
   }) => {
     await page.goto("/");
@@ -133,8 +137,9 @@ test.describe("issue #7 — export to calendar", () => {
 
     const download = await downloadIcsViaMenu(page);
 
-    // Named exactly ap-exams-2027.ics…
-    expect(download.suggestedFilename()).toBe("ap-exams-2027.ics");
+    // Named for the active schedule + cycle (issue #90): the fresh default
+    // schedule is "Schedule 1", so the file is schedule-1-ap-exams-2027.ics…
+    expect(download.suggestedFilename()).toBe("schedule-1-ap-exams-2027.ics");
     // …and generated entirely client-side: a blob: URL is not a server fetch.
     expect(download.url()).toMatch(/^blob:/);
     // …with no app-level network requests triggered by the export.

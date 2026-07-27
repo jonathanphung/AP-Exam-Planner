@@ -8,12 +8,13 @@ import {
   buildJsonExport,
   buildTxtExport,
   EXPORT_BASE_NAME,
+  exportFileName,
   JSON_EXPORT_FORMAT,
   JSON_EXPORT_VERSION,
-  JSON_FILE_NAME,
-  PNG_FILE_NAME,
+  MAX_SLUG_LENGTH,
+  scheduleExportBaseName,
+  scheduleNameSlug,
   TXT_EOL,
-  TXT_FILE_NAME,
   weekPngFileName,
 } from "./exports";
 
@@ -54,46 +55,155 @@ const KEEP_PHYSICS_C: SlotResolution = {
 
 const FIXED_NOW = new Date(Date.UTC(2026, 6, 5, 13, 30, 0));
 
-describe("filename convention (issue #51)", () => {
-  it("every format shares the ICS basename, per-format extension", () => {
+describe("filename convention (issue #51, schedule-named since issue #90)", () => {
+  it("the cycle stem stays derived from ICS_FILE_NAME (annual swap renames everything)", () => {
+    // The stem is DERIVED, and ICS_FILE_NAME itself is untouched by #90 —
+    // other consumers (ics.test.ts pins it) still see `ap-exams-<year>.ics`.
     expect(ICS_FILE_NAME).toBe(`${EXPORT_BASE_NAME}.ics`);
-    expect(PNG_FILE_NAME).toBe(`${EXPORT_BASE_NAME}.png`);
-    expect(JSON_FILE_NAME).toBe(`${EXPORT_BASE_NAME}.json`);
-    expect(TXT_FILE_NAME).toBe(`${EXPORT_BASE_NAME}.txt`);
     expect(EXPORT_BASE_NAME).toBe("ap-exams-2027");
+  });
+
+  it("all four formats share one <schedule-slug>-<stem> basename, per-format extension", () => {
+    expect(exportFileName("My Plan", "ics")).toBe(
+      `my-plan-${EXPORT_BASE_NAME}.ics`,
+    );
+    expect(exportFileName("My Plan", "json")).toBe(
+      `my-plan-${EXPORT_BASE_NAME}.json`,
+    );
+    expect(exportFileName("My Plan", "txt")).toBe(
+      `my-plan-${EXPORT_BASE_NAME}.txt`,
+    );
+    expect(weekPngFileName("My Plan", "week-1", "list")).toBe(
+      `my-plan-${EXPORT_BASE_NAME}-week-1-list.png`,
+    );
+  });
+
+  it("saving the same format from two different schedules gives two different filenames", () => {
+    for (const ext of ["ics", "json", "txt"] as const) {
+      expect(exportFileName("Schedule 1", ext)).not.toBe(
+        exportFileName("ambitious draft", ext),
+      );
+    }
+    expect(weekPngFileName("Schedule 1", "week-1", "list")).not.toBe(
+      weekPngFileName("ambitious draft", "week-1", "list"),
+    );
   });
 });
 
-describe("weekPngFileName — per-week, per-view suffix (issue #56 + bounce)", () => {
-  it("derives basename + week slug + view suffix", () => {
-    expect(weekPngFileName("week-1", "list")).toBe(
-      "ap-exams-2027-week-1-list.png",
+describe("scheduleNameSlug (issue #90)", () => {
+  it("kebab-cases an ordinary name", () => {
+    expect(scheduleNameSlug("Schedule 1")).toBe("schedule-1");
+    expect(scheduleNameSlug("ambitious draft")).toBe("ambitious-draft");
+  });
+
+  it("collapses Windows/POSIX-reserved characters into single separators", () => {
+    expect(scheduleNameSlug('a\\b/c:d*e?f"g<h>i|j')).toBe(
+      "a-b-c-d-e-f-g-h-i-j",
     );
-    expect(weekPngFileName("week-2", "calendar")).toBe(
-      "ap-exams-2027-week-2-calendar.png",
+    // A run of several reserved chars is ONE dash, not several.
+    expect(scheduleNameSlug('plan: "final"?!')).toBe("plan-final");
+  });
+
+  it("strips leading/trailing dots and spaces (the Windows extension-corruptors)", () => {
+    expect(scheduleNameSlug(" draft. ")).toBe("draft");
+    expect(scheduleNameSlug("...my plan...")).toBe("my-plan");
+  });
+
+  it("a name with no sluggable characters slugs to empty and falls back to the bare stem", () => {
+    for (const name of ["???", "...", "🎯🎯🎯", "   "]) {
+      expect(scheduleNameSlug(name)).toBe("");
+      // Fallback: the plain cycle basename — never "-ap-exams-2027.ics",
+      // never a leading-dash filename.
+      expect(exportFileName(name, "ics")).toBe(`${EXPORT_BASE_NAME}.ics`);
+    }
+  });
+
+  it("folds Latin diacritics to ASCII and strips what has no ASCII fold", () => {
+    expect(scheduleNameSlug("Café Plan")).toBe("cafe-plan");
+    expect(scheduleNameSlug("Über-Plan")).toBe("uber-plan");
+    // CJK / emoji have no ASCII decomposition: stripped, not transliterated
+    // (decision documented on the function; the exact name still lives inside
+    // the exported file contents).
+    expect(scheduleNameSlug("日本語 plan")).toBe("plan");
+    expect(scheduleNameSlug("🎯 target plan")).toBe("target-plan");
+  });
+
+  it("a Windows reserved device name can never become the emitted basename", () => {
+    const reserved = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i;
+    for (const name of ["CON", "prn", "Nul", "COM1", "lpt9"]) {
+      // The slug itself is just the lowercased word…
+      expect(scheduleNameSlug(name)).toBe(name.toLowerCase());
+      // …but the composed basename always carries the stem suffix, so the
+      // pre-extension basename never equals a bare device name.
+      const base = scheduleExportBaseName(name);
+      expect(base).toBe(`${name.toLowerCase()}-${EXPORT_BASE_NAME}`);
+      expect(reserved.test(base)).toBe(false);
+    }
+  });
+
+  it("case-only distinct names map to one slug (Downloads suffixing accepted, documented)", () => {
+    // "My Plan" and "my plan" are two legitimately different schedules under
+    // the case-sensitive duplicate rule; their exports share a filename and
+    // the browser's " (1)" suffix disambiguates. Deliberate — see the
+    // decision note on scheduleNameSlug.
+    expect(scheduleNameSlug("My Plan")).toBe(scheduleNameSlug("my plan"));
+  });
+
+  it("caps a maximum-length name and keeps the longest filename comfortably under limits", () => {
+    // 60 code points is the store's name cap (MAX_SCHEDULE_NAME_LENGTH).
+    const longName = "x".repeat(60);
+    expect(scheduleNameSlug(longName)).toBe(longName);
+    expect(scheduleNameSlug(longName).length).toBeLessThanOrEqual(
+      MAX_SLUG_LENGTH,
     );
-    expect(weekPngFileName("late-testing", "list")).toBe(
-      "ap-exams-2027-late-testing-list.png",
+    // NFKD can EXPAND ("ﬃ" → "ffi"): a 60-cp ligature name folds to 180
+    // chars — the cap must re-apply to the folded slug.
+    const ligatures = "ﬃ".repeat(60);
+    expect(scheduleNameSlug(ligatures).length).toBeLessThanOrEqual(
+      MAX_SLUG_LENGTH,
     );
-    expect(weekPngFileName("late-testing", "calendar")).toBe(
-      "ap-exams-2027-late-testing-calendar.png",
+    // The cut never exposes a trailing dash.
+    const dashAtCut = `${"x".repeat(MAX_SLUG_LENGTH - 1)} tail`;
+    expect(scheduleNameSlug(dashAtCut).endsWith("-")).toBe(false);
+    // Worst case end-to-end: longest slug + longest suffix stays far below
+    // the 255-byte filesystem component limit.
+    const longest = weekPngFileName(longName, "late-testing", "calendar");
+    expect(longest.length).toBeLessThan(128);
+  });
+});
+
+describe("weekPngFileName — per-week, per-view suffix (issue #56 + bounce, #90 schedule slug)", () => {
+  it("derives schedule basename + week slug + view suffix", () => {
+    expect(weekPngFileName("My Plan", "week-1", "list")).toBe(
+      "my-plan-ap-exams-2027-week-1-list.png",
+    );
+    expect(weekPngFileName("My Plan", "week-2", "calendar")).toBe(
+      "my-plan-ap-exams-2027-week-2-calendar.png",
+    );
+    expect(weekPngFileName("My Plan", "late-testing", "list")).toBe(
+      "my-plan-ap-exams-2027-late-testing-list.png",
+    );
+    expect(weekPngFileName("My Plan", "late-testing", "calendar")).toBe(
+      "my-plan-ap-exams-2027-late-testing-calendar.png",
     );
   });
 
   it("the two view variants never collide for the same week", () => {
     for (const slug of ["week-1", "week-2", "late-testing"]) {
-      expect(weekPngFileName(slug, "list")).not.toBe(
-        weekPngFileName(slug, "calendar"),
+      expect(weekPngFileName("My Plan", slug, "list")).not.toBe(
+        weekPngFileName("My Plan", slug, "calendar"),
       );
     }
   });
 
-  it("every emitted name starts with the shared, dataset-derived basename", () => {
+  it("every emitted name contains the shared, dataset-derived stem", () => {
     for (const slug of ["week-1", "week-2", "late-testing"]) {
       for (const view of ["list", "calendar"] as const) {
-        expect(weekPngFileName(slug, view).startsWith(`${EXPORT_BASE_NAME}-`)).toBe(
-          true,
-        );
+        expect(
+          weekPngFileName("My Plan", slug, view).includes(
+            `${EXPORT_BASE_NAME}-`,
+          ),
+        ).toBe(true);
       }
     }
   });

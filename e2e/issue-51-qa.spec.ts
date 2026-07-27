@@ -29,8 +29,9 @@ import { evidenceDir } from "./support/evidence";
  *   AC12    — no horizontal scroll at 320/375/1024/1920.
  *   AC13    — one real Playwright download per format: json parses + matches
  *             the selection; txt is CRLF + chronologically sorted; png has
- *             non-zero pixel dimensions; ics lands as ap-exams-2027.ics with a
- *             valid VCALENDAR (identical-to-pre-change is guaranteed by the
+ *             non-zero pixel dimensions; ics lands as
+ *             schedule-1-ap-exams-2027.ics (schedule-named since issue #90)
+ *             with a valid VCALENDAR (identical CONTENT is guaranteed by the
  *             zero-byte src/lib/ics.ts diff + the same buildIcsCalendar call).
  *
  * Evidence (light + dark, desktop + mobile menu-open shots, plus a real
@@ -349,7 +350,9 @@ test.describe("issue #51 — real downloads per format", () => {
     await selectBiologyAndSeminar(page);
 
     const download = await downloadVia(page, "Save as .json");
-    expect(download.suggestedFilename()).toBe("ap-exams-2027.json");
+    expect(download.suggestedFilename()).toBe(
+      "schedule-1-ap-exams-2027.json",
+    );
     expect(download.url()).toMatch(/^blob:/);
 
     const raw = readFileSync(await download.path(), "utf8");
@@ -379,7 +382,7 @@ test.describe("issue #51 — real downloads per format", () => {
     await selectBiologyAndSeminar(page);
 
     const download = await downloadVia(page, "Save as .txt");
-    expect(download.suggestedFilename()).toBe("ap-exams-2027.txt");
+    expect(download.suggestedFilename()).toBe("schedule-1-ap-exams-2027.txt");
 
     const raw = readFileSync(await download.path(), "utf8");
     // CRLF EOLs exclusively, trailing newline (Notepad-safe).
@@ -424,8 +427,8 @@ test.describe("issue #51 — real downloads per format", () => {
 
       await expect.poll(() => downloads.length, { timeout: 15000 }).toBe(2);
       expect(downloads.map((d) => d.suggestedFilename())).toEqual([
-        `ap-exams-2027-week-1-${view}.png`,
-        `ap-exams-2027-week-2-${view}.png`,
+        `schedule-1-ap-exams-2027-week-1-${view}.png`,
+        `schedule-1-ap-exams-2027-week-2-${view}.png`,
       ]);
 
       for (const download of downloads) {
@@ -448,7 +451,7 @@ test.describe("issue #51 — real downloads per format", () => {
     await selectBiologyAndSeminar(page);
 
     const download = await downloadVia(page, "Save as .ics");
-    expect(download.suggestedFilename()).toBe("ap-exams-2027.ics");
+    expect(download.suggestedFilename()).toBe("schedule-1-ap-exams-2027.ics");
     expect(download.url()).toMatch(/^blob:/);
 
     const ics = readFileSync(await download.path(), "utf8");
@@ -562,10 +565,10 @@ test("evidence — export a real .png / .json / .txt and commit the artifacts", 
 
   // Sanity: every artifact is non-empty on disk.
   for (const f of [
-    "ap-exams-2027-week-1-list.png",
-    "ap-exams-2027-week-2-list.png",
-    "ap-exams-2027-week-1-calendar.png",
-    "ap-exams-2027-week-2-calendar.png",
+    "schedule-1-ap-exams-2027-week-1-list.png",
+    "schedule-1-ap-exams-2027-week-2-list.png",
+    "schedule-1-ap-exams-2027-week-1-calendar.png",
+    "schedule-1-ap-exams-2027-week-2-calendar.png",
     "exported-schedule.json",
     "exported-schedule.txt",
   ]) {

@@ -302,7 +302,12 @@ test.describe("issue #37 — annual dataset swap to the May 2027 cycle", () => {
     await item.click();
     const download = await downloadPromise;
 
-    expect(download.suggestedFilename()).toBe(`ap-exams-${CYCLE_YEAR}.ics`);
+    // The legacy-selection seed is adopted as "Schedule 1" (issue #29), and
+    // since issue #90 the filename carries that schedule slug; the cycle year
+    // in the name is still asserted dataset-derived, which is this AC's point.
+    expect(download.suggestedFilename()).toBe(
+      `schedule-1-ap-exams-${CYCLE_YEAR}.ics`,
+    );
 
     const path = await download.path();
     const ics = readFileSync(path, "utf8");

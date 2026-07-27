@@ -71,8 +71,10 @@ const VARIANTS: Variant[] = [
 
 const THEMES = ["light", "dark"] as const;
 
+// The legacy-selection seed is adopted as "Schedule 1" (issue #29), and since
+// issue #90 every export filename carries that schedule's slug.
 const fileFor = (slug: string, view: Variant["view"]) =>
-  `ap-exams-2027-${slug}-${view}.png`;
+  `schedule-1-ap-exams-2027-${slug}-${view}.png`;
 
 test.beforeAll(() => {
   mkdirSync(EVIDENCE_DIR, { recursive: true });
@@ -169,9 +171,9 @@ test("other export menu items still download single files (AC10)", async ({
   await expect(trigger).toBeEnabled();
 
   for (const [item, expected] of [
-    ["Save as .ics", "ap-exams-2027.ics"],
-    ["Save as .json", "ap-exams-2027.json"],
-    ["Save as .txt", "ap-exams-2027.txt"],
+    ["Save as .ics", "schedule-1-ap-exams-2027.ics"],
+    ["Save as .json", "schedule-1-ap-exams-2027.json"],
+    ["Save as .txt", "schedule-1-ap-exams-2027.txt"],
   ] as const) {
     await trigger.click();
     await expect(page.getByTestId("export-menu")).toBeVisible();
