@@ -285,6 +285,10 @@ describe("ap-2027.json sections[] (issue #44)", () => {
         `${subject.id} calculator`,
       ).toBeUndefined();
       expect(subject.examNote, `${subject.id} examNote`).toBeTruthy();
+      // Issue #87: the state must also SAY why, in the dialog where the
+      // section table would have gone. The schema requires it; this pins the
+      // shipped dataset against a future entry that omits it.
+      expect(subject.formatNote, `${subject.id} formatNote`).toBeTruthy();
     }
     expect(noFormat).toEqual(["networking"]);
   });

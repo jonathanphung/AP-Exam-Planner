@@ -1269,10 +1269,11 @@
         "date": "2027-05-17",
         "session": "AM"
       },
-      "examNote": "College Board schedules this exam for 2026-27 pilot schools only. AP Networking is in its third and final pilot in 2026-27 and the course launches in fall 2027, so College Board publishes no exam page for it yet and no section structure, duration, delivery mode, or calculator policy is published.",
+      "examNote": "College Board schedules this exam for 2026-27 pilot schools only.",
       "format": {
         "sections": []
       },
+      "formatNote": "AP Networking is in its third and final pilot in 2026-27 and the course launches in fall 2027, so College Board publishes no exam page for it yet and no section structure, duration, delivery mode, or calculator policy is published.",
       "passRateNote": "AP Networking is in its 2026-27 pilot; College Board's AP Career Kickstart timeline puts the course launch in fall 2027 and the first exam administration in May 2028, so no score distribution has been published for it yet.",
       "portfolio": null
     },
