@@ -4,18 +4,21 @@ import {
   DEFAULT_SCHEDULE_NAME,
   MAX_SCHEDULE_NAME_LENGTH,
   activeSchedule,
+  copyScheduleName,
   createDefaultState,
   migrateLegacyState,
   nextScheduleName,
   parseSchedulesState,
   sanitizeResolutions,
   sanitizeSelection,
+  splitCopySuffix,
   validateScheduleName,
   withActiveResolutions,
   withActiveSchedule,
   withActiveSelection,
   withScheduleCreated,
   withScheduleDeleted,
+  withScheduleDuplicated,
   withScheduleRenamed,
   type SchedulesState,
 } from "./schedules";
@@ -398,5 +401,198 @@ describe("schedule-name validation: duplicates + length cap (issue #62)", () => 
       const after = withScheduleCreated(state, "🎓 dream schedule");
       expect(activeSchedule(after).name).toBe("🎓 dream schedule");
     });
+  });
+});
+
+describe("withScheduleDuplicated forks a plan (issue #88)", () => {
+  /** One schedule ("Schedule 1", active) with a full plan. */
+  function planned(): SchedulesState {
+    return withActiveResolutions(
+      withActiveSelection(createDefaultState(), ["us-history", "art-history"]),
+      [RESOLUTION_A],
+    );
+  }
+
+  it("copies selection AND resolutions under a fresh id and activates the copy", () => {
+    const state = planned();
+    const source = state.schedules[0];
+    const after = withScheduleDuplicated(state, source.id);
+
+    expect(after.schedules).toHaveLength(2);
+    const copy = activeSchedule(after);
+    expect(copy.id).not.toBe(source.id);
+    expect(after.activeId).toBe(copy.id);
+    expect(copy.selection).toEqual(["us-history", "art-history"]);
+    expect(copy.resolutions).toEqual([RESOLUTION_A]);
+    // The source is untouched.
+    expect(after.schedules[0]).toBe(source);
+  });
+
+  it("the copy shares no mutable structure with its source (non-aliasing, not just equality)", () => {
+    const state = planned();
+    const source = state.schedules[0];
+    const after = withScheduleDuplicated(state, source.id);
+    const copy = activeSchedule(after);
+
+    // Every mutable level is a distinct object: the arrays, each resolution,
+    // and each resolution's memberIds.
+    expect(copy.selection).not.toBe(source.selection);
+    expect(copy.resolutions).not.toBe(source.resolutions);
+    expect(copy.resolutions[0]).not.toBe(source.resolutions[0]);
+    expect(copy.resolutions[0].memberIds).not.toBe(
+      source.resolutions[0].memberIds,
+    );
+
+    // Editing the copy (it is active) leaves the source's plan intact.
+    let edited = withActiveSelection(after, ["biology"]);
+    edited = withActiveResolutions(edited, [RESOLUTION_B]);
+    const sourceAfterEdits = edited.schedules[0];
+    expect(sourceAfterEdits.selection).toEqual(["us-history", "art-history"]);
+    expect(sourceAfterEdits.resolutions).toEqual([RESOLUTION_A]);
+  });
+
+  it("inserts the copy directly after its source", () => {
+    // Schedule 1, Schedule 2 (active) — duplicate Schedule 1.
+    const state = withScheduleCreated(createDefaultState());
+    const firstId = state.schedules[0].id;
+    const after = withScheduleDuplicated(state, firstId);
+    expect(after.schedules.map((s) => s.name)).toEqual([
+      "Schedule 1",
+      "Schedule 1 (copy)",
+      "Schedule 2",
+    ]);
+  });
+
+  it("derives '<name> (copy)', then '(copy 2)', … and never collides", () => {
+    let state = createDefaultState();
+    state = withScheduleRenamed(state, state.schedules[0].id, "ambitious draft");
+    const sourceId = state.schedules[0].id;
+
+    state = withScheduleDuplicated(state, sourceId);
+    expect(activeSchedule(state).name).toBe("ambitious draft (copy)");
+
+    state = withScheduleDuplicated(state, sourceId);
+    expect(activeSchedule(state).name).toBe("ambitious draft (copy 2)");
+
+    state = withScheduleDuplicated(state, sourceId);
+    expect(activeSchedule(state).name).toBe("ambitious draft (copy 3)");
+
+    // All four names are unique.
+    expect(new Set(state.schedules.map((s) => s.name)).size).toBe(4);
+  });
+
+  it("duplicating a copy strips the suffix instead of stacking '(copy) (copy)'", () => {
+    let state = createDefaultState();
+    state = withScheduleDuplicated(state, state.schedules[0].id);
+    const copyId = state.activeId; // "Schedule 1 (copy)"
+    state = withScheduleDuplicated(state, copyId);
+    expect(activeSchedule(state).name).toBe("Schedule 1 (copy 2)");
+    state = withScheduleDuplicated(state, state.activeId); // fork the (copy 2)
+    expect(activeSchedule(state).name).toBe("Schedule 1 (copy 3)");
+  });
+
+  it("truncates the base so a 60-char source still yields a valid, unique name", () => {
+    const atCap = "x".repeat(MAX_SCHEDULE_NAME_LENGTH);
+    let state = withScheduleCreated(createDefaultState(), atCap);
+    const sourceId = state.activeId;
+
+    state = withScheduleDuplicated(state, sourceId);
+    const first = activeSchedule(state).name;
+    expect(first).toBe(`${"x".repeat(53)} (copy)`); // 53 + 7 = 60
+    expect([...first].length).toBe(MAX_SCHEDULE_NAME_LENGTH);
+
+    state = withScheduleDuplicated(state, sourceId);
+    const second = activeSchedule(state).name;
+    expect(second).toBe(`${"x".repeat(51)} (copy 2)`); // 51 + 9 = 60
+    expect([...second].length).toBe(MAX_SCHEDULE_NAME_LENGTH);
+
+    // Both pass the store's own validation against the full list.
+    expect(validateScheduleName(first, state.schedules, "none")).not.toBe(
+      "too-long",
+    );
+    expect(new Set(state.schedules.map((s) => s.name)).size).toBe(4);
+  });
+
+  it("counts the truncation limit in code points (emoji-safe, like the cap itself)", () => {
+    const emojiCap = "🎓".repeat(MAX_SCHEDULE_NAME_LENGTH);
+    let state = withScheduleCreated(createDefaultState(), emojiCap);
+    state = withScheduleDuplicated(state, state.activeId);
+    const name = activeSchedule(state).name;
+    expect(name).toBe(`${"🎓".repeat(53)} (copy)`);
+    expect([...name].length).toBe(MAX_SCHEDULE_NAME_LENGTH);
+    expect(validateScheduleName(name, [], undefined)).toBeNull();
+  });
+
+  it("no-ops on an unknown id, consistent with the other transitions", () => {
+    const state = planned();
+    expect(withScheduleDuplicated(state, "no-such-id")).toBe(state);
+  });
+
+  it("copyScheduleName always produces a name validateScheduleName accepts", () => {
+    // A crowded namespace: base, its copy, and a near-cap sibling.
+    let state = createDefaultState();
+    state = withScheduleRenamed(state, state.schedules[0].id, "plan");
+    state = withScheduleDuplicated(state, state.schedules[0].id); // "plan (copy)"
+    const derived = copyScheduleName("plan (copy)", state.schedules);
+    expect(derived).toBe("plan (copy 2)");
+    expect(validateScheduleName(derived, state.schedules)).toBeNull();
+  });
+});
+
+describe("splitCopySuffix (display companion to copyScheduleName — QA v1 mobile fix)", () => {
+  it("returns the whole name and an empty suffix for a non-copy name", () => {
+    expect(splitCopySuffix("ambitious draft")).toEqual({
+      base: "ambitious draft",
+      suffix: "",
+    });
+  });
+
+  it("splits ' (copy)' and numbered ' (copy N)' suffixes losslessly", () => {
+    expect(splitCopySuffix("ambitious draft (copy)")).toEqual({
+      base: "ambitious draft",
+      suffix: " (copy)",
+    });
+    expect(splitCopySuffix("ambitious draft (copy 12)")).toEqual({
+      base: "ambitious draft",
+      suffix: " (copy 12)",
+    });
+  });
+
+  it("reassembles to the original name (base + suffix is lossless)", () => {
+    for (const name of [
+      "Schedule 1",
+      "Schedule 1 (copy)",
+      "Schedule 1 (copy 2)",
+      `${"x".repeat(51)} (copy 2)`,
+    ]) {
+      const { base, suffix } = splitCopySuffix(name);
+      expect(base + suffix).toBe(name);
+    }
+  });
+
+  it("only treats a TRAILING copy-marker as suffix (same grammar as copyScheduleName)", () => {
+    expect(splitCopySuffix("my (copy) plan")).toEqual({
+      base: "my (copy) plan",
+      suffix: "",
+    });
+    expect(splitCopySuffix("plan (copy 2) (copy)")).toEqual({
+      base: "plan (copy 2)",
+      suffix: " (copy)",
+    });
+    // No leading space → not the derived-name grammar.
+    expect(splitCopySuffix("(copy)")).toEqual({ base: "(copy)", suffix: "" });
+  });
+
+  it("recognizes the suffix on every name copyScheduleName can derive", () => {
+    let state = createDefaultState();
+    state = withScheduleDuplicated(state, state.schedules[0].id);
+    state = withScheduleDuplicated(state, state.schedules[0].id);
+    const copies = state.schedules.slice(1);
+    expect(copies.length).toBe(2);
+    for (const copy of copies) {
+      const { base, suffix } = splitCopySuffix(copy.name);
+      expect(suffix).toMatch(/^ \(copy( \d+)?\)$/);
+      expect(base).toBe(DEFAULT_SCHEDULE_NAME);
+    }
   });
 });

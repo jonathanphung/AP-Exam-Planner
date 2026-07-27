@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   MAX_SCHEDULE_NAME_LENGTH,
+  splitCopySuffix,
   useSchedules,
   validateScheduleName,
   type Schedule,
@@ -42,6 +43,27 @@ function renameErrorMessage(error: ScheduleNameError): string {
  *     `useModalDialog` machinery (focus trapped, Escape cancels, focus
  *     restored). The last remaining schedule cannot be deleted — its delete
  *     button is disabled with an explanatory title.
+ *   - Duplicate (issue #88) is a third real button beside Rename/Delete —
+ *     like them it lives OUTSIDE the `role="radio"` control, is a regular
+ *     tab stop, and never participates in the radiogroup's roving tabindex
+ *     or arrow-key handling (`onRadioKeyDown` is untouched). One click forks
+ *     the schedule's FULL plan state (selection + resolutions, deep-copied)
+ *     into "<name> (copy)" / "<name> (copy 2)" and activates the copy; see
+ *     `copyScheduleName` in `src/lib/schedules.ts` for why auto-suffixing
+ *     here does not contradict issue #62's reject-duplicates rule (that rule
+ *     protects a label the user TYPED; a Duplicate click types nothing).
+ *     No confirm dialog — duplicating is additive and non-destructive,
+ *     unlike Delete. Layout: three 44px inline controls fit at the 375px
+ *     viewport, but they leave the truncating name span only ~99px (QA v1
+ *     measured; sidebar card chrome eats far more than the buttons alone).
+ *     End-truncation at that width clips exactly the copy-suffix, rendering
+ *     sibling copies pixel-identical — so the name paints as TWO segments
+ *     inside the single `.truncate` span: the base (truncates with an
+ *     ellipsis) and the `splitCopySuffix`-detected " (copy N)" tail (pinned,
+ *     never truncates). Different copies stay visually distinct at every
+ *     width; non-copy names render exactly as before. The segments are plain
+ *     text nodes, so the radio's accessible name is still the full schedule
+ *     name (whitespace-normalized per ACCNAME) — no overflow menu needed.
  *   - Drag-to-reorder from the reference is intentionally NOT implemented
  *     (builder's documented call): schedules are few, creation order is
  *     stable, and reorder adds drag-and-drop a11y complexity with no AC
@@ -138,7 +160,7 @@ function DeleteScheduleDialog({
 }
 
 export function MySchedules() {
-  const { schedules, activeId, setActive, create, rename, remove } =
+  const { schedules, activeId, setActive, create, rename, remove, duplicate } =
     useSchedules();
 
   const [renaming, setRenaming] = useState<{ id: string; draft: string } | null>(
@@ -218,6 +240,13 @@ export function MySchedules() {
     create();
   }
 
+  function onDuplicate(id: string) {
+    // The copy becomes active — move keyboard focus to its radio, exactly
+    // like create/delete do.
+    focusActiveAfterChange.current = true;
+    duplicate(id);
+  }
+
   function onConfirmDelete() {
     if (!confirming) return;
     focusActiveAfterChange.current = true;
@@ -239,6 +268,12 @@ export function MySchedules() {
         {schedules.map((schedule, index) => {
           const active = schedule.id === activeId;
           const isRenaming = renaming?.id === schedule.id;
+          // Render the copy-suffix as a pinned segment so it survives
+          // truncation at narrow widths (QA v1: at 375px end-truncation made
+          // sibling copies pixel-identical) — see the contract comment above.
+          const { base: nameBase, suffix: nameSuffix } = splitCopySuffix(
+            schedule.name,
+          );
           return (
             <div key={schedule.id} className="flex items-center gap-1">
               {isRenaming ? (
@@ -330,11 +365,43 @@ export function MySchedules() {
                       <span className="h-2 w-2 rounded-full bg-blue-600 dark:bg-blue-400" />
                     )}
                   </span>
-                  <span className="min-w-0 flex-1 truncate">
-                    {schedule.name}
+                  {/* One `.truncate` span paints the whole name (the QA suite
+                      screenshots `span.truncate` per row). As a flex container
+                      its own text-overflow is inert; the BASE segment carries
+                      the ellipsis while the copy-suffix segment is pinned
+                      (`shrink-0`) so two copies never truncate identically.
+                      `whitespace-pre` keeps the suffix's leading space, which
+                      would otherwise be collapsed at the segment boundary. */}
+                  <span className="flex min-w-0 flex-1 truncate">
+                    <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
+                      {nameBase}
+                    </span>
+                    {nameSuffix && (
+                      <span className="shrink-0 whitespace-pre">
+                        {nameSuffix}
+                      </span>
+                    )}
                   </span>
                 </button>
               )}
+              <button
+                type="button"
+                aria-label={`Duplicate ${schedule.name}`}
+                onClick={() => onDuplicate(schedule.id)}
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 lg:h-8 lg:w-8 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 dark:focus-visible:outline-blue-400"
+              >
+                {/* Two-overlapping-sheets "duplicate" glyph — distinct from
+                    Rename's pencil and Delete's trash. */}
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  className="h-4 w-4"
+                >
+                  <path d="M2 4.25A2.25 2.25 0 014.25 2h6.5A2.25 2.25 0 0113 4.25V5.5H9.25A3.75 3.75 0 005.5 9.25V13H4.25A2.25 2.25 0 012 10.75v-6.5z" />
+                  <path d="M9.25 7A2.25 2.25 0 007 9.25v6.5A2.25 2.25 0 009.25 18h6.5A2.25 2.25 0 0018 15.75v-6.5A2.25 2.25 0 0015.75 7h-6.5z" />
+                </svg>
+              </button>
               <button
                 type="button"
                 aria-label={`Rename ${schedule.name}`}

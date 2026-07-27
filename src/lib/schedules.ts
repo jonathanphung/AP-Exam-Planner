@@ -354,6 +354,105 @@ export function withScheduleCreated(
 }
 
 /**
+ * Matches a name's existing " (copy)" / " (copy N)" suffix, so duplicating a
+ * copy re-derives from the ORIGINAL base — "plan (copy)" forks to
+ * "plan (copy 2)", never to the unboundedly-growing "plan (copy) (copy)".
+ */
+const COPY_SUFFIX_RE = / \(copy(?: \d+)?\)$/;
+
+/**
+ * Unique display name for a duplicate of `sourceName` (issue #88):
+ * `<base> (copy)`, then `<base> (copy 2)`, … where `<base>` is the source name
+ * with any existing copy-suffix stripped.
+ *
+ * Why auto-suffixing here does NOT contradict issue #62's reject-duplicates
+ * decision: #62's rule ("duplicates are REJECTED, not auto-suffixed") is
+ * explicitly scoped to the inline rename — the app never silently mutates a
+ * label the user TYPED. A Duplicate click types nothing, so there is no
+ * user-entered label to protect and no field to bounce a rejection back to;
+ * deriving a unique name is the only behavior that lets the click always
+ * succeed. The invariant #62 actually guards — no duplicate / over-length name
+ * ever reaches `apx.schedules.v1` — still holds: the generated name passes
+ * {@link validateScheduleName} by construction.
+ *
+ * Length cap: the BASE is truncated (in code points, the store's counting
+ * unit) so base + suffix always fits {@link MAX_SCHEDULE_NAME_LENGTH} — a
+ * 60-character source still yields a valid, unique copy name rather than one
+ * the store's own validation would reject.
+ */
+export function copyScheduleName(
+  sourceName: string,
+  schedules: readonly Pick<Schedule, "name">[],
+): string {
+  const base = sourceName.trim().replace(COPY_SUFFIX_RE, "");
+  const existing = new Set(schedules.map((s) => s.name.trim()));
+  for (let n = 1; ; n++) {
+    const suffix = n === 1 ? " (copy)" : ` (copy ${n})`;
+    const room = MAX_SCHEDULE_NAME_LENGTH - suffix.length;
+    // Truncate in code points and drop any whitespace the cut exposes so the
+    // candidate never carries a double space before its suffix.
+    const truncatedBase = [...base].slice(0, room).join("").trimEnd();
+    const candidate = `${truncatedBase}${suffix}`;
+    // Candidates for distinct n are distinct strings, so with finitely many
+    // existing names this loop always terminates.
+    if (!existing.has(candidate)) return candidate;
+  }
+}
+
+/**
+ * Split `name` into its base and its {@link COPY_SUFFIX_RE} copy-suffix (empty
+ * string when the name is not a derived copy). Display-level companion to
+ * {@link copyScheduleName}, single-sourcing the suffix grammar.
+ *
+ * Why the UI needs the split (QA v1 of issue #88): at the 375px viewport the
+ * schedule row's name span gets ~99px, so end-truncation clipped exactly the
+ * copy-suffix — "Schedule 1 (copy)" and "Schedule 1 (copy 2)" both painted as
+ * "Schedule 1 (c…", making sibling copies pixel-identical. The row therefore
+ * renders the base and the suffix separately: the base truncates, the suffix
+ * — the only part that distinguishes copies — never does.
+ */
+export function splitCopySuffix(name: string): {
+  base: string;
+  suffix: string;
+} {
+  const match = COPY_SUFFIX_RE.exec(name);
+  if (!match) return { base: name, suffix: "" };
+  return { base: name.slice(0, match.index), suffix: match[0] };
+}
+
+/**
+ * Fork schedule `id` (issue #88): insert a deep, independently-frozen copy of
+ * its FULL plan state — selection AND resolutions (copying only the selection
+ * would silently drop the user's conflict decisions, exactly the leak the
+ * module doc forbids) — under a fresh id and a unique
+ * {@link copyScheduleName}-derived name, directly after its source so the fork
+ * sits next to the plan it came from. The copy becomes active (same
+ * activation behavior as {@link withScheduleCreated}: the user clicked to get
+ * a fork they can immediately edit). No-op for unknown ids, consistent with
+ * the other transitions.
+ */
+export function withScheduleDuplicated(
+  state: SchedulesState,
+  id: string,
+): SchedulesState {
+  const index = state.schedules.findIndex((s) => s.id === id);
+  if (index === -1) return state;
+  const source = state.schedules[index];
+  // freezeSchedule deep-copies the selection and every resolution (including
+  // each memberIds array), so the copy shares no mutable structure with its
+  // source — editing one can never alias into the other.
+  const copy = freezeSchedule({
+    id: generateId(),
+    name: copyScheduleName(source.name, state.schedules),
+    selection: source.selection,
+    resolutions: source.resolutions,
+  });
+  const schedules = [...state.schedules];
+  schedules.splice(index + 1, 0, copy);
+  return freezeState({ activeId: copy.id, schedules });
+}
+
+/**
  * Rename a schedule. No-op for unknown ids, an unchanged name, or any name that
  * fails {@link validateScheduleName} — blank, over the length cap, or an exact
  * duplicate of another schedule (issue #62). The UI validates first and surfaces
@@ -566,6 +665,18 @@ export function renameSchedule(id: string, name: string): void {
   setState(withScheduleRenamed(current, id, name));
 }
 
+/**
+ * Duplicate schedule `id` into a uniquely named, deep-copied, active fork
+ * (issue #88). Returns the copy's id — or, mirroring the transition's no-op
+ * on an unknown id, the unchanged active id.
+ */
+export function duplicateSchedule(id: string): string {
+  ensureHydrated();
+  const next = withScheduleDuplicated(current, id);
+  setState(next);
+  return next.activeId;
+}
+
 /** Delete schedule `id` (the last remaining schedule is never deleted). */
 export function deleteSchedule(id: string): void {
   ensureHydrated();
@@ -627,6 +738,11 @@ export interface SchedulesApi {
   rename: (id: string, name: string) => void;
   /** Delete schedule `id` (no-op on the last remaining schedule). */
   remove: (id: string) => void;
+  /**
+   * Duplicate schedule `id` into a uniquely named copy of its full plan
+   * (selection + resolutions) and make the copy active (issue #88).
+   */
+  duplicate: (id: string) => void;
 }
 
 /**
@@ -648,6 +764,9 @@ export function useSchedules(): SchedulesApi {
     [],
   );
   const remove = useCallback((id: string) => deleteSchedule(id), []);
+  const duplicate = useCallback((id: string) => {
+    duplicateSchedule(id);
+  }, []);
 
   return {
     schedules: state.schedules,
@@ -657,5 +776,6 @@ export function useSchedules(): SchedulesApi {
     create,
     rename,
     remove,
+    duplicate,
   };
 }
