@@ -65,8 +65,10 @@ const VARIANTS: Variant[] = [
 
 const THEMES = ["light", "dark"] as const;
 
+// The legacy-selection seed is adopted as "Schedule 1" (issue #29), and since
+// issue #90 every export filename carries that schedule's slug.
 const fileFor = (slug: string, view: Variant["view"]) =>
-  `ap-exams-2027-${slug}-${view}.png`;
+  `schedule-1-ap-exams-2027-${slug}-${view}.png`;
 
 test.beforeAll(() => {
   mkdirSync(EVIDENCE_DIR, { recursive: true });

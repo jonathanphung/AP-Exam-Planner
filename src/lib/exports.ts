@@ -8,33 +8,118 @@ import { ICS_FILE_NAME } from "./ics";
  * versioned `.json` envelope and the human-readable `.txt` schedule, plus the
  * shared filename convention for all four "Save as ." menu items.
  *
- * The `.ics` export intentionally does NOT live here — it is exactly the
- * pre-#51 `buildIcsCalendar` call in `src/lib/ics.ts`, untouched (that file's
- * internals belong to issue #38). The `.png` export is DOM-bound and lives in
+ * The `.ics` export intentionally does NOT live here — it is the pre-#51
+ * `buildIcsCalendar` call in `src/lib/ics.ts`, untouched (that file's
+ * internals belong to issue #38); only its download FILENAME follows this
+ * module's convention. The `.png` export is DOM-bound and lives in
  * `export-png.ts`; only its filename is defined here so the convention has a
  * single home.
  *
- * Filename convention (builder decision, issue #51): every format shares the
- * basename of today's ICS download (`ap-exams-2027`) with only the extension
- * varying — `ap-exams-2027.ics/.png/.json/.txt`. The basename is DERIVED from
- * `ICS_FILE_NAME`, which itself reads the year off the dataset cycle, so the
- * annual swap renames all four files with no edit here.
+ * Filename convention (issue #51, revised by issue #90): every format shares
+ * one basename — the ACTIVE SCHEDULE's slug, a dash, then the cycle stem —
+ * varying only by extension:
+ *
+ *     ambitious-draft-ap-exams-2027.ics/.json/.txt
+ *     ambitious-draft-ap-exams-2027-week-1-list.png
+ *
+ * The schedule slug comes from {@link scheduleNameSlug}; when a name has no
+ * sluggable characters at all the basename falls back to the bare cycle stem
+ * (`ap-exams-2027.ics`), never a leading-dash filename. The cycle stem is
+ * DERIVED from `ICS_FILE_NAME`, which itself reads the year off the dataset
+ * cycle, so the annual dataset swap still renames every emitted file with no
+ * edit here.
  */
 
-/** Shared basename for every export format (derived, never duplicated). */
+/**
+ * Cycle stem shared by every export format (derived, never duplicated), and
+ * the fallback basename when a schedule name slugs to nothing. Since issue
+ * #90 the emitted basename is normally `<schedule-slug>-<this stem>` — see
+ * {@link scheduleExportBaseName}.
+ */
 export const EXPORT_BASE_NAME = ICS_FILE_NAME.replace(/\.ics$/, "");
 
 /**
- * Base `.png` name. Retained as the single-file convention (and asserted by
- * the filename unit test), but the `.png` export is now per testing week
- * (issue #56): `ExportButton` names each week's file via {@link weekPngFileName}
- * — `ap-exams-2027-week-1-list.png`, `ap-exams-2027-late-testing-calendar.png`,
- * … — so a dataset-cycle rename still propagates to every emitted file
- * automatically.
+ * Cap for the schedule-slug segment of a filename. Schedule names are already
+ * ≤ 60 code points (`MAX_SCHEDULE_NAME_LENGTH`, `src/lib/schedules.ts`), but
+ * NFKD folding can EXPAND a string ("ﬃ" → "ffi"), so the cap is re-applied to
+ * the slug itself. 60 slug chars + the longest fixed suffix
+ * (`-ap-exams-2027-late-testing-calendar.png`, 41 chars) stays comfortably
+ * under every mainstream filesystem's 255-byte component limit.
  */
-export const PNG_FILE_NAME = `${EXPORT_BASE_NAME}.png`;
-export const JSON_FILE_NAME = `${EXPORT_BASE_NAME}.json`;
-export const TXT_FILE_NAME = `${EXPORT_BASE_NAME}.txt`;
+export const MAX_SLUG_LENGTH = 60;
+
+/**
+ * Slugify a user-typed schedule name into a filename-safe segment
+ * (issue #90). Pure, deterministic, no dependencies.
+ *
+ * Schedule names are constrained only by `validateScheduleName`
+ * (non-blank after trim, ≤ 60 code points, no exact duplicate) — everything
+ * else, including Windows-reserved characters, is possible. Decisions:
+ *
+ * - Output alphabet is `[a-z0-9]` with single `-` separators: every run of
+ *   anything else becomes one dash, then leading/trailing dashes are trimmed.
+ *   This kills the Windows-reserved set (`\ / : * ? " < > |`), path
+ *   separators, and the trailing dots/spaces Windows silently strips.
+ * - Unicode is NFKD-folded and combining marks dropped, so Latin diacritics
+ *   transliterate for free ("Café" → "cafe"). Characters with no ASCII
+ *   decomposition (CJK, emoji, symbols) are STRIPPED, not transliterated —
+ *   a transliteration table is a dependency and a maintenance burden, and the
+ *   exact user-typed name is already carried INSIDE the exports (the `.json`
+ *   envelope's `schedule.name`, the `.txt` header, both `.png` card headers),
+ *   so losing it from the filename is cosmetic. A name that strips to nothing
+ *   returns `""` and the caller falls back to the bare cycle stem.
+ * - Lowercasing means case-only distinct names ("My Plan" vs "my plan" — both
+ *   legal, the duplicate rule is case-sensitive) map to ONE slug. That is a
+ *   deliberate trade: the browser's `(1)` suffix disambiguates in Downloads,
+ *   which beats shipping mixed-case filenames that differ only on
+ *   case-sensitive filesystems.
+ * - Windows reserved device names (`CON`, `PRN`, `AUX`, `NUL`, `COM1`–`9`,
+ *   `LPT1`–`9`) need no special casing HERE because the composed basename is
+ *   always `<slug>-ap-exams-<year>` (see {@link scheduleExportBaseName}) —
+ *   Windows reserves only the exact pre-extension basename, and ours never
+ *   equals a bare device name. Asserted by the unit tests.
+ * - Length is capped at {@link MAX_SLUG_LENGTH} (slice is safe: the slug is
+ *   pure ASCII by then), re-trimming any dash the cut exposes.
+ */
+export function scheduleNameSlug(name: string): string {
+  const folded = name
+    .normalize("NFKD")
+    // Drop combining marks left by NFKD (é → e + U+0301 → e).
+    .replace(/\p{M}+/gu, "")
+    .toLowerCase();
+  const slug = folded
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return slug.slice(0, MAX_SLUG_LENGTH).replace(/-+$/, "");
+}
+
+/**
+ * The shared basename for every file exported from a given schedule
+ * (issue #90): `<schedule-slug>-<cycle stem>`, falling back to the bare
+ * cycle stem when the name slugs to empty — never `-ap-exams-2027` and never
+ * a Windows device name (the stem suffix guarantees the basename can't equal
+ * `CON`/`NUL`/… even when the schedule is literally named that).
+ */
+export function scheduleExportBaseName(scheduleName: string): string {
+  const slug = scheduleNameSlug(scheduleName);
+  return slug ? `${slug}-${EXPORT_BASE_NAME}` : EXPORT_BASE_NAME;
+}
+
+/** The single-file export formats named via {@link exportFileName}. */
+export type ExportExtension = "ics" | "json" | "txt";
+
+/**
+ * Downloaded filename for a single-file export format (issue #90):
+ * `my-plan-ap-exams-2027.ics` / `.json` / `.txt`. The per-week `.png` files
+ * are named by {@link weekPngFileName} instead (they carry week + view
+ * segments).
+ */
+export function exportFileName(
+  scheduleName: string,
+  extension: ExportExtension,
+): string {
+  return `${scheduleExportBaseName(scheduleName)}.${extension}`;
+}
 
 /**
  * The two designed `.png` variants (Jon's pre-merge bounce on issue #56): the
@@ -43,16 +128,21 @@ export const TXT_FILE_NAME = `${EXPORT_BASE_NAME}.txt`;
 export type ExportView = "list" | "calendar";
 
 /**
- * Per-week `.png` filename (issue #56 + bounce): the shared basename, a week
- * slug (`week-1` / `week-2` / `late-testing`, from the card's `slug`), AND a
- * view suffix (`list` / `calendar`). The view suffix keeps the two variants
- * from colliding when a user saves both for the same week
- * (`ap-exams-2027-week-1-list.png` vs `ap-exams-2027-week-1-calendar.png`).
- * Derived from `EXPORT_BASE_NAME`, so a future dataset-cycle rename re-names
+ * Per-week `.png` filename (issue #56 + bounce, schedule-named since issue
+ * #90): the shared schedule basename, a week slug (`week-1` / `week-2` /
+ * `late-testing`, from the card's `slug`), AND a view suffix (`list` /
+ * `calendar`). The view suffix keeps the two variants from colliding when a
+ * user saves both for the same week (`my-plan-ap-exams-2027-week-1-list.png`
+ * vs `my-plan-ap-exams-2027-week-1-calendar.png`). Derived from
+ * {@link scheduleExportBaseName}, so a future dataset-cycle rename re-names
  * every week file with no edit here.
  */
-export function weekPngFileName(slug: string, view: ExportView): string {
-  return `${EXPORT_BASE_NAME}-${slug}-${view}.png`;
+export function weekPngFileName(
+  scheduleName: string,
+  slug: string,
+  view: ExportView,
+): string {
+  return `${scheduleExportBaseName(scheduleName)}-${slug}-${view}.png`;
 }
 
 export const JSON_MIME_TYPE = "application/json;charset=utf-8";
