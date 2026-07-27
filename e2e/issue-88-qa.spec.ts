@@ -55,9 +55,15 @@ import { evidenceDir } from "./support/evidence";
  * "Schedule 1 (copy 2)" BOTH clip to "Schedule 1 (c…" and are pixel-
  * identical. The deliberately-red "visually distinguishable" test below is
  * the repro; the rebuild turns it green.
+ *
+ * v2 VERDICT (post-rebuild 0af518e): the copy-suffix now renders as a pinned
+ * segment inside the row's `.truncate` span (`splitCopySuffix`), so the base
+ * truncates but the suffix never does. The v1 repro is GREEN with zero
+ * assertion changes — only the evidence slug and the mobile screenshot's
+ * name (before-fix → after-fix) moved to v2. Full suite 13/13.
  */
 
-const EVIDENCE_DIR = evidenceDir("issue-88-qa-v1");
+const EVIDENCE_DIR = evidenceDir("issue-88-qa-v2");
 
 const SCHEDULES_KEY = "apx.schedules.v1";
 const SELECTION_KEY = "apx.selection.v1";
@@ -563,7 +569,12 @@ test("layout — at 375px each row keeps three 44px touch targets and the name s
 });
 
 /**
- * ❌ RED on v1 (the QA-fail driver — Builder turns this green).
+ * ❌ RED on v1 (the QA-fail driver) → ✅ GREEN on v2: the rebuild pins the
+ * copy-suffix outside the truncating base segment, so sibling copies paint
+ * different name pixels at 375px. The assertions below are byte-identical to
+ * v1 — only the captured screenshot's name records the fixed state.
+ *
+ * Original v1 finding, kept for the record:
  *
  * At 375px the name span gets 99px, but "Schedule 1 (copy)" needs 109px and
  * "Schedule 1 (copy 2)" needs 122px — BOTH clip to "Schedule 1 (c…", so two
@@ -596,7 +607,7 @@ test("layout — at 375px two sibling copies must be visually distinguishable (t
   );
 
   await page.screenshot({
-    path: `${EVIDENCE_DIR}/before-fix-mobile.png`,
+    path: `${EVIDENCE_DIR}/after-fix-mobile.png`,
     fullPage: false,
   });
 
