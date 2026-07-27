@@ -168,7 +168,9 @@ describe(`published exam qualifier reaches every schedule surface (${EXAM_NOTE_L
     if (!NOTED) return;
     const { cards } = buildCalendarCards(SUBJECTS, [NOTED.id], [], START_TIMES);
     const block = cards
-      .flatMap((c) => c.week.days)
+      // `week` is null on the Week 0 deadlines card (issue #97) — no grid, no
+      // blocks, and an exam qualifier never lives there.
+      .flatMap((c) => c.week?.days ?? [])
       .flatMap((d) => d.blocks)
       .find((b) => b.subjectId === NOTED.id);
     expect(block?.examNote).toBe(NOTED.examNote);

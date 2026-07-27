@@ -45,20 +45,39 @@ import {
  * - Week labels/slugs are derived from each week's POSITION + `late` flag
  *   ("Week 1" / "Week 2" / "Late Testing"), never hardcoded — so Week 2 stays
  *   "Week 2" even when Week 1 emits no card.
+ * - Portfolio deadlines are collected onto a "Week 0" card that precedes every
+ *   testing week (see below). It is NOT a `calendarWeeks()` window, so it does
+ *   not participate in the position-derived count: Week 1 stays Week 1.
  *
- * Edge-case decisions (documented per issue #56):
- * - Portfolio deadlines and any off-grid dated entry are assigned to the
- *   NEAREST week window by date and rendered as their own row on that card, so
- *   a selection is never silently dropped (matches the txt export's "never
- *   drop a selection" precedent). May 8 falls inside Week 1's window and joins
- *   Week 1; the April 30 deadlines fall before every window and join the
- *   nearest one (Week 1). An out-of-window entry never spawns a blank card of
- *   its own — it rides the nearest emitted week.
+ * Edge-case decisions (documented per issue #56; the portfolio half rewritten
+ * by issue #97):
+ * - PORTFOLIO deadlines no longer ride a testing week. Every `portfolio`-kind
+ *   entry — whatever its date — is collected onto ONE card, "Week 0"
+ *   (`week-0`), emitted FIRST when it has any row. Issue #56 assigned them to
+ *   the nearest week window; issue #97 supersedes that for this row kind only,
+ *   on Jon's call (2026-07-27): "things I submit before exams start" and "days
+ *   I sit in a room" are different mental buckets, and a shared Week 1 export
+ *   interleaved them. The never-silently-dropped invariant is unchanged — Week
+ *   0 IS the not-dropped mechanism for these rows now.
+ *   The predicate is the row KIND, never a date cutoff: the dataset's Art &
+ *   Design trio is due 2027-05-07, inside Week 1's window, and still belongs on
+ *   Week 0 carrying its real date. A deadline that falls during exam week is
+ *   still a deadline, not an exam sitting.
+ *   Week 0 sorts before Week 1 by IDENTITY, not by date, for the same reason —
+ *   it is the "submit these" card, so it leads the export even when one of its
+ *   rows is dated later than a Week 1 exam.
+ * - Non-portfolio off-grid dated entries (the rare exam whose session time is
+ *   unpublished, or whose date falls outside every window — none in the May
+ *   2027 dataset) KEEP the issue-#56 rule: they are assigned to the NEAREST
+ *   week window by date and rendered as their own row on that card, so they are
+ *   never dropped and never spawn a blank card of their own.
  * - Undated selections (Career Kickstart courses, no May date) have no week to
  *   sit in; they are returned in `undated` so the renderer can surface them as
- *   a footnote (never dropped), mirroring the txt/json exports. When EVERY
- *   selection is undated there are zero qualifying weeks and `cards` is empty —
- *   the caller shows the empty-state instead of downloading a misleading file.
+ *   a footnote (never dropped), mirroring the txt/json exports. They are NOT
+ *   deadlines and never become Week 0 rows. When EVERY selection is undated
+ *   there are zero qualifying weeks and `cards` is empty — the caller shows the
+ *   empty-state instead of downloading a misleading file. A portfolio-only
+ *   selection is NOT that case: it emits exactly one card, Week 0.
  */
 
 export type WeekCardRowKind = "exam" | "portfolio";
@@ -122,13 +141,15 @@ export interface WeekCardRow {
 }
 
 export interface WeekCard {
-  /** 0-based index into `calendarWeeks()`. */
+  /** 0-based index into `calendarWeeks()`; {@link WEEK_ZERO_INDEX} for Week 0. */
   weekIndex: number;
   /** True for the late-testing window (rendered with a distinct header). */
   late: boolean;
-  /** "Week 1" / "Week 2" / "Late Testing" — derived from position + `late`. */
+  /** True for the Week 0 deadlines card — no window, no grid, no exam rows. */
+  deadlines: boolean;
+  /** "Week 0" / "Week 1" / "Late Testing" — derived from position + `late`. */
   label: string;
-  /** Filename suffix: "week-1" / "week-2" / "late-testing". */
+  /** Filename suffix: "week-0" / "week-1" / "late-testing". */
   slug: string;
   /** "May 3 – 7, 2027" — range label incl. year. */
   rangeLabel: string;
@@ -221,17 +242,30 @@ export function weekCardNotes(
 
 /** Position-derived identity for one testing week (label, slug, range). */
 export interface WeekMeta {
-  /** 0-based index into `calendarWeeks()`. */
+  /** 0-based index into `calendarWeeks()`; {@link WEEK_ZERO_INDEX} for Week 0. */
   weekIndex: number;
   /** True for the late-testing window. */
   late: boolean;
-  /** "Week 1" / "Week 2" / "Late Testing" — derived from position + `late`. */
+  /** True for the Week 0 deadlines card — no window, no grid, no exam rows. */
+  deadlines: boolean;
+  /** "Week 0" / "Week 1" / "Late Testing" — derived from position + `late`. */
   label: string;
-  /** Filename slug: "week-1" / "week-2" / "late-testing". */
+  /** Filename slug: "week-0" / "week-1" / "late-testing". */
   slug: string;
   /** "May 3 – 7, 2027" — range label incl. year. */
   rangeLabel: string;
 }
+
+/**
+ * `weekIndex` for the Week 0 deadlines card. Negative on purpose: Week 0 is NOT
+ * a `calendarWeeks()` window, so there is no index it could honestly hold, and
+ * a negative value can never collide with a real one.
+ */
+export const WEEK_ZERO_INDEX = -1;
+/** Header label for the deadlines card (issue #97). */
+export const WEEK_ZERO_LABEL = "Week 0";
+/** Filename slug for the deadlines card — `…-week-0-list.png`. */
+export const WEEK_ZERO_SLUG = "week-0";
 
 /**
  * Position-derived metadata for EVERY testing week, in order. The label/slug
@@ -240,6 +274,10 @@ export interface WeekMeta {
  * by both designed export variants (list + calendar) so their week identities
  * are guaranteed identical — never hardcoded, always derived from
  * `calendarWeeks()`.
+ *
+ * Week 0 is derived separately by {@link weekZeroMeta} and deliberately does
+ * NOT enter this count: it is not a testing window, so counting it would shift
+ * every real week's number by one (issue #97).
  */
 export function weekCardMeta(weeks: readonly CalendarWeek[]): WeekMeta[] {
   const meta: WeekMeta[] = [];
@@ -250,6 +288,7 @@ export function weekCardMeta(weeks: readonly CalendarWeek[]): WeekMeta[] {
     meta.push({
       weekIndex: i,
       late: week.late,
+      deadlines: false,
       label: week.late ? "Late Testing" : `Week ${regularCount}`,
       slug: week.late ? "late-testing" : `week-${regularCount}`,
       rangeLabel: year
@@ -258,6 +297,36 @@ export function weekCardMeta(weeks: readonly CalendarWeek[]): WeekMeta[] {
     });
   });
   return meta;
+}
+
+/**
+ * Identity for the Week 0 deadlines card (issue #97) — the sibling derivation
+ * to {@link weekCardMeta}, kept here so both export variants read their week
+ * identities from ONE module and can never disagree about the label or slug.
+ *
+ * `rangeLabel` describes the rows the card actually holds, not a window: the
+ * span of the deadline dates passed in ("Apr 30 – May 7, 2027", or a single
+ * date when they all share one). Week 0 has no published window, so inventing a
+ * range for it would be fabricating data — the same reason the exam weeks quote
+ * their real `calendarWeeks()` days.
+ *
+ * @param dates ISO dates of the deadlines on the card (order irrelevant).
+ */
+export function weekZeroMeta(dates: readonly string[]): WeekMeta {
+  const sorted = [...dates].sort();
+  const first = sorted[0];
+  const last = sorted[sorted.length - 1];
+  const span = first === last ? [first] : [first, last];
+  const year = first?.slice(0, 4) ?? "";
+  const range = weekRangeLabel(span.filter((d): d is string => Boolean(d)));
+  return {
+    weekIndex: WEEK_ZERO_INDEX,
+    late: false,
+    deadlines: true,
+    label: WEEK_ZERO_LABEL,
+    slug: WEEK_ZERO_SLUG,
+    rangeLabel: year && range ? `${range}, ${year}` : range,
+  };
 }
 
 /** ISO date → "Mon" (local, no timezone shift). */
@@ -277,9 +346,13 @@ function dayDistance(a: string, b: string): number {
 
 /**
  * The week a dated entry belongs to: the window that CONTAINS its date, else
- * the window nearest to it (ties → earliest week). This keeps portfolio
- * deadlines and any off-grid dated entry on a real card instead of dropping
- * them, without ever inventing a date.
+ * the window nearest to it (ties → earliest week). This keeps an off-grid dated
+ * entry on a real card instead of dropping it, without ever inventing a date.
+ *
+ * Since issue #97 this applies to NON-portfolio off-grid entries only (an exam
+ * with no published session time, or one dated outside every window). Portfolio
+ * deadlines are routed by kind to the Week 0 card instead — see the module's
+ * edge-case ledger.
  */
 export function nearestWeekIndex(
   weeks: readonly CalendarWeek[],
@@ -413,19 +486,34 @@ export function buildWeekCards(
     }
   });
 
-  // 2. Off-grid dated entries (portfolio deadlines + edge-case exams) join the
-  //    nearest week by date, so nothing is silently dropped.
+  // 2. Off-grid dated entries split by KIND, not by date (issue #97):
+  //    - portfolio deadlines → the Week 0 card, whatever their date;
+  //    - everything else (an exam with no published session time, or one dated
+  //      outside every window) → the nearest week, the issue-#56 rule.
+  //    Either way nothing is silently dropped.
+  const deadlineRows: WeekCardRow[] = [];
   for (const off of layout.offGrid) {
-    rowsByWeek[nearestWeekIndex(weeks, off.entry.date)].push(
-      offGridRow(off, infoById),
-    );
+    const row = offGridRow(off, infoById);
+    if (row.kind === "portfolio") {
+      deadlineRows.push(row);
+      continue;
+    }
+    rowsByWeek[nearestWeekIndex(weeks, off.entry.date)].push(row);
   }
 
-  // 3. Emit only non-empty weeks, chronological, with position-derived labels
-  //    (the SAME `weekCardMeta` the calendar variant uses, so the two exports'
-  //    week identities always match).
+  // 3. Emit Week 0 first (only when it has rows), then only the non-empty
+  //    testing weeks, chronological, with position-derived labels (the SAME
+  //    `weekCardMeta` the calendar variant uses, so the two exports' week
+  //    identities always match).
   const meta = weekCardMeta(weeks);
   const cards: WeekCard[] = [];
+  if (deadlineRows.length > 0) {
+    deadlineRows.sort(compareRows);
+    cards.push({
+      ...weekZeroMeta(deadlineRows.map((row) => row.date)),
+      rows: deadlineRows,
+    });
+  }
   weeks.forEach((_week, i) => {
     const rows = rowsByWeek[i];
     if (rows.length === 0) return;

@@ -5,6 +5,7 @@ import type { ApDataset, ApSubject } from "../data/schema";
 import type { SlotResolution } from "./conflicts";
 import type { CalendarBlock } from "./calendar";
 import { buildCalendarCards, type CalendarCard } from "./calendar-cards";
+import { buildWeekCards } from "./week-cards";
 
 /**
  * Builder unit tests (Jon's pre-merge bounce on issue #56) — the pure per-week
@@ -21,7 +22,7 @@ import { buildCalendarCards, type CalendarCard } from "./calendar-cards";
  *   - AP Human Geography (2027-05-03 AM) shares Physics C: Mechanics's slot; keeping Physics C: Mechanics bumps
  *     Human Geography to its real late slot (2027-05-17 PM) → the Late Testing grid.
  *   - AP Seminar has an exam (2027-05-10 PM → Week 2 grid) AND a portfolio
- *     deadline (2027-04-30 → off-grid, nearest week = Week 1).
+ *     deadline (2027-04-30 → the strip-only Week 0 card, issue #97).
  *   - A synthetic undated subject (no May 2027 course is undated) → `undated`.
  */
 
@@ -39,9 +40,13 @@ const KEEP_PHYSICS_C: SlotResolution = {
   memberIds: ["physics-c-mechanics", "human-geography"],
 };
 
-/** Every positioned block across a card's days, in day order. */
+/**
+ * Every positioned block across a card's days, in day order. The Week 0
+ * deadlines card has no grid at all (`week: null`, issue #97), so it
+ * contributes no blocks.
+ */
 function blocksOf(card: CalendarCard): CalendarBlock[] {
-  return card.week.days.flatMap((day) => day.blocks);
+  return (card.week?.days ?? []).flatMap((day) => day.blocks);
 }
 
 describe("buildCalendarCards — exact set of emitted weeks by span (AC)", () => {
@@ -69,33 +74,41 @@ describe("buildCalendarCards — exact set of emitted weeks by span (AC)", () =>
     expect(cards[0].axisEndHour).toBeGreaterThan(bio.endHour);
   });
 
-  it("a 2-week selection emits exactly the two spanned weeks in order", () => {
+  it("a 2-week selection emits exactly the two spanned weeks in order (plus Week 0 for its deadline)", () => {
     const { cards } = buildCalendarCards(
       SUBJECTS,
       ["physics-c-mechanics", "seminar"],
       NO_RESOLUTIONS,
       START_TIMES,
     );
-    expect(cards.map((c) => c.label)).toEqual(["Week 1", "Week 2"]);
-    expect(cards.map((c) => c.slug)).toEqual(["week-1", "week-2"]);
+    expect(cards.map((c) => c.label)).toEqual(["Week 0", "Week 1", "Week 2"]);
+    expect(cards.map((c) => c.slug)).toEqual(["week-0", "week-1", "week-2"]);
 
-    // Week 1: the Physics C: Mechanics block on the grid, the Seminar portfolio off-grid.
-    const week1 = cards[0];
-    expect(blocksOf(week1).map((b) => b.subjectName)).toEqual(["AP Physics C: Mechanics"]);
-    expect(week1.offGrid.map((o) => o.subjectName)).toEqual(["AP Seminar"]);
-    const portfolio = week1.offGrid[0];
+    // Week 0: strip-only, no grid — the Seminar portfolio left Week 1 (#97).
+    const week0 = cards[0];
+    expect(week0.deadlines).toBe(true);
+    expect(week0.week).toBeNull();
+    expect(week0.offGrid.map((o) => o.subjectName)).toEqual(["AP Seminar"]);
+    const portfolio = week0.offGrid[0];
     expect(portfolio.reason).toBe("portfolio");
     expect(portfolio.label).toBe("Portfolio due Friday, April 30, 2027");
 
+    // Week 1: the Physics C: Mechanics block, and NOTHING off-grid any more.
+    const week1 = cards[1];
+    expect(blocksOf(week1).map((b) => b.subjectName)).toEqual([
+      "AP Physics C: Mechanics",
+    ]);
+    expect(week1.offGrid).toEqual([]);
+
     // Week 2: the Seminar sit-down exam block (PM).
-    const week2 = cards[1];
+    const week2 = cards[2];
     const seminar = blocksOf(week2)[0];
     expect(seminar.subjectName).toBe("AP Seminar");
     expect(seminar.startClock).toBe("12:00 PM");
     expect(seminar.endClock).toBe("2:00 PM");
   });
 
-  it("a 3-week selection (a moved-to-late exam) emits Week 1, Week 2, Late Testing", () => {
+  it("a 3-week selection (a moved-to-late exam) emits Week 0, Week 1, Week 2, Late Testing", () => {
     const { cards } = buildCalendarCards(
       SUBJECTS,
       ["physics-c-mechanics", "human-geography", "seminar"],
@@ -103,17 +116,19 @@ describe("buildCalendarCards — exact set of emitted weeks by span (AC)", () =>
       START_TIMES,
     );
     expect(cards.map((c) => c.label)).toEqual([
+      "Week 0",
       "Week 1",
       "Week 2",
       "Late Testing",
     ]);
     expect(cards.map((c) => c.slug)).toEqual([
+      "week-0",
       "week-1",
       "week-2",
       "late-testing",
     ]);
 
-    const late = cards[2];
+    const late = cards[3];
     expect(late.late).toBe(true);
     expect(late.rangeLabel).toBe("May 17 – May 21, 2027");
     // Human Geography renders at its EFFECTIVE (late) slot, flagged moved.
@@ -124,7 +139,7 @@ describe("buildCalendarCards — exact set of emitted weeks by span (AC)", () =>
     expect(humanGeography.startClock).toBe("12:00 PM");
     expect(humanGeography.endClock).toBe("2:15 PM");
     // The Human Geography block sits on a May 17–21 day column.
-    const humanGeographyDay = late.week.days.find((d) =>
+    const humanGeographyDay = late.week?.days.find((d) =>
       d.blocks.some((b) => b.subjectId === "human-geography"),
     );
     expect(humanGeographyDay?.date).toBe("2027-05-17");
@@ -177,17 +192,46 @@ describe("buildCalendarCards — nothing silently dropped", () => {
     expect(undated.map((u) => u.id)).toEqual(["test-undated-course"]);
   });
 
-  it("emits a Week 1 card (empty grid, off-grid strip) for a portfolio-only May 8 deadline", () => {
+  it("emits a strip-only Week 0 card for a portfolio-only May 7 deadline (inside Week 1's window)", () => {
     const { cards } = buildCalendarCards(
       SUBJECTS,
       ["drawing"], // portfolio 2027-05-07, no exam
       NO_RESOLUTIONS,
       START_TIMES,
     );
-    expect(cards.map((c) => c.label)).toEqual(["Week 1"]);
+    // Kind predicate, not a date cutoff (issue #97): May 7 sits inside Week 1's
+    // window and the deadline still gets its own card, never a Week 1 strip.
+    expect(cards.map((c) => c.label)).toEqual(["Week 0"]);
+    expect(cards[0].week).toBeNull();
     expect(blocksOf(cards[0])).toEqual([]);
     expect(cards[0].offGrid.map((o) => o.reason)).toEqual(["portfolio"]);
     expect(cards[0].offGrid[0].label).toBe("Portfolio due Friday, May 7, 2027");
+  });
+
+  it("fans out the SAME cards as the list variant, deadlines included", () => {
+    // The #73 one-presentation principle, pinned across the two exports for the
+    // ticket's worst case (both deadline dates + a Week 1 exam).
+    const selection = ["research", "drawing", "physics-c-mechanics"];
+    const calendar = buildCalendarCards(
+      SUBJECTS,
+      selection,
+      NO_RESOLUTIONS,
+      START_TIMES,
+    );
+    const list = buildWeekCards(SUBJECTS, selection, NO_RESOLUTIONS, START_TIMES);
+    expect(calendar.cards.map((c) => c.slug)).toEqual(
+      list.cards.map((c) => c.slug),
+    );
+    expect(calendar.cards.map((c) => c.label)).toEqual(["Week 0", "Week 1"]);
+    expect(calendar.cards.map((c) => c.rangeLabel)).toEqual(
+      list.cards.map((c) => c.rangeLabel),
+    );
+    // Both deadlines are on Week 0; no exam week carries one.
+    expect(calendar.cards[0].offGrid.map((o) => o.subjectName)).toEqual([
+      "AP Research",
+      "AP Drawing",
+    ]);
+    expect(calendar.cards[1].offGrid).toEqual([]);
   });
 });
 

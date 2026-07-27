@@ -6,6 +6,7 @@ import {
   SETUP_BUFFER_MINUTES,
   weekdayLabel,
   type CalendarBlock,
+  type CalendarWeekLayout,
 } from "./calendar";
 import { EXAM_NOTE_LABEL } from "./schedule";
 import {
@@ -38,6 +39,13 @@ import {
  * and the on-screen view line up. As with the list card, everything is authored
  * as explicit inline CSS (no Tailwind), `pixelRatio: 2`, solid per-theme
  * background, fully client-side / zero network.
+ *
+ * Week 0 treatment (issue #97): the deadlines card has no window, so it has no
+ * grid, no legend, and no published-notes strip (those describe exam blocks) —
+ * only the deadline list, under its own heading, at the list card's width. This
+ * is the "strip-only card" the ticket left to the builder: a grid whose every
+ * cell is empty would be chrome pretending to be data, and the alternative
+ * (leaving deadlines on Week 1) is the defect being fixed.
  *
  * Late-testing treatment: the header reuses the export's amber late tokens
  * (same as the list card) rather than the site's violet badge, so the two PNG
@@ -109,6 +117,12 @@ const DAY_W = 132;
 
 const ROOT_PAD = 28;
 const BODY_PAD_X = 24;
+/**
+ * Width of the grid-less Week 0 deadlines card (issue #97) — the LIST card's
+ * `CARD_WIDTH`, kept in sync deliberately so the two variants' deadlines cards
+ * are the same shape.
+ */
+const DEADLINES_CARD_WIDTH = 680;
 
 /** Category → block colors for the given theme (null category → neutral). */
 function blockColors(
@@ -284,8 +298,13 @@ function renderBlock(
 }
 
 /** The week grid: day-header row + time-axis + day columns with blocks. */
-function renderGrid(card: CalendarCard, tokens: ThemeTokens, theme: ExportTheme): HTMLElement {
-  const days = card.week.days;
+function renderGrid(
+  week: CalendarWeekLayout,
+  card: CalendarCard,
+  tokens: ThemeTokens,
+  theme: ExportTheme,
+): HTMLElement {
+  const days = week.days;
   const n = days.length;
   const gridW = AXIS_W + n * DAY_W;
   const hours: number[] = [];
@@ -388,12 +407,12 @@ function renderGrid(card: CalendarCard, tokens: ThemeTokens, theme: ExportTheme)
 
 /** Category dot + label legend for the categories used in this week's blocks. */
 function renderLegend(
-  card: CalendarCard,
+  week: CalendarWeekLayout,
   tokens: ThemeTokens,
   theme: ExportTheme,
 ): HTMLElement | null {
   const used = new Set<Category>();
-  for (const day of card.week.days)
+  for (const day of week.days)
     for (const block of day.blocks)
       if (block.category) used.add(block.category);
   const ordered = CATEGORIES.filter((c) => used.has(c));
@@ -467,11 +486,19 @@ function renderOffGridRow(
   return row;
 }
 
-/** "Not placed on the grid" strip — off-grid dated entries + undated subjects. */
+/**
+ * "Not placed on the grid" strip — off-grid dated entries + undated subjects.
+ *
+ * On the Week 0 deadlines card (`deadlines`, issue #97) the strip IS the card:
+ * there is no grid beside it, so "Not placed on the grid" would name a thing
+ * the reader cannot see. It gets the heading the card is about instead, and a
+ * blurb that explains the deadline/exam split rather than the grid exclusion.
+ */
 function renderOffGridStrip(
   offGrid: readonly CalendarOffGridRow[],
   undatedNames: readonly string[],
   cycle: string,
+  deadlines: boolean,
   tokens: ThemeTokens,
   theme: ExportTheme,
 ): HTMLElement | null {
@@ -490,14 +517,16 @@ function renderOffGridStrip(
     el(
       "div",
       { fontSize: "13px", fontWeight: "600", color: tokens.body },
-      "Not placed on the grid",
+      deadlines ? "Portfolio deadlines" : "Not placed on the grid",
     ),
   );
   strip.append(
     el(
       "div",
       { fontSize: "11px", color: tokens.muted, lineHeight: "1.4" },
-      `Deadlines without a clock time and subjects without a published ${cycle} exam date are listed here instead of being placed at a guessed position.`,
+      deadlines
+        ? `Submission deadlines have a date but no exam sitting, so they are listed here instead of on a ${cycle} exam week.`
+        : `Deadlines without a clock time and subjects without a published ${cycle} exam date are listed here instead of being placed at a guessed position.`,
     ),
   );
 
@@ -533,12 +562,12 @@ function renderOffGridStrip(
  * qualifier is printed verbatim from the dataset, never summarised.
  */
 function renderNotesStrip(
-  card: CalendarCard,
+  week: CalendarWeekLayout,
   tokens: ThemeTokens,
   theme: ExportTheme,
 ): HTMLElement | null {
   const noted: CalendarBlock[] = [];
-  for (const day of card.week.days) {
+  for (const day of week.days) {
     for (const block of day.blocks) if (block.examNote) noted.push(block);
   }
   if (noted.length === 0) return null;
@@ -615,8 +644,13 @@ export function renderCalendarCardNode(
   const accent = card.late ? tokens.lateAccent : tokens.regularAccent;
   const headerBg = card.late ? tokens.lateHeaderBg : tokens.regularHeaderBg;
   const headerText = card.late ? tokens.lateHeaderText : tokens.regularHeaderText;
-  const gridW = AXIS_W + card.week.days.length * DAY_W;
-  const rootW = gridW + 2 + 2 * BODY_PAD_X + 2 * ROOT_PAD;
+  // A grid-less Week 0 card has no day columns to size from, so it takes the
+  // LIST card's width — the two variants' deadline cards then rasterize to the
+  // same shape, and a Week 0 next to a Week 1 calendar card is narrower, not
+  // stretched to fit an absent grid.
+  const rootW = card.week
+    ? AXIS_W + card.week.days.length * DAY_W + 2 + 2 * BODY_PAD_X + 2 * ROOT_PAD
+    : DEADLINES_CARD_WIDTH;
 
   const root = el("div", {
     boxSizing: "border-box",
@@ -677,9 +711,13 @@ export function renderCalendarCardNode(
     ),
   );
 
-  const blockCount = card.week.days.reduce((n, d) => n + d.blocks.length, 0);
-  const countText =
-    blockCount > 0
+  // Count line — same rule as the list card (issue #97): a deadlines card says
+  // "N deadlines", never "0 exams".
+  const blockCount =
+    card.week?.days.reduce((n, d) => n + d.blocks.length, 0) ?? 0;
+  const countText = card.deadlines
+    ? `${card.offGrid.length} deadline${card.offGrid.length === 1 ? "" : "s"}`
+    : blockCount > 0
       ? `${blockCount} exam${blockCount === 1 ? "" : "s"}`
       : `${card.offGrid.length} item${card.offGrid.length === 1 ? "" : "s"}`;
   header.append(
@@ -707,18 +745,26 @@ export function renderCalendarCardNode(
     padding: "20px 24px",
     background: tokens.pageBg,
   });
-  const legend = renderLegend(card, tokens, options.theme);
-  if (legend) body.append(legend);
-  body.append(renderGrid(card, tokens, options.theme));
+  // Week 0 has no window and therefore no grid or legend — its deadline strip
+  // is the whole body (issue #97). Drawing an empty grid there would be chrome
+  // pretending to be data.
+  if (card.week) {
+    const legend = renderLegend(card.week, tokens, options.theme);
+    if (legend) body.append(legend);
+    body.append(renderGrid(card.week, card, tokens, options.theme));
+  }
   const strip = renderOffGridStrip(
     card.offGrid,
     options.undatedNames,
     options.cycle,
+    card.deadlines,
     tokens,
     options.theme,
   );
   if (strip) body.append(strip);
-  const notes = renderNotesStrip(card, tokens, options.theme);
+  const notes = card.week
+    ? renderNotesStrip(card.week, tokens, options.theme)
+    : null;
   if (notes) body.append(notes);
   cardBox.append(body);
 

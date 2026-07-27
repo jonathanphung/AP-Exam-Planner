@@ -414,9 +414,10 @@ test.describe("issue #51 — real downloads per format", () => {
       await selectBiologyAndSeminar(page);
 
       // Since issue #56 (+ bounce) each .png item emits one designed PNG per
-      // non-empty testing week. Biology (Week 1) + Seminar exam (Week 2) +
-      // Seminar's Apr 30 portfolio deadline (rides Week 1) → exactly two week
-      // files, in chronological week order. Collect every triggered download.
+      // non-empty testing week, and since issue #97 portfolio deadlines get
+      // their own leading "Week 0" card instead of riding Week 1. Biology
+      // (Week 1) + Seminar exam (Week 2) + Seminar's Apr 30 portfolio deadline
+      // (Week 0) → exactly three files, Week 0 first. Collect every download.
       const downloads: Download[] = [];
       page.on("download", (d) => downloads.push(d));
 
@@ -425,8 +426,9 @@ test.describe("issue #51 — real downloads per format", () => {
         .getByRole("menuitem", { name: menuItem, exact: true })
         .click();
 
-      await expect.poll(() => downloads.length, { timeout: 15000 }).toBe(2);
+      await expect.poll(() => downloads.length, { timeout: 15000 }).toBe(3);
       expect(downloads.map((d) => d.suggestedFilename())).toEqual([
+        `schedule-1-ap-exams-2027-week-0-${view}.png`,
         `schedule-1-ap-exams-2027-week-1-${view}.png`,
         `schedule-1-ap-exams-2027-week-2-${view}.png`,
       ]);
@@ -543,7 +545,8 @@ test("evidence — export a real .png / .json / .txt and commit the artifacts", 
     await openMenu(page);
     await page.getByRole("menuitem", { name: menuItem, exact: true }).click();
   }
-  await expect.poll(() => pngDownloads.length, { timeout: 15000 }).toBe(4);
+  // 3 week cards (Week 0 + Week 1 + Week 2, issue #97) × 2 variants.
+  await expect.poll(() => pngDownloads.length, { timeout: 15000 }).toBe(6);
   for (const download of pngDownloads) {
     writeFileSync(
       `${EVIDENCE_DIR}/${download.suggestedFilename()}`,
@@ -565,8 +568,10 @@ test("evidence — export a real .png / .json / .txt and commit the artifacts", 
 
   // Sanity: every artifact is non-empty on disk.
   for (const f of [
+    "schedule-1-ap-exams-2027-week-0-list.png",
     "schedule-1-ap-exams-2027-week-1-list.png",
     "schedule-1-ap-exams-2027-week-2-list.png",
+    "schedule-1-ap-exams-2027-week-0-calendar.png",
     "schedule-1-ap-exams-2027-week-1-calendar.png",
     "schedule-1-ap-exams-2027-week-2-calendar.png",
     "exported-schedule.json",

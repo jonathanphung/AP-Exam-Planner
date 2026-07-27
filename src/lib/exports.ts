@@ -129,8 +129,9 @@ export type ExportView = "list" | "calendar";
 
 /**
  * Per-week `.png` filename (issue #56 + bounce, schedule-named since issue
- * #90): the shared schedule basename, a week slug (`week-1` / `week-2` /
- * `late-testing`, from the card's `slug`), AND a view suffix (`list` /
+ * #90): the shared schedule basename, a week slug (`week-0` / `week-1` /
+ * `week-2` / `late-testing`, from the card's `slug` — `week-0` is issue #97's
+ * portfolio-deadlines card), AND a view suffix (`list` /
  * `calendar`). The view suffix keeps the two variants from colliding when a
  * user saves both for the same week (`my-plan-ap-exams-2027-week-1-list.png`
  * vs `my-plan-ap-exams-2027-week-1-calendar.png`). Derived from

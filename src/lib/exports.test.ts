@@ -174,6 +174,17 @@ describe("scheduleNameSlug (issue #90)", () => {
 
 describe("weekPngFileName — per-week, per-view suffix (issue #56 + bounce, #90 schedule slug)", () => {
   it("derives schedule basename + week slug + view suffix", () => {
+    // Week 0 is the portfolio-deadlines card (issue #97) — same composition,
+    // no special-casing anywhere in the filename pipeline.
+    expect(weekPngFileName("My Plan", "week-0", "list")).toBe(
+      "my-plan-ap-exams-2027-week-0-list.png",
+    );
+    expect(weekPngFileName("ambitious draft", "week-0", "list")).toBe(
+      "ambitious-draft-ap-exams-2027-week-0-list.png",
+    );
+    expect(weekPngFileName("My Plan", "week-0", "calendar")).toBe(
+      "my-plan-ap-exams-2027-week-0-calendar.png",
+    );
     expect(weekPngFileName("My Plan", "week-1", "list")).toBe(
       "my-plan-ap-exams-2027-week-1-list.png",
     );
@@ -189,7 +200,7 @@ describe("weekPngFileName — per-week, per-view suffix (issue #56 + bounce, #90
   });
 
   it("the two view variants never collide for the same week", () => {
-    for (const slug of ["week-1", "week-2", "late-testing"]) {
+    for (const slug of ["week-0", "week-1", "week-2", "late-testing"]) {
       expect(weekPngFileName("My Plan", slug, "list")).not.toBe(
         weekPngFileName("My Plan", slug, "calendar"),
       );
@@ -197,7 +208,7 @@ describe("weekPngFileName — per-week, per-view suffix (issue #56 + bounce, #90
   });
 
   it("every emitted name contains the shared, dataset-derived stem", () => {
-    for (const slug of ["week-1", "week-2", "late-testing"]) {
+    for (const slug of ["week-0", "week-1", "week-2", "late-testing"]) {
       for (const view of ["list", "calendar"] as const) {
         expect(
           weekPngFileName("My Plan", slug, view).includes(
