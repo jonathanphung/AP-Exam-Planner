@@ -400,6 +400,27 @@ export function copyScheduleName(
 }
 
 /**
+ * Split `name` into its base and its {@link COPY_SUFFIX_RE} copy-suffix (empty
+ * string when the name is not a derived copy). Display-level companion to
+ * {@link copyScheduleName}, single-sourcing the suffix grammar.
+ *
+ * Why the UI needs the split (QA v1 of issue #88): at the 375px viewport the
+ * schedule row's name span gets ~99px, so end-truncation clipped exactly the
+ * copy-suffix — "Schedule 1 (copy)" and "Schedule 1 (copy 2)" both painted as
+ * "Schedule 1 (c…", making sibling copies pixel-identical. The row therefore
+ * renders the base and the suffix separately: the base truncates, the suffix
+ * — the only part that distinguishes copies — never does.
+ */
+export function splitCopySuffix(name: string): {
+  base: string;
+  suffix: string;
+} {
+  const match = COPY_SUFFIX_RE.exec(name);
+  if (!match) return { base: name, suffix: "" };
+  return { base: name.slice(0, match.index), suffix: match[0] };
+}
+
+/**
  * Fork schedule `id` (issue #88): insert a deep, independently-frozen copy of
  * its FULL plan state — selection AND resolutions (copying only the selection
  * would silently drop the user's conflict decisions, exactly the leak the

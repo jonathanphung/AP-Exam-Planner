@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   MAX_SCHEDULE_NAME_LENGTH,
+  splitCopySuffix,
   useSchedules,
   validateScheduleName,
   type Schedule,
@@ -52,9 +53,17 @@ function renameErrorMessage(error: ScheduleNameError): string {
  *     here does not contradict issue #62's reject-duplicates rule (that rule
  *     protects a label the user TYPED; a Duplicate click types nothing).
  *     No confirm dialog — duplicating is additive and non-destructive,
- *     unlike Delete. Layout: three 44px controls + gaps take ~144px, so the
- *     truncating name keeps ≈200px at the 375px viewport (and ≈170px in the
- *     320px `lg` sidebar with 32px buttons) — no overflow menu needed.
+ *     unlike Delete. Layout: three 44px inline controls fit at the 375px
+ *     viewport, but they leave the truncating name span only ~99px (QA v1
+ *     measured; sidebar card chrome eats far more than the buttons alone).
+ *     End-truncation at that width clips exactly the copy-suffix, rendering
+ *     sibling copies pixel-identical — so the name paints as TWO segments
+ *     inside the single `.truncate` span: the base (truncates with an
+ *     ellipsis) and the `splitCopySuffix`-detected " (copy N)" tail (pinned,
+ *     never truncates). Different copies stay visually distinct at every
+ *     width; non-copy names render exactly as before. The segments are plain
+ *     text nodes, so the radio's accessible name is still the full schedule
+ *     name (whitespace-normalized per ACCNAME) — no overflow menu needed.
  *   - Drag-to-reorder from the reference is intentionally NOT implemented
  *     (builder's documented call): schedules are few, creation order is
  *     stable, and reorder adds drag-and-drop a11y complexity with no AC
@@ -259,6 +268,12 @@ export function MySchedules() {
         {schedules.map((schedule, index) => {
           const active = schedule.id === activeId;
           const isRenaming = renaming?.id === schedule.id;
+          // Render the copy-suffix as a pinned segment so it survives
+          // truncation at narrow widths (QA v1: at 375px end-truncation made
+          // sibling copies pixel-identical) — see the contract comment above.
+          const { base: nameBase, suffix: nameSuffix } = splitCopySuffix(
+            schedule.name,
+          );
           return (
             <div key={schedule.id} className="flex items-center gap-1">
               {isRenaming ? (
@@ -350,8 +365,22 @@ export function MySchedules() {
                       <span className="h-2 w-2 rounded-full bg-blue-600 dark:bg-blue-400" />
                     )}
                   </span>
-                  <span className="min-w-0 flex-1 truncate">
-                    {schedule.name}
+                  {/* One `.truncate` span paints the whole name (the QA suite
+                      screenshots `span.truncate` per row). As a flex container
+                      its own text-overflow is inert; the BASE segment carries
+                      the ellipsis while the copy-suffix segment is pinned
+                      (`shrink-0`) so two copies never truncate identically.
+                      `whitespace-pre` keeps the suffix's leading space, which
+                      would otherwise be collapsed at the segment boundary. */}
+                  <span className="flex min-w-0 flex-1 truncate">
+                    <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
+                      {nameBase}
+                    </span>
+                    {nameSuffix && (
+                      <span className="shrink-0 whitespace-pre">
+                        {nameSuffix}
+                      </span>
+                    )}
                   </span>
                 </button>
               )}
