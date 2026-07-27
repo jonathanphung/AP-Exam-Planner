@@ -105,8 +105,11 @@ export interface WeekCardRow {
   note: string | null;
   /**
    * The exam's published qualifier (verbatim `examNote`), or null (issue #71).
-   * A `.png` has no popup and no tooltip, so this text is PRINTED on the card
-   * under the subject name — the card is the whole disclosure surface.
+   * A `.png` has no popup and no tooltip, so this text is PRINTED on the card —
+   * the card is the whole disclosure surface. Issue #91 moved *where*: the row
+   * carries a short marker and the verbatim text moves to the card's notes
+   * strip (see {@link weekCardNotes}), so the text is never lost and never
+   * printed once per subject.
    */
   examNote: string | null;
 }
@@ -131,6 +134,81 @@ export interface WeekCardsResult {
   cards: WeekCard[];
   /** Selected subjects with no dated entry at all (never silently dropped). */
   undated: UndatedSubject[];
+}
+
+/** Which dataset field a card note came from — decides its printed label. */
+export type WeekCardNoteKind = "portfolio" | "exam";
+
+/**
+ * One de-duplicated note for a week card's notes strip: the verbatim text once,
+ * plus every subject on this card that carries it.
+ */
+export interface WeekCardNote {
+  /** `"portfolio"` for `row.note`, `"exam"` for `row.examNote`. */
+  kind: WeekCardNoteKind;
+  /** The dataset text, VERBATIM — never truncated, never summarised. */
+  text: string;
+  /** Subject names carrying this exact text, in row order, de-duplicated. */
+  subjectNames: string[];
+  /**
+   * The shared category when every subject in the group has the same one
+   * (the six PPR languages do), else null — the strip tints its bullet with
+   * it and must not imply a category the group does not actually share.
+   */
+  category: Category | null;
+}
+
+/**
+ * The card's notes, de-duplicated by (kind, verbatim text) — issue #91.
+ *
+ * Why this is a model function and not a render-time loop: the PPR submission
+ * note is BYTE-IDENTICAL across all six AP language subjects, and the Art &
+ * Design note across all three studio subjects. Printing it per row meant a
+ * student taking Spanish and French got the same 310-character paragraph twice
+ * on one card; all six printed it six times. The right unit of display is "one
+ * note, many subjects", which is a data question — so it is decided here, in
+ * the pure testable core, and merely painted by `export-png.ts`.
+ *
+ * Order is first appearance in row order (rows are already chronological), so
+ * the strip reads in the same sequence as the rows above it.
+ */
+export function weekCardNotes(
+  rows: readonly WeekCardRow[],
+): WeekCardNote[] {
+  const byKey = new Map<string, WeekCardNote>();
+  // Tracks whether a group is still category-unanimous; a group that has seen
+  // two categories is pinned to null and never re-tinted.
+  const unanimous = new Map<string, boolean>();
+
+  const add = (kind: WeekCardNoteKind, text: string, row: WeekCardRow) => {
+    // The two kind names are disjoint fixed prefixes, so `kind:text` can
+    // never make one kind's note collide with the other's.
+    const key = `${kind}:${text}`;
+    const existing = byKey.get(key);
+    if (!existing) {
+      byKey.set(key, {
+        kind,
+        text,
+        subjectNames: [row.subjectName],
+        category: row.category,
+      });
+      unanimous.set(key, true);
+      return;
+    }
+    if (!existing.subjectNames.includes(row.subjectName)) {
+      existing.subjectNames.push(row.subjectName);
+    }
+    if (unanimous.get(key) && existing.category !== row.category) {
+      unanimous.set(key, false);
+      existing.category = null;
+    }
+  };
+
+  for (const row of rows) {
+    if (row.note) add("portfolio", row.note, row);
+    if (row.examNote) add("exam", row.examNote, row);
+  }
+  return [...byKey.values()];
 }
 
 /** Position-derived identity for one testing week (label, slug, range). */

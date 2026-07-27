@@ -1,4 +1,9 @@
-import type { WeekCard, WeekCardRow } from "./week-cards";
+import {
+  weekCardNotes,
+  type WeekCard,
+  type WeekCardNote,
+  type WeekCardRow,
+} from "./week-cards";
 import { EXAM_NOTE_LABEL } from "./schedule";
 import {
   captureCardPng,
@@ -36,6 +41,17 @@ export type { ExportTheme };
  * exam already appears on its own "Late Testing" week card, so its placement
  * there is the signal — no information is lost.
  *
+ * Note budget (issue #91): a row is identity + timing + at most a one-line note
+ * MARKER. The verbatim note text — the portfolio submission notes and the
+ * published exam qualifier — lives in the card's "Notes" strip below the rows,
+ * printed once per distinct note and attributed to every subject that carries
+ * it. Before this, each row inlined both strings in full: the 310-character
+ * PPR note is byte-identical across all six AP language subjects, so a
+ * six-language card printed the same paragraph six times and the May dates the
+ * card exists to communicate were the smallest thing on it. The calendar
+ * variant reached the same shape from the other direction (#71's "Published
+ * notes" strip), so the two exports now defer notes the same way.
+ *
  * Rasterization mechanism (builder decision, issue #56) — an off-screen DOM
  * node + `html-to-image`, NOT a hand-drawn `<canvas>`: the card is authored in
  * ordinary DOM/CSS (readable, tweakable) with fully INLINE styles, and
@@ -64,6 +80,22 @@ export interface WeekCardRenderOptions {
 /** Fixed card width — a comfortable share/paste width (px, pre-pixelRatio). */
 const CARD_WIDTH = 680;
 
+/**
+ * Row-marker / notes-strip label for a portfolio submission note (issue #91).
+ *
+ * The sibling of {@link EXAM_NOTE_LABEL}, and written to the same rule: the
+ * label only NAMES what the text is, it never paraphrases or summarises it.
+ * Export-local because the on-screen list view has room to print the note in
+ * place and needs no marker — only the fixed-width rasterized card does.
+ */
+export const PORTFOLIO_NOTE_LABEL = "Portfolio note";
+
+/** The printed label for each note kind — the only kind→copy mapping. */
+const NOTE_LABEL: Record<WeekCardNote["kind"], string> = {
+  portfolio: PORTFOLIO_NOTE_LABEL,
+  exam: EXAM_NOTE_LABEL,
+};
+
 /** The right-hand "when" descriptor for a row (day · session · clock). */
 function rowWhen(row: WeekCardRow): string {
   const parts: string[] = [`${row.weekday}, ${row.monthDay}`];
@@ -86,8 +118,10 @@ function rowWhen(row: WeekCardRow): string {
 
 /**
  * One decluttered row: a color accent bar + a leading category dot + the
- * subject name (left), and the day / session / clock descriptor (right). No
- * category chip and no "Moved to late testing" pill (Jon's bounce).
+ * subject name and any note MARKER (left), and the day / session / clock
+ * descriptor (right). No category chip and no "Moved to late testing" pill
+ * (Jon's bounce), and no verbatim note paragraph (issue #91 — see the marker
+ * comment below).
  */
 function renderRow(
   row: WeekCardRow,
@@ -107,7 +141,7 @@ function renderRow(
     borderRadius: "10px",
   });
 
-  // Left: leading category dot + subject name (+ any portfolio note).
+  // Left: leading category dot + subject name (+ any note marker).
   const left = el("div", {
     display: "flex",
     flexDirection: "column",
@@ -142,25 +176,35 @@ function renderRow(
   nameRow.append(dot, name);
   left.append(nameRow);
 
-  if (row.note) {
+  // Note MARKERS, not the notes (issue #91). Issue #71 printed the published
+  // qualifier here in full, reasoning that "a PNG has no popup or tooltip to
+  // defer it to". That requirement — the text is never lost on the one surface
+  // with no interaction — still holds and is still met: the verbatim text now
+  // sits in the card's notes strip a few centimetres below, printed ONCE per
+  // distinct note. What changed is that the row is no longer the place for it.
+  // Inline, the portfolio note (310 chars for all six AP language subjects,
+  // byte-identical) wrapped to five or six 12px lines PER ROW and buried the
+  // May dates the card was exported for. The marker is the same construction
+  // the calendar block face has used since #71 — a short derived label naming
+  // what the text IS, never a paraphrase of it.
+  const markers: string[] = [];
+  if (row.note) markers.push(PORTFOLIO_NOTE_LABEL);
+  if (row.examNote) markers.push(EXAM_NOTE_LABEL);
+  if (markers.length > 0) {
     left.append(
       el(
         "span",
-        { fontSize: "12px", color: tokens.muted, lineHeight: "1.35" },
-        row.note,
-      ),
-    );
-  }
-
-  // A published qualifier on the exam itself (issue #71). Printed in full on the
-  // card because a PNG has no popup or tooltip to defer it to: the exported
-  // image is the only thing the student ends up looking at.
-  if (row.examNote) {
-    left.append(
-      el(
-        "span",
-        { fontSize: "12px", color: tokens.muted, lineHeight: "1.35" },
-        `${EXAM_NOTE_LABEL}: ${row.examNote}`,
+        {
+          fontSize: "11px",
+          fontStyle: "italic",
+          fontWeight: "500",
+          color: tokens.muted,
+          lineHeight: "1.3",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        },
+        markers.join("  ·  "),
       ),
     );
   }
@@ -182,6 +226,97 @@ function renderRow(
 
   wrapper.append(left, when);
   return wrapper;
+}
+
+/**
+ * "Notes" strip (issue #91) — the verbatim text every row above deferred, each
+ * distinct note printed ONCE and attributed to every subject that carries it.
+ *
+ * Construction: the card's own undated-footnote idiom (dashed rule + muted
+ * 12px), holding the calendar card's "Published notes" content model
+ * (`renderNotesStrip` in `export-png-calendar.ts`). The two variants deliberately
+ * differ in ONE way: this strip also carries portfolio notes, because the list
+ * card is where portfolio deadlines get a full row, whereas the calendar puts
+ * them in its off-grid strip under a derived label. Hence the heading is the
+ * honest superset "Notes" rather than the calendar's `Published notes` — the
+ * per-entry label ({@link NOTE_LABEL}) says which kind each entry is.
+ *
+ * Returns null when the card has no notes, so a card of plain exams gets no
+ * empty strip.
+ */
+function renderNotesStrip(
+  notes: readonly WeekCardNote[],
+  tokens: ThemeTokens,
+  theme: ExportTheme,
+): HTMLElement | null {
+  if (notes.length === 0) return null;
+
+  const strip = el("div", {
+    marginTop: "6px",
+    paddingTop: "12px",
+    borderTop: `1px dashed ${tokens.divider}`,
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+  });
+  strip.append(
+    el(
+      "div",
+      { fontSize: "13px", fontWeight: "600", color: tokens.body },
+      "Notes",
+    ),
+  );
+
+  const list = el("div", {
+    display: "flex",
+    flexDirection: "column",
+    gap: "6px",
+  });
+  for (const note of notes) {
+    const row = el("div", {
+      display: "flex",
+      alignItems: "flex-start",
+      gap: "6px",
+      fontSize: "12px",
+      lineHeight: "1.4",
+      color: tokens.muted,
+      minWidth: "0",
+    });
+    row.append(
+      el("span", {
+        width: "8px",
+        height: "8px",
+        borderRadius: "9999px",
+        background: categoryAccent(note.category, theme),
+        flex: "0 0 auto",
+        marginTop: "5px",
+      }),
+    );
+    const text = el("span", { minWidth: "0" });
+    // "<subjects> — <label>: <verbatim>". The label sits INSIDE the sentence
+    // (not only in the heading) so `Published note: <text>` stays contiguous —
+    // #71's disclosure contract, which e2e/issue-71-qa.spec.ts pins on the
+    // rasterized DOM.
+    text.append(
+      el(
+        "span",
+        { fontWeight: "600", color: tokens.body },
+        `${note.subjectNames.join(", ")} — `,
+      ),
+    );
+    text.append(
+      el(
+        "span",
+        { fontWeight: "600", color: tokens.body },
+        `${NOTE_LABEL[note.kind]}: `,
+      ),
+    );
+    text.append(el("span", {}, note.text));
+    row.append(text);
+    list.append(row);
+  }
+  strip.append(list);
+  return strip;
 }
 
 /**
@@ -291,6 +426,14 @@ export function renderWeekCardNode(
   for (const row of card.rows) {
     body.append(renderRow(row, tokens, options.theme));
   }
+
+  // Notes strip — the verbatim text the rows deferred, de-duplicated (#91).
+  const notesStrip = renderNotesStrip(
+    weekCardNotes(card.rows),
+    tokens,
+    options.theme,
+  );
+  if (notesStrip) body.append(notesStrip);
 
   // Undated footnote — a selection is never silently dropped.
   if (options.undatedNames.length > 0) {
