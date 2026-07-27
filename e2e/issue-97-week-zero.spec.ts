@@ -65,7 +65,13 @@ const FIRST_DAY = firstWindowStart(calendarWeeks())!;
 interface CardProbe {
   /** Header label: "Week 0" / "Week 1" / "Late Testing". */
   label: string;
-  /** Header range line, e.g. "Apr 30 – May 7, 2027". */
+  /**
+   * Header range line, e.g. "May 3 – May 7, 2027" for a window week, or the
+   * single-date "Apr 30, 2027" for a Week 0 whose rows share one deadline. The
+   * "Apr 30 – May 7, 2027" span this example used to name was the retracted
+   * kind-predicate build's Week 0 — no card produces it any more (Jon's bounce,
+   * 2026-07-27).
+   */
   range: string;
   /** Header count line — must never read "0 exams". */
   count: string;
