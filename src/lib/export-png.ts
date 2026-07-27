@@ -243,24 +243,6 @@ export function renderWeekCardNode(
       card.label,
     ),
   );
-  if (card.late) {
-    identity.append(
-      el(
-        "span",
-        {
-          fontSize: "11px",
-          fontWeight: "700",
-          letterSpacing: "0.05em",
-          textTransform: "uppercase",
-          color: headerText,
-          border: `1px solid ${accent}`,
-          padding: "2px 8px",
-          borderRadius: "9999px",
-        },
-        "Late window",
-      ),
-    );
-  }
   headerLeft.append(identity);
   headerLeft.append(
     el(
