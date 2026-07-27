@@ -1,0 +1,85 @@
+# e2e-full-final - condensed
+# Full Playwright reporter output was 1189 lines. The per-test 'ok N ...'
+# lines are dropped; the run summary, every failure headline and the
+# verbatim failure detail are kept.
+
+  x  648 [chromium] › e2e\qa-evidence.spec.ts:23:7 › AC2 — / renders header + populated main with no console errors (desktop 1920x1080) (1.4s)
+  x  650 [chromium] › e2e\qa-evidence.spec.ts:23:7 › AC2 — / renders header + populated main with no console errors (mobile 375x667) (921ms)
+  2 failed
+    [chromium] › e2e\qa-evidence.spec.ts:23:7 › AC2 — / renders header + populated main with no console errors (desktop 1920x1080) 
+    [chromium] › e2e\qa-evidence.spec.ts:23:7 › AC2 — / renders header + populated main with no console errors (mobile 375x667) 
+  669 passed (5.9m)
+EXIT=1
+
+----- failure detail (verbatim) -----
+
+  1) [chromium] › e2e\qa-evidence.spec.ts:23:7 › AC2 — / renders header + populated main with no console errors (desktop 1920x1080) 
+
+    Error: Unexpected console errors: A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+    - A server/client branch `if (typeof window !== 'undefined')`.
+    - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+    - Date formatting in a user's locale which doesn't match the server.
+    - External changing data without sending a snapshot of it along with the HTML.
+    - Invalid HTML tag nesting.
+
+    It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+    %s%s https://react.dev/link/hydration-mismatch 
+
+      ...
+        <LoadingBoundary name="/" loading={null}>
+          <HTTPAccessFallbackBoundary notFound={{...}} forbidden={undefined} unauthorized={undefined}>
+            <HTTPAccessFallbackErrorBoundary pathname="/" notFound={{...}} forbidden={undefined} unauthorized={undefined} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <InnerLayoutRouter url="/" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+                    <SegmentViewNode type="page" pagePath="page.tsx">
+                      <SegmentTrieNode>
+                      <Home>
+                        <div data-scroll-lock-anchor={true} className="mx-auto fl...">
+                          <Sidebar>
+                          <main className="flex min-w..." aria-label="Exam planner">
+                            <CatalogGrid>
+                              <section aria-label="Subject ca..." className="flex flex-...">
+                                <div className="flex flex-...">
+                                  <div className="flex flex-...">
+                                    <label>
+                                    <input
+                                      id="subject-search"
+                                      type="search"
+                                      value=""
+                                      onChange={function onChange}
+                                      placeholder="e.g. bio"
+                                      autoComplete="off"
+                                      className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 tex..."
+    -                                 style={{caret-color:"transparent"}}
+                                    >
+                                  ...
+                                ...
+                            ...
+                    ...
+                  ...
+
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  -  1
+    + Received  + 48
+
+    - Array []
+    + Array [
+    +   "A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+    +
+    + - A server/client branch `if (typeof window !== 'undefined')`.
+    + - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+    + - Date formatting in a user's locale which doesn't match the server.
+    + - External changing data without sending a snapshot of it along with the HTML.
+    + - Invalid HTML tag nesting.
+    +
+    + It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+    +
+    + %s%s https://react.dev/link/hydration-mismatch 
+    +
+    +   ...
+    +     <LoadingBoundary name=\"/\" loading={null}>
