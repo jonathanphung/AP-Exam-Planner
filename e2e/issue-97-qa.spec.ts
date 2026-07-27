@@ -21,12 +21,19 @@ import { pressViewChip } from "./support/view-chip";
  * `captureCardPng`'s holder), the REAL downloaded filenames, and the REAL
  * on-screen views for the "untouched" AC.
  *
+ * Test TITLES here deliberately spell no two-digit "all NN" count: the repo's
+ * own anti-drift guard (`src/data/doc-freshness.test.ts` AC5, issue #71) reads
+ * every test and describe title in the repo and rejects a roster count the
+ * dataset does not produce. 12 is the portfolio-subject count, not a roster or
+ * category size, so it reads as drift there. The sweep still covers all of
+ * them — the count lives in the assertions, derived from the dataset.
+ *
  * AC → test map:
- *   AC1  every selected deadline on Week 0, none on an exam week  → "all 12"
+ *   AC1  every selected deadline on Week 0, none on an exam week  → "every … deadline"
  *   AC2  Week 0 only when non-empty                               → "no deadline"
- *   AC3  label/slug + regular numbering unshifted                 → "all 12"
+ *   AC3  label/slug + regular numbering unshifted                 → "every … deadline"
  *   AC4  weekPngFileName composition                              → filenames
- *   AC5  name + "Portfolio deadline" + real date, no note prose   → "all 12"
+ *   AC5  name + "Portfolio deadline" + real date, no note prose   → "every … deadline"
  *   AC6  portfolio-only selection → exactly one card, Week 0      → "portfolio only"
  *   AC7  undated footnote unaffected                              → "undated"
  *   AC8  calendar variant consistent with the list variant        → "calendar"
@@ -185,7 +192,7 @@ test("fixture guard — the cycle ships 12 deadlines on two dates, one inside We
   expect(PLAIN_EXAM.exam?.date).toBeTruthy();
 });
 
-test("AC1/AC3/AC5/AC9 — all 12 deadlines land on ONE Week 0 card; exam weeks keep their numbers and hold no deadline", async ({
+test("AC1/AC3/AC5/AC9 — every portfolio deadline lands on ONE Week 0 card; exam weeks keep their numbers and hold no deadline", async ({
   page,
 }) => {
   const { downloads, probes } = await exportCards(
