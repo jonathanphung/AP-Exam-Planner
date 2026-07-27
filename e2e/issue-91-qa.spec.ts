@@ -57,10 +57,11 @@ import { pressViewChip } from "./support/view-chip";
  * stale, and the fixture guard fails loudly instead of letting an assertion go
  * vacuous.
  *
- * Evidence: `docs/super-board/runs/issue-91-qa-v1/` (via QA_EVIDENCE_DIR).
+ * Evidence: `docs/super-board/runs/issue-91-qa-v2/` (via QA_EVIDENCE_DIR).
+ * (v1 is the pre-bounce pass; its committed folder is history and stays put.)
  */
 
-const EVIDENCE_DIR = evidenceDir("issue-91-qa-v1");
+const EVIDENCE_DIR = evidenceDir("issue-91-qa-v2");
 
 /** Mirrors `EXAM_NOTE_LABEL` in src/lib/schedule.ts. */
 const EXAM_NOTE_LABEL = "Published note";
