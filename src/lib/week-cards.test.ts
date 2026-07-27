@@ -297,6 +297,46 @@ describe("buildWeekCards — nothing silently dropped", () => {
   });
 });
 
+describe("buildWeekCards — the whole roster, the shape Jon's bounce specified", () => {
+  it("splits the cycle's deadlines across Week 0 and the weeks they occur in", () => {
+    // Every real subject selected — the case the bounce comment tabulates.
+    const ids = dataset.subjects.map((s) => s.id);
+    const { cards } = buildWeekCards(SUBJECTS, ids, NO_RESOLUTIONS, START_TIMES);
+    expect(cards.map((c) => c.slug)).toEqual(["week-0", "week-1", "week-2"]);
+
+    const deadlines = dataset.subjects.filter((s) => s.portfolio !== null);
+    const before = deadlines.filter((s) => s.portfolio!.deadline < FIRST_DAY);
+    const inWindow = deadlines.filter((s) => s.portfolio!.deadline >= FIRST_DAY);
+
+    // Week 0 holds exactly the pre-window deadlines and nothing else.
+    const [week0, ...examWeeks] = cards;
+    expect(week0.rows.map((r) => r.subjectId).sort()).toEqual(
+      before.map((s) => s.id).sort(),
+    );
+    expect(week0.rangeLabel).toBe("Apr 30, 2027");
+
+    // Each in-window deadline is a row on the week whose window CONTAINS its
+    // date — derived from the shared week model, never asserted as a literal.
+    const weeks = calendarWeeks();
+    for (const subject of inWindow) {
+      const expected = weeks.findIndex((w) =>
+        w.days.includes(subject.portfolio!.deadline),
+      );
+      const carrier = examWeeks.find((c) =>
+        c.rows.some((r) => r.subjectId === subject.id && r.kind === "portfolio"),
+      );
+      expect(carrier, `${subject.id}'s deadline vanished`).toBeTruthy();
+      expect(carrier!.weekIndex).toBe(expected);
+    }
+
+    // No exam week keeps a pre-window deadline, and Week 0 keeps no exam.
+    expect(
+      examWeeks.flatMap((c) => c.rows.filter((r) => r.date < FIRST_DAY)),
+    ).toEqual([]);
+    expect(week0.rows.filter((r) => r.kind === "exam")).toEqual([]);
+  });
+});
+
 describe("belongsOnWeekZero — the shared Week 0 cutoff (Jon's bounce on #97)", () => {
   const WEEKS = calendarWeeks();
 
