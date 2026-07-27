@@ -8,7 +8,12 @@ import {
   type OffGridEntry,
   type SubjectCalendarInfo,
 } from "./calendar";
-import { nearestWeekIndex, weekCardMeta, weekZeroMeta } from "./week-cards";
+import {
+  belongsOnWeekZero,
+  nearestWeekIndex,
+  weekCardMeta,
+  weekZeroMeta,
+} from "./week-cards";
 
 /**
  * Pure model for the per-week CALENDAR-view PNG cards (Jon's pre-merge bounce
@@ -38,24 +43,32 @@ import { nearestWeekIndex, weekCardMeta, weekZeroMeta } from "./week-cards";
  *
  * Which weeks emit (matches the list variant): a card is emitted for every week
  * with ≥1 placed block OR ≥1 off-grid dated entry assigned to it, so the two
- * variants fan out the SAME set of weeks. Non-portfolio off-grid dated entries
- * (an exam whose session time is unpublished / falls outside every window) are
+ * variants fan out the SAME set of weeks. Off-grid dated entries that are not
+ * routed to Week 0 (an exam whose session time is unpublished / falls outside
+ * every window, and any deadline dated on or after the first testing day) are
  * assigned to the nearest week and listed in a "Not placed on the grid" strip —
  * never positioned at a guessed time, never silently dropped
  * (`buildCalendarLayout`'s `offGrid`, exactly as the website surfaces it).
  * Undated selections (no May date at all) are returned in `undated` for the
  * renderer to footnote, mirroring the list card + the txt/json exports.
  *
- * Week 0 (issue #97): portfolio deadlines no longer ride a testing week here
- * either — the two variants have to tell the same story (#73's one-presentation
- * principle). Every `portfolio`-kind entry is collected onto a leading Week 0
- * card that has NO grid: a deadline has no session and no clock, so it is
- * always off-grid (`calendar.ts` routes it to `offGrid` by kind), and a grid
- * whose every cell is empty would be chrome pretending to be data. The card is
+ * Week 0 (issue #97, as amended by Jon's bounce on it, 2026-07-27): a portfolio
+ * deadline dated STRICTLY BEFORE the first day of the earliest published
+ * testing window leaves the exam weeks here too — the two variants have to tell
+ * the same story (#73's one-presentation principle), so this file calls the
+ * SAME `belongsOnWeekZero` predicate the list variant does rather than
+ * re-deriving the cutoff. Those rows are collected onto a leading Week 0 card
+ * that has NO grid: a deadline has no session and no clock, so it is always
+ * off-grid (`calendar.ts` routes it to `offGrid` by kind), and a grid whose
+ * every cell is empty would be chrome pretending to be data. The card is
  * therefore strip-only — `week` is null — and the renderer prints the deadline
- * list alone. The predicate is the row kind, never a date cutoff: the Art &
- * Design trio's 2027-05-07 deadlines sit on Week 0 with their real date even
- * though that day falls inside Week 1's window.
+ * list alone.
+ *
+ * A deadline dated on or after that first testing day stays exactly where it
+ * was pre-#97: the Art & Design trio's 2027-05-07 deadlines ride Week 1's own
+ * "Not placed on the grid" strip, beside the grid holding that week's exams.
+ * Jon's ruling, verbatim: "keep portfolios due on ap exam week … on the actual
+ * week that they occur for both list and calendar view."
  */
 
 /** One row in a calendar card's "Not placed on the grid" strip. */
@@ -146,10 +159,13 @@ export function buildCalendarCards(
   const weeks = calendarWeeks();
   const meta = weekCardMeta(weeks);
 
-  // Off-grid dated entries split by KIND, exactly as the list variant splits
-  // them (issue #97): portfolio deadlines are collected for the Week 0 card
-  // whatever their date; an unplaceable EXAM still joins the nearest week
-  // (issue #56's rule). Either way nothing is dropped.
+  // Off-grid dated entries split by the SHARED Week 0 cutoff, exactly as the
+  // list variant splits them (issue #97 + Jon's bounce): a deadline dated
+  // before the first testing day is collected for the Week 0 card; an
+  // in-window/later deadline and an unplaceable EXAM both join the nearest week
+  // (issue #56's rule). Either way nothing is dropped. Calling the list
+  // variant's `belongsOnWeekZero` rather than restating the rule is what keeps
+  // AP Drawing from landing on Week 1 in one `.png` and Week 0 in the other.
   const offGridByWeek: CalendarOffGridRow[][] = weeks.map(() => []);
   const deadlines: { date: string; row: CalendarOffGridRow }[] = [];
   for (const off of layout.offGrid) {
@@ -161,7 +177,7 @@ export function buildCalendarCards(
       reason: off.reason,
       label: offGridLabel(off.entry.date, off.reason),
     };
-    if (off.entry.kind === "portfolio") {
+    if (belongsOnWeekZero(weeks, off.entry.kind, off.entry.date)) {
       deadlines.push({ date: off.entry.date, row });
       continue;
     }

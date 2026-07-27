@@ -2,17 +2,19 @@ import { test, expect, type Download, type Page } from "@playwright/test";
 import { readFileSync, writeFileSync } from "node:fs";
 import apData from "../src/data/ap-2027.json";
 import { evidenceDir } from "./support/evidence";
+import { calendarWeeks } from "../src/lib/calendar";
+import { firstWindowStart } from "../src/lib/week-cards";
 
 /**
  * Builder evidence + acceptance drive for issue #97 — the "Week 0" card that
- * collects every portfolio deadline, so deadline rows stop riding the Week 1
- * exam card.
+ * collects the portfolio deadlines due BEFORE exam week, so those rows stop
+ * riding the Week 1 exam card.
  *
  * ## Why this fixture
  *
- * The ticket's own worst case, and the reason the change could not be a date
- * cutoff: the May 2027 dataset has TWO deadline dates, and one of them is
- * INSIDE Week 1's window.
+ * The ticket's own worst case, and the reason the rule needed settling: the May
+ * 2027 dataset has TWO deadline dates, and one of them is INSIDE Week 1's
+ * window.
  *
  *   - AP German Language and Culture — PPR due 2027-04-30 (before every
  *     window) AND an exam on 2027-05-07 AM (Week 1, Friday).
@@ -20,10 +22,13 @@ import { evidenceDir } from "./support/evidence";
  *     exam, and no exam of its own.
  *   - AP Biology — 2027-05-03 PM, an ordinary Week 1 exam.
  *
- * So the export must split by row KIND: both deadlines land on Week 0 carrying
- * their real dates, while May 7 stays an exam day on Week 1. A `date <
- * firstWindowStart` implementation would pass the April-30 half and leave AP
- * Drawing on Week 1 — this spec is what tells those two apart.
+ * Jon settled it on the bounce of this build (2026-07-27): the split is a DATE
+ * CUTOFF — "i only want the stuff due before ap exam week on week 0. keep
+ * portfolios due on ap exam week (ap 2-d art and design, ap drawing, etc.) on
+ * the actual week that they occur for both list and calendar view." So German's
+ * April 30 PPR goes to Week 0, and AP Drawing's May 7 portfolio stays on Week 1
+ * beside the exams that share its day. A row-KIND implementation — this build's
+ * first draft — would move Drawing too; this spec is what tells those apart.
  *
  * Measured on the REAL app + real download pipeline: the assertions run against
  * the off-screen DOM `html-to-image` actually rasterizes (captured through a
@@ -31,7 +36,12 @@ import { evidenceDir } from "./support/evidence";
  * real downloaded filenames, and the PNGs are saved as evidence.
  */
 
-const EVIDENCE_DIR = evidenceDir("issue-97-build-v1");
+/**
+ * `-v2`: the v1 folder holds the superseded kind-predicate build's PNGs, which
+ * older issue/PR comments embed by raw URL. It stays untouched as the record of
+ * what was shipped then; this rebuild writes its own.
+ */
+const EVIDENCE_DIR = evidenceDir("issue-97-build-v2");
 
 /** A subject with BOTH an Apr 30 deadline and a Week 1 exam. */
 const LANGUAGE_ID = "german-language-and-culture";
@@ -49,6 +59,8 @@ type Subject = {
 };
 const SUBJECTS = (apData as unknown as { subjects: Subject[] }).subjects;
 const subject = (id: string) => SUBJECTS.find((s) => s.id === id)!;
+/** The Week 0 cutoff, derived exactly as production derives it. */
+const FIRST_DAY = firstWindowStart(calendarWeeks())!;
 
 interface CardProbe {
   /** Header label: "Week 0" / "Week 1" / "Late Testing". */
@@ -167,20 +179,23 @@ async function saveEvidence(downloads: Download[], prefix: string) {
   }
 }
 
-test("fixture guard — the dataset still ships both deadline dates, one inside Week 1", () => {
+test("fixture guard — the dataset still ships deadlines on BOTH sides of the cutoff", () => {
   const language = subject(LANGUAGE_ID);
   const art = subject(ART_ID);
   expect(language.portfolio?.deadline).toBe("2027-04-30");
   expect(art.portfolio?.deadline).toBe("2027-05-07");
-  // The whole point of the kind predicate: the Art deadline is the same day as
-  // a real Week 1 exam sitting.
+  // The cutoff is derived, never spelled: one deadline is strictly before the
+  // first testing day, the other is not.
+  expect(FIRST_DAY).toBe("2027-05-03");
+  expect(language.portfolio!.deadline < FIRST_DAY).toBe(true);
+  expect(art.portfolio!.deadline < FIRST_DAY).toBe(false);
+  // …and the Art deadline is the same day as a real Week 1 exam sitting, which
+  // is why Jon ruled it stays on that week.
   expect(language.exam?.date).toBe("2027-05-07");
   expect(subject(EXAM_ID).exam?.date).toBe("2027-05-03");
-  // …and the cycle really does ship the 12 deadlines the ticket counts.
-  expect(SUBJECTS.filter((s) => s.portfolio).length).toBe(12);
 });
 
-test("list .png — a Week 0 card holds BOTH deadline dates; Week 1 is exams only", async ({
+test("list .png — Week 0 holds the pre-window deadline; the May 7 one rides Week 1", async ({
   page,
 }) => {
   const { downloads, probes } = await exportCards(
@@ -196,39 +211,47 @@ test("list .png — a Week 0 card holds BOTH deadline dates; Week 1 is exams onl
 
   const [week0, week1] = probes;
 
-  // ── Week 0 — every deadline, correctly dated, no note prose ──────────────
-  expect(week0.rowTexts).toHaveLength(2);
+  // ── Week 0 — the deadline due before exams start, and only that ──────────
+  expect(week0.rowTexts).toHaveLength(1);
   expect(week0.rowTexts[0]).toContain(subject(LANGUAGE_ID).name);
   expect(week0.rowTexts[0]).toContain("Fri, Apr 30");
-  expect(week0.rowTexts[1]).toContain(subject(ART_ID).name);
-  // The Art & Design deadline keeps its REAL date — May 7, the same day as a
-  // Week 1 exam — and still sits here, not on Week 1.
-  expect(week0.rowTexts[1]).toContain("Fri, May 7");
-  for (const row of week0.rowTexts) expect(row).toContain("Portfolio deadline");
+  expect(week0.rowTexts[0]).toContain("Portfolio deadline");
+  // The Art & Design deadline is NOT here — Jon's bounce, in one assertion.
+  expect(week0.text).not.toContain(subject(ART_ID).name);
 
   // Jon's #91 bounce is not resurrected: no submission-note prose anywhere.
   for (const id of [LANGUAGE_ID, ART_ID]) {
-    expect(
-      week0.text,
-      `${id}'s portfolio note is back on the exported card`,
-    ).not.toContain(subject(id).portfolio!.note!);
+    for (const card of probes) {
+      expect(
+        card.text,
+        `${id}'s portfolio note is back on the exported card`,
+      ).not.toContain(subject(id).portfolio!.note!);
+    }
   }
 
-  // The header describes the rows it holds and never says "0 exams".
-  expect(week0.count).toBe("2 deadlines");
-  expect(week0.range).toBe("Apr 30 – May 7, 2027");
+  // The header describes the rows it holds and never says "0 exams". One date
+  // on the card → a single-date label, not an invented span.
+  expect(week0.count).toBe("1 deadline");
+  expect(week0.range).toBe("Apr 30, 2027");
+  expect(week0.range).not.toContain("–");
 
-  // ── Week 1 — exams only ──────────────────────────────────────────────────
-  expect(week1.text).not.toContain("Portfolio deadline");
-  expect(week1.rowTexts).toHaveLength(2);
-  expect(week1.rowTexts.join(" | ")).toContain(subject(EXAM_ID).name);
-  expect(week1.count).toBe("2 exams");
+  // ── Week 1 — its two exams AND the in-window deadline, in date order ─────
+  expect(week1.rowTexts).toHaveLength(3);
+  expect(week1.rowTexts[0]).toContain(subject(EXAM_ID).name); // May 3 exam
+  expect(week1.rowTexts[1]).toContain(subject(LANGUAGE_ID).name); // May 7 exam
+  expect(week1.rowTexts[2]).toContain(subject(ART_ID).name); // May 7 deadline
+  expect(week1.rowTexts[2]).toContain("Portfolio deadline");
+  expect(week1.rowTexts[2]).toContain("Fri, May 7");
   expect(week1.range).toBe("May 3 – May 7, 2027");
+  // Accepted consequence of the revert (Jon, 2026-07-27): a week that gains a
+  // deadline row still counts its EXAMS, so the count line trails the row
+  // count. Pinned as the current contract, flagged for a follow-up card.
+  expect(week1.count).toBe("2 exams");
 
   await saveEvidence(downloads, "list");
 });
 
-test("calendar .png — the same split, as a strip-only Week 0 card", async ({
+test("calendar .png — the same split: strip-only Week 0, Week 1 grid keeps its deadline", async ({
   page,
 }) => {
   const { downloads, probes } = await exportCards(
@@ -250,14 +273,16 @@ test("calendar .png — the same split, as a strip-only Week 0 card", async ({
   expect(week0.text).toContain("Portfolio deadlines");
   expect(week0.text).not.toContain("Not placed on the grid");
   expect(week0.text).toContain("Portfolio due Friday, April 30, 2027");
-  expect(week0.text).toContain("Portfolio due Friday, May 7, 2027");
-  expect(week0.count).toBe("2 deadlines");
+  expect(week0.text).not.toContain("Portfolio due Friday, May 7, 2027");
+  expect(week0.count).toBe("1 deadline");
   // No hour axis: a grid-less card must not print grid chrome.
   expect(week0.text).not.toContain("8 AM");
 
-  // Week 1 keeps its grid and loses the deadline strip entirely.
-  expect(week1.text).not.toContain("Portfolio due");
-  expect(week1.text).not.toContain("Not placed on the grid");
+  // Week 1 keeps its grid AND the in-window deadline, in its own off-grid
+  // strip — the wording the site uses, because there IS a grid beside it here.
+  expect(week1.text).toContain("Not placed on the grid");
+  expect(week1.text).toContain("Portfolio due Friday, May 7, 2027");
+  expect(week1.text).not.toContain("Portfolio due Friday, April 30, 2027");
   expect(week1.text).toContain(subject(EXAM_ID).name);
   expect(week1.count).toBe("2 exams");
 

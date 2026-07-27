@@ -3,18 +3,31 @@ import { readFileSync, writeFileSync } from "node:fs";
 import apData from "../src/data/ap-2027.json";
 import { evidenceDir } from "./support/evidence";
 import { pressViewChip } from "./support/view-chip";
+import { calendarWeeks } from "../src/lib/calendar";
+import { firstWindowStart } from "../src/lib/week-cards";
 
 /**
  * Independent Tester verification (super-board QA lane) — issue #97, the
- * "Week 0" card that collects every portfolio deadline so deadline rows stop
- * riding the Week 1 exam card.
+ * "Week 0" card that collects the portfolio deadlines due BEFORE exam week so
+ * those rows stop riding the Week 1 exam card.
  *
  * Written against the ACs, not against the builder's spec. Where
  * `issue-97-week-zero.spec.ts` drives a hand-picked 3-subject fixture, this
- * suite sweeps the WHOLE dataset — all 12 portfolio subjects, every distinct
+ * suite sweeps the WHOLE dataset — every portfolio subject, every distinct
  * submission-note string, every emitted card's count line — because the AC
- * says "all 12 possible in the current dataset" and "no portfolio note text
- * anywhere on the card", and a 2-subject fixture cannot observe either claim.
+ * covers every deadline "in the current dataset" and says "no portfolio note
+ * text anywhere on the card", and a 2-subject fixture cannot observe either.
+ *
+ * ## The rule these assertions pin (amended by Jon's bounce, 2026-07-27)
+ *
+ * A deadline lands on Week 0 **iff its date is strictly before the first day of
+ * the earliest published testing window** — derived from `calendarWeeks()`,
+ * never hardcoded here. The ticket body originally specified a row-KIND
+ * predicate and the first build implemented it; Jon retracted that: "i only
+ * want the stuff due before ap exam week on week 0. keep portfolios due on ap
+ * exam week (ap 2-d art and design, ap drawing, etc.) on the actual week that
+ * they occur for both list and calendar view." So the Art & Design trio's
+ * 2027-05-07 deadlines are Week 1 rows, and this suite asserts they are.
  *
  * Everything is measured on the REAL app: the off-screen DOM `html-to-image`
  * actually rasterizes (captured through a pre-navigation MutationObserver on
@@ -24,21 +37,21 @@ import { pressViewChip } from "./support/view-chip";
  * Test TITLES here deliberately spell no two-digit "all NN" count: the repo's
  * own anti-drift guard (`src/data/doc-freshness.test.ts` AC5, issue #71) reads
  * every test and describe title in the repo and rejects a roster count the
- * dataset does not produce. 12 is the portfolio-subject count, not a roster or
+ * dataset does not produce. The portfolio-subject count is not a roster or
  * category size, so it reads as drift there. The sweep still covers all of
  * them — the count lives in the assertions, derived from the dataset.
  *
  * AC → test map:
- *   AC1  every selected deadline on Week 0, none on an exam week  → "every … deadline"
- *   AC2  Week 0 only when non-empty                               → "no deadline"
- *   AC3  label/slug + regular numbering unshifted                 → "every … deadline"
- *   AC4  weekPngFileName composition                              → filenames
- *   AC5  name + "Portfolio deadline" + real date, no note prose   → "every … deadline"
- *   AC6  portfolio-only selection → exactly one card, Week 0      → "portfolio only"
- *   AC7  undated footnote unaffected                              → "undated"
- *   AC8  calendar variant consistent with the list variant        → "calendar"
- *   AC9  no card's count line reads "0 exams"                     → "count lines"
- *   AC10 on-screen views untouched                                → "on screen"
+ *   AC1  pre-window deadlines on Week 0, none left on an exam week → "pre-window"
+ *   AC2  Week 0 only when non-empty                                → "no deadline"
+ *   AC3  label/slug + regular numbering unshifted                  → "pre-window"
+ *   AC4  weekPngFileName composition                               → filenames
+ *   AC5  name + "Portfolio deadline" + real date, no note prose    → "pre-window"
+ *   AC6  in-window deadlines stay on the week they occur in        → "exam week"
+ *   AC7  undated footnote unaffected                               → "undated"
+ *   AC8  calendar variant consistent with the list variant         → "calendar"
+ *   AC9  no card's count line reads "0 exams"                      → "pre-window"
+ *   AC10 on-screen views untouched                                 → "on screen"
  */
 
 const EVIDENCE_DIR = evidenceDir("issue-97-qa-v1");
@@ -52,13 +65,19 @@ type Subject = {
 const SUBJECTS = (apData as unknown as { subjects: Subject[] }).subjects;
 const byId = (id: string) => SUBJECTS.find((s) => s.id === id)!;
 
-/** Every portfolio subject in the shipped cycle — the AC's "all 12". */
+/** Every portfolio subject in the shipped cycle. */
 const PORTFOLIO = SUBJECTS.filter((s) => s.portfolio);
 const PORTFOLIO_IDS = PORTFOLIO.map((s) => s.id);
-/** Deadlines before every testing window. */
-const APR30 = PORTFOLIO.filter((s) => s.portfolio!.deadline === "2027-04-30");
-/** Deadlines INSIDE Week 1's window — the Art & Design trio. */
-const MAY7 = PORTFOLIO.filter((s) => s.portfolio!.deadline === "2027-05-07");
+/**
+ * The Week 0 cutoff, derived exactly as production derives it — the first day
+ * of the earliest published window. Never a literal here, so the annual dataset
+ * swap re-pages this suite instead of breaking it.
+ */
+const FIRST_DAY = firstWindowStart(calendarWeeks())!;
+/** Deadlines strictly BEFORE the first testing day — the Week 0 rows. */
+const BEFORE = PORTFOLIO.filter((s) => s.portfolio!.deadline < FIRST_DAY);
+/** Deadlines on/after it — the Art & Design trio, which rides its own week. */
+const IN_WINDOW = PORTFOLIO.filter((s) => s.portfolio!.deadline >= FIRST_DAY);
 /** Every DISTINCT verbatim submission note the card must never print. */
 const PORTFOLIO_NOTES = [
   ...new Set(
@@ -181,18 +200,26 @@ async function saveEvidence(downloads: Download[], prefix: string) {
   }
 }
 
-test("fixture guard — the cycle ships 12 deadlines on two dates, one inside Week 1", () => {
-  expect(PORTFOLIO_IDS).toHaveLength(12);
-  expect(APR30).toHaveLength(9);
-  expect(MAY7).toHaveLength(3);
-  // The reason a date cutoff cannot implement this ticket: the Art & Design
-  // deadline is the same day as a real Week 1 exam sitting.
+test("fixture guard — the cycle ships deadlines on BOTH sides of the derived cutoff", () => {
+  expect(PORTFOLIO_IDS.length).toBeGreaterThan(0);
+  expect(BEFORE.length).toBeGreaterThan(0);
+  expect(IN_WINDOW.length).toBeGreaterThan(0);
+  expect(BEFORE.length + IN_WINDOW.length).toBe(PORTFOLIO_IDS.length);
+  // The cutoff really is the first testing day, and the near-side deadlines
+  // really do collide with a Week 1 exam sitting — the case Jon ruled on.
+  expect(FIRST_DAY).toBe("2027-05-03");
+  expect(new Set(BEFORE.map((s) => s.portfolio!.deadline))).toEqual(
+    new Set(["2027-04-30"]),
+  );
+  expect(new Set(IN_WINDOW.map((s) => s.portfolio!.deadline))).toEqual(
+    new Set(["2027-05-07"]),
+  );
   expect(byId("german-language-and-culture").exam?.date).toBe("2027-05-07");
   expect(PORTFOLIO_NOTES.length).toBeGreaterThan(0);
   expect(PLAIN_EXAM.exam?.date).toBeTruthy();
 });
 
-test("AC1/AC3/AC5/AC9 — every portfolio deadline lands on ONE Week 0 card; exam weeks keep their numbers and hold no deadline", async ({
+test("AC1/AC3/AC5/AC9 — pre-window deadlines land on ONE Week 0 card; exam weeks keep their numbers and their own deadlines", async ({
   page,
 }) => {
   const { downloads, probes } = await exportCards(
@@ -202,8 +229,8 @@ test("AC1/AC3/AC5/AC9 — every portfolio deadline lands on ONE Week 0 card; exa
   );
 
   // AC3/AC4: Week 0 leads, and the position-derived numbering is unshifted —
-  // the eight portfolio subjects that also sit exams span Weeks 1 and 2, and
-  // those cards are still "week-1" / "week-2".
+  // the portfolio subjects that also sit exams span Weeks 1 and 2, and those
+  // cards are still "week-1" / "week-2".
   expect(downloads.map((d) => d.suggestedFilename())).toEqual([
     "schedule-1-ap-exams-2027-week-0-list.png",
     "schedule-1-ap-exams-2027-week-1-list.png",
@@ -216,29 +243,42 @@ test("AC1/AC3/AC5/AC9 — every portfolio deadline lands on ONE Week 0 card; exa
   expect(examWeeks[0].header).toContain("Week 1");
   expect(examWeeks[1].header).toContain("Week 2");
 
-  // AC1: every one of the 12 deadlines is a Week 0 row, correctly dated.
-  expect(week0.rowTexts).toHaveLength(12);
-  for (const subject of APR30) {
+  // AC1: every pre-window deadline is a Week 0 row, correctly dated, and the
+  // card holds nothing else.
+  expect(week0.rowTexts).toHaveLength(BEFORE.length);
+  for (const subject of BEFORE) {
     const row = week0.rowTexts.find((r) => r.includes(subject.name));
     expect(row, `${subject.id} is missing from Week 0`).toBeTruthy();
     expect(row).toContain("Fri, Apr 30");
   }
-  for (const subject of MAY7) {
-    const row = week0.rowTexts.find((r) => r.includes(subject.name));
-    expect(row, `${subject.id} is missing from Week 0`).toBeTruthy();
-    // The real deadline date, even though May 7 is inside Week 1's window.
-    expect(row).toContain("Fri, May 7");
-  }
   // AC5: every row names the kind.
   for (const row of week0.rowTexts) expect(row).toContain("Portfolio deadline");
 
-  // AC1: and NO exam-week card carries a deadline row.
+  // AC6, the half Jon bounced: the in-window deadlines are NOT on Week 0 —
+  // they are rows on the exam week they actually fall in, with their real date.
+  const week1 = examWeeks[0];
+  for (const subject of IN_WINDOW) {
+    expect(
+      week0.text,
+      `${subject.id}'s in-window deadline was moved off its own week`,
+    ).not.toContain(subject.name);
+    const row = week1.rowTexts.find((r) => r.includes(subject.name));
+    expect(row, `${subject.id} is missing from Week 1`).toBeTruthy();
+    expect(row).toContain("Portfolio deadline");
+    expect(row).toContain("Fri, May 7");
+  }
+
+  // AC1: and no PRE-WINDOW deadline survives on any exam-week card.
   for (const card of examWeeks) {
-    expect(card.text).not.toContain("Portfolio deadline");
-    for (const subject of PORTFOLIO) {
-      expect(card.text).not.toContain(subject.portfolio!.deadline);
+    for (const subject of BEFORE) {
+      expect(
+        card.text,
+        `${subject.id}'s pre-window deadline is still riding an exam week`,
+      ).not.toContain(subject.portfolio!.deadline);
     }
   }
+  // Week 2 is exams only — nothing is due that late in this cycle.
+  expect(examWeeks[1].text).not.toContain("Portfolio deadline");
 
   // AC5: Jon's #91 bounce is not resurrected — NO submission-note prose on any
   // card, swept across every distinct note string in the dataset.
@@ -253,11 +293,11 @@ test("AC1/AC3/AC5/AC9 — every portfolio deadline lands on ONE Week 0 card; exa
 
   // AC9 + the header identity: a deadlines card counts deadlines, never exams,
   // and its range describes the rows it holds rather than a fabricated window.
-  expect(week0.header).toContain("12 deadlines");
-  expect(week0.header).toContain("Apr 30 – May 7, 2027");
+  expect(week0.header).toContain(`${BEFORE.length} deadlines`);
+  expect(week0.header).toContain("Apr 30, 2027");
   for (const card of probes) expect(card.header).not.toContain("0 exams");
 
-  await saveEvidence(downloads, "all12-list");
+  await saveEvidence(downloads, "sweep-list");
 });
 
 test("AC2 — a selection with no portfolio subject gets NO Week 0 card, in either variant", async ({
@@ -282,30 +322,38 @@ test("AC2 — a selection with no portfolio subject gets NO Week 0 card, in eith
   }
 });
 
-test("AC6 — a portfolio-ONLY selection exports exactly one card, and it is Week 0", async ({
+test("AC6 — an exam-week deadline selection exports the week it occurs in, not a Week 0", async ({
   page,
 }) => {
   for (const [menuItem, view] of [
     ["Save as list view .png", "list"],
     ["Save as calendar view .png", "calendar"],
   ] as const) {
-    // Every Art & Design subject: three deadlines, no exam of their own, all
-    // dated INSIDE Week 1's window. Pre-#97 this shipped as a card labeled
-    // "Week 1" holding nothing but deadlines.
+    // Every Art & Design subject: deadlines with no exam of their own, all
+    // dated INSIDE Week 1's window. #97's first build shipped these as a
+    // "Week 0" card; Jon bounced it — "essentially revert the change for these
+    // subjects" — so this is pre-#97 behavior restored, deliberately.
     const { downloads, probes } = await exportCards(
       page,
-      MAY7.map((s) => s.id),
+      IN_WINDOW.map((s) => s.id),
       menuItem,
     );
     expect(downloads.map((d) => d.suggestedFilename())).toEqual([
-      `schedule-1-ap-exams-2027-week-0-${view}.png`,
+      `schedule-1-ap-exams-2027-week-1-${view}.png`,
     ]);
     expect(probes).toHaveLength(1);
-    expect(probes[0].header).toContain("Week 0");
-    expect(probes[0].header).toContain("3 deadlines");
-    // Single-date card → a single-date range label, not an invented span.
-    expect(probes[0].header).toContain("May 7, 2027");
-    expect(probes[0].header).not.toContain("–");
+    expect(probes[0].header).toContain("Week 1");
+    expect(probes[0].header).not.toContain("Week 0");
+    // The card quotes its real window, and its count line falls through to the
+    // generic item fallback because the week holds no exam. Accepted
+    // consequence of the revert (Jon, 2026-07-27) — a follow-up card, not this
+    // one — so it is pinned here rather than silently tolerated.
+    expect(probes[0].header).toContain("May 3 – May 7, 2027");
+    expect(probes[0].header).toContain(`${IN_WINDOW.length} items`);
+    expect(probes[0].header).not.toContain("0 exams");
+    for (const subject of IN_WINDOW) {
+      expect(probes[0].text).toContain(subject.name);
+    }
   }
 });
 
@@ -327,31 +375,41 @@ test("AC8 — the calendar variant fans out the SAME cards, with a grid-less Wee
 
   const [week0, ...examWeeks] = probes;
   expect(week0.header).toContain("Week 0");
-  expect(week0.header).toContain("12 deadlines");
+  expect(week0.header).toContain(`${BEFORE.length} deadlines`);
   // The strip IS the card — it must not name a grid the reader cannot see.
   expect(week0.text).toContain("Portfolio deadlines");
   expect(week0.text).not.toContain("Not placed on the grid");
   // No grid chrome: no hour axis, no weekday column headers.
   expect(week0.text).not.toContain("8 AM");
   expect(week0.text).not.toContain("12 PM");
-  // Every deadline is present with its real date.
-  for (const subject of APR30) {
+  // Every pre-window deadline is present with its real date, and only those.
+  for (const subject of BEFORE) {
     expect(week0.text).toContain(subject.name);
   }
   expect(week0.text).toContain("Portfolio due Friday, April 30, 2027");
-  expect(week0.text).toContain("Portfolio due Friday, May 7, 2027");
+  expect(week0.text).not.toContain("Portfolio due Friday, May 7, 2027");
 
-  // The exam weeks lose the deadline strip entirely and keep their grids.
-  for (const card of examWeeks) {
-    expect(card.text).not.toContain("Portfolio due");
-    expect(card.text).not.toContain("Not placed on the grid");
-    expect(card.header).not.toContain("0 exams");
+  // Week 1 keeps its grid AND the in-window deadlines, in the site's own
+  // "Not placed on the grid" strip — there IS a grid beside them here, which
+  // is exactly why that wording is right on this card and wrong on Week 0.
+  const week1 = examWeeks[0];
+  expect(week1.text).toContain("Not placed on the grid");
+  expect(week1.text).toContain("Portfolio due Friday, May 7, 2027");
+  expect(week1.text).not.toContain("Portfolio due Friday, April 30, 2027");
+  for (const subject of IN_WINDOW) {
+    expect(week1.text).toContain(subject.name);
+    expect(week0.text).not.toContain(subject.name);
   }
+  // Week 2 has nothing due and keeps its grid alone.
+  expect(examWeeks[1].text).not.toContain("Portfolio due");
+  expect(examWeeks[1].text).not.toContain("Not placed on the grid");
+  for (const card of examWeeks) expect(card.header).not.toContain("0 exams");
+
   for (const note of PORTFOLIO_NOTES) {
     for (const card of probes) expect(card.text).not.toContain(note);
   }
 
-  await saveEvidence(downloads, "all12-calendar");
+  await saveEvidence(downloads, "sweep-calendar");
 });
 
 test("AC7 — the undated footnote is untouched: no card prints one, because the cycle has no undated subject", async ({

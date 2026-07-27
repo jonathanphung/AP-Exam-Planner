@@ -22,7 +22,10 @@ import { buildWeekCards } from "./week-cards";
  *   - AP Human Geography (2027-05-03 AM) shares Physics C: Mechanics's slot; keeping Physics C: Mechanics bumps
  *     Human Geography to its real late slot (2027-05-17 PM) → the Late Testing grid.
  *   - AP Seminar has an exam (2027-05-10 PM → Week 2 grid) AND a portfolio
- *     deadline (2027-04-30 → the strip-only Week 0 card, issue #97).
+ *     deadline (2027-04-30, before every window → the strip-only Week 0 card,
+ *     issue #97). AP Drawing's May 7 deadline is INSIDE Week 1's window and
+ *     stays on Week 1's own off-grid strip — the split is a date cutoff, not
+ *     the row kind (Jon's bounce, 2026-07-27).
  *   - A synthetic undated subject (no May 2027 course is undated) → `undated`.
  */
 
@@ -192,17 +195,20 @@ describe("buildCalendarCards — nothing silently dropped", () => {
     expect(undated.map((u) => u.id)).toEqual(["test-undated-course"]);
   });
 
-  it("emits a strip-only Week 0 card for a portfolio-only May 7 deadline (inside Week 1's window)", () => {
+  it("keeps a portfolio-only May 7 deadline on Week 1's own off-grid strip", () => {
     const { cards } = buildCalendarCards(
       SUBJECTS,
       ["drawing"], // portfolio 2027-05-07, no exam
       NO_RESOLUTIONS,
       START_TIMES,
     );
-    // Kind predicate, not a date cutoff (issue #97): May 7 sits inside Week 1's
-    // window and the deadline still gets its own card, never a Week 1 strip.
-    expect(cards.map((c) => c.label)).toEqual(["Week 0"]);
-    expect(cards[0].week).toBeNull();
+    // Date cutoff, not a kind predicate (Jon's bounce on issue #97): May 7 sits
+    // inside Week 1's window, so the deadline rides Week 1 exactly as it did
+    // pre-#97 — an empty grid plus the "Not placed on the grid" strip. No
+    // Week 0 card is emitted at all.
+    expect(cards.map((c) => c.label)).toEqual(["Week 1"]);
+    expect(cards[0].deadlines).toBe(false);
+    expect(cards[0].week).not.toBeNull();
     expect(blocksOf(cards[0])).toEqual([]);
     expect(cards[0].offGrid.map((o) => o.reason)).toEqual(["portfolio"]);
     expect(cards[0].offGrid[0].label).toBe("Portfolio due Friday, May 7, 2027");
@@ -210,7 +216,8 @@ describe("buildCalendarCards — nothing silently dropped", () => {
 
   it("fans out the SAME cards as the list variant, deadlines included", () => {
     // The #73 one-presentation principle, pinned across the two exports for the
-    // ticket's worst case (both deadline dates + a Week 1 exam).
+    // ticket's worst case (both deadline dates + a Week 1 exam). This is the
+    // assertion that catches the cutoff being applied to only one variant.
     const selection = ["research", "drawing", "physics-c-mechanics"];
     const calendar = buildCalendarCards(
       SUBJECTS,
@@ -226,12 +233,17 @@ describe("buildCalendarCards — nothing silently dropped", () => {
     expect(calendar.cards.map((c) => c.rangeLabel)).toEqual(
       list.cards.map((c) => c.rangeLabel),
     );
-    // Both deadlines are on Week 0; no exam week carries one.
+    // Apr 30 leaves for Week 0; the in-window May 7 deadline stays on Week 1,
+    // beside that week's grid — the same split the list variant makes.
     expect(calendar.cards[0].offGrid.map((o) => o.subjectName)).toEqual([
       "AP Research",
+    ]);
+    expect(calendar.cards[1].offGrid.map((o) => o.subjectName)).toEqual([
       "AP Drawing",
     ]);
-    expect(calendar.cards[1].offGrid).toEqual([]);
+    expect(
+      list.cards[1].rows.filter((r) => r.kind === "portfolio").map((r) => r.subjectName),
+    ).toEqual(["AP Drawing"]);
   });
 });
 

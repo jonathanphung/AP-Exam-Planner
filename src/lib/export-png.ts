@@ -63,12 +63,15 @@ export type { ExportTheme };
  *   goes. The text still ships in the dataset, the details dialog, and the
  *   `.txt`/`.json` exports — this is presentation, not data.
  *
- * Week 0 (issue #97): portfolio deadlines are no longer rows on an exam week's
- * card — `week-cards.ts` collects them onto a leading "Week 0" card. Nothing in
- * the row rendering changes (a deadline row is still name + "Portfolio
- * deadline" + its real date, and still carries no note text after Jon's #91
- * bounce); the only render-side difference is the header count line, which
- * reads "N deadlines" instead of falling through to the generic item count.
+ * Week 0 (issue #97, as amended by Jon's bounce on it, 2026-07-27): a portfolio
+ * deadline dated BEFORE the first testing day is no longer a row on an exam
+ * week's card — `week-cards.ts` collects those onto a leading "Week 0" card. A
+ * deadline dated on or after that day is untouched and still renders as a row
+ * on the week it occurs in. Nothing in the row rendering changes either way (a
+ * deadline row is still name + "Portfolio deadline" + its real date, and still
+ * carries no note text after Jon's #91 bounce); the only render-side difference
+ * is the header count line, which reads "N deadlines" on the Week 0 card
+ * instead of falling through to the generic item count.
  *
  * Rasterization mechanism (builder decision, issue #56) — an off-screen DOM
  * node + `html-to-image`, NOT a hand-drawn `<canvas>`: the card is authored in

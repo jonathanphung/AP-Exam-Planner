@@ -45,7 +45,10 @@ import {
  * only the deadline list, under its own heading, at the list card's width. This
  * is the "strip-only card" the ticket left to the builder: a grid whose every
  * cell is empty would be chrome pretending to be data, and the alternative
- * (leaving deadlines on Week 1) is the defect being fixed.
+ * (leaving pre-exam-week deadlines on Week 1) is the defect being fixed. Only
+ * deadlines dated BEFORE the first testing day reach this card — an in-window
+ * one keeps its ordinary strip on its own week's grid card (Jon's bounce on
+ * #97), so a Week 1 card here can still legitimately show a deadline row.
  *
  * Late-testing treatment: the header reuses the export's amber late tokens
  * (same as the list card) rather than the site's violet badge, so the two PNG
@@ -492,7 +495,10 @@ function renderOffGridRow(
  * On the Week 0 deadlines card (`deadlines`, issue #97) the strip IS the card:
  * there is no grid beside it, so "Not placed on the grid" would name a thing
  * the reader cannot see. It gets the heading the card is about instead, and a
- * blurb that explains the deadline/exam split rather than the grid exclusion.
+ * blurb naming the actual reason those rows are here — they are due before the
+ * testing windows open. An in-window deadline is NOT here (Jon's bounce on #97,
+ * 2026-07-27): it rides its own week's ordinary off-grid strip, beside that
+ * week's grid, where the "Not placed on the grid" wording is the true one.
  */
 function renderOffGridStrip(
   offGrid: readonly CalendarOffGridRow[],
@@ -525,7 +531,7 @@ function renderOffGridStrip(
       "div",
       { fontSize: "11px", color: tokens.muted, lineHeight: "1.4" },
       deadlines
-        ? `Submission deadlines have a date but no exam sitting, so they are listed here instead of on a ${cycle} exam week.`
+        ? `These are due before the ${cycle} testing windows open, so they are listed here instead of on an exam week.`
         : `Deadlines without a clock time and subjects without a published ${cycle} exam date are listed here instead of being placed at a guessed position.`,
     ),
   );

@@ -3,7 +3,13 @@ import apData from "../data/ap-2027.json";
 import { withUndatedSubject } from "./test-fixtures";
 import type { ApDataset, ApSubject } from "../data/schema";
 import type { SlotResolution } from "./conflicts";
-import { buildWeekCards, WEEK_ZERO_INDEX } from "./week-cards";
+import { calendarWeeks } from "./calendar";
+import {
+  belongsOnWeekZero,
+  buildWeekCards,
+  firstWindowStart,
+  WEEK_ZERO_INDEX,
+} from "./week-cards";
 
 /**
  * Builder unit tests (issue #56) — the pure per-week PNG model.
@@ -17,9 +23,11 @@ import { buildWeekCards, WEEK_ZERO_INDEX } from "./week-cards";
  *   - AP Human Geography (2027-05-03 AM) shares Physics C: Mechanics's slot; keeping Physics C: Mechanics bumps
  *     Human Geography to its real late slot (2027-05-17 PM) → the Late Testing week.
  *   - AP Seminar has an exam (2027-05-10 PM → Week 2) AND a portfolio deadline
- *     (2027-04-30 → the Week 0 deadlines card, issue #97).
- *   - AP Drawing's portfolio is due 2027-05-07, INSIDE Week 1's window, and
- *     still belongs to Week 0 — the split is by row kind, never by date.
+ *     (2027-04-30, before every window → the Week 0 deadlines card, issue #97).
+ *   - AP Drawing's portfolio is due 2027-05-07, INSIDE Week 1's window, so it
+ *     rides Week 1 like any other May 7 entry — the split is a DATE CUTOFF
+ *     (strictly before the first testing day), not the row kind. #97's first
+ *     build routed it to Week 0 by kind and Jon bounced that (2026-07-27).
  *   - A synthetic undated subject (no May 2027 course is undated) → `undated`.
  */
 
@@ -28,6 +36,13 @@ const SUBJECTS = withUndatedSubject(dataset.subjects);
 const START_TIMES = dataset.sessionStartTimes;
 
 const NO_RESOLUTIONS: SlotResolution[] = [];
+
+/**
+ * The Week 0 cutoff, derived the way production derives it — the first day of
+ * the earliest published window. Never spelled as a literal here, so an annual
+ * dataset swap re-pages these expectations instead of breaking them.
+ */
+const FIRST_DAY = firstWindowStart(calendarWeeks())!;
 
 /** Keep Physics C: Mechanics at 2027-05-03 AM; Human Geography is bumped to its real late slot. */
 const KEEP_PHYSICS_C: SlotResolution = {
@@ -184,24 +199,25 @@ describe("buildWeekCards — nothing silently dropped", () => {
     expect(undated[0].reason).toBeTruthy();
   });
 
-  it("puts an IN-window deadline (May 7, inside Week 1) on Week 0 with its real date", () => {
+  it("keeps an IN-window deadline (May 7, inside Week 1) on the week it occurs in", () => {
     const { cards } = buildWeekCards(
       SUBJECTS,
       ["drawing"], // portfolio 2027-05-07, no exam
       NO_RESOLUTIONS,
       START_TIMES,
     );
-    // The predicate is the row KIND, not a date cutoff (issue #97): May 7 falls
-    // inside Week 1's window and the deadline STILL leaves the exam card.
-    expect(cards.map((c) => c.label)).toEqual(["Week 0"]);
-    expect(cards.map((c) => c.slug)).toEqual(["week-0"]);
+    // Jon's bounce on issue #97: the predicate is a DATE CUTOFF, not the row
+    // kind. May 7 is not before exam week, so the Art & Design deadline stays
+    // exactly where it sat pre-#97 — no Week 0 card is emitted at all here.
+    expect(cards.map((c) => c.label)).toEqual(["Week 1"]);
+    expect(cards.map((c) => c.slug)).toEqual(["week-1"]);
+    expect(cards[0].deadlines).toBe(false);
     const row = cards[0].rows[0];
     expect(row.kind).toBe("portfolio");
     expect(row.date).toBe("2027-05-07");
-    expect(cards[0].rangeLabel).toBe("May 7, 2027");
   });
 
-  it("puts an out-of-window deadline (Apr 30) on Week 0, not the nearest week", () => {
+  it("puts a BEFORE-window deadline (Apr 30) on Week 0, not the nearest week", () => {
     const { cards } = buildWeekCards(
       SUBJECTS,
       ["research"], // portfolio 2027-04-30, no exam
@@ -210,11 +226,14 @@ describe("buildWeekCards — nothing silently dropped", () => {
     );
     expect(cards.map((c) => c.label)).toEqual(["Week 0"]);
     expect(cards[0].rows[0].date).toBe("2027-04-30");
+    // One date on the card → a single-date label, never an invented span.
+    expect(cards[0].rangeLabel).toBe("Apr 30, 2027");
   });
 
-  it("collects BOTH deadline dates onto one Week 0 card, exam weeks left clean", () => {
-    // The ticket's worst case: a language PPR (Apr 30), an Art & Design
-    // portfolio (May 7 — inside Week 1), and a Week 1 exam.
+  it("splits the two deadline dates across Week 0 and the week each occurs in", () => {
+    // The ticket's worst case: a language PPR (Apr 30, before every window), an
+    // Art & Design portfolio (May 7 — inside Week 1), and a Week 1 exam. The
+    // cutoff, not the kind, decides: only the Apr 30 row leaves Week 1.
     const { cards } = buildWeekCards(
       SUBJECTS,
       ["research", "drawing", "physics-c-mechanics"],
@@ -226,28 +245,30 @@ describe("buildWeekCards — nothing silently dropped", () => {
     const week0 = cards[0];
     expect(week0.rows.map((r) => [r.subjectName, r.date])).toEqual([
       ["AP Research", "2027-04-30"],
-      ["AP Drawing", "2027-05-07"],
     ]);
     expect(week0.rows.every((r) => r.kind === "portfolio")).toBe(true);
-    // A card spanning both deadline dates labels the span it actually holds.
-    expect(week0.rangeLabel).toBe("Apr 30 – May 7, 2027");
+    expect(week0.rangeLabel).toBe("Apr 30, 2027");
 
-    // No portfolio row survives on ANY exam week card.
-    expect(
-      cards.slice(1).flatMap((c) => c.rows.filter((r) => r.kind === "portfolio")),
-    ).toEqual([]);
-    expect(cards[1].rows.map((r) => r.subjectName)).toEqual([
-      "AP Physics C: Mechanics",
+    // Week 1 keeps its exam AND the in-window deadline, chronological: the
+    // May 3 exam, then the May 7 deadline (portfolios sort last within a day).
+    expect(cards[1].rows.map((r) => [r.subjectName, r.kind])).toEqual([
+      ["AP Physics C: Mechanics", "exam"],
+      ["AP Drawing", "portfolio"],
     ]);
   });
 
-  it("emits Week 0 for EVERY portfolio subject in the cycle and nothing else", () => {
+  it("routes every pre-window deadline in the cycle to Week 0, in-window ones to their own week", () => {
     const portfolioIds = SUBJECTS.filter((s) => s.portfolio !== null).map(
       (s) => s.id,
     );
-    // Fixture guard: the cycle really does ship the 12 deadlines the ticket
-    // describes (a swap that changes this should re-point the suite loudly).
-    expect(portfolioIds.length).toBeGreaterThan(1);
+    // Fixture guard: the cycle really does ship deadlines on BOTH sides of the
+    // cutoff (a swap that changes this should re-point the suite loudly).
+    const deadlineOf = (id: string) =>
+      SUBJECTS.find((s) => s.id === id)!.portfolio!.deadline;
+    const beforeWindow = portfolioIds.filter((id) => deadlineOf(id) < FIRST_DAY);
+    const inWindow = portfolioIds.filter((id) => deadlineOf(id) >= FIRST_DAY);
+    expect(beforeWindow.length).toBeGreaterThan(0);
+    expect(inWindow.length).toBeGreaterThan(0);
 
     const { cards } = buildWeekCards(
       SUBJECTS,
@@ -257,15 +278,62 @@ describe("buildWeekCards — nothing silently dropped", () => {
     );
     const week0 = cards[0];
     expect(week0.label).toBe("Week 0");
+    expect(week0.rows.map((r) => r.subjectId).sort()).toEqual(
+      [...beforeWindow].sort(),
+    );
+    // Nothing from the near side of the cutoff leaked onto the deadlines card.
     expect(
-      week0.rows.filter((r) => r.kind === "portfolio").map((r) => r.subjectId),
-    ).toEqual(expect.arrayContaining(portfolioIds));
-    expect(
-      cards.flatMap((c) =>
-        c.deadlines ? [] : c.rows.filter((r) => r.kind === "portfolio"),
-      ),
-      "a portfolio row is still riding an exam week card",
+      week0.rows.filter((r) => r.date >= FIRST_DAY),
+      "an in-window deadline is riding the Week 0 card",
     ).toEqual([]);
+    // …and every in-window deadline is still on a real exam week.
+    expect(
+      cards
+        .filter((c) => !c.deadlines)
+        .flatMap((c) => c.rows.filter((r) => r.kind === "portfolio"))
+        .map((r) => r.subjectId)
+        .sort(),
+    ).toEqual([...inWindow].sort());
+  });
+});
+
+describe("belongsOnWeekZero — the shared Week 0 cutoff (Jon's bounce on #97)", () => {
+  const WEEKS = calendarWeeks();
+
+  it("claims a portfolio deadline strictly before the first testing day", () => {
+    expect(belongsOnWeekZero(WEEKS, "portfolio", "2027-04-30")).toBe(true);
+  });
+
+  it("does NOT claim a deadline dated ON the first testing day", () => {
+    // Strict `<`: a deadline due the morning exams start is not "before exam
+    // week", so it rides that week — the same one sentence that keeps the Art
+    // & Design trio on Week 1.
+    expect(belongsOnWeekZero(WEEKS, "portfolio", FIRST_DAY)).toBe(false);
+  });
+
+  it("does NOT claim a deadline dated after the first testing day", () => {
+    expect(belongsOnWeekZero(WEEKS, "portfolio", "2027-05-07")).toBe(false);
+    // Nor a make-up dated after every window — that is a nearest-week case, not
+    // a "due before exams start" one.
+    expect(belongsOnWeekZero(WEEKS, "portfolio", "2027-06-01")).toBe(false);
+  });
+
+  it("never claims an exam, whatever its date", () => {
+    expect(belongsOnWeekZero(WEEKS, "exam", "2027-04-01")).toBe(false);
+    expect(belongsOnWeekZero(WEEKS, "exam", "2027-05-03")).toBe(false);
+  });
+
+  it("emits no Week 0 at all when the dataset publishes no window", () => {
+    // Unreachable with the shipped data; pinned so the fallback stays "nothing
+    // qualifies" rather than an invented cutoff date.
+    expect(firstWindowStart([])).toBeNull();
+    expect(belongsOnWeekZero([], "portfolio", "2027-04-30")).toBe(false);
+  });
+
+  it("derives the cutoff by reduction, not by trusting weeks[0]", () => {
+    const reversed = [...WEEKS].reverse();
+    expect(firstWindowStart(reversed)).toBe(FIRST_DAY);
+    expect(belongsOnWeekZero(reversed, "portfolio", "2027-04-30")).toBe(true);
   });
 });
 

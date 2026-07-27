@@ -45,39 +45,51 @@ import {
  * - Week labels/slugs are derived from each week's POSITION + `late` flag
  *   ("Week 1" / "Week 2" / "Late Testing"), never hardcoded — so Week 2 stays
  *   "Week 2" even when Week 1 emits no card.
- * - Portfolio deadlines are collected onto a "Week 0" card that precedes every
- *   testing week (see below). It is NOT a `calendarWeeks()` window, so it does
- *   not participate in the position-derived count: Week 1 stays Week 1.
+ * - Portfolio deadlines dated BEFORE the first testing day are collected onto a
+ *   "Week 0" card that precedes every testing week (see below). It is NOT a
+ *   `calendarWeeks()` window, so it does not participate in the position-derived
+ *   count: Week 1 stays Week 1.
  *
  * Edge-case decisions (documented per issue #56; the portfolio half rewritten
- * by issue #97):
- * - PORTFOLIO deadlines no longer ride a testing week. Every `portfolio`-kind
- *   entry — whatever its date — is collected onto ONE card, "Week 0"
- *   (`week-0`), emitted FIRST when it has any row. Issue #56 assigned them to
- *   the nearest week window; issue #97 supersedes that for this row kind only,
- *   on Jon's call (2026-07-27): "things I submit before exams start" and "days
- *   I sit in a room" are different mental buckets, and a shared Week 1 export
- *   interleaved them. The never-silently-dropped invariant is unchanged — Week
- *   0 IS the not-dropped mechanism for these rows now.
- *   The predicate is the row KIND, never a date cutoff: the dataset's Art &
- *   Design trio is due 2027-05-07, inside Week 1's window, and still belongs on
- *   Week 0 carrying its real date. A deadline that falls during exam week is
- *   still a deadline, not an exam sitting.
- *   Week 0 sorts before Week 1 by IDENTITY, not by date, for the same reason —
- *   it is the "submit these" card, so it leads the export even when one of its
- *   rows is dated later than a Week 1 exam.
+ * by issue #97 and then AMENDED by Jon's bounce on that build, 2026-07-27):
+ * - A PORTFOLIO deadline dated STRICTLY BEFORE the first day of the earliest
+ *   published testing window leaves the exam weeks: those rows are collected
+ *   onto ONE card, "Week 0" (`week-0`), emitted FIRST when it has any row.
+ *   Issue #56 assigned them to the nearest week window; issue #97 supersedes
+ *   that for this case, on Jon's call (2026-07-27): "things I submit before
+ *   exams start" and "days I sit in a room" are different mental buckets, and a
+ *   shared Week 1 export interleaved them. The never-silently-dropped invariant
+ *   is unchanged — Week 0 IS the not-dropped mechanism for these rows now.
+ * - A portfolio deadline dated ON OR AFTER that first testing day does NOT
+ *   move. It keeps the issue-#56 nearest-week assignment and renders on the
+ *   week it actually occurs in. #97's first build routed every deadline to
+ *   Week 0 by row KIND; Jon bounced exactly that (2026-07-27): "keep portfolios
+ *   due on ap exam week (ap 2-d art and design, ap drawing, etc.) on the actual
+ *   week that they occur for both list and calendar view. essentially revert
+ *   the change for these subjects." The dataset's Art & Design trio (due
+ *   2027-05-07, the Friday INSIDE Week 1's window) is that case and rides
+ *   Week 1, deadline row and all.
+ *   So the predicate is a DATE CUTOFF, never the row kind — see
+ *   {@link belongsOnWeekZero}. The cutoff is derived from `calendarWeeks()`,
+ *   never hardcoded, so an annual dataset swap re-pages it with no edit, and
+ *   the comparison is strict: a deadline dated ON the first testing day is not
+ *   "before exam week" and rides that week.
+ * - Week 0 therefore leads the export by identity AND by chronology — every row
+ *   it holds is dated before Week 1's first day, so the two agree.
  * - Non-portfolio off-grid dated entries (the rare exam whose session time is
  *   unpublished, or whose date falls outside every window — none in the May
- *   2027 dataset) KEEP the issue-#56 rule: they are assigned to the NEAREST
- *   week window by date and rendered as their own row on that card, so they are
- *   never dropped and never spawn a blank card of their own.
+ *   2027 dataset) KEEP the issue-#56 rule unconditionally: they are assigned to
+ *   the NEAREST week window by date and rendered as their own row on that card,
+ *   so they are never dropped and never spawn a blank card of their own. Only
+ *   `portfolio` rows are eligible for Week 0 at all.
  * - Undated selections (Career Kickstart courses, no May date) have no week to
  *   sit in; they are returned in `undated` so the renderer can surface them as
  *   a footnote (never dropped), mirroring the txt/json exports. They are NOT
  *   deadlines and never become Week 0 rows. When EVERY selection is undated
  *   there are zero qualifying weeks and `cards` is empty — the caller shows the
  *   empty-state instead of downloading a misleading file. A portfolio-only
- *   selection is NOT that case: it emits exactly one card, Week 0.
+ *   selection is NOT that case: it emits Week 0, an exam week, or both,
+ *   depending on which side of the cutoff its deadlines fall.
  */
 
 export type WeekCardRowKind = "exam" | "portfolio";
@@ -305,10 +317,12 @@ export function weekCardMeta(weeks: readonly CalendarWeek[]): WeekMeta[] {
  * identities from ONE module and can never disagree about the label or slug.
  *
  * `rangeLabel` describes the rows the card actually holds, not a window: the
- * span of the deadline dates passed in ("Apr 30 – May 7, 2027", or a single
- * date when they all share one). Week 0 has no published window, so inventing a
+ * span of the deadline dates passed in, collapsing to a single date when they
+ * all share one ("Apr 30, 2027" for the shipped 2027 cycle, whose pre-window
+ * deadlines are all April 30). Week 0 has no published window, so inventing a
  * range for it would be fabricating data — the same reason the exam weeks quote
- * their real `calendarWeeks()` days.
+ * their real `calendarWeeks()` days. The span form is kept because a future
+ * cycle can publish more than one pre-window deadline date.
  *
  * @param dates ISO dates of the deadlines on the card (order irrelevant).
  */
@@ -345,14 +359,72 @@ function dayDistance(a: string, b: string): number {
 }
 
 /**
+ * First day of the EARLIEST published testing window — the Week 0 cutoff.
+ *
+ * Reduced over every window rather than read off `weeks[0]`: `calendarWeeks()`
+ * happens to emit the regular windows before the late one today, but nothing in
+ * its contract promises that order, and an annual dataset swap must re-page
+ * this with no edit here. Returns null when the dataset publishes no window at
+ * all — an unreachable state with the shipped data, and deliberately NOT given
+ * a fabricated fallback date (see {@link belongsOnWeekZero}).
+ */
+export function firstWindowStart(weeks: readonly CalendarWeek[]): string | null {
+  let earliest: string | null = null;
+  for (const week of weeks) {
+    const first = week.days[0];
+    if (!first) continue;
+    if (earliest === null || first < earliest) earliest = first;
+  }
+  return earliest;
+}
+
+/**
+ * Does this dated entry belong on the Week 0 deadlines card?
+ *
+ * The ONE definition of that rule, shared by both designed export variants
+ * (`buildWeekCards` + `buildCalendarCards`) so the list and calendar `.png`s
+ * can never disagree about where a deadline lands — the cross-variant drift
+ * issue #73's one-presentation principle exists to prevent.
+ *
+ * True iff the row is a `portfolio` deadline AND its date is strictly before
+ * the first day of the earliest published testing window (Jon's bounce on
+ * issue #97, 2026-07-27). Everything else — an exam of any kind, and any
+ * deadline dated on or after that day — falls through to
+ * {@link nearestWeekIndex} and renders on the week it actually occurs in.
+ *
+ * Deliberate details:
+ * - **Strict `<`.** A deadline dated ON the first testing day is not "before
+ *   exam week"; it rides that week, exactly like the Art & Design trio's
+ *   in-window 2027-05-07 deadlines.
+ * - **Lexicographic ISO comparison, no `Date` objects.** `schema.ts` documents
+ *   these dates as lexicographically comparable, and `schedule.ts` /
+ *   `calendar.ts` deliberately avoid a `Date` parse that would shift by a
+ *   timezone.
+ * - **No windows → no Week 0.** With nothing published there is no honest
+ *   cutoff, so no row qualifies and every deadline keeps its nearest-week
+ *   assignment; nothing is invented and nothing is dropped.
+ */
+export function belongsOnWeekZero(
+  weeks: readonly CalendarWeek[],
+  kind: WeekCardRowKind,
+  date: string,
+): boolean {
+  if (kind !== "portfolio") return false;
+  const start = firstWindowStart(weeks);
+  return start !== null && date < start;
+}
+
+/**
  * The week a dated entry belongs to: the window that CONTAINS its date, else
  * the window nearest to it (ties → earliest week). This keeps an off-grid dated
  * entry on a real card instead of dropping it, without ever inventing a date.
  *
- * Since issue #97 this applies to NON-portfolio off-grid entries only (an exam
- * with no published session time, or one dated outside every window). Portfolio
- * deadlines are routed by kind to the Week 0 card instead — see the module's
- * edge-case ledger.
+ * Applies to every off-grid entry that {@link belongsOnWeekZero} does not
+ * claim: non-portfolio entries (an exam with no published session time, or one
+ * dated outside every window) unconditionally, AND portfolio deadlines dated on
+ * or after the first testing day — the Art & Design trio reaches this function
+ * and lands on Week 1 by window containment (Jon's bounce on issue #97). Only
+ * deadlines dated before the first testing day are routed away, to Week 0.
  */
 export function nearestWeekIndex(
   weeks: readonly CalendarWeek[],
@@ -486,15 +558,18 @@ export function buildWeekCards(
     }
   });
 
-  // 2. Off-grid dated entries split by KIND, not by date (issue #97):
-  //    - portfolio deadlines → the Week 0 card, whatever their date;
-  //    - everything else (an exam with no published session time, or one dated
-  //      outside every window) → the nearest week, the issue-#56 rule.
-  //    Either way nothing is silently dropped.
+  // 2. Off-grid dated entries split by the SHARED Week 0 cutoff (issue #97 as
+  //    amended by Jon's bounce, 2026-07-27):
+  //    - a portfolio deadline dated BEFORE the first testing day → Week 0;
+  //    - everything else — an in-window / later deadline, or an exam with no
+  //      published session time — → the nearest week, the issue-#56 rule.
+  //    Either way nothing is silently dropped. The predicate lives in
+  //    `belongsOnWeekZero` and `calendar-cards.ts` calls the same one, so the
+  //    two `.png` variants cannot page a deadline differently.
   const deadlineRows: WeekCardRow[] = [];
   for (const off of layout.offGrid) {
     const row = offGridRow(off, infoById);
-    if (row.kind === "portfolio") {
+    if (belongsOnWeekZero(weeks, row.kind, row.date)) {
       deadlineRows.push(row);
       continue;
     }
