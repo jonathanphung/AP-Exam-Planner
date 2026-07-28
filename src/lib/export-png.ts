@@ -60,8 +60,9 @@ export type { ExportTheme };
  * - `row.note` (the portfolio submission note): NOT printed anywhere on the
  *   list card — not inline, not in the strip, not as a marker. The dated
  *   deadline row stays (it is schedule content); the submission-process prose
- *   goes. The text still ships in the dataset, the details dialog, and the
- *   `.txt`/`.json` exports — this is presentation, not data.
+ *   goes. The text still ships in the dataset, the details dialog, the
+ *   `.json` export, and the `.ics` DESCRIPTION — this is presentation, not
+ *   data. (Not the `.txt` export: `buildTxtExport` appends `examNote` only.)
  *
  * Week 0 (issue #97, as amended by Jon's bounce on it, 2026-07-27): a portfolio
  * deadline dated BEFORE the first testing day is no longer a row on an exam

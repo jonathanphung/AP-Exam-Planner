@@ -123,7 +123,7 @@ test.describe("issue #4 — my schedule", () => {
    * The advisory itself is not gone from the product: `InfoPanel` renders an
    * equivalent line in the subject's details dialog, which is why removing it
    * here loses no information. Note text likewise still ships in the dataset,
-   * the `.ics` DESCRIPTION, and the `.txt`/`.json` exports.
+   * the `.json` export, and the `.ics` DESCRIPTION.
    */
   test("AC2 — a subject with a portfolio renders an ordinary card whose only tell is the 'Portfolio due' pill", async ({
     page,
