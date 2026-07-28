@@ -9,8 +9,8 @@ import { evidenceDir } from "./support/evidence";
  * Independent Tester verification (super-board QA lane): drives the REAL app
  * (real dataset, real download pipeline) and saves the ACTUAL downloaded files
  * into the QA evidence folder for the AC-required matrix — a 1-week, a 2-week,
- * and a full 3-week export (with a moved-to-late exam and an off-grid Apr 30
- * portfolio deadline), light + dark, for BOTH variants.
+ * and a full 3-week export (with a moved-to-late exam and an Apr 30
+ * portfolio deadline on its own Week 0 card), light + dark, for BOTH variants.
  *
  * Covers: one designed PNG per non-empty week (chronological order) for each
  * variant; effective/moved-to-late slots (the 3-week case bumps Latin to its
@@ -54,13 +54,15 @@ const SCENARIOS: Scenario[] = [
     key: "2week",
     selection: ["biology", "seminar"],
     resolutions: [],
-    weeks: ["week-1", "week-2"],
+    // Seminar's Apr 30 portfolio deadline is its own leading card since #97.
+    weeks: ["week-0", "week-1", "week-2"],
   },
   {
     key: "3week",
     selection: ["biology", "italian-language-and-culture", "seminar"],
     resolutions: [KEEP_BIOLOGY],
-    weeks: ["week-1", "week-2", "late-testing"],
+    // Italian's PPR + Seminar's PPR share the one Week 0 deadlines card.
+    weeks: ["week-0", "week-1", "week-2", "late-testing"],
   },
 ];
 

@@ -63,6 +63,16 @@ export type { ExportTheme };
  *   goes. The text still ships in the dataset, the details dialog, and the
  *   `.txt`/`.json` exports — this is presentation, not data.
  *
+ * Week 0 (issue #97, as amended by Jon's bounce on it, 2026-07-27): a portfolio
+ * deadline dated BEFORE the first testing day is no longer a row on an exam
+ * week's card — `week-cards.ts` collects those onto a leading "Week 0" card. A
+ * deadline dated on or after that day is untouched and still renders as a row
+ * on the week it occurs in. Nothing in the row rendering changes either way (a
+ * deadline row is still name + "Portfolio deadline" + its real date, and still
+ * carries no note text after Jon's #91 bounce); the only render-side difference
+ * is the header count line, which reads "N deadlines" on the Week 0 card
+ * instead of falling through to the generic item count.
+ *
  * Rasterization mechanism (builder decision, issue #56) — an off-screen DOM
  * node + `html-to-image`, NOT a hand-drawn `<canvas>`: the card is authored in
  * ordinary DOM/CSS (readable, tweakable) with fully INLINE styles, and
@@ -388,9 +398,13 @@ export function renderWeekCardNode(
     ),
   );
 
+  // Count line. A Week 0 card holds deadlines only, so it says so — "0 exams"
+  // would be both wrong and useless, and the generic "N items" fallback is
+  // vaguer than the card's own content warrants (issue #97).
   const examCount = card.rows.filter((r) => r.kind === "exam").length;
-  const countText =
-    examCount > 0
+  const countText = card.deadlines
+    ? `${card.rows.length} deadline${card.rows.length === 1 ? "" : "s"}`
+    : examCount > 0
       ? `${examCount} exam${examCount === 1 ? "" : "s"}`
       : `${card.rows.length} item${card.rows.length === 1 ? "" : "s"}`;
   const headerRight = el(
@@ -431,7 +445,12 @@ export function renderWeekCardNode(
   );
   if (notesStrip) body.append(notesStrip);
 
-  // Undated footnote — a selection is never silently dropped.
+  // Undated footnote — a selection is never silently dropped. Every emitted
+  // card carries it, Week 0 included: each PNG is downloaded and shared as a
+  // standalone file, so "also selected, no date" has to be legible on whichever
+  // one the student sends. Issue #97 deliberately did NOT move it to Week 0 —
+  // an undated Career Kickstart course is not a deadline, and putting it on the
+  // deadlines card would imply it has one.
   if (options.undatedNames.length > 0) {
     body.append(
       el(

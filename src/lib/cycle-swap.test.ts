@@ -91,7 +91,11 @@ describe("annual cycle swap — a stale saved subject id degrades gracefully", (
     expect(calendar.undated.map((u) => u.id)).not.toContain(STALE_ID);
     expect(
       calendar.cards.flatMap((c) =>
-        c.week.days.flatMap((d) => d.blocks.map((b) => b.subjectId)),
+        // `week` is null on the Week 0 deadlines card (issue #97) — it has no
+        // grid, so it contributes no blocks.
+        (c.week?.days ?? []).flatMap((d) =>
+          d.blocks.map((b) => b.subjectId),
+        ),
       ),
     ).toEqual([LIVE_ID]);
   });

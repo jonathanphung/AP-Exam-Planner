@@ -194,16 +194,19 @@ test("AC2 — per-week .pngs from a renamed schedule keep week slug AND view suf
   await renameSchedule(page, "Schedule 1", "My Plan");
   await selectBiologyAndSeminar(page);
 
-  // Biology (Week 1) + Seminar (Week 2, portfolio rides Week 1) → exactly two
-  // week cards per view (the issue-51/56 fixture arithmetic).
-  const list = await downloadPngs(page, "Save as list view .png", 2);
+  // Biology (Week 1) + Seminar (Week 2) + Seminar's portfolio deadline, which
+  // since issue #97 is its own leading Week 0 card → three week cards per
+  // view. The schedule slug composes with `week-0` exactly as with any other.
+  const list = await downloadPngs(page, "Save as list view .png", 3);
   expect(list).toEqual([
+    `my-plan-${STEM}-week-0-list.png`,
     `my-plan-${STEM}-week-1-list.png`,
     `my-plan-${STEM}-week-2-list.png`,
   ]);
 
-  const calendar = await downloadPngs(page, "Save as calendar view .png", 2);
+  const calendar = await downloadPngs(page, "Save as calendar view .png", 3);
   expect(calendar).toEqual([
+    `my-plan-${STEM}-week-0-calendar.png`,
     `my-plan-${STEM}-week-1-calendar.png`,
     `my-plan-${STEM}-week-2-calendar.png`,
   ]);
