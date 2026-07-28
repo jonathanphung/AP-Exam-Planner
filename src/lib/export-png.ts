@@ -60,8 +60,9 @@ export type { ExportTheme };
  * - `row.note` (the portfolio submission note): NOT printed anywhere on the
  *   list card — not inline, not in the strip, not as a marker. The dated
  *   deadline row stays (it is schedule content); the submission-process prose
- *   goes. The text still ships in the dataset, the details dialog, and the
- *   `.txt`/`.json` exports — this is presentation, not data.
+ *   goes. The text still ships in the dataset, the details dialog, the
+ *   `.json` export, and the `.ics` DESCRIPTION — this is presentation, not
+ *   data. (Not the `.txt` export: `buildTxtExport` appends `examNote` only.)
  *
  * Rasterization mechanism (builder decision, issue #56) — an off-screen DOM
  * node + `html-to-image`, NOT a hand-drawn `<canvas>`: the card is authored in

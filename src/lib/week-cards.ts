@@ -107,7 +107,8 @@ export interface WeekCardRow {
    * deliberately does NOT print it anywhere (Jon's product call on the #91
    * bounce, 2026-07-27): the dated deadline row is schedule content, the
    * submission-process prose is not. The text still lives in the dataset, the
-   * details dialog, and the `.txt`/`.json` exports.
+   * details dialog, the `.json` export, and the `.ics` DESCRIPTION (not the
+   * `.txt` export — `buildTxtExport` appends `examNote` only).
    */
   note: string | null;
   /**
@@ -175,9 +176,9 @@ export interface WeekCardNote {
  *    the strip, not as a row marker. The dated deadline row is schedule
  *    content; the submission-process prose is not. So `row.note` is now
  *    deliberately IGNORED here, and only `examNote` reaches the strip. The
- *    portfolio text still lives in the dataset, the details dialog, and the
- *    `.txt`/`.json` exports — this is a list-`.png` presentation decision,
- *    not a data change.
+ *    portfolio text still lives in the dataset, the details dialog, the
+ *    `.json` export, and the `.ics` DESCRIPTION — this is a list-`.png`
+ *    presentation decision, not a data change.
  *
  * The `examNote` treatment is unchanged from the approved #91 build: #71's
  * requirement (a `.png` has no popup or tooltip, so the qualifier must be
