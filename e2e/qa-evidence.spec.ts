@@ -9,6 +9,22 @@ import { evidenceDir } from "./support/evidence";
  * viewports (desktop 1920x1080, tablet 1024x768, mobile 375x667). Screenshots
  * are written to the run evidence folder and committed to the issue branch so
  * they render inline on the issue / PR.
+ *
+ * Issue #82: `page.screenshot()` defaults to `caret: "hide"`, which mutates
+ * EVERY `<input>`'s `style` attribute (`caret-color: transparent !important`)
+ * for the capture's duration, then resets it — even on inputs that were never
+ * focused. Under cold full-suite compile load, React hydration is still
+ * pending when that screenshot fires; hydration then diffs against a DOM
+ * carrying a `style` attribute the server never rendered and logs a
+ * hydration-mismatch console error, which the zero-console-errors assertion
+ * below (correctly) fails. Two changes close the race without touching
+ * product code:
+ *   1. `caret: "initial"` stops the mutation outright — nothing on this page
+ *      is focused at capture time, so the evidence PNGs are pixel-identical.
+ *   2. A post-screenshot interactivity probe (fill → filtered → clear →
+ *      restored) forces hydration to complete before the console-error
+ *      assertions run, so the check is deterministic w.r.t. hydration timing
+ *      instead of "no errors yet, if we happened to look early".
  */
 
 const EVIDENCE_DIR = evidenceDir("issue-1-qa-v1");
@@ -48,10 +64,34 @@ for (const vp of viewports) {
     await expect(main).not.toBeEmpty();
     await expect(main.getByLabel("Search subjects")).toBeVisible();
 
+    // caret: "initial" (issue #82) — the default "hide" mutates every
+    // input's style attribute for the capture, which races React hydration
+    // under cold-boot load and produces a false-positive hydration-mismatch
+    // console error below. Nothing here is focused at capture time, so the
+    // evidence PNGs are unaffected either way.
     await page.screenshot({
       path: `${EVIDENCE_DIR}/${vp.name}.png`,
       fullPage: true,
+      caret: "initial",
     });
+
+    // Interactivity probe (issue #82): prove the page is hydrated and
+    // actually wired up before checking for console errors, so the check
+    // below is deterministic instead of a race against hydration timing.
+    // Uses the search input's own placeholder query ("e.g. bio") so this
+    // stays in sync with whatever the placeholder suggests.
+    const searchInput = main.getByLabel("Search subjects");
+    await searchInput.fill("bio");
+    await expect(
+      main.getByRole("button", { name: "AP Biology", exact: true }),
+    ).toBeVisible();
+    await expect(
+      main.getByRole("button", { name: "AP Calculus AB", exact: true }),
+    ).not.toBeVisible();
+    await searchInput.fill("");
+    await expect(
+      main.getByRole("button", { name: "AP Calculus AB", exact: true }),
+    ).toBeVisible();
 
     // Zero browser console errors (favicon noise ignored — none expected here).
     const meaningfulErrors = consoleErrors.filter((t) => !/favicon/i.test(t));
