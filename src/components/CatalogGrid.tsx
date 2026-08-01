@@ -47,6 +47,11 @@ function jumpToCategory(category: Category): void {
  * sections was redundant with scrolling and confusing next to the section
  * headings; the quick-jump keeps the filter's one unique value — reaching a
  * category instantly — with one shared control on both platforms.
+ *
+ * Issue #102 finishes that consolidation: the search field and the `{n}
+ * selected` count moved INTO the same sticky bar as the quick-jump pills, so
+ * the catalog's whole control surface survives scrolling instead of only the
+ * pills. See the bar's own comment below.
  */
 export function CatalogGrid() {
   const { isSelected, toggle, selectedCount } = useSelection();
@@ -62,45 +67,66 @@ export function CatalogGrid() {
 
   return (
     <section aria-label="Subject catalog" className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div className="flex flex-col gap-1">
-          <label
-            htmlFor="subject-search"
-            className="text-sm font-medium text-slate-700 dark:text-slate-300"
-          >
-            Search subjects
-          </label>
-          <input
-            id="subject-search"
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="e.g. bio"
-            autoComplete="off"
-            className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus-visible:border-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500/40 sm:min-h-0 sm:w-72 dark:border-slate-700 dark:bg-slate-900"
-          />
-        </div>
-        <p
-          aria-live="polite"
-          className="text-sm font-medium text-slate-700 dark:text-slate-300"
-        >
-          {selectedCount} selected
-        </p>
-      </div>
+      {/* One condensed sticky catalog header (issue #102).
+       *
+       * Before: two stacked lines — a NON-sticky search + count row, then the
+       * sticky quick-jump nav. Scrolling the catalog kept the pills but threw
+       * away both the search box and the running count, so narrowing a long
+       * list meant scrolling back to the top first.
+       *
+       * Now the three controls are one pinned unit that owns the chrome the
+       * nav used to own alone: `sticky top-0 z-30`, hairline bottom border,
+       * translucent backdrop-blur, and the below-`sm` edge bleed (`-mx-6
+       * px-6`) for the widths where the catalog column spans the viewport.
+       *
+       * Layout — at `sm` and up one row: search (fixed width, left), pills
+       * (flex-1, horizontally scrollable), count pinned to the right edge.
+       * Below `sm` the row wraps INSIDE the same sticky box: full-width search
+       * on line 1 (327px at 375px wide is a usable field; a one-row squeeze
+       * would leave it ~120px), pills + count on line 2. DOM order is always
+       * search → pills → count, which is also the tab order.
+       *
+       * The bar renders unconditionally — including in the no-matches state,
+       * where `groups` is empty and the pills drop out. Keeping it inside the
+       * old `groups.length > 0` branch would have hidden the search input the
+       * moment a query matched nothing, i.e. exactly when the user needs it to
+       * clear the query. */}
+      <div
+        data-testid="catalog-header"
+        className="sticky top-0 z-30 -mx-6 flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-slate-200 bg-white/95 px-6 py-2 backdrop-blur-sm sm:mx-0 sm:flex-nowrap sm:px-0 dark:border-slate-800 dark:bg-slate-950/95"
+      >
+        {/* The label's visible TEXT is what the condensed row drops, not the
+            label itself: `sr-only` keeps a real `<label for>` association, so
+            the accessible name stays "Search subjects" instead of degrading to
+            the placeholder. The placeholder repeats those words for sighted
+            users now that no caption sits above the field — which cost the old
+            "e.g. bio" hint: at the bar's width the two together truncated
+            mid-word, and naming the field beats illustrating it. */}
+        <label htmlFor="subject-search" className="sr-only">
+          Search subjects
+        </label>
+        <input
+          id="subject-search"
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Search subjects"
+          autoComplete="off"
+          className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus-visible:border-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500/40 sm:min-h-0 sm:w-48 sm:flex-none 2xl:w-72 dark:border-slate-700 dark:bg-slate-900"
+        />
 
-      {groups.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
-          No subjects match your search.
-        </p>
-      ) : (
-        <div className="flex flex-col gap-4">
-          {/* Sticky quick-jump nav (issues #22 + #24): sections stay
-              always-expanded for scannability, and this bar reaches any
-              category without scrolling the whole catalog. Bleeds edge-to-edge
-              only below `sm`, where the catalog column spans the viewport. */}
+        {/* Quick-jump nav (issues #22 + #24): sections stay always-expanded for
+            scannability and this reaches any category without scrolling the
+            whole catalog. `min-w-0 flex-1` lets it absorb the free space and
+            still shrink below its content width, so the pill list — not the
+            page — is what scrolls sideways when the categories outrun the bar.
+            It keeps `sticky top-0` of its own: inert while it sits inside the
+            already-pinned bar (its offset never engages), but it preserves the
+            invariant #22/#24 assert — the quick-jump nav is a sticky box. */}
+        {groups.length > 0 && (
           <nav
             aria-label="Jump to category"
-            className="sticky top-0 z-30 -mx-6 border-b border-slate-200 bg-white/95 px-6 py-2 backdrop-blur-sm sm:mx-0 sm:px-0 dark:border-slate-800 dark:bg-slate-950/95"
+            className="sticky top-0 min-w-0 flex-1"
           >
             <ul className="flex gap-2 overflow-x-auto">
               {groups.map((group) => (
@@ -116,7 +142,25 @@ export function CatalogGrid() {
               ))}
             </ul>
           </nav>
+        )}
 
+        {/* `ml-auto` is the fallback that pins the count to the bar's right
+            edge in the no-matches state, where the flex-1 nav is gone and
+            nothing else would push it over. */}
+        <p
+          aria-live="polite"
+          className="ml-auto shrink-0 whitespace-nowrap text-sm font-medium text-slate-700 dark:text-slate-300"
+        >
+          {selectedCount} selected
+        </p>
+      </div>
+
+      {groups.length === 0 ? (
+        <p className="rounded-lg border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
+          No subjects match your search.
+        </p>
+      ) : (
+        <div className="flex flex-col gap-4">
           {groups.map((group) => (
             <CategorySection
               key={group.category}
