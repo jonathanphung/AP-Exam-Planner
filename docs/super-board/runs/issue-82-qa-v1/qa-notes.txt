@@ -1,0 +1,72 @@
+Issue #82 -- Tester (QA) v1
+PR: #103 -- Branch: issue-82-qa-evidence-caret-hydration -- Base: main
+
+Spec-only fix (no product code change): e2e/qa-evidence.spec.ts now passes
+caret: "initial" to page.screenshot() and adds a post-screenshot
+interactivity probe, closing a race between Playwright's caret-hide DOM
+mutation and pending React hydration under cold-boot load.
+
+Diff scope check (AC6):
+  git diff origin/main..HEAD --stat
+  e2e/qa-evidence.spec.ts | 40 ++++++++++++++++++++++++++++++++++++++++
+  1 file changed, 40 insertions(+)
+src/ untouched -- confirmed independently (single file changed, spec-only).
+
+AC1 -- root cause (independent corroboration, no re-run of the throwaway repro):
+Builder's PR description documents a deterministic JS-delay repro (throttle
+**/*.js, goto({waitUntil:"commit"}), screenshot before hydration) that
+reproduces the exact hydration-mismatch console error on the unfixed pattern
+and shows zero errors on the fixed pattern. Rather than re-run the same
+uncommitted throwaway probe, independently verified the underlying mechanism
+against the installed library itself:
+
+  grep -n -A2 'caret?: "hide"|"initial"' \
+    node_modules/.pnpm/playwright-core@1.61.1/node_modules/playwright-core/types/types.d.ts
+  -> "When set to "hide", screenshot will hide text caret. When set to
+     "initial", text caret behavior will not be changed. Defaults to "hide"."
+  -> caret?: "hide"|"initial";
+
+Confirms the PR's central technical claim (default caret: "hide" mutates
+DOM; "initial" opts out) directly from Playwright's own type declarations.
+Combined with the empirical AC4 result below, AC1 is considered satisfied
+without re-deriving the repro -- further churn here would not add
+confidence, per this wave's iteration guard.
+
+AC2 / AC3 -- code review:
+Confirmed by reading the diff: page.screenshot() passes caret: "initial";
+the pageErrors / meaningfulErrors assertions are byte-identical to before
+(no relaxing). The interactivity probe (fill "bio" -> AP Biology visible /
+AP Calculus AB not visible -> clear -> AP Calculus AB visible again) runs
+between the screenshot and the console-error assertions, forcing hydration
+to complete first.
+
+AC4 -- repeated cold-boot verification (independent of Builder's own runs):
+Builder already ran 3x targeted qa-evidence.spec.ts cold boots + 1x full
+pnpm test:e2e cold boot (720/720), and asked Tester for 2 more full-suite
+cold boots to reach the AC's ">=3 full-suite cold boots" bar. Ran both,
+each with rm -rf .next, a fresh next dev, and a distinct PORT:
+
+  Tester full run 1, port 3192: 720 passed, 0 failed, 6.5m wall clock,
+    all 3 qa-evidence viewports green.
+  Tester full run 2, port 3193: 720 passed, 0 failed, 6.4m wall clock,
+    all 3 qa-evidence viewports green.
+
+Combined with Builder's 1 full-suite cold boot: 3 independent full-suite
+cold boots, all green -- satisfies AC4. Lingering dev-server processes were
+killed (Get-Process node | Stop-Process) between runs to guarantee each
+boot was genuinely cold, not a reuseExistingServer hit against a leftover
+process (Playwright's Windows webServer teardown left orphaned node.exe
+processes after the first run -- worth a follow-up issue, out of scope here).
+
+AC5 -- evidence PNGs visually unchanged:
+Inspected test-results/evidence/issue-1-qa-v1/{desktop,mobile}.png from
+Tester full run 2 (default gitignored path -- this ticket doesn't touch the
+committed docs/super-board/runs/issue-1-qa-v1 evidence, per the PR's own
+note). Both show the default page state: 0 selected, full catalog, unfocused
+search input showing its placeholder, no caret artifact. Visually matches
+the pre-fix baseline shape.
+
+Result: all 6 ACs verified. No [QA]-prefixed threads opened -- no defects
+found. Moving QA -> Review.
+
+gh-quota-on-exit: graphql=4193/5000 rest=4991/5000
