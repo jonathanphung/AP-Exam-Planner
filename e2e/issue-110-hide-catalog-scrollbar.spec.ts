@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import apData from "../src/data/ap-2027.json";
 import { evidenceDir } from "./support/evidence";
 
 /**
@@ -68,6 +69,16 @@ const TEN_SUBJECT_IDS = [
 
 /** Minimum painted background between the pill row's clip edge and the count. */
 const MIN_BOUNDARY_GAP = 16;
+
+/**
+ * Every subject id in the shipped dataset — the WIDEST the count label can ever
+ * get ("43 selected" today). QA v2 uses this instead of a hardcoded list so the
+ * invariant tracks the dataset: if the catalog ever grows past 99 subjects the
+ * count goes three digits and these tests are the ones that notice.
+ */
+const ALL_SUBJECT_IDS = (
+  apData as { subjects: ReadonlyArray<{ id: string }> }
+).subjects.map((subject) => subject.id);
 
 const VIEWPORTS = [
   { name: "desktop", width: 1920, height: 1080 },
@@ -475,6 +486,109 @@ test("AC9 — the row is still scrollable at 10 selected, and the pills keep the
 });
 
 // ---------------------------------------------------------------------------
+// QA v2 — the bounce's directive is "no visual overlap … at ANY selected-count
+// width". The build's AC9 block proves that at the reported repro (10), which
+// is where the count first goes double-digit. These three lock the two ends the
+// build only argued for in prose: the WIDEST label the shipped catalog can
+// produce ("43 selected"), and the narrowest viewport the suite supports.
+// ---------------------------------------------------------------------------
+
+for (const vp of VIEWPORTS) {
+  for (const scheme of ["light", "dark"] as const) {
+    test(`QA v2 — the boundary gap survives the widest possible count (whole catalog selected) (${vp.name} ${vp.width}x${vp.height}, ${scheme})`, async ({
+      browser,
+    }) => {
+      const ctx = await browser.newContext({
+        viewport: { width: vp.width, height: vp.height },
+        colorScheme: scheme,
+      });
+      const page = await ctx.newPage();
+      await seedSelection(page, ALL_SUBJECT_IDS);
+      await page.goto("/");
+      await expect(pills(page)).toHaveCount(5);
+      await expect(count(page)).toHaveText(
+        `${ALL_SUBJECT_IDS.length} selected`,
+      );
+
+      const geo = await boundaryGeometry(page);
+
+      expect(
+        geo.gap,
+        `${vp.name}/${scheme}: the gap must not shrink at the catalog's maximum count (${geo.countText})`,
+      ).toBeGreaterThanOrEqual(MIN_BOUNDARY_GAP);
+      expect(
+        geo.worstPillOverlap,
+        `${vp.name}/${scheme}: no pill's visible pixels may reach the count at maximum count`,
+      ).toBeLessThan(0);
+      expect(
+        Math.abs(geo.countRight - geo.barContentRight),
+        `${vp.name}/${scheme}: the widest count must still sit flush with the bar's content edge`,
+      ).toBeLessThanOrEqual(1);
+
+      await ctx.close();
+    });
+  }
+}
+
+test("QA v2 — the desktop row still fits whole at the catalog's maximum count (1920x1080)", async ({
+  page,
+}) => {
+  // The build's justification for `px-3` was "the desktop row now fits whole at
+  // any selection size (43 subjects max, so the count never exceeds two
+  // digits)". That claim is only measured at 10 there; measure it at the top.
+  expect(
+    ALL_SUBJECT_IDS.length,
+    "a catalog past 99 subjects makes the count three digits — re-measure the desktop fit before shipping that",
+  ).toBeLessThan(100);
+
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await seedSelection(page, ALL_SUBJECT_IDS);
+  await page.goto("/");
+  await expect(pills(page)).toHaveCount(5);
+  await expect(count(page)).toHaveText(`${ALL_SUBJECT_IDS.length} selected`);
+
+  const geo = await boundaryGeometry(page);
+  expect(
+    geo.overflowing,
+    `at 1920px the widest count must not push the pill row back into overflow (${geo.scrollWidth}px of pills in a ${geo.clientWidth}px list)`,
+  ).toBe(false);
+});
+
+test("QA v2 — gap, page-scroll and scrollability invariants hold at the 320px floor with the whole catalog selected", async ({
+  page,
+}) => {
+  // 320px is the narrowest width the suite's overflow guard covers
+  // (`e2e/support/scroll-shift.ts`), and it is the worst case for this card:
+  // the least room for the pill row, the widest count label.
+  await page.setViewportSize({ width: 320, height: 667 });
+  await seedSelection(page, ALL_SUBJECT_IDS);
+  await page.goto("/");
+  await expect(pills(page)).toHaveCount(5);
+  await expect(count(page)).toHaveText(`${ALL_SUBJECT_IDS.length} selected`);
+
+  const geo = await boundaryGeometry(page);
+  expect(geo.overflowing, "premise: the pills overflow at 320px").toBe(true);
+  expect(geo.gap).toBeGreaterThanOrEqual(MIN_BOUNDARY_GAP);
+  expect(geo.worstPillOverlap).toBeLessThan(0);
+  expect(await noPageHorizontalScroll(page)).toBe(true);
+
+  // Still the escape valve: the row scrolls, and scrolling to the end does not
+  // walk a pill onto the count.
+  await pillList(page).evaluate((el) => {
+    el.scrollLeft = el.scrollWidth;
+  });
+  expect(
+    await pillList(page).evaluate((el) => el.scrollLeft),
+    "the row must still scroll at 320px",
+  ).toBeGreaterThan(0);
+
+  const scrolled = await boundaryGeometry(page);
+  expect(scrolled.gap).toBeGreaterThanOrEqual(MIN_BOUNDARY_GAP);
+  expect(scrolled.worstPillOverlap).toBeLessThan(0);
+  expect(await noPageHorizontalScroll(page)).toBe(true);
+});
+
+// ---------------------------------------------------------------------------
 // Evidence — the sticky bar with pills overflowing, light + dark, at the
 // three standard viewports.
 // ---------------------------------------------------------------------------
@@ -522,6 +636,33 @@ for (const vp of VIEWPORTS) {
       });
       await page.locator("[data-testid='catalog-header']").screenshot({
         path: `${EVIDENCE_DIR}/${vp.name}-${scheme}-10-selected-bar.png`,
+        caret: "initial",
+      });
+      await ctx.close();
+    });
+  }
+}
+
+// QA-v2 evidence — the same boundary at the widest label the catalog can
+// produce, cropped to the bar. Pairs with the "widest possible count" tests.
+for (const vp of VIEWPORTS) {
+  for (const scheme of ["light", "dark"] as const) {
+    test(`evidence — pills/count boundary at the catalog's maximum count (${vp.name} ${vp.width}x${vp.height}, ${scheme})`, async ({
+      browser,
+    }) => {
+      const ctx = await browser.newContext({
+        viewport: { width: vp.width, height: vp.height },
+        colorScheme: scheme,
+      });
+      const page = await ctx.newPage();
+      await seedSelection(page, ALL_SUBJECT_IDS);
+      await page.goto("/");
+      await expect(pills(page)).toHaveCount(5);
+      await expect(count(page)).toHaveText(
+        `${ALL_SUBJECT_IDS.length} selected`,
+      );
+      await page.locator("[data-testid='catalog-header']").screenshot({
+        path: `${EVIDENCE_DIR}/${vp.name}-${scheme}-max-selected-bar.png`,
         caret: "initial",
       });
       await ctx.close();
