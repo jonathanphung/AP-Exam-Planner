@@ -638,11 +638,12 @@ test("AC8 — two schedules hold OPPOSITE resolutions of the same collision with
   await switchSchedule(page, "Schedule 2");
   await expect(page.getByTestId("conflict-prompt").first()).toBeVisible();
 
-  // Resolve S2 the OPPOSITE way: keep Latin → Biology moves late.
+  // Resolve S2 the OPPOSITE way: move Biology late → Latin is the keeper
+  // (issue #101 inverted actions: the button names the exam that moves).
   await page
     .getByTestId("conflict-prompt")
     .first()
-    .getByRole("button", { name: `Keep ${ITALIAN.name} at the regular time` })
+    .getByRole("button", { name: `Move ${BIOLOGY.name} to late testing` })
     .first()
     .click();
   await expect(page.getByTestId("conflict-prompt")).toHaveCount(0);
