@@ -1,4 +1,8 @@
 import { test, expect } from "@playwright/test";
+// Issue #104 gave the document title a dataset-derived cycle label, so the
+// expected string is read from the same constant the layout renders rather
+// than re-spelled here (a hand-written copy would go stale on the next swap).
+import { SITE_TITLE } from "../src/lib/site";
 
 test("home page renders the AP Exam Planner header and title", async ({
   page,
@@ -13,7 +17,7 @@ test("home page renders the AP Exam Planner header and title", async ({
 
   await page.goto("/");
 
-  await expect(page).toHaveTitle("AP Exam Planner");
+  await expect(page).toHaveTitle(SITE_TITLE);
   await expect(
     page.getByRole("heading", { level: 1, name: "AP Exam Planner" }),
   ).toBeVisible();
