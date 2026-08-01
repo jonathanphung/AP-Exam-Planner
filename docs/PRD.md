@@ -36,6 +36,8 @@ Secondary: a parent or counselor checking a student's exam load.
 5. Tapping a subject opens an info panel: MCQ count, FRQ count and type, total time, calculator policy, digital vs paper, and the most recently published pass rate.
 6. User taps "Export to Calendar" and downloads an ICS file with every selected exam as an event.
 
+> **Status update (2026-07-31, issue #101):** step 4's prompt framing is inverted. The student now picks which exam(s) **move to late testing** — each red action reads "Move {subject} to late testing" and moving a subject sends it to its own official late-testing slot; the remaining exam stays at the regular time. The recorded planning choice is unchanged (one keeper per slot, same stored resolution), only the buttons flipped so each names the exam that actually changes. The step above is kept as written for provenance.
+
 ## 7. Functional Requirements
 
 ### 7.1 Subject catalog
@@ -60,6 +62,8 @@ Secondary: a parent or counselor checking a student's exam load.
 - Clear in-app note: this is a planning choice, not a registration action. The actual swap is arranged through the school's AP coordinator.
 - Edge case: if three or more selected exams share one slot, the same choose-one-to-keep flow applies, the rest move to late testing. If any of those late-testing dates also collide with each other, surface a second warning rather than silently overwriting.
 - Portfolio deadlines do not trigger this flow. There is no physical conflict in submitting two pieces of work on the same day, they are shown on the schedule but never compared for conflicts.
+
+> **Status update (2026-07-31, issue #101):** the resolution prompt described in §7.3/§7.4 above is inverted — it no longer asks which exam *stays* at the regular time; it asks which exam(s) the student will **move to late testing**, with one red "Move {subject} to late testing" action per involved exam. A two-way conflict resolves in one click (the un-clicked exam is recorded as the keeper). For the three-or-more edge case the student moves exams one at a time: clicked exams are visibly marked as moving, and the resolution is recorded once exactly one exam remains — it becomes the keeper. Dismissing the prompt midway persists nothing. The persisted keeper-based resolution model, the late-late collision warning, the coordinator note, and everything else in this section are unchanged. The choose-one-to-keep wording above is superseded but kept for provenance.
 
 ### 7.5 Exam info panel
 - Per subject: MCQ count, FRQ count and type, total exam length, calculator policy, digital or paper format.

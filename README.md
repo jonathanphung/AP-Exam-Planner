@@ -34,7 +34,7 @@ Your plan renders two ways from one shared model, switchable from a toolbar: a c
 
 When two selected exams share a date and session, the app flags the collision and offers to move one to its official late-testing slot, then re-checks that the moved exams don't land on top of each other again. The prompt appears in both views. On the calendar you can round-trip a move: send an exam to late testing, switch it back (which re-opens the choice), or swap which exam keeps the regular slot.
 
-![The exam-time conflict prompt: AP Chemistry and AP Human Geography both fall in the May 5 morning slot, with buttons to keep one at the regular time and move the other to its official late-testing date](docs/screenshots/conflict-dialog.png)
+![The exam-time conflict prompt: AP Chemistry and AP Human Geography both fall in the May 5 morning slot, with a "Move {subject} to late testing" button per exam that sends it to its official late-testing date while the other stays at the regular time](docs/screenshots/conflict-dialog.png)
 
 ### Multiple schedules, saved on your device
 

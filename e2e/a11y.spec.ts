@@ -423,14 +423,15 @@ test.describe("AC1 — keyboard operability", () => {
     await expect(conflictPrompt(page)).toBeVisible();
     expect(await page.evaluate(() => document.body.style.overflow)).toBe("");
 
-    // Resolving from the inline prompt still works.
+    // Resolving from the inline prompt still works (issue #101: the red
+    // action moves THAT subject; the other member is recorded as keeper).
     await conflictPrompt(page)
-      .getByRole("button", { name: `Keep ${ITALIAN.name} at the regular time` })
+      .getByRole("button", { name: `Move ${BIOLOGY.name} to late testing` })
       .click();
     await expect(conflictPrompt(page)).toHaveCount(0);
   });
 
-  test("conflict dialog: choosing a keeper inside the modal resolves and closes it", async ({
+  test("conflict dialog: moving an exam inside the modal resolves and closes it", async ({
     page,
   }) => {
     await seedSelection(page, [BIOLOGY.id, ITALIAN.id]);
@@ -440,7 +441,7 @@ test.describe("AC1 — keyboard operability", () => {
     await expect(modal).toBeVisible();
 
     await modal
-      .getByRole("button", { name: `Keep ${ITALIAN.name} at the regular time` })
+      .getByRole("button", { name: `Move ${BIOLOGY.name} to late testing` })
       .click();
     await expect(dialog(page)).toHaveCount(0);
     await expect(conflictPrompt(page)).toHaveCount(0);
@@ -562,13 +563,13 @@ test.describe("AC3 — conflict + moved-to-late styles measure ≥ 4.5:1", () =>
         promptHeading,
         `conflict prompt heading (${scheme}) = ${promptHeading.toFixed(2)}:1`,
       ).toBeGreaterThanOrEqual(4.5);
-      const keepButton = await contrastRatio(
+      const moveButton = await contrastRatio(
         page,
         '[data-testid="conflict-prompt"] div > button',
       );
       expect(
-        keepButton,
-        `keep-at-regular-time button (${scheme}) = ${keepButton.toFixed(2)}:1`,
+        moveButton,
+        `move-to-late-testing button (${scheme}) = ${moveButton.toFixed(2)}:1`,
       ).toBeGreaterThanOrEqual(4.5);
       await ctx.close();
 
@@ -759,9 +760,9 @@ test.describe("AC4 — 375×667 layout", () => {
     await expect(dialog(conflict)).toBeVisible();
     await expectTapTarget(
       dialog(conflict)
-        .getByRole("button", { name: /^Keep .* at the regular time$/ })
+        .getByRole("button", { name: /^Move .* to late testing$/ })
         .first(),
-      "keep-at-regular-time button",
+      "move-to-late-testing button",
     );
     await expectTapTarget(
       dialog(conflict).getByRole("button", { name: "Close" }),

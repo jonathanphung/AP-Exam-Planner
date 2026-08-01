@@ -486,8 +486,9 @@ test("AC3 — resolved conflict places the moved exam at its late-testing slot i
 
   // Drive the real resolution flow in the LIST view (where issue #5's
   // modal-on-collision behavior lives; the calendar-native path is covered by
-  // the Bounce C tests below): Biology and Latin share 2027-05-03 AM; keeping
-  // Latin moves Biology to its official late slot (2027-05-19 PM).
+  // the Bounce C tests below): Biology and Latin share 2027-05-03 AM; moving
+  // Biology sends it to its official late slot (2027-05-19 PM) and Latin
+  // stays at the regular time.
   await openList(page);
   await select(page, BIOLOGY.name);
   await select(page, ITALIAN.name);
@@ -516,13 +517,14 @@ test("AC3 — resolved conflict places the moved exam at its late-testing slot i
     path: `${EVIDENCE_DIR}/ac3-unresolved-lane-split-desktop.png`,
   });
 
-  // Now resolve: back to the list view, keep Latin at the regular time.
+  // Now resolve: back to the list view, move Biology to late testing (issue
+  // #101 inverted actions — Latin, the other member, is recorded as keeper).
   // (Hydration-safe press: nothing before this point proves the handlers
   // are attached — the block reads above are passive.)
   await pressViewChip(page, "List");
   await expect(prompt.first()).toBeVisible();
   await prompt
-    .getByRole("button", { name: `Keep ${ITALIAN.name} at the regular time` })
+    .getByRole("button", { name: `Move ${BIOLOGY.name} to late testing` })
     .first()
     .click();
 
@@ -1139,9 +1141,10 @@ test("Bounce C8 — activating a conflicted block opens the conflict dialog; res
     path: `${EVIDENCE_DIR}/bounceC8-conflict-dialog-from-calendar-desktop.png`,
   });
 
-  // Resolve from the calendar: keep Biology → Latin moves to late testing.
+  // Resolve from the calendar: move Latin to late testing (Biology, the
+  // other member, is recorded as keeper — issue #101 inverted actions).
   await prompt
-    .getByRole("button", { name: `Keep ${BIOLOGY.name} at the regular time` })
+    .getByRole("button", { name: `Move ${ITALIAN.name} to late testing` })
     .click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
 
@@ -1255,10 +1258,10 @@ test("Bounce C9 — switch back re-opens the conflict prompt so the collision is
     path: `${EVIDENCE_DIR}/bounceC9-switch-back-reprompts-desktop.png`,
   });
 
-  // Re-resolve, keeping Biology this time: Latin moves to late testing —
-  // the same round-trip the list view's prompt would apply.
+  // Re-resolve the other way this time: move Latin to late testing (Biology
+  // becomes the keeper) — the same round-trip the list view's prompt applies.
   await prompt
-    .getByRole("button", { name: `Keep ${BIOLOGY.name} at the regular time` })
+    .getByRole("button", { name: `Move ${ITALIAN.name} to late testing` })
     .click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
 

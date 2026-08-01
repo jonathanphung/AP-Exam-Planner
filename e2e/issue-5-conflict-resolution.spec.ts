@@ -121,9 +121,15 @@ async function deselect(page: Page, name: string) {
   await expect(c).toHaveAttribute("aria-pressed", "false");
 }
 
-async function keep(page: Page, name: string) {
+/**
+ * Issue #101 inverted the red actions: each button reads
+ * "Move {subject} to late testing" and moves THAT subject. Recording the
+ * resolution is unchanged (the other member becomes the keeper), so specs
+ * that used to "keep A" now "move B".
+ */
+async function moveToLate(page: Page, name: string) {
   await prompt(page)
-    .getByRole("button", { name: `Keep ${name} at the regular time` })
+    .getByRole("button", { name: `Move ${name} to late testing` })
     .first()
     .click();
 }
@@ -240,18 +246,18 @@ test.describe("issue #5 — same-slot conflicts resolve to official late-testing
     await expect(prompt(page)).toContainText(
       `${BIOLOGY.exam!.session} session`,
     );
-    // Asks which one stays at the regular time.
+    // Asks which exam MOVES to late testing (issue #101 inverted framing).
     await expect(prompt(page)).toContainText(
-      "Which exam will you take at the regular time?",
+      "Which exam will you move to late testing?",
     );
     await expect(
       prompt(page).getByRole("button", {
-        name: `Keep ${BIOLOGY.name} at the regular time`,
+        name: `Move ${BIOLOGY.name} to late testing`,
       }),
     ).toBeVisible();
     await expect(
       prompt(page).getByRole("button", {
-        name: `Keep ${ITALIAN.name} at the regular time`,
+        name: `Move ${ITALIAN.name} to late testing`,
       }),
     ).toBeVisible();
 
@@ -273,7 +279,7 @@ test.describe("issue #5 — same-slot conflicts resolve to official late-testing
     await seedSelection(page, [BIOLOGY.id, ITALIAN.id]);
     await page.goto("/");
     await openList(page);
-    await keep(page, ITALIAN.name);
+    await moveToLate(page, BIOLOGY.name);
 
     await expect(prompt(page)).toHaveCount(0);
 
@@ -301,7 +307,7 @@ test.describe("issue #5 — same-slot conflicts resolve to official late-testing
     await seedSelection(page, [BIOLOGY.id, ITALIAN.id]);
     await page.goto("/");
     await openList(page);
-    await keep(page, ITALIAN.name);
+    await moveToLate(page, BIOLOGY.name);
     await expect(rowsIn(page, BIOLOGY.lateTesting!.date)).toHaveCount(1);
 
     // Persisted under the versioned key with the chosen keeper.
@@ -371,8 +377,8 @@ test.describe("issue #5 — same-slot conflicts resolve to official late-testing
 
     // Two independent conflicts (May 3 PM, May 6 PM) → two prompts.
     await expect(prompt(page)).toHaveCount(2);
-    await keep(page, ITALIAN.name); // Biology → its late slot
-    await keep(page, CHEMISTRY.name); // Chemistry → late 2027-05-19 PM
+    await moveToLate(page, BIOLOGY.name); // Biology → its late slot
+    await moveToLate(page, AAS.name); // Chemistry → late 2027-05-19 PM
 
     // Both moved exams now share Biology's late slot → warning naming them.
     await expect(lateWarning(page)).toBeVisible();
@@ -410,7 +416,7 @@ test.describe("issue #5 — same-slot conflicts resolve to official late-testing
 
     await expect(prompt(page)).toContainText(COORDINATOR_NOTE);
 
-    await keep(page, ITALIAN.name);
+    await moveToLate(page, BIOLOGY.name);
     const movedRow = rowsIn(page, BIOLOGY.lateTesting!.date).first();
     await expect(movedRow).toContainText("Moved to late testing");
     await expect(movedRow).toContainText(COORDINATOR_NOTE);
@@ -465,8 +471,8 @@ test.describe("issue #5 — same-slot conflicts resolve to official late-testing
       `prompt text contrast (light) = ${lightPrompt.toFixed(2)}:1`,
     ).toBeGreaterThanOrEqual(4.5);
 
-    await keep(page, ITALIAN.name);
-    await keep(page, CHEMISTRY.name);
+    await moveToLate(page, BIOLOGY.name);
+    await moveToLate(page, AAS.name);
 
     // Resolved slots render — the moved exams appear ONLY under their late
     // dates; their regular slots no longer list them.
@@ -553,7 +559,7 @@ test("evidence — resolved state (moved tag) and late-late warning at desktop",
   await seedSelection(page, [BIOLOGY.id, ITALIAN.id]);
   await page.goto("/");
   await openList(page);
-  await keep(page, ITALIAN.name);
+  await moveToLate(page, BIOLOGY.name);
   await expect(
     rowsIn(page, BIOLOGY.lateTesting!.date).first(),
   ).toContainText("Moved to late testing");
@@ -574,8 +580,8 @@ test("evidence — resolved state (moved tag) and late-late warning at desktop",
   ]);
   await fresh.goto("/");
   await openList(fresh);
-  await keep(fresh, ITALIAN.name);
-  await keep(fresh, CHEMISTRY.name);
+  await moveToLate(fresh, BIOLOGY.name);
+  await moveToLate(fresh, AAS.name);
   await expect(lateWarning(fresh)).toBeVisible();
   await fresh.screenshot({
     path: `${EVIDENCE_DIR}/ac5-late-late-warning-desktop.png`,

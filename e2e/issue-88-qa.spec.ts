@@ -180,8 +180,9 @@ async function persistedState(page: Page): Promise<{
 
 /**
  * Build "Schedule 1" into a real plan: two colliding subjects + one resolved
- * conflict (keep Biology → Italian moves to its late slot). Returns with the
- * List view open and the resolution visible.
+ * conflict (move Italian to its late slot → Biology is recorded as keeper;
+ * issue #101 inverted actions). Returns with the List view open and the
+ * resolution visible.
  */
 async function planWithResolution(page: Page) {
   await cleanStart(page);
@@ -189,7 +190,7 @@ async function planWithResolution(page: Page) {
   await select(page, BIOLOGY.name);
   await select(page, ITALIAN.name);
   await prompt(page)
-    .getByRole("button", { name: `Keep ${BIOLOGY.name} at the regular time` })
+    .getByRole("button", { name: `Move ${ITALIAN.name} to late testing` })
     .first()
     .click();
   await expect(prompt(page)).toBeHidden();
