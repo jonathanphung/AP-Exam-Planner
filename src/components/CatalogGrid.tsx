@@ -80,7 +80,8 @@ export function CatalogGrid() {
        * px-6`) for the widths where the catalog column spans the viewport.
        *
        * Layout — at `sm` and up one row: search (fixed width, left), pills
-       * (flex-1, horizontally scrollable), count pinned to the right edge.
+       * (flex-1, horizontally scrollable — scrollbar chrome hidden, see #110),
+       * count pinned to the right edge.
        * Below `sm` the row wraps INSIDE the same sticky box: full-width search
        * on line 1 (327px at 375px wide is a usable field; a one-row squeeze
        * would leave it ~120px), pills + count on line 2. DOM order is always
@@ -122,13 +123,23 @@ export function CatalogGrid() {
             page — is what scrolls sideways when the categories outrun the bar.
             It keeps `sticky top-0` of its own: inert while it sits inside the
             already-pinned bar (its offset never engages), but it preserves the
-            invariant #22/#24 assert — the quick-jump nav is a sticky box. */}
+            invariant #22/#24 assert — the quick-jump nav is a sticky box.
+
+            The list stays horizontally scrollable (issue #110): whenever the
+            pills outrun the bar, wheel/trackpad/touch panning and keyboard
+            focus-scroll must still move the row — it is the escape valve that
+            keeps the page itself from scrolling horizontally at 375px. What
+            #110 removes is only the scrollbar's PAINT: `catalog-quickjump-scroll`
+            (defined in globals.css, scoped to this list) hides the classic
+            scrollbar track/thumb that issue #49's global custom-scrollbar
+            styling would otherwise draw under this pinned bar on non-overlay
+            scrollbar platforms (e.g. Windows). */}
         {groups.length > 0 && (
           <nav
             aria-label="Jump to category"
             className="sticky top-0 min-w-0 flex-1"
           >
-            <ul className="flex gap-2 overflow-x-auto">
+            <ul className="catalog-quickjump-scroll flex gap-2 overflow-x-auto">
               {groups.map((group) => (
                 <li key={group.category} className="flex-none">
                   <button

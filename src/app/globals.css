@@ -115,3 +115,31 @@ html {
     scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
   }
 }
+
+/*
+ * Issue #110 — visually hide the scrollbar on the sticky catalog header's
+ * quick-jump pill row (`src/components/CatalogGrid.tsx`) without touching its
+ * scroll behavior.
+ *
+ * The pill `<ul>` keeps `overflow-x-auto` on purpose (issue #22/#24): it is
+ * the designed escape valve that lets the pills scroll sideways instead of
+ * the page itself. But every scroll container on the page — including this
+ * one — also inherits the issue #49 custom-scrollbar treatment above
+ * (`::-webkit-scrollbar` sizing + the Firefox `* { scrollbar-width: thin }`
+ * rule), so once the five pills outrun the space between the search field
+ * and the count, the row paints a permanent classic-scrollbar track under
+ * the pinned bar (non-overlay-scrollbar OSes, e.g. Windows) — it eats
+ * vertical space and the light track is jarring in dark mode.
+ *
+ * `.catalog-quickjump-scroll` scopes the fix to that one list: a class
+ * selector outranks the universal `*` and `::-webkit-scrollbar` selectors
+ * above regardless of source order, so this always wins without needing
+ * `!important`. Every other scroll container on the page (document,
+ * dialogs) keeps the themed scrollbar from issue #49 untouched.
+ */
+.catalog-quickjump-scroll {
+  scrollbar-width: none;
+}
+.catalog-quickjump-scroll::-webkit-scrollbar {
+  display: none;
+}
