@@ -7,7 +7,7 @@ import { SubjectChip } from "@/components/SubjectChip";
  * One labeled category card in the sectioned catalog (issue #22).
  *
  * A real `<section>` landmark with a real heading, so assistive tech can
- * navigate by headings/regions, and the sticky quick-jump nav can move focus
+ * navigate by headings/regions, and the sticky catalog header can move focus
  * here (`tabIndex={-1}` on the heading; `scroll-mt` clears the sticky bar).
  *
  * Issue #24 makes this section the desktop layout too: the chip list is one
@@ -53,7 +53,13 @@ export function CategorySection({
       <h2
         id={headingId}
         tabIndex={-1}
-        className="scroll-mt-20 text-sm font-semibold tracking-wide text-slate-700 uppercase focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:text-slate-300"
+        // scroll-mt clears the sticky catalog header so a quick-jump lands the
+        // heading below the bar, not behind it. Issue #102 folded the search
+        // box and the count into that bar; below `sm` it wraps to two rows
+        // (~113px: 8 + 44 input + 8 + 44 pills + 8 + 1px border), which the
+        // old flat 5rem no longer clears. At `sm` and up the bar is back to
+        // one 60px row and 5rem is still right.
+        className="scroll-mt-32 text-sm font-semibold tracking-wide text-slate-700 uppercase focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 sm:scroll-mt-20 dark:text-slate-300"
       >
         {category}
         {/* slate-600: ≥4.5:1 on the slate-50 card background (issue #8 AC2). */}

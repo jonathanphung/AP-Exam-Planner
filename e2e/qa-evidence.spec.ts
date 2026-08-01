@@ -78,8 +78,10 @@ for (const vp of viewports) {
     // Interactivity probe (issue #82): prove the page is hydrated and
     // actually wired up before checking for console errors, so the check
     // below is deterministic instead of a race against hydration timing.
-    // Uses the search input's own placeholder query ("e.g. bio") so this
-    // stays in sync with whatever the placeholder suggests.
+    // "bio" is the narrowest useful query in the dataset — exactly one match
+    // — so the filter's effect is unambiguous. (It used to be quoted from the
+    // input's placeholder; issue #102 shortened that to "Search subjects" when
+    // the field moved into the condensed sticky header.)
     const searchInput = main.getByLabel("Search subjects");
     await searchInput.fill("bio");
     await expect(
