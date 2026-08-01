@@ -1,0 +1,15 @@
+### Vercel preview deployment: https://apexamplanner-git-issue-104-seo-metadata-jonat.vercel.app
+--- HEAD / ---
+HTTP/1.1 302 Found
+Content-Type: text/plain
+X-Robots-Tag: noindex
+X-Vercel-Id: cle1::6mcgv-1785557296833-098fdcddd4f6
+--- /robots.txt ---
+HTTP/1.1 302 Found
+Content-Type: text/plain
+X-Robots-Tag: noindex
+Redirecting...
+--- /sitemap.xml ---
+Redirecting...
+--- /opengraph-image.png ---
+status=302 type=text/plain bytes=15

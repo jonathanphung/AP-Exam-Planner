@@ -1,0 +1,37 @@
+=== title raw ===
+'AP Exam Planner — May 2027 AP exam dates and schedule'
+=== ld+json script count === 1
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "AP Exam Planner",
+  "url": "https://apexamplanner.vercel.app",
+  "description": "Plan your May 2027 AP exam schedule: official dates and sessions, portfolio deadlines, conflict detection, and calendar export.",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "Any modern web browser",
+  "browserRequirements": "Requires JavaScript.",
+  "inLanguage": "en",
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+canonical      : https://apexamplanner.vercel.app
+jsonld url     : https://apexamplanner.vercel.app
+url == canon   : True
+@type          : WebApplication
+--- data-rule scan (cycle label from CYCLE removed) ---
+ISO date       : none
+calendar year  : none
+percentage     : none
+date-ish keys  : none
+=== h1 count in prod HTML === 1
+h1 text        : ['AP Exam Planner']
+=== og source asset === 1200x630 263178 bytes sig-ok
+alt sidecar    : 'AP Exam Planner — "Plan your AP exams" beside a screenshot of the app\'s subject catalog with several AP courses selected.'
+=== AC6: files under src/ containing the bare host ===
+['src/lib/site.ts']
+=== repo-wide (excluding node_modules/.next/docs/e2e) ===
+['README.md', 'src/lib/site.ts']

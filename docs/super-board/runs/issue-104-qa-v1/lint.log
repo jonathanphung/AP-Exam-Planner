@@ -1,0 +1,17 @@
+
+> ap-exam-planner@0.1.0 lint C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-104-qa
+> eslint
+
+
+C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-104-qa\docs\super-board\runs\issue-39-sweep-v1\specs\11-misc-features.spec.ts
+  10:3  warning  'chipFor' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-104-qa\e2e\issue-51-qa.spec.ts
+  3:10  warning  'pressViewChip' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-104-qa\e2e\issue-84-qa.spec.ts
+  66:7  warning  'QUESTIONS' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  68:7  warning  'WEIGHT' is assigned a value but never used     @typescript-eslint/no-unused-vars
+
+✖ 4 problems (0 errors, 4 warnings)
+

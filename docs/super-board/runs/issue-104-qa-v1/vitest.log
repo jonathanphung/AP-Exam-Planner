@@ -1,0 +1,27 @@
+### pnpm test:unit
+> ap-exam-planner@0.1.0 test:unit C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-104-qa
+> vitest run src/lib
+
+
+ RUN  v4.1.9 C:/Users/jonat/repos/AP-Exam-Planner/AP-Exam-Planner/.worktrees/issue-104-qa
+
+
+ Test Files  20 passed (20)
+      Tests  294 passed (294)
+   Start at  23:18:09
+   Duration  2.95s (transform 3.49s, setup 0ms, import 12.26s, tests 1.05s, environment 5ms)
+
+
+### pnpm test:data
+> ap-exam-planner@0.1.0 test:data C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-104-qa
+> vitest run src/data
+
+
+ RUN  v4.1.9 C:/Users/jonat/repos/AP-Exam-Planner/AP-Exam-Planner/.worktrees/issue-104-qa
+
+
+ Test Files  7 passed (7)
+      Tests  110 passed (110)
+   Start at  23:18:14
+   Duration  1.23s (transform 664ms, setup 0ms, import 2.19s, tests 383ms, environment 1ms)
+
