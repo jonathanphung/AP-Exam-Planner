@@ -81,7 +81,9 @@ export function CatalogGrid() {
        *
        * Layout — at `sm` and up one row: search (fixed width, left), pills
        * (flex-1, horizontally scrollable — scrollbar chrome hidden, see #110),
-       * count pinned to the right edge.
+       * count pinned to the right edge. The pills/count boundary carries a
+       * DOUBLE gap (the bar's `gap-x-3` plus the nav's own `pr-3`) — see the
+       * nav's comment for why the single gap was not enough.
        * Below `sm` the row wraps INSIDE the same sticky box: full-width search
        * on line 1 (327px at 375px wide is a usable field; a one-row squeeze
        * would leave it ~120px), pills + count on line 2. DOM order is always
@@ -133,19 +135,40 @@ export function CatalogGrid() {
             (defined in globals.css, scoped to this list) hides the classic
             scrollbar track/thumb that issue #49's global custom-scrollbar
             styling would otherwise draw under this pinned bar on non-overlay
-            scrollbar platforms (e.g. Windows). */}
+            scrollbar platforms (e.g. Windows).
+
+            `pr-3` is the pills/count boundary fix (#110 pass 2). The count is
+            `shrink-0`, so every character it gains steals width from this
+            `flex-1` nav and walks the list's clip edge LEFT into whatever pill
+            happens to be there: at 1920px the row fits exactly through "9
+            selected" and the tenth selection sliced the rounded right edge off
+            "Career Kickstart", leaving a guillotined pill 12px from the count.
+            Padding on the nav (not a margin, and not padding on the `<ul>` —
+            end-padding on a scroll container travels with the scrolled content
+            instead of holding the edge open) shrinks the list's CONTENT box, so
+            the clip edge always stops 12px short of the nav's border box and
+            the bar's own `gap-x-3` adds another 12px before the count. 24px of
+            painted background between the two at every width and every count
+            value, with the nav's border box — what issue #102's overlap spec
+            measures — left where it was. */}
         {groups.length > 0 && (
           <nav
             aria-label="Jump to category"
-            className="sticky top-0 min-w-0 flex-1"
+            className="sticky top-0 min-w-0 flex-1 pr-3"
           >
             <ul className="catalog-quickjump-scroll flex gap-2 overflow-x-auto">
               {groups.map((group) => (
                 <li key={group.category} className="flex-none">
+                  {/* `px-3`, down from `px-4` (#110 pass 2): 8px off each pill
+                      is 40px back into the row across the five categories —
+                      enough that the desktop bar no longer sits one character
+                      of the count away from slicing a pill. `min-h-11` still
+                      carries the 44px target; the narrowest label ("Arts")
+                      stays ~51px wide, so nothing drops below it. */}
                   <button
                     type="button"
                     onClick={() => jumpToCategory(group.category)}
-                    className="inline-flex min-h-11 items-center whitespace-nowrap rounded-full border border-slate-300 bg-white px-4 py-1 text-sm text-slate-700 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                    className="inline-flex min-h-11 items-center whitespace-nowrap rounded-full border border-slate-300 bg-white px-3 py-1 text-sm text-slate-700 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
                   >
                     {group.category}
                   </button>
@@ -157,7 +180,12 @@ export function CatalogGrid() {
 
         {/* `ml-auto` is the fallback that pins the count to the bar's right
             edge in the no-matches state, where the flex-1 nav is gone and
-            nothing else would push it over. */}
+            nothing else would push it over.
+
+            The count deliberately carries NO padding of its own: its right
+            edge has to stay flush with the bar's content edge (issue #102
+            asserts that at 375px and 1920px), so the breathing room in front
+            of it lives on the nav instead — see `pr-3` above. */}
         <p
           aria-live="polite"
           className="ml-auto shrink-0 whitespace-nowrap text-sm font-medium text-slate-700 dark:text-slate-300"

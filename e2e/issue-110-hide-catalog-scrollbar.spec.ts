@@ -25,9 +25,49 @@ import { evidenceDir } from "./support/evidence";
  *
  * One observable test per AC, plus evidence screenshots of the sticky bar
  * with pills overflowing, light + dark, at the three standard viewports.
+ *
+ * ## Pass 2 — the pills/count boundary (bounce, 2026-08-01)
+ *
+ * Hiding the scrollbar took away the only thing that separated the clipped
+ * pill row from the "N selected" count, and the count is `shrink-0` inside a
+ * `flex-nowrap` bar: every character it gains steals width from the `flex-1`
+ * nav and walks the list's clip edge LEFT. At 1920px the five pills fitted
+ * exactly through "9 selected"; the tenth selection widened the count by ~5px
+ * and sliced the rounded right edge off "Career Kickstart", leaving a
+ * guillotined pill 12px from the count.
+ *
+ * The fix is spacing only: `pr-3` on the `<nav>` (holds the clip edge 12px
+ * inside the nav's border box, on top of the bar's own `gap-x-3`) and `px-3`
+ * instead of `px-4` on the pills (40px of row width back across the five
+ * categories). The AC9 block below is the regression: at 10 selected, the
+ * clip container and the count must not intersect and must keep a real gap,
+ * at every standard viewport in both themes.
  */
 
-const EVIDENCE_DIR = evidenceDir("issue-110-build-v1");
+const EVIDENCE_DIR = evidenceDir("issue-110-build-v2");
+
+/** Legacy selection key — the migration source the whole suite seeds through. */
+const SELECTION_KEY = "apx.selection.v1";
+
+/**
+ * Ten subject ids — the reported trigger ("whenever 10+ ap exams are
+ * selected"): the count's label goes double-digit and its slot grows.
+ */
+const TEN_SUBJECT_IDS = [
+  "african-american-studies",
+  "art-history",
+  "biology",
+  "business-with-personal-finance",
+  "calculus-ab",
+  "calculus-bc",
+  "chemistry",
+  "chinese-language-and-culture",
+  "comparative-government-and-politics",
+  "computer-science-a",
+] as const;
+
+/** Minimum painted background between the pill row's clip edge and the count. */
+const MIN_BOUNDARY_GAP = 16;
 
 const VIEWPORTS = [
   { name: "desktop", width: 1920, height: 1080 },
@@ -49,6 +89,69 @@ const quickJump = (page: Page) =>
 const pillList = (page: Page) => quickJump(page).locator("ul");
 const pills = (page: Page) => quickJump(page).getByRole("button");
 const search = (page: Page) => page.getByLabel("Search subjects");
+const count = (page: Page) => page.getByText(/^\d+ selected$/);
+
+/** Seed N selections before the app boots (legacy key → #29 migration path). */
+async function seedSelection(page: Page, ids: readonly string[]) {
+  await page.addInitScript(
+    ([key, value]) => window.localStorage.setItem(key, value),
+    [SELECTION_KEY, JSON.stringify(ids)] as const,
+  );
+}
+
+/**
+ * Geometry of the pills/count boundary, measured after hydration has settled
+ * the count to its seeded value.
+ *
+ * `clip` is the `<ul>`'s border box — the pill row's clip container, i.e. the
+ * rightmost pixel column any pill can paint into. `countBox` is the count
+ * paragraph. `worstPillOverlap` walks every pill, intersects it with the clip
+ * box (that intersection is the pill's *visible* part) and reports how far the
+ * rightmost visible pixel of any pill reaches past the count's left edge — it
+ * must stay negative.
+ */
+async function boundaryGeometry(page: Page) {
+  return page.evaluate(() => {
+    const header = document.querySelector(
+      "[data-testid='catalog-header']",
+    ) as HTMLElement;
+    const ul = header.querySelector(
+      "nav[aria-label='Jump to category'] ul",
+    ) as HTMLElement;
+    const countEl = [...header.querySelectorAll("p")].find((p) =>
+      /^\d+ selected$/.test((p.textContent ?? "").trim()),
+    ) as HTMLElement;
+
+    const clip = ul.getBoundingClientRect();
+    const countBox = countEl.getBoundingClientRect();
+
+    let worstPillRight = -Infinity;
+    for (const button of ul.querySelectorAll("button")) {
+      const pill = button.getBoundingClientRect();
+      // The pill's VISIBLE part: what survives the clip container.
+      const visibleRight = Math.min(pill.right, clip.right);
+      const visibleLeft = Math.max(pill.left, clip.left);
+      if (visibleRight <= visibleLeft) continue; // fully scrolled out of view
+      worstPillRight = Math.max(worstPillRight, visibleRight);
+    }
+
+    const headerStyle = getComputedStyle(header);
+    return {
+      countText: (countEl.textContent ?? "").trim(),
+      clipRight: clip.right,
+      countLeft: countBox.left,
+      countRight: countBox.right,
+      barContentRight:
+        header.getBoundingClientRect().right -
+        parseFloat(headerStyle.paddingRight),
+      gap: countBox.left - clip.right,
+      worstPillOverlap: worstPillRight - countBox.left,
+      overflowing: ul.scrollWidth > ul.clientWidth + 1,
+      scrollWidth: ul.scrollWidth,
+      clientWidth: ul.clientWidth,
+    };
+  });
+}
 
 const noPageHorizontalScroll = (page: Page) =>
   page.evaluate(
@@ -249,6 +352,129 @@ test("AC6 — scrollbar hiding is scoped to the pill list; the document scroller
 });
 
 // ---------------------------------------------------------------------------
+// AC9 (pass 2) — at 10+ selected the pill row's clip container and the count
+// never intersect and keep a real gap, at every standard viewport, both
+// themes. This is the bounce's regression test.
+// ---------------------------------------------------------------------------
+
+for (const vp of VIEWPORTS) {
+  for (const scheme of ["light", "dark"] as const) {
+    test(`AC9 — at 10 selected the pill row keeps a clear gap before the count (${vp.name} ${vp.width}x${vp.height}, ${scheme})`, async ({
+      browser,
+    }) => {
+      const ctx = await browser.newContext({
+        viewport: { width: vp.width, height: vp.height },
+        colorScheme: scheme,
+      });
+      const page = await ctx.newPage();
+      await seedSelection(page, TEN_SUBJECT_IDS);
+      await page.goto("/");
+      await expect(pills(page)).toHaveCount(5);
+      // Wait for hydration to settle the count to the seeded value — the
+      // server snapshot is always "0 selected", which is the NARROW case this
+      // test must not measure.
+      await expect(count(page)).toHaveText("10 selected");
+
+      const geo = await boundaryGeometry(page);
+
+      expect(
+        geo.gap,
+        `${vp.name}/${scheme}: painted background between the pill row's clip edge (${geo.clipRight}) and the count (${geo.countLeft}) must be ≥ ${MIN_BOUNDARY_GAP}px`,
+      ).toBeGreaterThanOrEqual(MIN_BOUNDARY_GAP);
+
+      expect(
+        geo.worstPillOverlap,
+        `${vp.name}/${scheme}: no pill's visible pixels may reach the count's left edge`,
+      ).toBeLessThan(0);
+
+      // The count stays fully visible and right-pinned — the fix must not have
+      // bought its gap by pushing the count off the bar's edge (issue #102).
+      expect(
+        Math.abs(geo.countRight - geo.barContentRight),
+        `${vp.name}/${scheme}: count must stay flush with the bar's content right edge`,
+      ).toBeLessThanOrEqual(1);
+
+      await ctx.close();
+    });
+  }
+}
+
+test("AC9 — growing the count from 9 to 10 selected does not slice a pill that was whole at 9 (1920x1080)", async ({
+  browser,
+}) => {
+  // The reported trigger, measured at the width where it was reported: the
+  // desktop bar used to fit the five pills exactly, so the count's extra digit
+  // walked the clip edge back into "Career Kickstart" and guillotined it.
+  const measure = async (ids: readonly string[], label: string) => {
+    const ctx = await browser.newContext({
+      viewport: { width: 1920, height: 1080 },
+    });
+    const page = await ctx.newPage();
+    await seedSelection(page, ids);
+    await page.goto("/");
+    await expect(pills(page)).toHaveCount(5);
+    await expect(count(page)).toHaveText(label);
+    const geo = await boundaryGeometry(page);
+    await ctx.close();
+    return geo;
+  };
+
+  const nine = await measure(TEN_SUBJECT_IDS.slice(0, 9), "9 selected");
+  const ten = await measure(TEN_SUBJECT_IDS, "10 selected");
+
+  expect(
+    nine.overflowing,
+    "premise: at 1920px the pill row fits without scrolling at 9 selected",
+  ).toBe(false);
+  expect(
+    ten.overflowing,
+    `at 1920px the tenth selection must not push the pill row into overflow (${ten.scrollWidth}px of pills in a ${ten.clientWidth}px list)`,
+  ).toBe(false);
+  expect(ten.gap).toBeGreaterThanOrEqual(MIN_BOUNDARY_GAP);
+});
+
+test("AC9 — the row is still scrollable at 10 selected, and the pills keep their ≥44px targets", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 667 });
+  await seedSelection(page, TEN_SUBJECT_IDS);
+  await page.goto("/");
+  await expect(pills(page)).toHaveCount(5);
+  await expect(count(page)).toHaveText("10 selected");
+
+  const before = await boundaryGeometry(page);
+  expect(
+    before.overflowing,
+    "premise: at 375px with 10 selected the pills still overflow their list",
+  ).toBe(true);
+
+  await pillList(page).evaluate((el) => {
+    el.scrollLeft = el.scrollWidth;
+  });
+  expect(
+    await pillList(page).evaluate((el) => el.scrollLeft),
+    "the narrowed row must still scroll",
+  ).toBeGreaterThan(0);
+
+  // …and scrolling to the end must not have pushed a pill onto the count.
+  const scrolled = await boundaryGeometry(page);
+  expect(scrolled.worstPillOverlap).toBeLessThan(0);
+  expect(scrolled.gap).toBeGreaterThanOrEqual(MIN_BOUNDARY_GAP);
+
+  // `px-3` (down from `px-4`) must not have taken any pill below the 44px
+  // tap-target floor the a11y suite enforces.
+  const widths = await pillList(page).evaluate((el) =>
+    [...el.querySelectorAll("button")].map(
+      (b) => b.getBoundingClientRect().width,
+    ),
+  );
+  for (const width of widths) {
+    expect(width, "every quick-jump pill stays ≥44px wide").toBeGreaterThanOrEqual(44);
+  }
+  expect(widths).toHaveLength(5);
+});
+
+// ---------------------------------------------------------------------------
 // Evidence — the sticky bar with pills overflowing, light + dark, at the
 // three standard viewports.
 // ---------------------------------------------------------------------------
@@ -267,6 +493,35 @@ for (const vp of VIEWPORTS) {
       await expect(pills(page)).toHaveCount(5);
       await page.screenshot({
         path: `${EVIDENCE_DIR}/${vp.name}-${scheme}.png`,
+        caret: "initial",
+      });
+      await ctx.close();
+    });
+  }
+}
+
+// Pass-2 evidence — the same bar at the reported repro state ("10 selected"),
+// cropped to the sticky header so the pills/count boundary is legible.
+for (const vp of VIEWPORTS) {
+  for (const scheme of ["light", "dark"] as const) {
+    test(`evidence — pills/count boundary at 10 selected (${vp.name} ${vp.width}x${vp.height}, ${scheme})`, async ({
+      browser,
+    }) => {
+      const ctx = await browser.newContext({
+        viewport: { width: vp.width, height: vp.height },
+        colorScheme: scheme,
+      });
+      const page = await ctx.newPage();
+      await seedSelection(page, TEN_SUBJECT_IDS);
+      await page.goto("/");
+      await expect(pills(page)).toHaveCount(5);
+      await expect(count(page)).toHaveText("10 selected");
+      await page.screenshot({
+        path: `${EVIDENCE_DIR}/${vp.name}-${scheme}-10-selected.png`,
+        caret: "initial",
+      });
+      await page.locator("[data-testid='catalog-header']").screenshot({
+        path: `${EVIDENCE_DIR}/${vp.name}-${scheme}-10-selected-bar.png`,
         caret: "initial",
       });
       await ctx.close();
