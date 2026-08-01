@@ -139,7 +139,7 @@ test.describe("issue #20 — decorative subject emoji everywhere the name shows"
     ).not.toContain(BIOLOGY_EMOJI);
   });
 
-  test("AC2 — emoji shows on schedule rows and the conflict prompt's subject list", async ({
+  test("AC2 — emoji shows on schedule rows and the conflict prompt's Move actions", async ({
     page,
   }) => {
     await page.goto("/");
@@ -154,13 +154,22 @@ test.describe("issue #20 — decorative subject emoji everywhere the name shows"
     await expect(schedule(page)).toContainText(BIOLOGY_EMOJI);
     await expect(schedule(page)).toContainText(ITALIAN_EMOJI);
 
-    // Conflict prompt is up, and its bulleted subject list carries the emoji.
+    // Conflict prompt is up, and each subject's Move action carries the emoji.
+    // Issue #111 folded the destination bullet list INTO the buttons, so the
+    // per-subject emoji moved from `ul > li` onto the action itself — and it
+    // stays aria-hidden, hence the plain name still resolves the button.
     await expect(conflictPrompt(page)).toContainText("Exam time conflict");
     await expect(
-      conflictPrompt(page).locator("ul > li").filter({ hasText: "AP Biology" }),
+      conflictPrompt(page)
+        .getByRole("button", { name: "Move AP Biology to late testing" })
+        .first(),
     ).toContainText(BIOLOGY_EMOJI);
     await expect(
-      conflictPrompt(page).locator("ul > li").filter({ hasText: "AP Italian Language and Culture" }),
+      conflictPrompt(page)
+        .getByRole("button", {
+          name: "Move AP Italian Language and Culture to late testing",
+        })
+        .first(),
     ).toContainText(ITALIAN_EMOJI);
   });
 

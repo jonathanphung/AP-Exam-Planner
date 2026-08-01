@@ -571,6 +571,17 @@ test.describe("AC3 — conflict + moved-to-late styles measure ≥ 4.5:1", () =>
         moveButton,
         `move-to-late-testing button (${scheme}) = ${moveButton.toFixed(2)}:1`,
       ).toBeGreaterThanOrEqual(4.5);
+      // Issue #111 gave the button a SECOND line (its late-testing
+      // destination) in a dimmer tint — measured separately against the same
+      // red fill, since the primary line's ratio says nothing about it.
+      const moveButtonDestination = await contrastRatio(
+        page,
+        '[data-testid="conflict-prompt"] div > button > span:last-child',
+      );
+      expect(
+        moveButtonDestination,
+        `move-to-late-testing destination line (${scheme}) = ${moveButtonDestination.toFixed(2)}:1`,
+      ).toBeGreaterThanOrEqual(4.5);
       await ctx.close();
 
       // Resolved double conflict → moved badge + late-late warning.
@@ -760,7 +771,9 @@ test.describe("AC4 — 375×667 layout", () => {
     await expect(dialog(conflict)).toBeVisible();
     await expectTapTarget(
       dialog(conflict)
-        .getByRole("button", { name: /^Move .* to late testing$/ })
+        // Issue #111 folded each button's destination onto a second line, so
+        // the accessible name continues past "… to late testing".
+        .getByRole("button", { name: /^Move .+ to late testing/ })
         .first(),
       "move-to-late-testing button",
     );

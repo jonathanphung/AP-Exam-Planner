@@ -293,11 +293,14 @@ test.describe("issue #101 QA — inverted conflict actions, independent verifica
 
     // Midway: the clicked subject is visibly moving, the prompt stays open,
     // two Move buttons remain, and NOTHING has been persisted yet.
+    // Issue #111 put the subject's emoji inside the phrase (via SubjectName)
+    // and its destination on a second line, so both matchers are loosened at
+    // exactly those two points — the wording either side is still pinned.
     await expect(page.getByTestId("conflict-moving-indicator")).toContainText(
-      `Moving ${TRIO[0].name} to late testing`,
+      new RegExp(`Moving .*${TRIO[0].name} to late testing`),
     );
     await expect(
-      prompt(page).getByRole("button", { name: /to late testing$/ }),
+      prompt(page).getByRole("button", { name: /^Move .+ to late testing/ }),
     ).toHaveCount(2);
     expect(await storedResolutions(page)).toHaveLength(0);
 

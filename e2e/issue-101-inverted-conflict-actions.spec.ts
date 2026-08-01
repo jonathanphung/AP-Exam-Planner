@@ -180,8 +180,10 @@ test.describe("issue #101 — inverted red actions: Move {subject} to late testi
     await moveButton(page, FRENCH.name).click();
     await expect(prompt(page)).toBeVisible();
     await expect(movingIndicator(page)).toHaveCount(1);
+    // Issue #111 put the subject's emoji inside the phrase (via SubjectName)
+    // and its destination on a second line; the wording is otherwise pinned.
     await expect(movingIndicator(page)).toContainText(
-      `Moving ${FRENCH.name} to late testing`,
+      new RegExp(`Moving .*${FRENCH.name} to late testing`),
     );
     await expect(moveButton(page, FRENCH.name)).toHaveCount(0);
     expect(await storedResolutions(page)).toHaveLength(0);
