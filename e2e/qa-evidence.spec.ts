@@ -1,5 +1,9 @@
 import { test, expect } from "@playwright/test";
 import { evidenceDir } from "./support/evidence";
+// Issue #104: the document title now carries the dataset's cycle label, so
+// this asserts against the layout's own constant instead of a literal that
+// would have to be re-edited on every annual swap.
+import { SITE_TITLE } from "../src/lib/site";
 
 /**
  * super-board QA (issue #1) — evidence spec.
@@ -50,7 +54,7 @@ for (const vp of viewports) {
     await page.goto("/");
 
     // Document title
-    await expect(page).toHaveTitle("AP Exam Planner");
+    await expect(page).toHaveTitle(SITE_TITLE);
 
     // Visible h1 header
     const h1 = page.getByRole("heading", { level: 1, name: "AP Exam Planner" });

@@ -1,0 +1,22 @@
+
+> ap-exam-planner@0.1.0 test:e2e C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-104-qa
+> playwright test "e2e/issue-104-seo.spec.ts" "e2e/issue-104-qa.spec.ts"
+
+
+Running 13 tests using 6 workers
+
+  ok  4 [chromium] › e2e\issue-104-qa.spec.ts:77:7 › issue #104 QA — SEO surfaces the AC spec does not pin › QA3: the PNG-export footer wordmark stays a bare host (19ms)
+  ok  7 [chromium] › e2e\issue-104-seo.spec.ts:108:7 › issue #104 — SEO metadata › AC1: the cycle label in the SEO copy comes from the dataset accessor (16ms)
+  ok  6 [chromium] › e2e\issue-104-seo.spec.ts:124:7 › issue #104 — SEO metadata › AC2: /robots.txt allows every agent and points at the sitemap (240ms)
+  ok  8 [chromium] › e2e\issue-104-seo.spec.ts:138:7 › issue #104 — SEO metadata › AC3: /sitemap.xml lists exactly the root URL (258ms)
+  ok  1 [chromium] › e2e\issue-104-qa.spec.ts:46:7 › issue #104 QA — SEO surfaces the AC spec does not pin › QA1: og:image:alt renders the sidecar text verbatim (4.7s)
+  ok 11 [chromium] › e2e\issue-104-seo.spec.ts:194:7 › issue #104 — SEO metadata › AC5: the JSON-LD states no date, deadline, or pass rate (9ms)
+  ok  9 [chromium] › e2e\issue-104-seo.spec.ts:149:7 › issue #104 — SEO metadata › AC4: the og:image resolves as a 1200x630 image (4.3s)
+  ok 10 [chromium] › e2e\issue-104-seo.spec.ts:169:7 › issue #104 — SEO metadata › AC5: exactly one WebApplication JSON-LD block, matching the canonical (4.3s)
+  ok  3 [chromium] › e2e\issue-104-qa.spec.ts:89:7 › issue #104 QA — SEO surfaces the AC spec does not pin › QA4: canonical, og:url, sitemap <loc>, and JSON-LD url are one string (4.7s)
+  ok 13 [chromium] › e2e\issue-104-seo.spec.ts:212:7 › issue #104 — SEO metadata › AC6: the production origin is written in exactly one source file (167ms)
+  ok  5 [chromium] › e2e\issue-104-qa.spec.ts:62:7 › issue #104 QA — SEO surfaces the AC spec does not pin › QA2: twitter:image points at the same asset as og:image (4.8s)
+  ok  2 [chromium] › e2e\issue-104-seo.spec.ts:59:7 › issue #104 — SEO metadata › AC1: head carries canonical, Open Graph, and Twitter card tags (5.2s)
+  ok 12 [chromium] › e2e\issue-104-seo.spec.ts:222:7 › issue #104 — SEO metadata › AC7: the page still has exactly one h1 and renders no new UI (1.8s)
+
+  13 passed (17.8s)

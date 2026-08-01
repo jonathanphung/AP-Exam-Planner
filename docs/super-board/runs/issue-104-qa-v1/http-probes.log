@@ -1,0 +1,26 @@
+### GET /robots.txt
+HTTP/1.1 200 OK
+content-type: text/plain
+--- body ---
+User-Agent: *
+Allow: /
+
+Sitemap: https://apexamplanner.vercel.app/sitemap.xml
+
+### GET /sitemap.xml
+HTTP/1.1 200 OK
+content-type: application/xml
+--- body ---
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url>
+<loc>https://apexamplanner.vercel.app</loc>
+</url>
+</urlset>
+
+### GET /opengraph-image.png (path replayed locally)
+HTTP/1.1 200 OK
+cache-control: public, max-age=0, must-revalidate
+content-type: image/png
+### GET /opengraph-image.png (no query)
+status=200 type=image/png bytes=263178

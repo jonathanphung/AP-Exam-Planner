@@ -75,11 +75,17 @@ pnpm build && pnpm start                       # serves on http://localhost:3000
 node scripts/capture-screenshots.mjs           # writes docs/screenshots/*.png
 ```
 
+The 1200×630 social preview card is composed from one of those screenshots by a second script. It needs no running server — re-run it after a branding change and commit the result:
+
+```bash
+node scripts/make-og-image.mjs                 # writes src/app/opengraph-image.png
+```
+
 ## Architecture
 
 A static Next.js (App Router) single-page app: no server, no database, no API routes. The bundled dataset is the only data source, so the whole app is prerendered and served as static files.
 
-- `src/app/`: the route, layout, and global styles.
+- `src/app/`: the route, layout, global styles, and the SEO file conventions (`robots.ts`, `sitemap.ts`, `opengraph-image.png`) — all prerendered at build time, so they add no runtime request.
 - `src/components/`: presentational UI (catalog, schedule views, dialogs, sidebar). Components stay dumb.
 - `src/lib/`: pure, unit-tested logic (the multi-schedule store, conflict detection, calendar layout, and the ICS / PNG / JSON / text exporters).
 - `src/data/`: `ap-2027.json` (the one swappable data file), `cycle.ts` (the single cycle-label accessor), `schema.ts` (zod validation + testing-window constants), and `sources.md` (citation URLs).

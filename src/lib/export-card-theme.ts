@@ -1,4 +1,5 @@
 import type { Category } from "../data/schema";
+import { SITE_HOST } from "./site";
 
 /**
  * Shared design tokens + DOM helpers for the designed PNG export cards (issue
@@ -123,7 +124,14 @@ export const NEUTRAL_ACCENT: Record<ExportTheme, string> = {
 export const FONT_STACK =
   'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
-export const DEFAULT_FOOTER_URL = "apexamplanner.vercel.app";
+/**
+ * Wordmark printed in the exported cards' footer.
+ *
+ * Issue #104: this used to be its own copy of the domain, so the SEO work
+ * would have moved the canonical URL while every exported PNG kept pointing at
+ * the old host. It now derives from the one origin constant.
+ */
+export const DEFAULT_FOOTER_URL = SITE_HOST;
 
 export type Style = Partial<CSSStyleDeclaration>;
 

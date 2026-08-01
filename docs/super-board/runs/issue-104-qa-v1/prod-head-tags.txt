@@ -1,0 +1,28 @@
+<!-- `pnpm build && PORT=3413 pnpm start` — SEO tags from the served production HTML -->
+
+<title>AP Exam Planner — May 2027 AP exam dates and schedule</title>
+<meta name="description" content="Plan your May 2027 AP exam schedule: official dates and sessions, portfolio deadlines, conflict detection, and calendar export."/>
+<meta name="application-name" content="AP Exam Planner"/>
+<link rel="canonical" href="https://apexamplanner.vercel.app"/>
+<meta property="og:title" content="AP Exam Planner — May 2027 AP exam dates and schedule"/>
+<meta property="og:description" content="Plan your May 2027 AP exam schedule: official dates and sessions, portfolio deadlines, conflict detection, and calendar export."/>
+<meta property="og:url" content="https://apexamplanner.vercel.app"/>
+<meta property="og:site_name" content="AP Exam Planner"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:image" content="https://apexamplanner.vercel.app/opengraph-image.png?opengraph-image.19gheut8cp-yh.png"/>
+<meta property="og:image:type" content="image/png"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="AP Exam Planner — &quot;Plan your AP exams&quot; beside a screenshot of the app&#x27;s subject catalog with several AP courses selected."/>
+<meta property="og:type" content="website"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="AP Exam Planner — May 2027 AP exam dates and schedule"/>
+<meta name="twitter:description" content="Plan your May 2027 AP exam schedule: official dates and sessions, portfolio deadlines, conflict detection, and calendar export."/>
+<meta name="twitter:image" content="https://apexamplanner.vercel.app/opengraph-image.png?opengraph-image.19gheut8cp-yh.png"/>
+<meta name="twitter:image:alt" content="AP Exam Planner — &quot;Plan your AP exams&quot; beside a screenshot of the app&#x27;s subject catalog with several AP courses selected."/>
+<meta name="twitter:image:type" content="image/png"/>
+<meta name="twitter:image:width" content="1200"/>
+<meta name="twitter:image:height" content="630"/>
+
+<!-- the single application/ld+json block (from <body>) -->
+{"@context":"https://schema.org","@type":"WebApplication","name":"AP Exam Planner","url":"https://apexamplanner.vercel.app","description":"Plan your May 2027 AP exam schedule: official dates and sessions, portfolio deadlines, conflict detection, and calendar export.","applicationCategory":"EducationalApplication","operatingSystem":"Any modern web browser","browserRequirements":"Requires JavaScript.","inLanguage":"en","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
