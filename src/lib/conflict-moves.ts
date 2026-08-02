@@ -20,7 +20,34 @@ import type { ApSubject } from "../data/schema";
  *
  * Everything here is pure so the translation is unit-testable without the
  * dialog (`conflict-moves.test.ts`, `pnpm test:unit`).
+ *
+ * Issue #109 adds the membership guard: an in-progress moving-set belongs to
+ * the exact set of members it was built against, so {@link conflictMembersKey}
+ * lets the dialog tell "same collision" from "different collision in the same
+ * slot" and drop a set that no longer applies.
  */
+
+/**
+ * Identity of a conflict's MEMBERSHIP, independent of member order (issue #109).
+ *
+ * Both hosts key `ConflictDialog` by the slot alone (`slotKey`), so a catalog
+ * selection change that adds or removes a member of an already-mounted
+ * collision keeps the same component instance — and with it the in-progress
+ * N≥3 moving-set. That set was built for a different member list: replaying it
+ * against the new one could leave every remaining member marked as moving,
+ * i.e. a prompt with zero Move buttons and no recordable keeper (the inline
+ * dead-end this helper exists to prevent).
+ *
+ * The dialog stores this key alongside the moving-set and treats a mismatch as
+ * "start over": the set is dropped and every member is offered a Move button
+ * again. Sorted, so a pure re-ordering of the same members is NOT a change and
+ * does not throw away the student's in-progress clicks. Ids are kebab-case
+ * (`schema.ts`) and can never contain the `|` separator, so distinct
+ * memberships can never collide on one key.
+ */
+export function conflictMembersKey(memberIds: readonly string[]): string {
+  return [...memberIds].sort().join("|");
+}
 
 /**
  * The members of a conflict group that can actually be moved — i.e. have a

@@ -1,0 +1,135 @@
+=== RED CHECK: issue-109 guard reverted in src/components/ConflictDialog.tsx ===
+$ const movingIds = moves.movingIds;   // guard removed
+
+Running 9 tests using 1 worker
+  x  1 [chromium] › e2e\issue-109-qa.spec.ts:211:7 › issue #109 QA — a mid-flow membership change can never dead-end the prompt › AC1 — churn invariant: move → shrink → re-grow → shrink again → re-grow → resolve, with an actionable prompt at EVERY step (6.3s)
+  ok 2 [chromium] › e2e\issue-109-qa.spec.ts:323:7 › issue #109 QA — a mid-flow membership change can never dead-end the prompt › AC1/AC3 — the guard is membership-scoped, not a blanket reset: churning an UNRELATED selection keeps the in-progress moving-set (issue #101's N≥3 flow) (1.5s)
+  x  3 [chromium] › e2e\issue-109-qa.spec.ts:376:7 › issue #109 QA — a mid-flow membership change can never dead-end the prompt › AC2 — the churn persists nothing, and the resolution finally recorded matches the CURRENT membership (survives reload) (30.1s)
+  x  4 [chromium] › e2e\issue-109-qa.spec.ts:449:9 › issue #109 QA — a mid-flow membership change can never dead-end the prompt › evidence — mid-flow shrink, before/after, at desktop 1920x1080 (6.5s)
+  x  5 [chromium] › e2e\issue-109-qa.spec.ts:449:9 › issue #109 QA — a mid-flow membership change can never dead-end the prompt › evidence — mid-flow shrink, before/after, at tablet 1024x768 (6.7s)
+  x  6 [chromium] › e2e\issue-109-qa.spec.ts:449:9 › issue #109 QA — a mid-flow membership change can never dead-end the prompt › evidence — mid-flow shrink, before/after, at mobile 375x667 (6.8s)
+  x  7 [chromium] › e2e\issue-109-stale-moving-set.spec.ts:111:7 › issue #109 — a mid-flow selection change never dead-ends the conflict prompt › AC1/AC2 — deselecting a NON-moving member restarts the flow: Move buttons return, nothing is persisted, and the next click resolves (6.2s)
+  ok 8 [chromium] › e2e\issue-109-stale-moving-set.spec.ts:163:7 › issue #109 — a mid-flow selection change never dead-ends the conflict prompt › AC2 — dismissal semantics unchanged: a shrinking collision does not re-raise the dismissed modal (1.1s)
+  ok 9 [chromium] › e2e\issue-109-stale-moving-set.spec.ts:185:7 › issue #109 — a mid-flow selection change never dead-ends the conflict prompt › AC1 — deselecting the MOVING member also leaves an actionable prompt (1.0s)
+  1) [chromium] › e2e\issue-109-qa.spec.ts:211:7 › issue #109 QA — a mid-flow membership change can never dead-end the prompt › AC1 — churn invariant: move → shrink → re-grow → shrink again → re-grow → resolve, with an actionable prompt at EVERY step 
+    Error: expect(locator).toHaveCount(expected) failed
+    Locator:  getByTestId('conflict-prompt').filter({ hasText: 'AP French Language and Culture' }).getByTestId('conflict-moving-indicator')
+    Expected: 0
+    Received: 1
+    Timeout:  5000ms
+    Call log:
+      - Expect "toHaveCount" with timeout 5000ms
+      - waiting for getByTestId('conflict-prompt').filter({ hasText: 'AP French Language and Culture' }).getByTestId('conflict-moving-indicator')
+        14 × locator resolved to 1 element
+           - unexpected value "1"
+      241 |     ).toBe("open");
+      242 |     // The stale set no longer applies, so the pair is fully actionable again.
+    > 243 |     await expect(movingIn(prompt())).toHaveCount(0);
+          |                                      ^
+      244 |     await expect(moveButtonsIn(prompt())).toHaveCount(2);
+      245 |     expect(await storedResolutions(page)).toHaveLength(0);
+      246 |
+        at C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-109-qa\e2e\issue-109-qa.spec.ts:243:38
+    Error Context: test-results\issue-109-qa-issue-109-QA--34ecf-onable-prompt-at-EVERY-step-chromium\error-context.md
+  2) [chromium] › e2e\issue-109-qa.spec.ts:376:7 › issue #109 QA — a mid-flow membership change can never dead-end the prompt › AC2 — the churn persists nothing, and the resolution finally recorded matches the CURRENT membership (survives reload) 
+    Test timeout of 30000ms exceeded.
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByTestId('conflict-prompt').filter({ hasText: 'AP French Language and Culture' }).getByRole('button', { name: 'Move AP French Language and Culture to late testing' })
+      409 |
+      410 |     // One deliberate click on the (now two-member) conflict resolves it.
+    > 411 |     await moveButtonFor(prompt(), FRENCH.name).click();
+          |                                                ^
+      412 |     await expect(promptNaming(page, FRENCH.name)).toHaveCount(0);
+      413 |
+      414 |     const stored = await storedResolutions(page);
+        at C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-109-qa\e2e\issue-109-qa.spec.ts:411:48
+    Error Context: test-results\issue-109-qa-issue-109-QA--cd9ce-membership-survives-reload--chromium\error-context.md
+  3) [chromium] › e2e\issue-109-qa.spec.ts:449:9 › issue #109 QA — a mid-flow membership change can never dead-end the prompt › evidence — mid-flow shrink, before/after, at desktop 1920x1080 
+    Error: expect(locator).toHaveCount(expected) failed
+    Locator:  getByTestId('conflict-prompt').filter({ hasText: 'AP French Language and Culture' }).getByTestId('conflict-moving-indicator')
+    Expected: 0
+    Received: 1
+    Timeout:  5000ms
+    Call log:
+      - Expect "toHaveCount" with timeout 5000ms
+      - waiting for getByTestId('conflict-prompt').filter({ hasText: 'AP French Language and Culture' }).getByTestId('conflict-moving-indicator')
+        14 × locator resolved to 1 element
+           - unexpected value "1"
+      468 |
+      469 |       await toggleCard(page, WORLD_HISTORY, false);
+    > 470 |       await expect(movingIn(prompt())).toHaveCount(0);
+          |                                        ^
+      471 |       await expect(moveButtonsIn(prompt())).toHaveCount(2);
+      472 |       await prompt().scrollIntoViewIfNeeded();
+      473 |       await page.screenshot({
+        at C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-109-qa\e2e\issue-109-qa.spec.ts:470:40
+    Error Context: test-results\issue-109-qa-issue-109-QA--dd65d--after-at-desktop-1920x1080-chromium\error-context.md
+  4) [chromium] › e2e\issue-109-qa.spec.ts:449:9 › issue #109 QA — a mid-flow membership change can never dead-end the prompt › evidence — mid-flow shrink, before/after, at tablet 1024x768 
+    Error: expect(locator).toHaveCount(expected) failed
+    Locator:  getByTestId('conflict-prompt').filter({ hasText: 'AP French Language and Culture' }).getByTestId('conflict-moving-indicator')
+    Expected: 0
+    Received: 1
+    Timeout:  5000ms
+    Call log:
+      - Expect "toHaveCount" with timeout 5000ms
+      - waiting for getByTestId('conflict-prompt').filter({ hasText: 'AP French Language and Culture' }).getByTestId('conflict-moving-indicator')
+        14 × locator resolved to 1 element
+           - unexpected value "1"
+      468 |
+      469 |       await toggleCard(page, WORLD_HISTORY, false);
+    > 470 |       await expect(movingIn(prompt())).toHaveCount(0);
+          |                                        ^
+      471 |       await expect(moveButtonsIn(prompt())).toHaveCount(2);
+      472 |       await prompt().scrollIntoViewIfNeeded();
+      473 |       await page.screenshot({
+        at C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-109-qa\e2e\issue-109-qa.spec.ts:470:40
+    Error Context: test-results\issue-109-qa-issue-109-QA--b7850-re-after-at-tablet-1024x768-chromium\error-context.md
+  5) [chromium] › e2e\issue-109-qa.spec.ts:449:9 › issue #109 QA — a mid-flow membership change can never dead-end the prompt › evidence — mid-flow shrink, before/after, at mobile 375x667 
+    Error: expect(locator).toHaveCount(expected) failed
+    Locator:  getByTestId('conflict-prompt').filter({ hasText: 'AP French Language and Culture' }).getByTestId('conflict-moving-indicator')
+    Expected: 0
+    Received: 1
+    Timeout:  5000ms
+    Call log:
+      - Expect "toHaveCount" with timeout 5000ms
+      - waiting for getByTestId('conflict-prompt').filter({ hasText: 'AP French Language and Culture' }).getByTestId('conflict-moving-indicator')
+        14 × locator resolved to 1 element
+           - unexpected value "1"
+      468 |
+      469 |       await toggleCard(page, WORLD_HISTORY, false);
+    > 470 |       await expect(movingIn(prompt())).toHaveCount(0);
+          |                                        ^
+      471 |       await expect(moveButtonsIn(prompt())).toHaveCount(2);
+      472 |       await prompt().scrollIntoViewIfNeeded();
+      473 |       await page.screenshot({
+        at C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-109-qa\e2e\issue-109-qa.spec.ts:470:40
+    Error Context: test-results\issue-109-qa-issue-109-QA--a7a8f-ore-after-at-mobile-375x667-chromium\error-context.md
+  6) [chromium] › e2e\issue-109-stale-moving-set.spec.ts:111:7 › issue #109 — a mid-flow selection change never dead-ends the conflict prompt › AC1/AC2 — deselecting a NON-moving member restarts the flow: Move buttons return, nothing is persisted, and the next click resolves 
+    Error: expect(locator).toHaveCount(expected) failed
+    Locator:  getByTestId('conflict-moving-indicator')
+    Expected: 0
+    Received: 1
+    Timeout:  5000ms
+    Call log:
+      - Expect "toHaveCount" with timeout 5000ms
+      - waiting for getByTestId('conflict-moving-indicator')
+        14 × locator resolved to 1 element
+           - unexpected value "1"
+      142 |       "Which exam will you move to late testing?",
+      143 |     );
+    > 144 |     await expect(movingIndicator(page)).toHaveCount(0);
+          |                                         ^
+      145 |     await expect(moveButton(page, FRENCH.name)).toBeVisible();
+      146 |     await expect(moveButton(page, PHYSICS2.name)).toBeVisible();
+      147 |
+        at C:\Users\jonat\repos\AP-Exam-Planner\AP-Exam-Planner\.worktrees\issue-109-qa\e2e\issue-109-stale-moving-set.spec.ts:144:41
+    Error Context: test-results\issue-109-stale-moving-set-c6f7b-and-the-next-click-resolves-chromium\error-context.md
+  6 failed
+    [chromium] › e2e\issue-109-qa.spec.ts:211:7 › issue #109 QA — a mid-flow membership change can never dead-end the prompt › AC1 — churn invariant: move → shrink → re-grow → shrink again → re-grow → resolve, with an actionable prompt at EVERY step 
+    [chromium] › e2e\issue-109-qa.spec.ts:376:7 › issue #109 QA — a mid-flow membership change can never dead-end the prompt › AC2 — the churn persists nothing, and the resolution finally recorded matches the CURRENT membership (survives reload) 
+    [chromium] › e2e\issue-109-qa.spec.ts:449:9 › issue #109 QA — a mid-flow membership change can never dead-end the prompt › evidence — mid-flow shrink, before/after, at desktop 1920x1080 
+    [chromium] › e2e\issue-109-qa.spec.ts:449:9 › issue #109 QA — a mid-flow membership change can never dead-end the prompt › evidence — mid-flow shrink, before/after, at tablet 1024x768 
+    [chromium] › e2e\issue-109-qa.spec.ts:449:9 › issue #109 QA — a mid-flow membership change can never dead-end the prompt › evidence — mid-flow shrink, before/after, at mobile 375x667 
+    [chromium] › e2e\issue-109-stale-moving-set.spec.ts:111:7 › issue #109 — a mid-flow selection change never dead-ends the conflict prompt › AC1/AC2 — deselecting a NON-moving member restarts the flow: Move buttons return, nothing is persisted, and the next click resolves 
+  3 passed (1.3m)
