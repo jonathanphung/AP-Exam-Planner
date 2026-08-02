@@ -2,6 +2,7 @@ import { test, expect, type Page } from "@playwright/test";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { resolve, relative, sep } from "node:path";
 import { CYCLE } from "../src/data/cycle";
+import { SUBJECTS, subjectPath } from "../src/lib/seo-subjects";
 import {
   SITE_DESCRIPTION,
   SITE_HOST,
@@ -135,7 +136,13 @@ test.describe("issue #104 — SEO metadata", () => {
     expect(body).not.toMatch(/^disallow:\s*\/\s*$/im);
   });
 
-  test("AC3: /sitemap.xml lists exactly the root URL", async ({ request }) => {
+  test("AC3: /sitemap.xml lists the root plus every subject page", async ({
+    request,
+  }) => {
+    // Originally "exactly the root URL"; issue #116 added one page per
+    // dataset subject, derived from the same SUBJECTS/subjectPath iteration
+    // the route and the footer index use — so this assertion still pins the
+    // sitemap to the full set of real routes and nothing else.
     const res = await request.get("/sitemap.xml");
     expect(res.status()).toBe(200);
     expect(res.headers()["content-type"]).toContain("xml");
@@ -143,7 +150,10 @@ test.describe("issue #104 — SEO metadata", () => {
     const locs = [...(await res.text()).matchAll(/<loc>([^<]+)<\/loc>/g)].map(
       (m) => m[1],
     );
-    expect(locs).toEqual([SITE_URL]);
+    expect(locs).toEqual([
+      SITE_URL,
+      ...SUBJECTS.map((subject) => `${SITE_URL}${subjectPath(subject.id)}`),
+    ]);
   });
 
   test("AC4: the og:image resolves as a 1200x630 image", async ({
@@ -171,11 +181,19 @@ test.describe("issue #104 — SEO metadata", () => {
   }) => {
     await page.goto("/");
 
+    // Originally the page's ONLY ld+json script; issue #116 added the FAQPage
+    // block beside it, so the invariant is now "exactly one WebApplication
+    // among the blocks" — the FAQ block has its own contract in
+    // e2e/issue-116-seo-followup.spec.ts.
     const scripts = page.locator('script[type="application/ld+json"]');
-    await expect(scripts).toHaveCount(1);
-
-    const raw = await scripts.textContent();
-    const jsonLd = JSON.parse(raw ?? "") as Record<string, unknown>;
+    const blocks = (await scripts.allTextContents()).map(
+      (raw) => JSON.parse(raw) as Record<string, unknown>,
+    );
+    const webApplications = blocks.filter(
+      (block) => block["@type"] === "WebApplication",
+    );
+    expect(webApplications).toHaveLength(1);
+    const jsonLd = webApplications[0];
     expect(jsonLd["@context"]).toBe("https://schema.org");
     expect(jsonLd["@type"]).toBe("WebApplication");
     expect(jsonLd.name).toBe(SITE_NAME);
@@ -219,7 +237,7 @@ test.describe("issue #104 — SEO metadata", () => {
     expect(carriers).toEqual([SITE_MODULE]);
   });
 
-  test("AC7: the page still has exactly one h1 and renders no new UI", async ({
+  test("AC7: the page still has exactly one h1, and JSON-LD renders zero pixels", async ({
     page,
   }) => {
     await page.goto("/");
@@ -228,9 +246,18 @@ test.describe("issue #104 — SEO metadata", () => {
     await expect(h1).toHaveCount(1);
     await expect(h1).toHaveText(SITE_NAME);
 
-    // The JSON-LD block is a script: present in the DOM, zero pixels on screen.
+    // JSON-LD blocks are scripts: present in the DOM, zero pixels on screen.
+    // Two since issue #116 (WebApplication + FAQPage), checked individually —
+    // a multi-match locator would trip Playwright's strict mode.
     const ld = page.locator('script[type="application/ld+json"]');
-    await expect(ld).toBeHidden();
-    expect(await ld.evaluate((el) => (el as HTMLElement).offsetHeight)).toBe(0);
+    const count = await ld.count();
+    expect(count).toBe(2);
+    for (let i = 0; i < count; i++) {
+      const script = ld.nth(i);
+      await expect(script).toBeHidden();
+      expect(
+        await script.evaluate((el) => (el as HTMLElement).offsetHeight),
+      ).toBe(0);
+    }
   });
 });

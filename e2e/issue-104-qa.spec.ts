@@ -2,6 +2,7 @@ import { test, expect, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { DEFAULT_FOOTER_URL } from "../src/lib/export-card-theme";
+import { SUBJECTS, subjectPath } from "../src/lib/seo-subjects";
 import { SITE_HOST, SITE_URL } from "../src/lib/site";
 
 /**
@@ -96,21 +97,32 @@ test.describe("issue #104 QA — SEO surfaces the AC spec does not pin", () => {
       .locator('head > link[rel="canonical"]')
       .getAttribute("href");
     const ogUrl = await metaContent(page, 'meta[property="og:url"]');
-    const jsonLd = JSON.parse(
-      (await page
-        .locator('script[type="application/ld+json"]')
-        .textContent()) ?? "",
-    ) as { url?: string };
+    // Issue #116 added the FAQPage block beside the WebApplication one — the
+    // `url` under test is the WebApplication's, selected by @type rather than
+    // by being the only script.
+    const blocks = (
+      await page.locator('script[type="application/ld+json"]').allTextContents()
+    ).map((raw) => JSON.parse(raw) as { "@type"?: string; url?: string });
+    const webApplication = blocks.find(
+      (block) => block["@type"] === "WebApplication",
+    );
+    expect(webApplication).toBeDefined();
 
     const sitemap = await request.get("/sitemap.xml");
     const locs = [...(await sitemap.text()).matchAll(/<loc>([^<]+)<\/loc>/g)].map(
       (m) => m[1],
     );
 
-    // One URL, byte-identical across all four surfaces — including the trailing
-    // slash (there is none).
-    expect(new Set([canonical, ogUrl, jsonLd.url, ...locs])).toEqual(
+    // One URL, byte-identical across all four ROOT surfaces — including the
+    // trailing slash (there is none). The sitemap's first <loc> is the root;
+    // issue #116 appended the subject pages after it, each derived from the
+    // same SITE_URL + subjectPath the route uses, so none of them can smuggle
+    // in a second origin or a trailing slash either.
+    expect(new Set([canonical, ogUrl, webApplication?.url, locs[0]])).toEqual(
       new Set([SITE_URL]),
+    );
+    expect(locs.slice(1)).toEqual(
+      SUBJECTS.map((subject) => `${SITE_URL}${subjectPath(subject.id)}`),
     );
   });
 });
