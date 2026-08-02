@@ -103,6 +103,15 @@ const lanePrompt = (lane, card, pass) => rootPreamble + [
   `- status=blocked or human-gate → you wrote the Block template and moved the card to Blocked`,
   `- status=failed    → you could not complete the lifecycle (say why in detail)`,
   `column = the column the card is in when you exit. detail = one line. Include prUrl/branch when they exist.`,
+  ``,
+  `EXIT CONTRACT — your LAST action must be the StructuredOutput call. You are a headless`,
+  `workflow agent: the moment you end your turn you are terminated — there is no user to wait`,
+  `for, and Monitor/background-task notifications will NOT revive you afterward. Never end your`,
+  `turn to "wait" for a background test run: keep issuing tool calls (re-check the task's output`,
+  `file, review diffs, gh pr checks) until it finishes — notifications land between tool calls —`,
+  `then report. If the run genuinely cannot finish within your session, report status=failed (or`,
+  `bounce/block per your lifecycle gates) with what you observed; a reported exit is always`,
+  `better than a dropped card.`,
 ].join('\n')
 
 // Run-tier model ladders. Card complexity indexes into the active ladder;
@@ -122,15 +131,59 @@ const tierFor = (cls) => (cls ? ladder[cls.complexity] : undefined)
 // The classify router writes no code — haiku is fine except on --high runs.
 const classifyModel = (input.tier || 'medium') === 'high' ? 'sonnet' : 'haiku'
 
+// Read-only fallback for a lane agent that ended without a structured result
+// (observed twice: the agent parks the e2e suite in a background task, ends its
+// turn to "wait" for the Monitor notification, and is finalized mid-wait with
+// no StructuredOutput — wf_6abe700e #101/QA, wf_bb406c13 #111/review). The
+// lane's board/PR side effects are real but unreported, so a cheap observer
+// reads the board and reports the outcome instead of the stage throwing and
+// dropping the card from the wave summary. Observation is not product work,
+// and it runs as an agent — the orchestrator contract stays intact.
+const reconcilePrompt = (lane, card) => rootPreamble + [
+  `You are the reconciler for a super-board wave (workflow-wave backend). The ${LANE[lane].section}`,
+  `lane agent for issue #${card.number} ("${card.title}") ended without reporting a structured result,`,
+  `so its board/PR side effects are unknown. Do NOT redo, continue, or clean up its work — observe`,
+  `and report ONLY, using read-only commands: gh issue view #${card.number} (with comments), the`,
+  `linked PR if any (gh pr view: state, comments, review threads), and the project card's current`,
+  `column (gh project item-list; project config: ${input.configPath}). Judge how far the`,
+  `${LANE[lane].section} lifecycle (.claude/skills/super-board/references/run.md) actually got,`,
+  `then report via structured output:`,
+  `- status=advanced  → the card was moved forward (Building→QA, QA→Review, Review→Done/merged)`,
+  `- status=bounced   → the card was moved backward (QA fail → Ready, Reviewer bounce → Ready/QA)`,
+  `- status=blocked or human-gate → the Block template was posted and the card moved to Blocked`,
+  `- status=failed    → the lifecycle visibly did not finish (card still in its lane column,`,
+  `  exit comments missing) — set column to where the card sits now and describe the evidence.`,
+  `column = the card's current column. detail = one line. Include prUrl/branch when they exist.`,
+  `Your LAST action must be the StructuredOutput call — do not end your turn without it.`,
+].join('\n')
+
 const runLane = async (lane, card, model, history, pass) => {
+  // agent() throws when the lane agent finishes without calling
+  // StructuredOutput; without the catch that throw propagates out of the
+  // pipeline stage and silently drops the card. Null (skipped/API-dead
+  // agent) gets the same reconciliation — partial side effects are possible
+  // there too.
   const r = await agent(lanePrompt(lane, card, pass), {
     label: `${lane}:#${card.number}` + (pass > 1 ? `:pass${pass}` : ''),
     phase: LANE[lane].phase,
     schema: STAGE_SCHEMA,
     ...(model ? { model } : {}),
-  })
-  const result = r || { status: 'failed', column: 'unknown', detail: `${lane} agent returned no result` }
-  history.push({ lane, ...result })
+  }).catch(() => null)
+  let result = r
+  let reconciled = false
+  if (!result) {
+    log(`${lane}:#${card.number}: lane agent returned no structured result — dispatching read-only reconciler`)
+    result = await agent(reconcilePrompt(lane, card), {
+      label: `reconcile:${lane}:#${card.number}`,
+      phase: LANE[lane].phase,
+      schema: STAGE_SCHEMA,
+      model: 'sonnet',
+    }).catch(() => null)
+    reconciled = !!result
+  }
+  result = result ||
+    { status: 'failed', column: 'unknown', detail: `${lane} agent returned no result and the reconciler could not determine the outcome` }
+  history.push({ lane, reconciled, ...result })
   return result
 }
 
@@ -139,12 +192,15 @@ const results = await pipeline(
   // Stage 1: classify cards entering at Ready (router for model tiering)
   async (card) => {
     if (card.status !== 'Ready') return { card, cls: null }
+    // .catch: a router that dies or skips StructuredOutput must not throw the
+    // stage and drop the card — cls null just means the lane inherits the
+    // session model (graceful degrade, never a weaker model).
     const cls = await agent(
       rootPreamble +
       `Read GitHub issue #${card.number} ("${card.title}") — body and all comments — using gh issue view. ` +
       `Classify it: kind (feature|bug|docs|chore) and complexity (low|medium|high) judged by the scope of code change required.`,
       { label: `classify:#${card.number}`, phase: 'Classify', model: classifyModel, schema: CLASSIFY_SCHEMA }
-    )
+    ).catch(() => null)
     return { card, cls }
   },
   // Stage 2: lane chain — entry point depends on the card's current column.

@@ -89,7 +89,11 @@ Repeat until a done condition or halt gate fires:
    otherwise (sonnet/opus/session — the default). A `model_tier` key in the
    config sets the default; an explicit flag wins over config.
 5. **Reconcile** (when the run completes) — read the returned `cards`
-   summary. For EVERY card in the wave, release the assignee
+   summary. The wave script self-heals lane agents that end without a
+   structured result: a read-only `reconcile:<lane>:#N` agent reads the
+   board/PR state and reports the lane outcome, so such cards stay in the
+   summary (their history entries carry `reconciled: true`) instead of
+   silently dropping. For EVERY card in the wave, release the assignee
    (`gh issue edit <n> --remove-assignee <bot_identity>`, idempotent).
    Append one line per card to the run manifest
    `docs/super-board/runs/<date>-<slug>.md`:
