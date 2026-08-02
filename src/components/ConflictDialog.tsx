@@ -3,7 +3,7 @@
 import { useId, useRef, useState } from "react";
 import type { ApSubject } from "@/data/schema";
 import type { ConflictGroup } from "@/lib/conflicts";
-import { keeperAfterMoves } from "@/lib/conflict-moves";
+import { conflictMembersKey, keeperAfterMoves } from "@/lib/conflict-moves";
 import { conflictActionRows } from "@/lib/conflict-rows";
 import { formatDateLabel } from "@/lib/schedule";
 import { useModalDialog } from "@/lib/modal";
@@ -43,6 +43,19 @@ import { SubjectName } from "@/components/SubjectName";
  *     `onKeep` fires through the same pathway. The in-progress moving-set is
  *     component state only — dismissing the modal midway discards it (nothing
  *     is persisted) and the conflict stays unresolved.
+ *
+ * The moving-set is scoped to the MEMBERSHIP it was built against (issue
+ * #109). Both hosts key this component by `slotKey` alone, so a catalog
+ * selection change that adds or drops a member of an already-mounted collision
+ * re-renders the SAME instance with a different `group.subjectIds`. Replaying
+ * a stale set against the new membership could mark every remaining member as
+ * moving, leaving the inline prompt with zero Move buttons and no recordable
+ * keeper — a dead end (nothing was ever persisted, but the student had no way
+ * to finish). So the set is stored with a `conflictMembersKey` and is used
+ * only while that key still matches: a membership change restarts the flow
+ * with every Move button offered again. Deriving it (rather than remounting on
+ * a membership-aware key) keeps `dismissed` intact, so shrinking a collision
+ * never re-raises a modal the student already dismissed.
  *
  * Two presentation states share the same prompt body (and the same
  * `data-testid="conflict-prompt"` contract from issue #5's QA suite):
@@ -227,6 +240,15 @@ function ConflictBody({
 
 const NO_MOVES: ReadonlySet<string> = new Set();
 
+/**
+ * In-progress moving-set, tagged with the membership it was built against
+ * (issue #109) so a mid-flow selection change can invalidate it.
+ */
+interface MoveState {
+  membersKey: string;
+  movingIds: ReadonlySet<string>;
+}
+
 export function ConflictDialog({
   group,
   subjectsById,
@@ -238,7 +260,19 @@ export function ConflictDialog({
   const [dismissed, setDismissed] = useState(false);
   // In-progress moving-set for the N≥3 one-at-a-time flow (issue #101).
   // Component state only — never persisted until it implies a keeper.
-  const [movingIds, setMovingIds] = useState<ReadonlySet<string>>(NO_MOVES);
+  const membersKey = conflictMembersKey(group.subjectIds);
+  const [moves, setMoves] = useState<MoveState>(() => ({
+    membersKey,
+    movingIds: NO_MOVES,
+  }));
+
+  // Issue #109: the stored set applies only to the membership it was built
+  // for. A catalog change that adds or drops a member of this same slot keeps
+  // the component mounted, so the set is dropped here instead — derived, not
+  // an effect, so there is no extra render and nothing is ever persisted on
+  // the student's behalf. The flow simply restarts with every Move button.
+  const movingIds =
+    moves.membersKey === membersKey ? moves.movingIds : NO_MOVES;
 
   const handleMove = (movedId: string) => {
     const next = new Set(movingIds).add(movedId);
@@ -249,7 +283,7 @@ export function ConflictDialog({
       onKeep(keeperId);
       return;
     }
-    setMovingIds(next);
+    setMoves({ membersKey, movingIds: next });
   };
 
   const body = (
@@ -270,7 +304,7 @@ export function ConflictDialog({
         // Dismissing midway discards any partial moving-set: the conflict
         // stays unresolved and the inline prompt re-offers every Move button.
         setDismissed(true);
-        setMovingIds(NO_MOVES);
+        setMoves({ membersKey, movingIds: NO_MOVES });
         onDismiss?.();
       }}
     >
