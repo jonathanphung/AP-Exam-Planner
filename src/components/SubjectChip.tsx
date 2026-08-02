@@ -116,14 +116,16 @@ export function SubjectChip({
   const slotLabel = (slot: { date: string; session: Session }) =>
     `${formatSlotDate(slot.date)} · ${slot.session} (${sessionStartTimes[slot.session]})`;
 
-  // scroll-mt clears the sticky quick-jump bar when the chip is scrolled
-  // back into view from below (e.g. keyboard focus or test automation).
-  // The className is deliberately state-independent: expanding must not
-  // change the card's width or grid footprint (vertical-only growth — the
-  // section grid is `items-start`, so the card grows downward in its cell
-  // and only pushes rows below).
+  // scroll-mt would clear the sticky catalog header, but native focus-driven
+  // scrolling (Tab/Shift+Tab) reads scroll-margin from the FOCUSED element,
+  // never from an ancestor — so it has to live on every focusable button in
+  // this chip (issue #108), not on the <li> wrapper. Same two heights as
+  // CategorySection's heading (`scroll-mt-32 sm:scroll-mt-20`): ~113px below
+  // `sm` (the condensed two-row header), ~61px at `sm`+.
+  const focusScrollMargin = "scroll-mt-32 sm:scroll-mt-20";
+
   return (
-    <li className="min-w-0 max-w-full scroll-mt-20">
+    <li className="min-w-0 max-w-full">
       <div
         className={[
           "flex flex-col overflow-hidden rounded-xl border transition",
@@ -154,6 +156,7 @@ export function SubjectChip({
             aria-pressed={selected}
             onClick={() => onToggle(subject.id)}
             className={[
+              focusScrollMargin,
               "flex min-h-14 min-w-0 flex-1 items-center gap-1.5 px-3 py-2 text-left text-sm font-medium transition",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500",
               selected
@@ -191,6 +194,7 @@ export function SubjectChip({
             aria-label={`Show exam dates for ${subject.name}`}
             onClick={() => setExpanded((open) => !open)}
             className={[
+              focusScrollMargin,
               "flex min-h-11 w-11 flex-none items-center justify-center border-l transition",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500",
               selected
@@ -279,7 +283,10 @@ export function SubjectChip({
             onClick={() => onShowDetails(subject)}
             aria-haspopup="dialog"
             aria-label={`View exam details for ${subject.name}`}
-            className="mt-3 flex min-h-11 w-full items-center justify-center gap-1 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
+            className={[
+              focusScrollMargin,
+              "mt-3 flex min-h-11 w-full items-center justify-center gap-1 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800",
+            ].join(" ")}
           >
             Full exam details
             <svg
