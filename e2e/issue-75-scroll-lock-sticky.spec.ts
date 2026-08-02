@@ -326,7 +326,15 @@ for (const { viewport, depth } of DEPTH_CASES) {
     const opener = page.getByRole("button", { name: "Delete Schedule 2" });
     await expect(opener).toBeVisible();
 
-    const landedAt = await scrollDeep(page, depth);
+    // Issue #116 put real content below the sidebar's sticky range (the FAQ
+    // at the bottom of the planner column, the footer's subject index), so
+    // the deepest scroll can now carry a sidebar-hosted opener off-viewport —
+    // the exact hazard scrollDeepWithOpenerVisible exists for: without it,
+    // click()'s implicit scroll-into-view invalidates every baseline below.
+    // "page bottom" therefore means "the deepest scroll at which the opener
+    // is still on screen", the deepest depth this assertion was ever
+    // meaningful at.
+    const landedAt = await scrollDeepWithOpenerVisible(page, opener, depth);
     expect(landedAt).toBeGreaterThan(200);
 
     const before = await sidebarBox(page);
@@ -416,6 +424,10 @@ test.describe("AC2 — the lock still blocks every input path", () => {
 
     // Control: with no dialog open, every one of these gestures really does move
     // the page — otherwise the locked assertions below would pass vacuously.
+    // The gesture is RE-SENT inside the retry (issue #116): a single delivery
+    // can race dev-mode hydration/focus and land on a page not yet listening,
+    // which is a harness hazard, not a product one. The locked loop below
+    // stays single-shot — the lock must hold against every delivered gesture.
     for (const [label, gesture] of gestures) {
       await page.evaluate(() => window.scrollTo(0, 600));
       // Keyboard scrolling needs focus on the document, not on a control.
@@ -423,16 +435,19 @@ test.describe("AC2 — the lock still blocks every input path", () => {
         (document.activeElement as HTMLElement)?.blur(),
       );
       const from = await scrollY(page);
-      await gesture();
-      await expect
-        .poll(() => scrollY(page), {
-          message: `control: ${label} did not scroll the unlocked page`,
-        })
-        .not.toBe(from);
+      await expect(async () => {
+        await gesture();
+        expect(
+          await scrollY(page),
+          `control: ${label} did not scroll the unlocked page`,
+        ).not.toBe(from);
+      }).toPass();
     }
 
-    // Locked: the same gestures, with the dialog open.
-    const landedAt = await scrollDeep(page);
+    // Locked: the same gestures, with the dialog open. Opener-visible scroll
+    // for the same #116 reason as the AC1 depth cases above: the baseline
+    // must be sampled after click() has nothing left to scroll.
+    const landedAt = await scrollDeepWithOpenerVisible(page, opener);
     expect(landedAt).toBeGreaterThan(200);
     const dialog = page.getByRole("dialog", { name: /Delete .Schedule 2./ });
     await expect(async () => {
@@ -440,13 +455,27 @@ test.describe("AC2 — the lock still blocks every input path", () => {
       await expect(dialog).toBeVisible({ timeout: 1000 });
     }).toPass();
 
+    // Space is excluded HERE while staying in the control loop above. With a
+    // dialog open the focus trap keeps focus on the dialog's controls
+    // (modal.ts focuses the first focusable — the Cancel button), and Space
+    // on a focused button is ACTIVATION, not scrolling: it clicks Cancel,
+    // closes the dialog, and every later iteration then runs against an
+    // unlocked page. Pre-#116 that hole was invisible — the page was short
+    // enough that landedAt was its last scrollable pixel, so the post-close
+    // gestures "held" only because a page resting on its bottom cannot
+    // scroll down. #116 made the page taller, landedAt stopped being the
+    // bottom, and the vacuous pass became a real failure. The visibility
+    // guard below fails loudly if any remaining gesture ever closes the
+    // dialog, so this can never go vacuously green again.
     for (const [label, gesture] of gestures) {
+      if (label === "Space") continue;
       await gesture();
       await page.waitForTimeout(120);
       expect(
         await scrollY(page),
         `${label} scrolled the background while the dialog was open`,
       ).toBe(landedAt);
+      await expect(dialog, `${label} closed the dialog`).toBeVisible();
     }
 
     // …and the lock is released on close: the page scrolls again. Upward —
@@ -455,12 +484,18 @@ test.describe("AC2 — the lock still blocks every input path", () => {
     await page.keyboard.press("Escape");
     await expect(dialog).toBeHidden();
     await page.mouse.move(700, 500);
-    await page.mouse.wheel(0, -200);
-    await expect
-      .poll(() => scrollY(page), {
-        message: "the page did not scroll again after the dialog closed",
-      })
-      .not.toBe(landedAt);
+    // Re-sent inside the retry (issue #116): `toBeHidden` can be true a beat
+    // before the unlock cleanup runs, and a single wheel delivered into that
+    // gap is swallowed forever — the poll then times out on a lock that DID
+    // release. A lock that never releases still fails: no number of wheels
+    // moves a clipped page.
+    await expect(async () => {
+      await page.mouse.wheel(0, -200);
+      expect(
+        await scrollY(page),
+        "the page did not scroll again after the dialog closed",
+      ).not.toBe(landedAt);
+    }).toPass();
   });
 });
 

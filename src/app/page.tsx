@@ -1,4 +1,5 @@
 import { CatalogGrid } from "@/components/CatalogGrid";
+import { Faq } from "@/components/Faq";
 import { ScheduleViews } from "@/components/ScheduleViews";
 import { Sidebar } from "@/components/Sidebar";
 
@@ -32,6 +33,16 @@ export default function Home() {
       >
         <CatalogGrid />
         <ScheduleViews />
+        {/* FAQ (issue #116) — INSIDE the shell's main column, deliberately.
+            The sticky sidebar's containing block is this shell, and the
+            sticky/scroll-lock specs (#29/#60/#75) derive their scroll targets
+            from the invariant "the shell's content box ends where the site
+            footer begins". Content BETWEEN the shell and the footer breaks
+            that boundary and unpins the sidebar a FAQ-height early; inside
+            the column the FAQ extends the shell instead, so the boundary
+            stays true. Server component: its copy and FAQPage JSON-LD ship
+            in the crawlable HTML. */}
+        <Faq />
       </main>
     </div>
   );

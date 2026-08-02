@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Footer } from "@/components/Footer";
 import {
+  BING_SITE_VERIFICATION,
+  GOOGLE_SITE_VERIFICATION,
   SITE_DESCRIPTION,
   SITE_NAME,
   SITE_TITLE,
@@ -44,6 +46,17 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
+  },
+  /*
+   * Verification tags (issue #116): each spread contributes its key only when
+   * the env var is set, so an unset variable renders no tag rather than an
+   * empty one. See the constants' doc in `src/lib/site.ts` for the rollout.
+   */
+  verification: {
+    ...(GOOGLE_SITE_VERIFICATION ? { google: GOOGLE_SITE_VERIFICATION } : undefined),
+    ...(BING_SITE_VERIFICATION
+      ? { other: { "msvalidate.01": BING_SITE_VERIFICATION } }
+      : undefined),
   },
 };
 

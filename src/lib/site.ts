@@ -1,4 +1,7 @@
-import { CYCLE } from "@/data/cycle";
+// Relative import (not `@/`): issue #116 put this module on the vitest path
+// (faq.ts / seo-subjects.ts import it), and vitest has no path-alias config —
+// matches the other lib modules' convention.
+import { CYCLE } from "../data/cycle";
 
 /**
  * The one place the app names itself and its own origin (issue #104).
@@ -54,6 +57,22 @@ export const SITE_TITLE = `${SITE_NAME} — ${CYCLE} AP exam dates and schedule`
 
 /** Meta description, shared verbatim with `og:description` and the JSON-LD. */
 export const SITE_DESCRIPTION = `Plan your ${CYCLE} AP exam schedule: official dates and sessions, portfolio deadlines, conflict detection, and calendar export.`;
+
+/**
+ * Search-engine verification tokens (issue #116) — build-time env, never a
+ * committed literal. Unset (every local build, and production until the user
+ * creates the Search Console / Bing Webmaster accounts) means the
+ * corresponding `<meta>` tag is not rendered at all. Rollout is: paste the
+ * token into Vercel → Settings → Environment Variables and redeploy — no code
+ * edit. `msvalidate.01` is Bing's tag name; Next's `verification` field has no
+ * first-class `bing` key, so the layout carries it under `other`.
+ *
+ * Read here (the module every SEO surface already imports) rather than inline
+ * in the layout so the e2e spec can assert the wiring without duplicating the
+ * env-var names.
+ */
+export const GOOGLE_SITE_VERIFICATION = process.env.GOOGLE_SITE_VERIFICATION;
+export const BING_SITE_VERIFICATION = process.env.BING_SITE_VERIFICATION;
 
 /**
  * `WebApplication` structured data for the site (one `application/ld+json`

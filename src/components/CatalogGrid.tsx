@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import apData from "@/data/ap-2027.json";
 import { type ApDataset, type ApSubject, type Category } from "@/data/schema";
 import { useSelection } from "@/lib/selection";
@@ -57,6 +57,7 @@ export function CatalogGrid() {
   const { isSelected, toggle, selectedCount } = useSelection();
   const [query, setQuery] = useState("");
   const [detailsSubject, setDetailsSubject] = useState<ApSubject | null>(null);
+  const headerRef = useRef<HTMLDivElement | null>(null);
 
   // Grouped in canonical category order with empty categories dropped; the
   // same trimmed case-insensitive name match at every width.
@@ -64,6 +65,31 @@ export function CatalogGrid() {
     () => groupSubjectsByCategory(SUBJECTS, query),
     [query],
   );
+
+  // Issue #116 guard for issue #102's invariant ("the catalog's whole control
+  // surface survives filtering"). The page now has real content below the
+  // catalog (the FAQ in this column, the footer's subject index), so when a
+  // query collapses the catalog from a deep scroll the document no longer
+  // shrinks under the viewport — the browser's scroll clamp used to pull the
+  // viewport back to the bar, and now it can leave it stranded below the
+  // section with the sticky bar pinned to the section's bottom edge, above
+  // the viewport. If a query CHANGE left the bar off the top, scroll the
+  // catalog back under it (instant, so no reduced-motion concern).
+  //
+  // `rescuedFor` gates the effect to real query changes: the mount run must
+  // never fire, because a reader who loads the page and scrolls straight to
+  // the footer before hydration completes would otherwise be yanked back up
+  // to the catalog the moment the effect first runs.
+  const rescuedFor = useRef(query);
+  useEffect(() => {
+    if (rescuedFor.current === query) return;
+    rescuedFor.current = query;
+    const header = headerRef.current;
+    if (!header) return;
+    if (header.getBoundingClientRect().top < -1) {
+      (header.closest("section") ?? header).scrollIntoView({ block: "start" });
+    }
+  }, [query]);
 
   return (
     <section aria-label="Subject catalog" className="flex flex-col gap-6">
@@ -95,6 +121,7 @@ export function CatalogGrid() {
        * moment a query matched nothing, i.e. exactly when the user needs it to
        * clear the query. */}
       <div
+        ref={headerRef}
         data-testid="catalog-header"
         className="sticky top-0 z-30 -mx-6 flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-slate-200 bg-white/95 px-6 py-2 backdrop-blur-sm sm:mx-0 sm:flex-nowrap sm:px-0 dark:border-slate-800 dark:bg-slate-950/95"
       >

@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { CYCLE } from "@/data/cycle";
 import { SupportLinks } from "@/components/SupportLinks";
+import { SUBJECTS, subjectPath } from "@/lib/seo-subjects";
 
 /**
  * Site-wide footer: the support pair (mobile/tablet), data attribution, and a
@@ -36,6 +38,35 @@ export function Footer() {
       className="mt-auto border-t border-slate-200 dark:border-slate-800"
     >
       <div className="mx-auto flex max-w-5xl flex-col items-center px-6 py-6 text-center text-xs text-slate-600 dark:text-slate-400">
+        {/* Subject-page index (issue #116): the crawlable path from every
+            page's server-rendered HTML to all 43 per-subject pages — a search
+            engine that never executes the app can still discover every route.
+            Iterates the same SUBJECTS/subjectPath the route and sitemap use,
+            so the three surfaces cannot list different pages. Spacing-only
+            separation from the attribution block below, per this footer's
+            no-manufactured-rules convention (#60). */}
+        <nav
+          aria-label="AP subject pages"
+          data-testid="footer-subject-index"
+          className="mb-5 w-full"
+        >
+          <p className="font-medium text-slate-700 dark:text-slate-300">
+            {`${CYCLE} AP exam dates by subject`}
+          </p>
+          <ul className="mt-2 flex flex-wrap justify-center gap-x-3 gap-y-1.5">
+            {SUBJECTS.map((subject) => (
+              <li key={subject.id}>
+                <Link
+                  href={subjectPath(subject.id)}
+                  className="rounded-sm hover:text-slate-900 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:hover:text-slate-100 dark:focus-visible:outline-blue-400"
+                >
+                  {subject.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
         <div className="flex flex-col gap-1">
           <p className="break-words">
             {`Data: College Board AP calendar and score-distribution reports — ${CYCLE} cycle`}
